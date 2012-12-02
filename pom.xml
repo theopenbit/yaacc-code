@@ -46,7 +46,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <android.version>4.1.1.4</android.version>
-        <android.sdk.path>../../android-sdk-linux</android.sdk.path>
+        <!--android.sdk.path>../../android-sdk-linux</android.sdk.path-->
     </properties>
     <build>
         <pluginManagement>
