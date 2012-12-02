@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>de.yaacc.tests</name>
+	<name>yaacc-integration-tests</name>
 	<comment></comment>
 	<projects>
-		<project>de.yaacc</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -40,7 +40,7 @@
 
     <modules>
         <module>app</module>
-        <!-- doesn't working yet module>integration-tests</module-->
+        <module>integration-tests</module>
     </modules>
 
     <properties>
