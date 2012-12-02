@@ -1,8 +1,8 @@
 
 <resources>
 
-    <style name="Theme.Bootstrap.Dark" parent="@style/Theme.Sherlock">
-        <item name="android:windowBackground">@color/pager_background</item>
+    <!--  <style name="Theme.Bootstrap.Dark" parent="@style/Theme.Sherlock">
+    <item name="android:windowBackground">@color/pager_background</item>
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="absForceOverflow">true</item>
@@ -12,5 +12,5 @@
         <item name="background">@drawable/actionbar_background</item>
         <item name="android:background">@drawable/actionbar_background</item>
     </style>
-
+ -->
 </resources>
