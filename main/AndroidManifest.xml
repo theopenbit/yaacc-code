@@ -21,27 +21,15 @@
         <activity
             android:name="de.yaacc.MainActivity"
             android:label="@string/title_activity_main" >
-            <!-- intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter-->
-        </activity>
-
-        <service android:name="org.teleal.cling.android.AndroidUpnpServiceImpl" />
-
-        <activity
-            android:name="de.yaacc.UpnpBrowserActivity"
-            android:label="@string/title_activity_upnp_browser" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.yaacc.MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name="de.yaacc.upnp.UpnpRegistryService" />
+        
     </application>
 
 </manifest>
