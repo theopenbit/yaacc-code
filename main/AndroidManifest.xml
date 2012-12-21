@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.yaacc"
     android:versionCode="1"
@@ -7,13 +8,34 @@
         android:minSdkVersion="10"
         android:targetSdkVersion="15" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="de.yaacc.MainActivity"
             android:label="@string/title_activity_main" >
+            <!-- intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter-->
+        </activity>
+
+        <service android:name="org.teleal.cling.android.AndroidUpnpServiceImpl" />
+
+        <activity
+            android:name="de.yaacc.UpnpBrowserActivity"
+            android:label="@string/title_activity_upnp_browser" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.yaacc.MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

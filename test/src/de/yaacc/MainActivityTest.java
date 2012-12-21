@@ -1,5 +1,6 @@
 package de.yaacc;
 
+import android.annotation.TargetApi;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
@@ -12,6 +13,7 @@ import android.test.ActivityInstrumentationTestCase2;
  * -e class de.yaacc.MainActivityTest \
  * de.yaacc.tests/android.test.InstrumentationTestRunner
  */
+@TargetApi(3)
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     public MainActivityTest() {
