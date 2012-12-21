@@ -18,8 +18,13 @@
  */
 package de.yaacc.upnp;
 
+import org.teleal.cling.UpnpService;
+import org.teleal.cling.UpnpServiceConfiguration;
+import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceConfiguration;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
+import org.teleal.cling.controlpoint.ControlPoint;
+import org.teleal.cling.registry.Registry;
 
 import android.net.wifi.WifiManager;
 
@@ -43,8 +48,16 @@ import android.net.wifi.WifiManager;
  * @author Tobias Schöne (openbit)  
  * 
  */
-public class UpnpRegistryService extends AndroidUpnpServiceImpl {
+public class UpnpRegistryService extends AndroidUpnpServiceImpl{
 
+	public Registry getRegistry(){
+		return upnpService.getRegistry();
+	}
+	
+	public UpnpService getUpnpService(){
+		return upnpService;
+	}
+	
 //FIXME Example for further use
 //	@Override
 //    protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) {

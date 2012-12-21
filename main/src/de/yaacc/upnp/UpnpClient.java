@@ -48,14 +48,14 @@ public class UpnpClient implements RegistryListener {
 
 	private List<UpnpDeviceHolder> upnpDevices = new ArrayList<UpnpDeviceHolder>();
 
-	private AndroidUpnpService upnpRegistryService;
+	private UpnpRegistryService upnpRegistryService;
 
 	public UpnpClient() {
 
 	}
 
 	public void initialize(Context context) {
-		context.bindService(new Intent(context, AndroidUpnpServiceImpl.class),
+		context.bindService(new Intent(context, UpnpRegistryService.class),
 				new AndroidUpnpServiceConnection(), Context.BIND_AUTO_CREATE);
 	}
 
@@ -79,7 +79,7 @@ public class UpnpClient implements RegistryListener {
 		listeners.remove(listener);
 	}
 
-	public AndroidUpnpService getUpnpRegistryService() {
+	public UpnpRegistryService getUpnpRegistryService() {
 		return upnpRegistryService;
 	}
 
@@ -89,7 +89,7 @@ public class UpnpClient implements RegistryListener {
 	 * 
 	 * @param upnpRegistryService
 	 */
-	public void setUpnpRegistryService(AndroidUpnpService upnpRegistryService) {
+	public void setUpnpRegistryService(UpnpRegistryService upnpRegistryService) {
 		this.upnpRegistryService = upnpRegistryService;
 		refreshUpnpDeviceCatalog();
 
@@ -106,7 +106,7 @@ public class UpnpClient implements RegistryListener {
 			getUpnpRegistryService().getRegistry().addListener(this);
 
 			// Search asynchronously for all devices
-			getUpnpRegistryService().getControlPoint().search();
+			getUpnpRegistryService().getUpnpService().getControlPoint().search();
 		}
 	}
 
@@ -144,6 +144,10 @@ public class UpnpClient implements RegistryListener {
 		for (UpnpClientListener listener : listeners) {
 			listener.deviceUpdated(holder);
 		}
+	}
+	
+	public Registry getRegistry(){
+		return getUpnpRegistryService().getRegistry();
 	}
 	
 	// ----------Implementation RemoteListerner Interface
@@ -228,7 +232,7 @@ public class UpnpClient implements RegistryListener {
 	class AndroidUpnpServiceConnection implements ServiceConnection {
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			setUpnpRegistryService((AndroidUpnpService) service);
+			setUpnpRegistryService((UpnpRegistryService)service);
 
 		}
 
