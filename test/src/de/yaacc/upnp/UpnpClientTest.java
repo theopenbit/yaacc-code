@@ -17,6 +17,7 @@ import org.teleal.cling.model.types.UDN;
 
 import android.content.Context;
 import android.test.ServiceTestCase;
+
 /*
  * 
  This program is free software; you can redistribute it and/or
@@ -32,23 +33,25 @@ import android.test.ServiceTestCase;
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ */
 /**
  * Testcase for UpnpClient-service class.
- * @author Tobias Schöne (openbit)  
- *
+ * 
+ * @author Tobias Schöne (openbit)
+ * 
  */
 public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
+
+	protected boolean flag;
 
 	public UpnpClientTest() {
 		super(UpnpRegistryService.class);
 		// TODO Auto-generated constructor stub
 	}
 
-	
 	public void testScan() throws Exception {
-		
-		Context ctx = getContext();			
+
+		Context ctx = getContext();
 		UpnpClient upnpClient = new UpnpClient();
 		assertTrue(upnpClient.initialize(ctx));
 		upnpClient.addUpnpClientListener(new UpnpClientListener() {
@@ -71,20 +74,73 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 			}
 		});
-		LocalDevice device = new LocalDevice(new DeviceIdentity(new UDN("de.yaacc.test.Dev1")), new UDADeviceType(
-				"SomeDevice", 1), new DeviceDetails("Some Device"),
-				new LocalService(
-						new ServiceType("de.yaacc.test","Erna"), 
-						new ServiceId("de.yaacc.test","Erna1"), 
-						new Action[]{new Action("action1",null)}, 
-						new StateVariable[]{new StateVariable("state1", new StateVariableTypeDetails(new StringDatatype()))}));
-		while(!upnpClient.isInitialized());
+		LocalDevice device = new LocalDevice(new DeviceIdentity(new UDN(
+				"de.yaacc.test.Dev1")), new UDADeviceType("SomeDevice", 1),
+				new DeviceDetails("Some Device"), new LocalService(
+						new ServiceType("de.yaacc.test", "Erna"),
+						new ServiceId("de.yaacc.test", "Erna1"),
+						new Action[] { new Action("action1", null) },
+						new StateVariable[] { new StateVariable("state1",
+								new StateVariableTypeDetails(
+										new StringDatatype())) }));
+		while (!upnpClient.isInitialized())
+			;
 		assertNotNull(upnpClient.getRegistry());
 		upnpClient.getRegistry().addDevice(device);
 		int size = upnpClient.getRegistry().getDevices().size();
-		assertTrue(size >0);
+		assertTrue(size > 0);
 		upnpClient.getRegistry().removeDevice(device);
-		assertEquals(size -1 , upnpClient.getRegistry().getDevices().size() );
+		assertEquals(size - 1, upnpClient.getRegistry().getDevices().size());
+
+	}
+
+	public void testLookupServices() {
+		Context ctx = getContext();
+		UpnpClient upnpClient = new UpnpClient();
+		assertTrue(upnpClient.initialize(ctx));
+		upnpClient.addUpnpClientListener(new UpnpClientListener() {
+
+			@Override
+			public void deviceUpdated(UpnpDeviceHolder holder) {
+				System.out.println("Device updated:" + holder);
+
+			}
+
+			@Override
+			public void deviceRemoved(UpnpDeviceHolder holder) {
+				System.out.println("Device removed:" + holder.getDevice());
+
+			}
+
+			@Override
+			public void deviceAdded(UpnpDeviceHolder holder) {
+				System.out.println("Device added:" + holder.getDevice());
+				System.out.println("Manufacturer:"
+						+ holder.getDevice().getDetails()
+								.getManufacturerDetails().getManufacturer());
+			}
+		});
+		while (!upnpClient.isInitialized())
+			;
+		upnpClient.getUpnpService().getControlPoint().search();
+		Runnable wait = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					flag = false;
+					Thread.sleep(60000l);
+					flag = true;
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		};
+		wait.run();
+		while (!flag)
+			;
 
 	}
 }
