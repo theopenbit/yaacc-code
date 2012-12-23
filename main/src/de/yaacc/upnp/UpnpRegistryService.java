@@ -26,7 +26,11 @@ import org.teleal.cling.android.AndroidUpnpServiceImpl;
 import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.registry.Registry;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.wifi.WifiManager;
+import android.os.IBinder;
 
 /*
  This program is free software; you can redistribute it and/or
@@ -50,13 +54,8 @@ import android.net.wifi.WifiManager;
  */
 public class UpnpRegistryService extends AndroidUpnpServiceImpl{
 
-	public Registry getRegistry(){
-		return upnpService.getRegistry();
-	}
 	
-	public UpnpService getUpnpService(){
-		return upnpService;
-	}
+	
 	
 //FIXME Example for further use
 //	@Override
