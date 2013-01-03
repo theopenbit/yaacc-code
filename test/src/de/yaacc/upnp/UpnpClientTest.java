@@ -1,11 +1,18 @@
 package de.yaacc.upnp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
+import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Action;
+import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.ActionArgument;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
+import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.meta.StateVariable;
 import org.teleal.cling.model.meta.StateVariableTypeDetails;
 import org.teleal.cling.model.types.Datatype;
@@ -13,7 +20,14 @@ import org.teleal.cling.model.types.ServiceId;
 import org.teleal.cling.model.types.ServiceType;
 import org.teleal.cling.model.types.StringDatatype;
 import org.teleal.cling.model.types.UDADeviceType;
+import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDN;
+import org.teleal.cling.support.contentdirectory.callback.Browse;
+import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
+import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.DIDLContent;
+import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.MusicTrack;
 
 import android.content.Context;
 import android.test.ServiceTestCase;
@@ -42,7 +56,8 @@ import android.test.ServiceTestCase;
  */
 public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
-	protected boolean flag;
+	private static final int MAX_DEPTH= 1;
+	protected boolean flag = false;
 
 	public UpnpClientTest() {
 		super(UpnpRegistryService.class);
@@ -95,6 +110,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	}
 
 	public void testLookupServices() {
+		final List<UpnpDeviceHolder> deviceHolder = new ArrayList<UpnpDeviceHolder>();
 		Context ctx = getContext();
 		UpnpClient upnpClient = new UpnpClient();
 		assertTrue(upnpClient.initialize(ctx));
@@ -108,16 +124,18 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 			@Override
 			public void deviceRemoved(UpnpDeviceHolder holder) {
-				System.out.println("Device removed:" + holder.getDevice());
+				System.out.println("Device removed:" + holder);
 
 			}
 
 			@Override
 			public void deviceAdded(UpnpDeviceHolder holder) {
-				System.out.println("Device added:" + holder.getDevice());
+				System.out.println("Device added:" + holder);
 				System.out.println("Manufacturer:"
 						+ holder.getDevice().getDetails()
 								.getManufacturerDetails().getManufacturer());
+				deviceHolder.add(holder);
+
 			}
 		});
 		while (!upnpClient.isInitialized())
@@ -141,6 +159,134 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		wait.run();
 		while (!flag)
 			;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			Service[] services = upnpDeviceHolder.getDevice().getServices();
+			for (Service service : services) {
+				System.out.println("####Service: " + service);
+				System.out.println("####ServiceNamespace: "
+						+ service.getServiceId().getNamespace());
+				Action[] actions = service.getActions();
+				for (Action action : actions) {
+					System.out.println("###Action: " + action);
+					ActionArgument[] inputArguments = action
+							.getInputArguments();
+					for (ActionArgument actionArgument : inputArguments) {
+						System.out
+								.println("##InputArgument: " + actionArgument);
+					}
+					inputArguments = action.getOutputArguments();
+					for (ActionArgument actionArgument : inputArguments) {
+						System.out
+								.println("#OutputArgument: " + actionArgument);
+					}
+				}
+			}
+		}
 
 	}
+
+	public void testRetrieveContentDirectoryServices() throws Exception {
+		final List<UpnpDeviceHolder> deviceHolder = new ArrayList<UpnpDeviceHolder>();
+		Context ctx = getContext();
+		UpnpClient upnpClient = new UpnpClient();
+		assertTrue(upnpClient.initialize(ctx));
+		upnpClient.addUpnpClientListener(new UpnpClientListener() {
+
+			@Override
+			public void deviceUpdated(UpnpDeviceHolder holder) {
+				System.out.println("Device updated:" + holder);
+
+			}
+
+			@Override
+			public void deviceRemoved(UpnpDeviceHolder holder) {
+				System.out.println("Device removed:" + holder);
+
+			}
+
+			@Override
+			public void deviceAdded(UpnpDeviceHolder holder) {
+				System.out.println("Device added:" + holder);
+				System.out.println("Manufacturer:"
+						+ holder.getDevice().getDetails()
+								.getManufacturerDetails().getManufacturer());
+				deviceHolder.add(holder);
+
+			}
+		});
+		while (!upnpClient.isInitialized())
+			;
+		upnpClient.getUpnpService().getControlPoint().search();
+		Runnable wait = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					flag = false;
+					Thread.sleep(30000l);
+					flag = true;
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		};
+		wait.run();
+		while (!flag)
+			;
+		ContentDirectoryBrowser browse = null;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("ContentDirectory"));
+			if (service != null) {
+				browse = new ContentDirectoryBrowser(service, "0",
+						BrowseFlag.DIRECT_CHILDREN);
+				upnpClient.getUpnpService().getControlPoint().execute(browse);
+				while (browse != null&&browse.getStatus() != Status.OK)
+					;
+				browseContainer(upnpClient, browse.getContainers(), service, 0);
+			}
+
+		}
+		
+		 wait = new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						flag = false;
+						Thread.sleep(60000l);
+						flag = true;
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			};
+			wait.run();
+			while (!flag)
+				;
+
+	}
+
+	private void browseContainer(UpnpClient upnpClient,
+			List<Container> containers, Service service, int depth) {
+		if(depth == MAX_DEPTH) return;
+		if(containers == null) return;
+		for (Container container : containers) {
+			ContentDirectoryBrowser dirBrowser = new ContentDirectoryBrowser(service, container.getId(),
+					BrowseFlag.DIRECT_CHILDREN);
+			upnpClient.getUpnpService().getControlPoint().execute(dirBrowser);
+			while (dirBrowser != null&& dirBrowser.getStatus() != Status.OK)
+				;
+			browseContainer(upnpClient, dirBrowser.getContainers(), service, depth + 1 );
+		}
+	}
+	
+	
+	
 }

@@ -236,7 +236,7 @@ public class UpnpClient implements RegistryListener {
 	}
 	
 	
-	// ----------Implementation RemoteListerner Interface
+	// ----------Implementation RegistryListener Interface
 
 	@Override
 	public void remoteDeviceDiscoveryStarted(Registry registry,
