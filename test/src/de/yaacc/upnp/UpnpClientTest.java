@@ -44,6 +44,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Picture;
 import android.net.Uri;
 import android.test.ServiceTestCase;
 import android.text.format.DateFormat;
@@ -336,10 +337,49 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			}
 
 		}
-		getConnectionInfos(upnpClient,deviceHolder);
+		
 
 	}
 
+	public void testInfoInstance() throws Exception {
+		UpnpClient upnpClient = new UpnpClient();
+		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		ContentDirectoryBrowser browse = null;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("ContentDirectory"));
+			if (service != null) {
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				browse = new ContentDirectoryBrowser(service, "432528",
+						BrowseFlag.DIRECT_CHILDREN);
+				upnpClient.getUpnpService().getControlPoint().execute(browse);
+				while (browse != null && browse.getStatus() != Status.OK)
+					;
+				List<Item> items = browse.getItems();
+				for (Item item : items) {
+					System.out.println("ParentId: " + item.getParentID());
+					System.out.println("ItemId: " + item.getId());
+					Res resource = item.getFirstResource();
+					if (resource == null)
+						break;
+					System.out.println("ImportUri: " + resource.getImportUri());
+					System.out.println("Duration: " + resource.getDuration());
+					System.out.println("ProtocolInfo: "
+							+ resource.getProtocolInfo());
+					System.out.println("ContentFormat: "
+							+ resource.getProtocolInfo().getContentFormat());
+					System.out.println("Value: " + resource.getValue());	
+				}
+			}
+
+		}
+	
+
+	}
+	
 	public void testStreamMP3Album() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
@@ -352,50 +392,145 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				browse = new ContentDirectoryBrowser(service, "434405",
-						BrowseFlag.DIRECT_CHILDREN);
-				upnpClient.getUpnpService().getControlPoint().execute(browse);
-				while (browse != null && browse.getStatus() != Status.OK)
-					;
-				List<Item> items = browse.getItems();
-				for (Item item : items) {
-					
-					System.out.println("ParentId: " + item.getParentID());
-					System.out.println("ItemId: " + item.getId());
-					Res resource = item.getFirstResource();
-					if (resource == null)
-						break;
-					System.out.println("ImportUri: " + resource.getImportUri());
-					System.out.println("Duration: " + resource.getDuration());
-					System.out.println("ProtocolInfo: "
-							+ resource.getProtocolInfo());
-					System.out.println("ContentFormat: "
-							+ resource.getProtocolInfo().getContentFormat());
-					System.out.println("Value: " + resource.getValue());
-					SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");					
-					
-					//just for a test
-					int millis = 0;
-					try {
-						Date date = dateFormat.parse(resource.getDuration());
-						millis = date.getHours() * 60* 60 *1000;
-						millis += date.getMinutes() *60*1000;
-						millis += date.getSeconds()* 1000;
-						System.out.println("HappyHappy Joy Joy Duration in Millis=" + millis);;
-						System.out.println("Playing: " + item.getTitle());
-						intentView(resource.getProtocolInfo().getContentFormat(),
-								Uri.parse(resource.getValue()));
-					} catch (ParseException e) {
-						System.out.println("bad duration format");;
-					}					
-					myWait(millis);
-				}
+				startMusicPlay(upnpClient, service);
 			}
 
 		}
 
 	}
 
+	private void startMusicPlay(UpnpClient upnpClient, Service service) {
+		ContentDirectoryBrowser browse;
+		browse = new ContentDirectoryBrowser(service, "432498",
+				BrowseFlag.DIRECT_CHILDREN);
+		upnpClient.getUpnpService().getControlPoint().execute(browse);
+		while (browse != null && browse.getStatus() != Status.OK)
+			;
+		List<Item> items = browse.getItems();				
+		for (Item item : items) {
+			
+			System.out.println("ParentId: " + item.getParentID());
+			System.out.println("ItemId: " + item.getId());
+			Res resource = item.getFirstResource();
+			if (resource == null)
+				break;
+			System.out.println("ImportUri: " + resource.getImportUri());
+			System.out.println("Duration: " + resource.getDuration());
+			System.out.println("ProtocolInfo: "
+					+ resource.getProtocolInfo());
+			System.out.println("ContentFormat: "
+					+ resource.getProtocolInfo().getContentFormat());
+			System.out.println("Value: " + resource.getValue());
+			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");					
+			
+			//just for a test
+			int millis = 0;
+			try {
+				Date date = dateFormat.parse(resource.getDuration());
+				millis = date.getHours() * 60* 60 *1000;
+				millis += date.getMinutes() *60*1000;
+				millis += date.getSeconds()* 1000;
+				System.out.println("HappyHappy Joy Joy Duration in Millis=" + millis );
+				System.out.println("Playing: " + item.getTitle());
+				intentView(resource.getProtocolInfo().getContentFormat(),
+						Uri.parse(resource.getValue()));
+			} catch (ParseException e) {
+				System.out.println("bad duration format");;
+			}					
+			myWait(millis);
+		}
+	}
+
+	public void testStreamPictureWithMusicShow() throws Exception {
+		final UpnpClient upnpClient = new UpnpClient();
+		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		ContentDirectoryBrowser browse = null;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			final Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("ContentDirectory"));
+			if (service != null) {
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				Runnable musicPlay = new Runnable() {
+					
+					@Override
+					public void run() {
+						startMusicPlay(upnpClient, service);						
+					}
+				};
+				Runnable  photoShow = new Runnable(){
+					
+					@Override
+					public void run() {
+						startPhotoShow(upnpClient, service);						
+					}
+				};
+				
+				musicPlay.run();
+				photoShow.run();
+			}
+
+		}
+
+	}
+	
+	public void testStreamPhotoShow() throws Exception {
+		UpnpClient upnpClient = new UpnpClient();
+		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		ContentDirectoryBrowser browse = null;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("ContentDirectory"));
+			if (service != null) {
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				startPhotoShow(upnpClient, service);
+			}
+
+		}
+
+	}
+
+	private void startPhotoShow(UpnpClient upnpClient, Service service) {
+		ContentDirectoryBrowser browse;
+		browse = new ContentDirectoryBrowser(service, "480776",
+				BrowseFlag.DIRECT_CHILDREN);
+		upnpClient.getUpnpService().getControlPoint().execute(browse);
+		while (browse != null && browse.getStatus() != Status.OK)
+			;
+		List<Item> items = browse.getItems();				
+		for (Item item : items) {
+			
+			System.out.println("ParentId: " + item.getParentID());
+			System.out.println("ItemId: " + item.getId());
+			Res resource = item.getFirstResource();
+			if (resource == null)
+				break;
+			System.out.println("ImportUri: " + resource.getImportUri());					
+			System.out.println("ProtocolInfo: "
+					+ resource.getProtocolInfo());
+			System.out.println("ContentFormat: "
+					+ resource.getProtocolInfo().getContentFormat());
+			System.out.println("Value: " + resource.getValue());																													
+			System.out.println("Picture: " + item.getTitle());
+//			intentView(/*resource.getProtocolInfo().getContentFormat()*/ "image/jpg",
+//						Uri.parse(resource.getValue()));
+			Intent intent = new Intent(Intent.ACTION_VIEW,
+				    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.setDataAndType(Uri.parse(resource.getValue()),"*/*");
+			
+			getContext().startActivity(intent);
+				  
+			myWait(3000l);
+		}
+	}
+
+	
 	private void intentView(String mime, Uri uri) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(uri, mime);
@@ -403,18 +538,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
 		getContext().startActivity(intent);
-		 BroadcastReceiver receiver = new BroadcastReceiver(){
-
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				System.out.println(intent.getAction());
-				
-			}
-			 
-		 };
-	     IntentFilter receiveFilter = new IntentFilter("com.android.music.playstatechanged");
-	     getContext().registerReceiver(receiver, receiveFilter);
-		// myWait(60000l);
+		 // myWait(60000l);
 	}
 
 	private List<UpnpDeviceHolder> searchDevices(UpnpClient upnpClient) {
