@@ -1,9 +1,15 @@
 package de.yaacc.upnp;
 
-import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.xml.datatype.Duration;
+
+import org.teleal.cling.controlpoint.ActionCallback;
+import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
@@ -22,18 +28,26 @@ import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
+import org.teleal.cling.support.avtransport.callback.GetCurrentTransportActions;
 import org.teleal.cling.support.avtransport.callback.GetMediaInfo;
+import org.teleal.cling.support.connectionmanager.callback.GetCurrentConnectionInfo;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.ConnectionInfo;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.Res;
+import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.test.ServiceTestCase;
+import android.text.format.DateFormat;
+import android.text.format.Time;
 
 /*
  * 
@@ -161,9 +175,47 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 		}
 
-		
 	}
 
+	public void testConnectionInfos() throws Exception {
+		UpnpClient upnpClient = new UpnpClient();
+		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		getConnectionInfos(upnpClient, deviceHolder);
+	}
+
+	private void getConnectionInfos(UpnpClient upnpClient,final List<UpnpDeviceHolder> deviceHolder ) throws Exception {		
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+		 Service service = upnpDeviceHolder.getDevice().findService(new UDAServiceId("ConnectionManager"));
+		 assertNotNull(service);
+		 Action getCurrentConnectionIds = service.getAction("GetCurrentConnectionIDs");
+		 assertNotNull(getCurrentConnectionIds);
+		 ActionInvocation getCurrentConnectionIdsInvocation = new ActionInvocation(getCurrentConnectionIds);
+		 ActionCallback getCurrentConnectionCallback = new ActionCallback(getCurrentConnectionIdsInvocation) {
+			 @Override
+		      public void success(ActionInvocation invocation) {
+		          ActionArgumentValue connectionIds  = invocation.getOutput("ConnectionIds");
+		          System.out.println(connectionIds.getValue());
+		      }
+
+		      
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				System.err.println("Failure:" + upnpresponse);
+				
+			}
+		 };
+
+		 upnpClient.getUpnpService().getControlPoint().execute(getCurrentConnectionCallback);
+		 
+		}
+		myWait();
+	}
+
+	
+
+	// Not implemented by MediaTomb
 	public void testGetMediaInfo() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
@@ -173,35 +225,80 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			Service service = upnpDeviceHolder.getDevice().findService(
 					new UDAServiceId("GetMediaInfo"));
 			if (service != null) {
-				System.out.println("#####Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
-				getMediaInfo = new GetMediaInfo(new UnsignedIntegerFourBytes("85778"),
-						service){
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				getMediaInfo = new GetMediaInfo(new UnsignedIntegerFourBytes(
+						"85778"), service) {
 
-							@Override
-							public void received(
-									ActionInvocation actioninvocation,
-									MediaInfo mediainfo) {
-								System.out.println("Mediainfo:" + mediainfo);
-								
-							}
+					@Override
+					public void received(ActionInvocation actioninvocation,
+							MediaInfo mediainfo) {
+						System.out.println("Mediainfo:" + mediainfo);
 
-							@Override
-							public void failure(
-									ActionInvocation actioninvocation,
-									UpnpResponse upnpresponse, String s) {
-								System.out.println("Failure:" + upnpresponse);
-								
-							}
-					
+					}
+
+					@Override
+					public void failure(ActionInvocation actioninvocation,
+							UpnpResponse upnpresponse, String s) {
+						System.err.println("Failure:" + upnpresponse);
+
+					}
+
 				};
-				upnpClient.getUpnpService().getControlPoint().execute(getMediaInfo);
-				myWait();				
+				upnpClient.getUpnpService().getControlPoint()
+						.execute(getMediaInfo);
+				myWait();
 			}
 
 		}
-		
+
 	}
-	
+
+	// Not implemented by MediaTomb
+	public void testCurrentTransportActions() throws Exception {
+		UpnpClient upnpClient = new UpnpClient();
+		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		GetCurrentTransportActions getCurrentTransportActions = null;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("GetCurrentTransportActions"));
+			if (service != null) {
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				getCurrentTransportActions = new GetCurrentTransportActions(
+						service) {
+
+					@Override
+					public void failure(ActionInvocation actioninvocation,
+							UpnpResponse upnpresponse, String s) {
+						System.err.println("Failure:" + upnpresponse);
+
+					}
+
+					@Override
+					public void received(ActionInvocation actioninvocation,
+							TransportAction[] atransportaction) {
+
+						System.out.println("received TransportActions:");
+						for (TransportAction action : atransportaction) {
+							System.out.println("TransportAction: " + action);
+						}
+
+					}
+				};
+
+				upnpClient.getUpnpService().getControlPoint()
+						.execute(getCurrentTransportActions);
+				myWait();
+			}
+
+		}
+
+	}
+
 	public void testStreamMP3() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
@@ -211,38 +308,115 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			Service service = upnpDeviceHolder.getDevice().findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
-				System.out.println("#####Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
-				browse = new ContentDirectoryBrowser(service, "85778",
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				browse = new ContentDirectoryBrowser(service, "434406",
 						BrowseFlag.DIRECT_CHILDREN);
 				upnpClient.getUpnpService().getControlPoint().execute(browse);
 				while (browse != null && browse.getStatus() != Status.OK)
 					;
 				List<Item> items = browse.getItems();
 				for (Item item : items) {
+					System.out.println("ParentId: " + item.getParentID());
+					System.out.println("ItemId: " + item.getId());
 					Res resource = item.getFirstResource();
-					if(resource == null) break;
+					if (resource == null)
+						break;
 					System.out.println("ImportUri: " + resource.getImportUri());
 					System.out.println("Duration: " + resource.getDuration());
-					System.out.println("ProtocolInfo: " + resource.getProtocolInfo());
-					System.out.println("ContentFormat: " + resource.getProtocolInfo().getContentFormat());
+					System.out.println("ProtocolInfo: "
+							+ resource.getProtocolInfo());
+					System.out.println("ContentFormat: "
+							+ resource.getProtocolInfo().getContentFormat());
 					System.out.println("Value: " + resource.getValue());
-					intentView(resource.getProtocolInfo().getContentFormat(),Uri.parse(resource.getValue()));
+					intentView(resource.getProtocolInfo().getContentFormat(),
+							Uri.parse(resource.getValue()));
+				}
+			}
+
+		}
+		getConnectionInfos(upnpClient,deviceHolder);
+
+	}
+
+	public void testStreamMP3Album() throws Exception {
+		UpnpClient upnpClient = new UpnpClient();
+		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		ContentDirectoryBrowser browse = null;
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			System.out.println("#####Device: " + upnpDeviceHolder);
+			Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("ContentDirectory"));
+			if (service != null) {
+				System.out.println("#####Service found: "
+						+ service.getServiceId() + " Type: "
+						+ service.getServiceType());
+				browse = new ContentDirectoryBrowser(service, "434405",
+						BrowseFlag.DIRECT_CHILDREN);
+				upnpClient.getUpnpService().getControlPoint().execute(browse);
+				while (browse != null && browse.getStatus() != Status.OK)
+					;
+				List<Item> items = browse.getItems();
+				for (Item item : items) {
+					
+					System.out.println("ParentId: " + item.getParentID());
+					System.out.println("ItemId: " + item.getId());
+					Res resource = item.getFirstResource();
+					if (resource == null)
+						break;
+					System.out.println("ImportUri: " + resource.getImportUri());
+					System.out.println("Duration: " + resource.getDuration());
+					System.out.println("ProtocolInfo: "
+							+ resource.getProtocolInfo());
+					System.out.println("ContentFormat: "
+							+ resource.getProtocolInfo().getContentFormat());
+					System.out.println("Value: " + resource.getValue());
+					SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");					
+					
+					//just for a test
+					int millis = 0;
+					try {
+						Date date = dateFormat.parse(resource.getDuration());
+						millis = date.getHours() * 60* 60 *1000;
+						millis += date.getMinutes() *60*1000;
+						millis += date.getSeconds()* 1000;
+						System.out.println("HappyHappy Joy Joy Duration in Millis=" + millis);;
+						System.out.println("Playing: " + item.getTitle());
+						intentView(resource.getProtocolInfo().getContentFormat(),
+								Uri.parse(resource.getValue()));
+					} catch (ParseException e) {
+						System.out.println("bad duration format");;
+					}					
+					myWait(millis);
 				}
 			}
 
 		}
 
-		
 	}
-	
-	private void intentView(String mime, Uri uri){
+
+	private void intentView(String mime, Uri uri) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(uri, mime);
+
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		getContext().startActivity(intent);		
-		myWait(60000l);
-   }
-	
+		
+		getContext().startActivity(intent);
+		 BroadcastReceiver receiver = new BroadcastReceiver(){
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				System.out.println(intent.getAction());
+				
+			}
+			 
+		 };
+	     IntentFilter receiveFilter = new IntentFilter("com.android.music.playstatechanged");
+	     getContext().registerReceiver(receiver, receiveFilter);
+		// myWait(60000l);
+	}
+
 	private List<UpnpDeviceHolder> searchDevices(UpnpClient upnpClient) {
 		final List<UpnpDeviceHolder> deviceHolder = new ArrayList<UpnpDeviceHolder>();
 		Context ctx = getContext();
@@ -282,6 +456,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	private void myWait() {
 		myWait(5000l);
 	}
+
 	private void myWait(final long millis) {
 		Runnable wait = new Runnable() {
 
@@ -319,7 +494,5 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 					depth + 1);
 		}
 	}
-
-	
 
 }
