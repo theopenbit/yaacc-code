@@ -9,7 +9,9 @@
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
     <string name="title_activity_settings">Settings</string>
     
-    <string name="settings_selected_provider">Currend media provider</string>
-    <string name="settings_selected_receiver">Currend media receiver</string>
+    <string name="settings_selected_provider_title">Current media provider</string>
+    <string name="settings_change_provider">Tab to change current provider</string>
+    <string name="settings_selected_receiver_title">Current media receiver</string>
+    <string name="settings_change_receiver">Tab to change current receiver</string>
 
 </resources>
