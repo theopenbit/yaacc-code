@@ -6,5 +6,6 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">YAACC</string>
     <string name="title_activity_upnp_browser">UpnpBrowserActivity</string>
+    <string name="title_activity_image_viewer">ImageViewerActivity</string>
 
 </resources>

@@ -40,6 +40,8 @@ import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
+import de.yaacc.ImageViewerActivity;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -49,6 +51,8 @@ import android.net.Uri;
 import android.test.ServiceTestCase;
 import android.text.format.DateFormat;
 import android.text.format.Time;
+import android.webkit.MimeTypeMap;
+import android.widget.ImageView;
 
 /*
  * 
@@ -476,7 +480,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	}
 	
-	public void testStreamPhotoShow() throws Exception {
+	public void testMimetypeDiscovery(){
+		System.out.println("jpg: " +MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg"));		
+	}
+	
+	public void testStreamPhotoShow() throws Exception {		
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
 		ContentDirectoryBrowser browse = null;
@@ -497,7 +505,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	private void startPhotoShow(UpnpClient upnpClient, Service service) {
 		ContentDirectoryBrowser browse;
-		browse = new ContentDirectoryBrowser(service, "480776",
+		browse = new ContentDirectoryBrowser(service, "380077",
 				BrowseFlag.DIRECT_CHILDREN);
 		upnpClient.getUpnpService().getControlPoint().execute(browse);
 		while (browse != null && browse.getStatus() != Status.OK)
@@ -517,22 +525,21 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 					+ resource.getProtocolInfo().getContentFormat());
 			System.out.println("Value: " + resource.getValue());																													
 			System.out.println("Picture: " + item.getTitle());
-//			intentView(/*resource.getProtocolInfo().getContentFormat()*/ "image/jpg",
-//						Uri.parse(resource.getValue()));
-			Intent intent = new Intent(Intent.ACTION_VIEW,
-				    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			intent.setDataAndType(Uri.parse(resource.getValue()),"*/*");
-			
-			getContext().startActivity(intent);
-				  
-			myWait(3000l);
+			intentView(resource.getProtocolInfo().getContentFormat() ,
+						Uri.parse(resource.getValue()),ImageViewerActivity.class);
+			myWait(3000l); //Wait a bit between photo switch
 		}
 	}
 
-	
 	private void intentView(String mime, Uri uri) {
+		intentView(mime, uri, null);
+	}
+	private void intentView(String mime, Uri uri, Class activityClazz) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
+		if(activityClazz != null){
+			intent = new Intent(getContext(), activityClazz);
+		}
+	
 		intent.setDataAndType(uri, mime);
 
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -578,7 +585,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	}
 
 	private void myWait() {
-		myWait(5000l);
+		myWait(30000l);
 	}
 
 	private void myWait(final long millis) {
@@ -620,3 +627,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	}
 
 }
+
+//TODO
+//ArrayList<Uri> imageUris = new ArrayList<Uri>();
+//imageUris.add(imageUri1); // Add your image URIs here
+//imageUris.add(imageUri2);
+//
+//Intent shareIntent = new Intent();
+//shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+//shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
+//shareIntent.setType("image/*");
+//startActivity(Intent.createChooser(shareIntent, "Share images to.."));

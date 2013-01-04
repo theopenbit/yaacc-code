@@ -29,7 +29,16 @@
         </activity>
 
         <service android:name="de.yaacc.upnp.UpnpRegistryService" />
-        
+
+        <activity
+            android:name="de.yaacc.ImageViewerActivity"
+            android:label="@string/title_activity_image_viewer" >
+             <intent-filter>                
+                <action android:name="android.intent.action.VIEW" />                
+                <category android:name="android.intent.category.DEFAULT" />                
+                <data android:mimeType="image/*" />	            	                 	        	            
+            </intent-filter>            
+        </activity>
     </application>
 
 </manifest>
