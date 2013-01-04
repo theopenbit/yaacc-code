@@ -7,5 +7,9 @@
     <string name="title_activity_main">YAACC</string>
     <string name="title_activity_upnp_browser">UpnpBrowserActivity</string>
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
+    <string name="title_activity_settings">Settings</string>
+    
+    <string name="settings_selected_provider">Currend media provider</string>
+    <string name="settings_selected_receiver">Currend media receiver</string>
 
 </resources>
