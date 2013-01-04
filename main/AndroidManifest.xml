@@ -28,7 +28,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name="de.yaacc.upnp.UpnpRegistryService" />
+        <service android:enabled="true" android:name="de.yaacc.upnp.UpnpRegistryService" />
+        <service android:enabled="true" android:name="de.yaacc.BackgroundMusicService" />
 
         <activity
             android:name="de.yaacc.ImageViewerActivity"

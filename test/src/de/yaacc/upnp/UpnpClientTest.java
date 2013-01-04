@@ -40,6 +40,7 @@ import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
+import de.yaacc.BackgroundMusicService;
 import de.yaacc.ImageViewerActivity;
 
 import android.content.BroadcastReceiver;
@@ -402,8 +403,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		}
 
 	}
-
 	private void startMusicPlay(UpnpClient upnpClient, Service service) {
+		startMusicPlay(upnpClient, service, false);
+	}
+	private void startMusicPlay(UpnpClient upnpClient, Service service, boolean background) {
 		ContentDirectoryBrowser browse;
 		browse = new ContentDirectoryBrowser(service, "432498",
 				BrowseFlag.DIRECT_CHILDREN);
@@ -435,9 +438,16 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				millis += date.getMinutes() *60*1000;
 				millis += date.getSeconds()* 1000;
 				System.out.println("HappyHappy Joy Joy Duration in Millis=" + millis );
-				System.out.println("Playing: " + item.getTitle());
+				System.out.println("Playing: " + item.getTitle());				
+				if(background){
+					System.out.println("Starting Background service... " );
+					Intent svc=new Intent(getContext(), BackgroundMusicService.class);
+					svc.setData(Uri.parse(resource.getValue()));
+					getContext().startService(svc);					
+				}else{
 				intentView(resource.getProtocolInfo().getContentFormat(),
 						Uri.parse(resource.getValue()));
+				}
 			} catch (ParseException e) {
 				System.out.println("bad duration format");;
 			}					
@@ -457,23 +467,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				Runnable musicPlay = new Runnable() {
-					
-					@Override
-					public void run() {
-						startMusicPlay(upnpClient, service);						
-					}
-				};
-				Runnable  photoShow = new Runnable(){
-					
-					@Override
-					public void run() {
-						startPhotoShow(upnpClient, service);						
-					}
-				};
 				
-				musicPlay.run();
-				photoShow.run();
+				startMusicPlay(upnpClient, service, true);
+				startPhotoShow(upnpClient, service);
+				
 			}
 
 		}
