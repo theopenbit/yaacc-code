@@ -189,37 +189,40 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		getConnectionInfos(upnpClient, deviceHolder);
 	}
 
-	private void getConnectionInfos(UpnpClient upnpClient,final List<UpnpDeviceHolder> deviceHolder ) throws Exception {		
+	private void getConnectionInfos(UpnpClient upnpClient,
+			final List<UpnpDeviceHolder> deviceHolder) throws Exception {
 		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-		 Service service = upnpDeviceHolder.getDevice().findService(new UDAServiceId("ConnectionManager"));
-		 assertNotNull(service);
-		 Action getCurrentConnectionIds = service.getAction("GetCurrentConnectionIDs");
-		 assertNotNull(getCurrentConnectionIds);
-		 ActionInvocation getCurrentConnectionIdsInvocation = new ActionInvocation(getCurrentConnectionIds);
-		 ActionCallback getCurrentConnectionCallback = new ActionCallback(getCurrentConnectionIdsInvocation) {
-			 @Override
-		      public void success(ActionInvocation invocation) {
-		          ActionArgumentValue connectionIds  = invocation.getOutput("ConnectionIds");
-		          System.out.println(connectionIds.getValue());
-		      }
+			Service service = upnpDeviceHolder.getDevice().findService(
+					new UDAServiceId("ConnectionManager"));
+			assertNotNull(service);
+			Action getCurrentConnectionIds = service
+					.getAction("GetCurrentConnectionIDs");
+			assertNotNull(getCurrentConnectionIds);
+			ActionInvocation getCurrentConnectionIdsInvocation = new ActionInvocation(
+					getCurrentConnectionIds);
+			ActionCallback getCurrentConnectionCallback = new ActionCallback(
+					getCurrentConnectionIdsInvocation) {
+				@Override
+				public void success(ActionInvocation invocation) {
+					ActionArgumentValue connectionIds = invocation
+							.getOutput("ConnectionIds");
+					System.out.println(connectionIds.getValue());
+				}
 
-		      
+				@Override
+				public void failure(ActionInvocation actioninvocation,
+						UpnpResponse upnpresponse, String s) {
+					System.err.println("Failure:" + upnpresponse);
 
-			@Override
-			public void failure(ActionInvocation actioninvocation,
-					UpnpResponse upnpresponse, String s) {
-				System.err.println("Failure:" + upnpresponse);
-				
-			}
-		 };
+				}
+			};
 
-		 upnpClient.getUpnpService().getControlPoint().execute(getCurrentConnectionCallback);
-		 
+			upnpClient.getUpnpService().getControlPoint()
+					.execute(getCurrentConnectionCallback);
+
 		}
 		myWait();
 	}
-
-	
 
 	// Not implemented by MediaTomb
 	public void testGetMediaInfo() throws Exception {
@@ -342,7 +345,6 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			}
 
 		}
-		
 
 	}
 
@@ -376,15 +378,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 							+ resource.getProtocolInfo());
 					System.out.println("ContentFormat: "
 							+ resource.getProtocolInfo().getContentFormat());
-					System.out.println("Value: " + resource.getValue());	
+					System.out.println("Value: " + resource.getValue());
 				}
 			}
 
 		}
-	
 
 	}
-	
+
 	public void testStreamMP3Album() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
@@ -403,19 +404,22 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		}
 
 	}
+
 	private void startMusicPlay(UpnpClient upnpClient, Service service) {
 		startMusicPlay(upnpClient, service, false);
 	}
-	private void startMusicPlay(UpnpClient upnpClient, Service service, boolean background) {
+
+	private void startMusicPlay(UpnpClient upnpClient, Service service,
+			boolean background) {
 		ContentDirectoryBrowser browse;
 		browse = new ContentDirectoryBrowser(service, "432498",
 				BrowseFlag.DIRECT_CHILDREN);
 		upnpClient.getUpnpService().getControlPoint().execute(browse);
 		while (browse != null && browse.getStatus() != Status.OK)
 			;
-		List<Item> items = browse.getItems();				
+		List<Item> items = browse.getItems();
 		for (Item item : items) {
-			
+
 			System.out.println("ParentId: " + item.getParentID());
 			System.out.println("ItemId: " + item.getId());
 			Res resource = item.getFirstResource();
@@ -423,34 +427,36 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				break;
 			System.out.println("ImportUri: " + resource.getImportUri());
 			System.out.println("Duration: " + resource.getDuration());
-			System.out.println("ProtocolInfo: "
-					+ resource.getProtocolInfo());
+			System.out.println("ProtocolInfo: " + resource.getProtocolInfo());
 			System.out.println("ContentFormat: "
 					+ resource.getProtocolInfo().getContentFormat());
 			System.out.println("Value: " + resource.getValue());
-			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");					
-			
-			//just for a test
+			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+
+			// just for a test
 			int millis = 0;
 			try {
 				Date date = dateFormat.parse(resource.getDuration());
-				millis = date.getHours() * 60* 60 *1000;
-				millis += date.getMinutes() *60*1000;
-				millis += date.getSeconds()* 1000;
-				System.out.println("HappyHappy Joy Joy Duration in Millis=" + millis );
-				System.out.println("Playing: " + item.getTitle());				
-				if(background){
-					System.out.println("Starting Background service... " );
-					Intent svc=new Intent(getContext(), BackgroundMusicService.class);
+				millis = date.getHours() * 60 * 60 * 1000;
+				millis += date.getMinutes() * 60 * 1000;
+				millis += date.getSeconds() * 1000;
+				System.out.println("HappyHappy Joy Joy Duration in Millis="
+						+ millis);
+				System.out.println("Playing: " + item.getTitle());
+				if (background) {
+					System.out.println("Starting Background service... ");
+					Intent svc = new Intent(getContext(),
+							BackgroundMusicService.class);
 					svc.setData(Uri.parse(resource.getValue()));
-					getContext().startService(svc);					
-				}else{
-				intentView(resource.getProtocolInfo().getContentFormat(),
-						Uri.parse(resource.getValue()));
+					getContext().startService(svc);
+				} else {
+					intentView(resource.getProtocolInfo().getContentFormat(),
+							Uri.parse(resource.getValue()));
 				}
 			} catch (ParseException e) {
-				System.out.println("bad duration format");;
-			}					
+				System.out.println("bad duration format");
+				;
+			}
 			myWait(millis);
 		}
 	}
@@ -467,21 +473,30 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				
-				startMusicPlay(upnpClient, service, true);
-				startPhotoShow(upnpClient, service);
-				
+
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						startMusicPlay(upnpClient, service, true);
+
+					}
+				}).start();
+
+				startPhotoShow(upnpClient, service, 10000l);
+
 			}
 
 		}
 
 	}
-	
-	public void testMimetypeDiscovery(){
-		System.out.println("jpg: " +MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg"));		
+
+	public void testMimetypeDiscovery() {
+		System.out.println("jpg: "
+				+ MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg"));
 	}
-	
-	public void testStreamPhotoShow() throws Exception {		
+
+	public void testStreamPhotoShow() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
 		ContentDirectoryBrowser browse = null;
@@ -493,56 +508,57 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				startPhotoShow(upnpClient, service);
+				startPhotoShow(upnpClient, service, 5000l);
 			}
 
 		}
 
 	}
 
-	private void startPhotoShow(UpnpClient upnpClient, Service service) {
+	private void startPhotoShow(UpnpClient upnpClient, Service service,
+			long durationInMillis) {
 		ContentDirectoryBrowser browse;
 		browse = new ContentDirectoryBrowser(service, "380077",
 				BrowseFlag.DIRECT_CHILDREN);
 		upnpClient.getUpnpService().getControlPoint().execute(browse);
 		while (browse != null && browse.getStatus() != Status.OK)
 			;
-		List<Item> items = browse.getItems();				
+		List<Item> items = browse.getItems();
 		for (Item item : items) {
-			
+
 			System.out.println("ParentId: " + item.getParentID());
 			System.out.println("ItemId: " + item.getId());
 			Res resource = item.getFirstResource();
 			if (resource == null)
 				break;
-			System.out.println("ImportUri: " + resource.getImportUri());					
-			System.out.println("ProtocolInfo: "
-					+ resource.getProtocolInfo());
+			System.out.println("ImportUri: " + resource.getImportUri());
+			System.out.println("ProtocolInfo: " + resource.getProtocolInfo());
 			System.out.println("ContentFormat: "
 					+ resource.getProtocolInfo().getContentFormat());
-			System.out.println("Value: " + resource.getValue());																													
+			System.out.println("Value: " + resource.getValue());
 			System.out.println("Picture: " + item.getTitle());
-			intentView(resource.getProtocolInfo().getContentFormat() ,
-						Uri.parse(resource.getValue()),ImageViewerActivity.class);
-			myWait(3000l); //Wait a bit between photo switch
+			intentView(resource.getProtocolInfo().getContentFormat(),
+					Uri.parse(resource.getValue()), ImageViewerActivity.class);
+			myWait(durationInMillis); // Wait a bit between photo switch
 		}
 	}
 
 	private void intentView(String mime, Uri uri) {
 		intentView(mime, uri, null);
 	}
+
 	private void intentView(String mime, Uri uri, Class activityClazz) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		if(activityClazz != null){
+		if (activityClazz != null) {
 			intent = new Intent(getContext(), activityClazz);
 		}
-	
+
 		intent.setDataAndType(uri, mime);
 
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
+
 		getContext().startActivity(intent);
-		 // myWait(60000l);
+		// myWait(60000l);
 	}
 
 	private List<UpnpDeviceHolder> searchDevices(UpnpClient upnpClient) {
@@ -586,24 +602,16 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	}
 
 	private void myWait(final long millis) {
-		Runnable wait = new Runnable() {
 
-			@Override
-			public void run() {
-				try {
-					flag = false;
-					Thread.sleep(millis);
-					flag = true;
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		try {
 
-			}
-		};
-		wait.run();
-		while (!flag)
-			;
+			Thread.sleep(millis);
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private void browseContainer(UpnpClient upnpClient,
@@ -625,13 +633,13 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 }
 
-//TODO
-//ArrayList<Uri> imageUris = new ArrayList<Uri>();
-//imageUris.add(imageUri1); // Add your image URIs here
-//imageUris.add(imageUri2);
+// TODO
+// ArrayList<Uri> imageUris = new ArrayList<Uri>();
+// imageUris.add(imageUri1); // Add your image URIs here
+// imageUris.add(imageUri2);
 //
-//Intent shareIntent = new Intent();
-//shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
-//shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
-//shareIntent.setType("image/*");
-//startActivity(Intent.createChooser(shareIntent, "Share images to.."));
+// Intent shareIntent = new Intent();
+// shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+// shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
+// shareIntent.setType("image/*");
+// startActivity(Intent.createChooser(shareIntent, "Share images to.."));
