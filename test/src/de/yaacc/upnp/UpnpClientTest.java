@@ -2,11 +2,8 @@ package de.yaacc.upnp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.datatype.Duration;
 
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.action.ActionArgumentValue;
@@ -30,30 +27,22 @@ import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.support.avtransport.callback.GetCurrentTransportActions;
 import org.teleal.cling.support.avtransport.callback.GetMediaInfo;
-import org.teleal.cling.support.connectionmanager.callback.GetCurrentConnectionInfo;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.BrowseFlag;
-import org.teleal.cling.support.model.ConnectionInfo;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
-import de.yaacc.BackgroundMusicService;
-import de.yaacc.ImageViewerActivity;
-
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Picture;
 import android.net.Uri;
 import android.test.ServiceTestCase;
-import android.text.format.DateFormat;
-import android.text.format.Time;
 import android.webkit.MimeTypeMap;
-import android.widget.ImageView;
+import de.yaacc.BackgroundMusicService;
+import de.yaacc.ImageViewerActivity;
+import de.yaacc.upnp.server.LocalUpnpServer;
 
 /*
  * 
@@ -79,13 +68,28 @@ import android.widget.ImageView;
  */
 public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
+	
 	private static final int MAX_DEPTH = 1;
-	protected boolean flag = false;
+	protected Boolean flag = false;
+	private LocalUpnpServer localUpnpServer;
+
 
 	public UpnpClientTest() {
 		super(UpnpRegistryService.class);
 		// TODO Auto-generated constructor stub
 	}
+
+	
+	/* (non-Javadoc)
+	 * @see android.test.ServiceTestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception { 
+		super.setUp();
+		
+		localUpnpServer = LocalUpnpServer.setup(getContext());
+	}
+
 
 	public void testScan() throws Exception {
 
@@ -109,6 +113,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			@Override
 			public void deviceAdded(UpnpDeviceHolder holder) {
 				System.out.println("Device added:" + holder.getDevice());
+				System.out.println("Identifier added:" + holder.getDevice().getIdentity().getUdn().getIdentifierString());
 
 			}
 		});
@@ -137,6 +142,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
 		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
 			System.out.println("#####Device: " + upnpDeviceHolder);
+			System.out.println("#####Device Identifier:" + upnpDeviceHolder.getDevice().getIdentity().getUdn().getIdentifierString());
 			Service[] services = upnpDeviceHolder.getDevice().getServices();
 			for (Service service : services) {
 				System.out.println("####Service: " + service);
@@ -308,11 +314,20 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	}
 
-	public void testStreamMP3() throws Exception {
-		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+	
+	
+
+	public void testStreamMP3() throws Exception {	
+		streamMp3("101",LocalUpnpServer.UDN_ID);
+
+	}
+
+
+	protected void streamMp3(String instanceId, String upnpServerid) {
+		UpnpClient  upnpClient = new UpnpClient();
+		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient, upnpServerid);
 		ContentDirectoryBrowser browse = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+		if(upnpDeviceHolder != null) {
 			System.out.println("#####Device: " + upnpDeviceHolder);
 			Service service = upnpDeviceHolder.getDevice().findService(
 					new UDAServiceId("ContentDirectory"));
@@ -320,7 +335,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				browse = new ContentDirectoryBrowser(service, "434406",
+				browse = new ContentDirectoryBrowser(service, instanceId,
 						BrowseFlag.DIRECT_CHILDREN);
 				upnpClient.getUpnpService().getControlPoint().execute(browse);
 				while (browse != null && browse.getStatus() != Status.OK)
@@ -345,9 +360,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			}
 
 		}
-
 	}
 
+	
+	
 	public void testInfoInstance() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
 		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
@@ -385,12 +401,19 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		}
 
 	}
-
+	
+	
 	public void testStreamMP3Album() throws Exception {
+		streamMP3Album("1",LocalUpnpServer.UDN_ID);
+
+	}
+
+
+	protected void streamMP3Album(String instanceId, String upnpServerid) {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient, upnpServerid);
 		ContentDirectoryBrowser browse = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+		if(upnpDeviceHolder != null) {
 			System.out.println("#####Device: " + upnpDeviceHolder);
 			Service service = upnpDeviceHolder.getDevice().findService(
 					new UDAServiceId("ContentDirectory"));
@@ -398,21 +421,20 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				startMusicPlay(upnpClient, service);
+				startMusicPlay(upnpClient, service,  instanceId);
 			}
 
 		}
-
 	}
 
-	private void startMusicPlay(UpnpClient upnpClient, Service service) {
-		startMusicPlay(upnpClient, service, false);
+	protected void startMusicPlay(UpnpClient upnpClient, Service service,String instanceId) {
+		startMusicPlay(upnpClient, service, false,instanceId);
 	}
 
-	private void startMusicPlay(UpnpClient upnpClient, Service service,
-			boolean background) {
+	protected void startMusicPlay(UpnpClient upnpClient, Service service,
+			boolean background, String instanceId) {
 		ContentDirectoryBrowser browse;
-		browse = new ContentDirectoryBrowser(service, "432498",
+		browse = new ContentDirectoryBrowser(service, instanceId,
 				BrowseFlag.DIRECT_CHILDREN);
 		upnpClient.getUpnpService().getControlPoint().execute(browse);
 		while (browse != null && browse.getStatus() != Status.OK)
@@ -458,14 +480,21 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				;
 			}
 			myWait(millis);
+			
 		}
 	}
 
+	
 	public void testStreamPictureWithMusicShow() throws Exception {
+		streamMusicWithPhotoShow("1","2",LocalUpnpServer.UDN_ID);
+
+	}
+
+	protected void streamMusicWithPhotoShow(final String musicAlbumId, String photoAlbumid, String deviceId) {
 		final UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient, deviceId);
 		ContentDirectoryBrowser browse = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+		if (upnpDeviceHolder !=null ) {
 			System.out.println("#####Device: " + upnpDeviceHolder);
 			final Service service = upnpDeviceHolder.getDevice().findService(
 					new UDAServiceId("ContentDirectory"));
@@ -478,17 +507,16 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 					@Override
 					public void run() {
-						startMusicPlay(upnpClient, service, true);
+						startMusicPlay(upnpClient, service, true,musicAlbumId);
 
 					}
 				}).start();
 
-				startPhotoShow(upnpClient, service, 10000l);
+				startPhotoShow(upnpClient, service, 10000l,photoAlbumid);
 
 			}
 
 		}
-
 	}
 
 	public void testMimetypeDiscovery() {
@@ -496,11 +524,17 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				+ MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg"));
 	}
 
+	
 	public void testStreamPhotoShow() throws Exception {
+		streamPhotoShow("2",LocalUpnpServer.UDN_ID);
+
+	}
+
+	protected void streamPhotoShow(String instanceId, String upnpServerId) {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient,upnpServerId);
 		ContentDirectoryBrowser browse = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+		if (upnpDeviceHolder != null) {
 			System.out.println("#####Device: " + upnpDeviceHolder);
 			Service service = upnpDeviceHolder.getDevice().findService(
 					new UDAServiceId("ContentDirectory"));
@@ -508,17 +542,16 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				System.out.println("#####Service found: "
 						+ service.getServiceId() + " Type: "
 						+ service.getServiceType());
-				startPhotoShow(upnpClient, service, 5000l);
+				startPhotoShow(upnpClient, service, 5000l,instanceId);
 			}
 
 		}
-
 	}
 
-	private void startPhotoShow(UpnpClient upnpClient, Service service,
-			long durationInMillis) {
+	protected void startPhotoShow(UpnpClient upnpClient, Service service,
+			long durationInMillis, String instanceId) {
 		ContentDirectoryBrowser browse;
-		browse = new ContentDirectoryBrowser(service, "380077",
+		browse = new ContentDirectoryBrowser(service, instanceId,
 				BrowseFlag.DIRECT_CHILDREN);
 		upnpClient.getUpnpService().getControlPoint().execute(browse);
 		while (browse != null && browse.getStatus() != Status.OK)
@@ -543,11 +576,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		}
 	}
 
-	private void intentView(String mime, Uri uri) {
+	protected void intentView(String mime, Uri uri) {
 		intentView(mime, uri, null);
 	}
 
-	private void intentView(String mime, Uri uri, Class activityClazz) {
+	protected void intentView(String mime, Uri uri, Class activityClazz) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		if (activityClazz != null) {
 			intent = new Intent(getContext(), activityClazz);
@@ -560,9 +593,20 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		getContext().startActivity(intent);
 		// myWait(60000l);
 	}
+	
+	protected UpnpDeviceHolder lookupDevice(UpnpClient upnpClient, String deviceId) {		
+		UpnpDeviceHolder result= null;
+		List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
+			if(deviceId.equals(upnpDeviceHolder.getDevice().getIdentity().getUdn().getIdentifierString())){
+				result = upnpDeviceHolder;
+				break;
+			}
+		}
+		return result;
+	}
 
-	private List<UpnpDeviceHolder> searchDevices(UpnpClient upnpClient) {
-		final List<UpnpDeviceHolder> deviceHolder = new ArrayList<UpnpDeviceHolder>();
+	protected List<UpnpDeviceHolder> searchDevices(UpnpClient upnpClient) {		
 		Context ctx = getContext();
 
 		assertTrue(upnpClient.initialize(ctx));
@@ -583,38 +627,34 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			@Override
 			public void deviceAdded(UpnpDeviceHolder holder) {
 				System.out.println("Device added:" + holder);
-				System.out.println("Manufacturer:"
-						+ holder.getDevice().getDetails()
-								.getManufacturerDetails().getManufacturer());
-				deviceHolder.add(holder);
-
+				System.out.println("Identifier added:" + holder.getDevice().getIdentity().getUdn().getIdentifierString());
 			}
 		});
 		while (!upnpClient.isInitialized())
 			;
 		upnpClient.getUpnpService().getControlPoint().search();
 		myWait();
-		return deviceHolder;
+
+		return upnpClient.getUpnpDevices();
 	}
 
-	private void myWait() {
+	protected void myWait() {
 		myWait(30000l);
 	}
 
-	private void myWait(final long millis) {
+	protected void myWait(final long millis) {
 
 		try {
-
 			Thread.sleep(millis);
-
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 
 	}
 
-	private void browseContainer(UpnpClient upnpClient,
+	protected void browseContainer(UpnpClient upnpClient,
 			List<Container> containers, Service service, int depth) {
 		if (depth == MAX_DEPTH)
 			return;

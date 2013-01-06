@@ -101,6 +101,13 @@ public class UpnpClient implements RegistryListener {
 		return androidUpnpService;
 	}
 	
+	/**
+	 * @return the upnpDevices
+	 */
+	public List<UpnpDeviceHolder> getUpnpDevices() {
+		return upnpDevices;
+	}
+
 	public UpnpService getUpnpService() {
 		if (getAndroidUpnpService() == null){
 			return null;
