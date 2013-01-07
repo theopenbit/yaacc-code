@@ -1,5 +1,7 @@
 package de.yaacc.upnp;
 
+import org.teleal.cling.model.meta.Device;
+
 
 /*
 This program is free software; you can redistribute it and/or
@@ -24,9 +26,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 public interface UpnpClientListener  {
 
-	void deviceAdded(UpnpDeviceHolder holder);
-	void deviceRemoved(UpnpDeviceHolder holder);
-	void deviceUpdated(UpnpDeviceHolder holder);
+	void deviceAdded(Device<?, ?, ?> device);
+	void deviceRemoved(Device<?, ?, ?> device);
+	void deviceUpdated(Device<?, ?, ?> device);	
 	                	
 }
 

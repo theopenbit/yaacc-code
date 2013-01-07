@@ -18,35 +18,25 @@
  */
 package de.yaacc.upnp.server;
 
-import java.util.UUID;
-
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.teleal.cling.model.DefaultServiceManager;
 import org.teleal.cling.model.ValidationException;
-import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
-import org.teleal.cling.model.meta.StateVariable;
-import org.teleal.cling.model.meta.StateVariableTypeDetails;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.ServiceType;
-import org.teleal.cling.model.types.StringDatatype;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
-
-import de.yaacc.upnp.UpnpRegistryService;
-import de.yaacc.upnp.UpnpClient.AndroidUpnpServiceConnection;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import de.yaacc.upnp.UpnpRegistryService;
 
 /*
  This program is free software; you can redistribute it and/or

@@ -2,8 +2,11 @@ package de.yaacc.upnp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.action.ActionArgumentValue;
@@ -11,6 +14,7 @@ import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.ActionArgument;
+import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
 import org.teleal.cling.model.meta.LocalDevice;
@@ -99,21 +103,21 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		upnpClient.addUpnpClientListener(new UpnpClientListener() {
 
 			@Override
-			public void deviceUpdated(UpnpDeviceHolder holder) {
-				System.out.println("Device updated:" + holder.getDevice());
+			public void deviceUpdated(Device<?,?,?>device) {
+				System.out.println("Device updated:" + device.getDisplayString());
 
 			}
 
 			@Override
-			public void deviceRemoved(UpnpDeviceHolder holder) {
-				System.out.println("Device removed:" + holder.getDevice());
+			public void deviceRemoved(Device<?,?,?>device) {
+				System.out.println("Device removed:" + device.getDisplayString());
 
 			}
 
 			@Override
-			public void deviceAdded(UpnpDeviceHolder holder) {
-				System.out.println("Device added:" + holder.getDevice());
-				System.out.println("Identifier added:" + holder.getDevice().getIdentity().getUdn().getIdentifierString());
+			public void deviceAdded(Device<?,?,?>device) {
+				System.out.println("Device added:" + device.getDisplayString());
+				System.out.println("Identifier added:" + device.getIdentity().getUdn().getIdentifierString());
 
 			}
 		});
@@ -139,11 +143,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	public void testLookupServices() {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			System.out.println("#####Device Identifier:" + upnpDeviceHolder.getDevice().getIdentity().getUdn().getIdentifierString());
-			Service[] services = upnpDeviceHolder.getDevice().getServices();
+		final List<Device<?,?,?>> devices = searchDevices(upnpClient);
+		for (Device<?,?,?> device : devices) {
+			System.out.println("#####Device: " + device.getDisplayString());
+			System.out.println("#####Device Identifier:" + device.getIdentity().getUdn().getIdentifierString());
+			Service[] services = device.getServices();
 			for (Service service : services) {
 				System.out.println("####Service: " + service);
 				System.out.println("####ServiceNamespace: "
@@ -170,11 +174,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	public void testRetrieveContentDirectoryServices() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		final List<Device<?,?,?>> devices = searchDevices(upnpClient);
 		ContentDirectoryBrowser browse = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		for (Device<?,?,?>device  : devices) {
+			System.out.println("#####Device: " + device.getDisplayString());
+			Service service = device.findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
 				browse = new ContentDirectoryBrowser(service, "0",
@@ -191,14 +195,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	public void testConnectionInfos() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		final List<Device<?,?,?>> deviceHolder = searchDevices(upnpClient);
 		getConnectionInfos(upnpClient, deviceHolder);
 	}
 
 	private void getConnectionInfos(UpnpClient upnpClient,
-			final List<UpnpDeviceHolder> deviceHolder) throws Exception {
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			Service service = upnpDeviceHolder.getDevice().findService(
+			final List<Device<?,?,?>> devices) throws Exception {
+		for (Device<?,?,?> device : devices) {
+			Service service = device.findService(
 					new UDAServiceId("ConnectionManager"));
 			assertNotNull(service);
 			Action getCurrentConnectionIds = service
@@ -233,11 +237,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	// Not implemented by MediaTomb
 	public void testGetMediaInfo() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		final List<Device<?,?,?>> devices = searchDevices(upnpClient);
 		GetMediaInfo getMediaInfo = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		for (Device<?,?,?> device : devices) {
+			System.out.println("#####Device: " + device);
+			Service service = device.findService(
 					new UDAServiceId("GetMediaInfo"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -273,11 +277,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	// Not implemented by MediaTomb
 	public void testCurrentTransportActions() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		final List<Device<?,?,?>> devices = searchDevices(upnpClient);
 		GetCurrentTransportActions getCurrentTransportActions = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		for (Device<?,?,?> device : devices) {
+			System.out.println("#####Device: " + device);
+			Service service = device.findService(
 					new UDAServiceId("GetCurrentTransportActions"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -325,11 +329,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	protected void streamMp3(String instanceId, String upnpServerid) {
 		UpnpClient  upnpClient = new UpnpClient();
-		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient, upnpServerid);
+		Device<?,?,?> device = lookupDevice(upnpClient, upnpServerid);
 		ContentDirectoryBrowser browse = null;
-		if(upnpDeviceHolder != null) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		if(device != null) {
+			System.out.println("#####Device: " + device);
+			Service service = device.findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -366,11 +370,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	
 	public void testInfoInstance() throws Exception {
 		UpnpClient upnpClient = new UpnpClient();
-		final List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
+		final List<Device<?,?,?>> devices = searchDevices(upnpClient);
 		ContentDirectoryBrowser browse = null;
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		for (Device<?,?,?> device : devices) {
+			System.out.println("#####Device: " + device.getDisplayString());
+			Service service = device.findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -411,11 +415,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	protected void streamMP3Album(String instanceId, String upnpServerid) {
 		UpnpClient upnpClient = new UpnpClient();
-		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient, upnpServerid);
+		Device<?,?,?> device = lookupDevice(upnpClient, upnpServerid);
 		ContentDirectoryBrowser browse = null;
-		if(upnpDeviceHolder != null) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		if(device != null) {
+			System.out.println("#####Device: " + device);
+			Service service = device.findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -492,11 +496,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	protected void streamMusicWithPhotoShow(final String musicAlbumId, String photoAlbumid, String deviceId) {
 		final UpnpClient upnpClient = new UpnpClient();
-		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient, deviceId);
+		Device<?,?,?> device = lookupDevice(upnpClient, deviceId);
 		ContentDirectoryBrowser browse = null;
-		if (upnpDeviceHolder !=null ) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			final Service service = upnpDeviceHolder.getDevice().findService(
+		if (device !=null ) {
+			System.out.println("#####Device: " + device);
+			final Service service = device.findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -532,11 +536,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	protected void streamPhotoShow(String instanceId, String upnpServerId) {
 		UpnpClient upnpClient = new UpnpClient();
-		UpnpDeviceHolder upnpDeviceHolder = lookupDevice(upnpClient,upnpServerId);
+		Device<?,?,?> device = lookupDevice(upnpClient,upnpServerId);
 		ContentDirectoryBrowser browse = null;
-		if (upnpDeviceHolder != null) {
-			System.out.println("#####Device: " + upnpDeviceHolder);
-			Service service = upnpDeviceHolder.getDevice().findService(
+		if (device != null) {
+			System.out.println("#####Device: " + device);
+			Service service = device.findService(
 					new UDAServiceId("ContentDirectory"));
 			if (service != null) {
 				System.out.println("#####Service found: "
@@ -594,48 +598,48 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		// myWait(60000l);
 	}
 	
-	protected UpnpDeviceHolder lookupDevice(UpnpClient upnpClient, String deviceId) {		
-		UpnpDeviceHolder result= null;
-		List<UpnpDeviceHolder> deviceHolder = searchDevices(upnpClient);
-		for (UpnpDeviceHolder upnpDeviceHolder : deviceHolder) {
-			if(deviceId.equals(upnpDeviceHolder.getDevice().getIdentity().getUdn().getIdentifierString())){
-				result = upnpDeviceHolder;
+	protected Device<?,?,?> lookupDevice(UpnpClient upnpClient, String deviceId) {		
+		Device<?,?,?> result= null;
+		List<Device<?,?,?>> devices = searchDevices(upnpClient);
+		for (Device<?,?,?> device : devices) {
+			if(deviceId.equals(device.getIdentity().getUdn().getIdentifierString())){
+				result = device;
 				break;
 			}
 		}
 		return result;
 	}
 
-	protected List<UpnpDeviceHolder> searchDevices(UpnpClient upnpClient) {		
+	protected List<Device<?,?,?>> searchDevices(UpnpClient upnpClient) {		
 		Context ctx = getContext();
 
 		assertTrue(upnpClient.initialize(ctx));
 		upnpClient.addUpnpClientListener(new UpnpClientListener() {
 
 			@Override
-			public void deviceUpdated(UpnpDeviceHolder holder) {
-				System.out.println("Device updated:" + holder);
+			public void deviceUpdated(Device<?, ?, ?> device) {
+				System.out.println("Device updated:" + device);
 
 			}
 
 			@Override
-			public void deviceRemoved(UpnpDeviceHolder holder) {
-				System.out.println("Device removed:" + holder);
+			public void deviceRemoved(Device<?, ?, ?> device) {
+				System.out.println("Device removed:" + device);
 
 			}
 
 			@Override
-			public void deviceAdded(UpnpDeviceHolder holder) {
-				System.out.println("Device added:" + holder);
-				System.out.println("Identifier added:" + holder.getDevice().getIdentity().getUdn().getIdentifierString());
+			public void deviceAdded(Device<?, ?, ?> device) {
+				System.out.println("Device added:" + device.getDisplayString());
+				System.out.println("Identifier added:" + device.getIdentity().getUdn().getIdentifierString());
 			}
 		});
 		while (!upnpClient.isInitialized())
 			;
-		upnpClient.getUpnpService().getControlPoint().search();
+		upnpClient.searchDevices();
 		myWait();
 
-		return upnpClient.getUpnpDevices();
+		return new ArrayList(upnpClient.getDevices());
 	}
 
 	protected void myWait() {
@@ -671,6 +675,37 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		}
 	}
 
+	public void testUseCaseBrowse(){
+		
+		UpnpClient upnpClient = new UpnpClient();
+		upnpClient.initialize(getContext());
+		flag = false;
+		new Timer().schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				flag =true;				
+			}
+		}, 30000l); //30sec. Watchdog
+		
+		while(upnpClient.getDevice(LocalUpnpServer.UDN_ID) == null && !flag){
+			//wait for local device is connected
+		}
+		
+		assertFalse("Watchdog timeout No Device found!", flag);
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device, "1", BrowseFlag.DIRECT_CHILDREN, "", 0, 999l,null);
+		if(result != null && result.getResult() != null){
+			for (Container container : result.getResult().getContainers()) {
+				System.out.println("Container: " + container.getTitle() + " (" + container.getChildCount() + ")");
+			}
+			for (Item item : result.getResult().getItems()) {
+				System.out.println("Item: " + item.getTitle() + " (" + item.getFirstResource().getProtocolInfo().getContentFormat() + ")");
+			}
+		}
+		
+	}
+	
 }
 
 // TODO
