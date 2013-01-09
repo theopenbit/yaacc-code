@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="@string/settings_category_send_rec">
+      <ListPreference android:title="@string/settings_selected_provider_title" android:entryValues="@array/devices" android:entries="@array/devices"/>
+      <ListPreference android:title="@string/settings_selected_receiver_title" android:entryValues="@array/devices" android:entries="@array/devices"/>
+        
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_browsing">
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_audio_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_audio_off"/>
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_video_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_video_off"/>
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_image_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_image_off"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

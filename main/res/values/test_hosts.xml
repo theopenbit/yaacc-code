@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="devices">
+        <item name="127.0.0.1">localhost</item>
+        <item name="111.111.111.1">Generic Smart TV</item>
+        <item name="111.111.111.2">Generic Smart Phone</item>
+        <item name="111.111.111.3">Generic Smart Frame</item>
+    </string-array>
+    
+</resources>
