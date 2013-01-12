@@ -147,7 +147,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	public void testLookupServices() {
 		UpnpClient upnpClient = new UpnpClient();
+		
 		final List<Device<?, ?, ?>> devices = searchDevices(upnpClient);
+		Log.d(getClass().getName(),
+				"DeviceCount: " + devices.size());
 		for (Device<?, ?, ?> device : devices) {
 			Log.d(getClass().getName(),
 					"#####Device: " + device.getDisplayString());
@@ -593,6 +596,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		Context ctx = getContext();
 
 		assertTrue(upnpClient.initialize(ctx));
+		myWait();
 		upnpClient.addUpnpClientListener(new UpnpClientListener() {
 
 			@Override
@@ -663,7 +667,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	}
 
-	private UpnpClient getInitializedUpnpClientWithLocalServer() {
+	protected UpnpClient getInitializedUpnpClientWithLocalServer() {
+		return getInitializedUpnpClientWithDevice(LocalUpnpServer.UDN_ID);
+	}
+	
+	protected UpnpClient getInitializedUpnpClientWithDevice(String deviceId) {
 		UpnpClient upnpClient = new UpnpClient();
 		upnpClient.initialize(getContext());
 		flag = false;
@@ -673,9 +681,9 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			public void run() {
 				flag = true;
 			}
-		}, 30000l); // 30sec. Watchdog
+		}, 120000l); // 120sec. Watchdog
 
-		while (upnpClient.getDevice(LocalUpnpServer.UDN_ID) == null && !flag) {
+		while (upnpClient.getDevice(deviceId) == null && !flag) {
 			// wait for local device is connected
 		}
 		assertFalse("Watchdog timeout No Device found!", flag);
