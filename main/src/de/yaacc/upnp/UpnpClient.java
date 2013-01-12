@@ -116,6 +116,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return null;
 	}
+	
+	
 
 	/**
 	 * Returns a registered UpnpDevice.
@@ -198,21 +200,86 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 	}
 	
+	
 	/**
 	 * Browse ContenDirctory synchronous
-	 * @return the result.
+	 * @param device the device to be browsed 
+	 * @param objectID the browsing root 
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseSync(Device<?,?,?> device,String objectID){
+		return browseSync(device, objectID,
+				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0] );
+	}
+	
+	
+	/**
+	 * Browse ContenDirctory synchronous
+	 * @param device the device to be browsed 
+	 * @param objectID the browsing root
+	 * @param flag  kind of browsing @see {@link BrowseFlag}
+	 * @param filter a filter 
+	 * @param firstResult first result 
+	 * @param maxResults max result count
+	 * @param orderBy sorting criteria @see {@link SortCriterion} 
+	 * @return  the browsing result
 	 */
 	public ContentDirectoryBrowseResult browseSync(Device<?,?,?> device,String objectID,
 			BrowseFlag flag, String filter, long firstResult, Long maxResults,
 			SortCriterion... orderBy ){
 		Service service = device.findService(new UDAServiceId("ContentDirectory"));
-		ContentDirectoryBrowseResult result=null;
+		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
+		ContentDirectoryBrowseActionCallback actionCallback=null;
 		if (service != null) {
-			result = new ContentDirectoryBrowseResult(service, objectID,
-					flag, filter, firstResult, maxResults,
+			Log.d(getClass().getName(),"#####Service found: "
+					+ service.getServiceId() + " Type: "
+					+ service.getServiceType());
+			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID,
+					flag, filter, firstResult, maxResults,result,
 					orderBy);
-			getControlPoint().execute(result);
-			while (result.getStatus() != Status.OK && result.getUpnpFailure() == null);
+			getControlPoint().execute(actionCallback);
+			while (actionCallback.getStatus() != Status.OK && actionCallback.getUpnpFailure() == null);
+		}
+		return result;			
+	}
+	
+	
+	/**
+	 * Browse ContenDirctory asynchronous
+	 * @param device the device to be browsed 
+	 * @param objectID the browsing root 
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseAsync(Device<?,?,?> device,String objectID){
+		return browseAsync(device, objectID,
+				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0] );
+	}
+
+	/**
+	 * Browse ContenDirctory asynchronous
+	 * @param device the device to be browsed 
+	 * @param objectID the browsing root
+	 * @param flag  kind of browsing @see {@link BrowseFlag}
+	 * @param filter a filter 
+	 * @param firstResult first result 
+	 * @param maxResults max result count
+	 * @param orderBy sorting criteria @see {@link SortCriterion} 
+	 * @return  the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseAsync(Device<?,?,?> device,String objectID,
+			BrowseFlag flag, String filter, long firstResult, Long maxResults,
+			SortCriterion... orderBy ){
+		Service service = device.findService(new UDAServiceId("ContentDirectory"));
+		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
+		ContentDirectoryBrowseActionCallback actionCallback=null;
+		if (service != null) {
+			Log.d(getClass().getName(),"#####Service found: "
+					+ service.getServiceId() + " Type: "
+					+ service.getServiceType());
+			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID,
+					flag, filter, firstResult, maxResults,result,
+					orderBy);
+			getControlPoint().execute(actionCallback);			
 		}
 		return result;			
 	}
