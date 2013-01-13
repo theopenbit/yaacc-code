@@ -1,8 +1,13 @@
 package de.yaacc.upnp;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
@@ -14,6 +19,8 @@ import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
 import org.teleal.cling.controlpoint.ControlPoint;
+import org.teleal.cling.model.action.ActionInvocation;
+import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.message.header.MXHeader;
 import org.teleal.cling.model.message.header.STAllHeader;
 import org.teleal.cling.model.message.header.UpnpHeader;
@@ -21,21 +28,33 @@ import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.types.ServiceId;
 import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.registry.Registry;
 import org.teleal.cling.registry.RegistryListener;
+import org.teleal.cling.support.avtransport.callback.Play;
+import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.connectionmanager.callback.GetProtocolInfo;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.SortCriterion;
+import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.Item;
+
+import de.yaacc.BackgroundMusicService;
+import de.yaacc.ImageViewerActivity;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 /*
  This program is free software; you can redistribute it and/or
@@ -63,7 +82,20 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
 	private AndroidUpnpService androidUpnpService;
-
+	private Context context;
+	public static final ThreadLocal<Boolean> watchdogFlag = new ThreadLocal<Boolean>(); // Watchdog
+																						// flag
+																						// for
+																						// async
+																						// calls
+	public static final ThreadLocal<Boolean> actionFinished = new ThreadLocal<Boolean>(); // Flag
+																							// that
+																							// indicates
+																							// an
+																							// async
+																							// call
+																							// has
+																							// finished
 
 	public UpnpClient() {
 
@@ -77,220 +109,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return true if initialization completes correctly
 	 */
 	public boolean initialize(Context context) {
+		this.context = context;
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
-	}
-
-	/**
-	 * Add an listener.
-	 * 
-	 * @param listener
-	 *            the listener to be added
-	 */
-	public void addUpnpClientListener(UpnpClientListener listener) {
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove the given listener.
-	 * 
-	 * @param listener
-	 *            the listener which is to be removed
-	 */
-	public void removeUpnpClientListener(UpnpClientListener listener) {
-		listeners.remove(listener);
-	}
-
-	protected AndroidUpnpService getAndroidUpnpService() {
-		return androidUpnpService;
-	}
-
-	/**
-	 * Returns all registered UpnpDevices.
-	 * 
-	 * @return the upnpDevices
-	 */
-	public Collection<Device> getDevices() {
-		if(isInitialized()){
-			return getRegistry().getDevices();
-		}
-		return null;
-	}
-	
-	
-
-	/**
-	 * Returns a registered UpnpDevice.
-	 * 
-	 * @return the upnpDevice null if not found
-	 */
-	public Device<?,?,?> getDevice(String identifier) {
-		if(isInitialized()){
-			return getRegistry().getDevice(new UDN(identifier),false);
-		}
-		return null;
-	}
-
-	
-	/**
-	 * Returns the cling UpnpService.
-	 * 
-	 * @return the cling UpnpService
-	 */
-	public UpnpService getUpnpService() {
-		if (!isInitialized()) {
-			return null;
-		}
-		return androidUpnpService.get();
-	}
-
-	/**
-	 * True if the client is initialized.
-	 * 
-	 * @return true or false
-	 */
-	public boolean isInitialized() {
-		return getAndroidUpnpService() != null;
-	}
-
-	public UpnpServiceConfiguration getConfiguration() {
-		if (!isInitialized()) {
-			return null;
-		}
-		return androidUpnpService.getConfiguration();
-	}
-
-	public ControlPoint getControlPoint() {
-		if (!isInitialized()) {
-			return null;
-		}
-		return androidUpnpService.getControlPoint();
-	}
-
-	public Registry getRegistry() {
-		if (!isInitialized()) {
-			return null;
-		}
-		return androidUpnpService.getRegistry();
-	}
-
-	/**
-	 * Setting an new upnpRegistryService. If the service is not null, refresh
-	 * the device list.
-	 * 
-	 * @param upnpService
-	 */
-	protected void setAndroidUpnpService(AndroidUpnpService upnpService) {
-		this.androidUpnpService = upnpService;
-		
-
-	}
-
-	private void refreshUpnpDeviceCatalog() {
-		if (isInitialized()) {
-			for (Device<?, ?, ?> device : getAndroidUpnpService().getRegistry()
-					.getDevices()) {
-				this.deviceAdded(device);
-			}
-
-			// Getting ready for future device advertisements
-			getAndroidUpnpService().getRegistry().addListener(this);
-
-			searchDevices();
-		}
-	}
-	
-	
-	/**
-	 * Browse ContenDirctory synchronous
-	 * @param device the device to be browsed 
-	 * @param objectID the browsing root 
-	 * @return the browsing result
-	 */
-	public ContentDirectoryBrowseResult browseSync(Device<?,?,?> device,String objectID){
-		return browseSync(device, objectID,
-				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0] );
-	}
-	
-	
-	/**
-	 * Browse ContenDirctory synchronous
-	 * @param device the device to be browsed 
-	 * @param objectID the browsing root
-	 * @param flag  kind of browsing @see {@link BrowseFlag}
-	 * @param filter a filter 
-	 * @param firstResult first result 
-	 * @param maxResults max result count
-	 * @param orderBy sorting criteria @see {@link SortCriterion} 
-	 * @return  the browsing result
-	 */
-	public ContentDirectoryBrowseResult browseSync(Device<?,?,?> device,String objectID,
-			BrowseFlag flag, String filter, long firstResult, Long maxResults,
-			SortCriterion... orderBy ){
-		Service service = device.findService(new UDAServiceId("ContentDirectory"));
-		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
-		ContentDirectoryBrowseActionCallback actionCallback=null;
-		if (service != null) {
-			Log.d(getClass().getName(),"#####Service found: "
-					+ service.getServiceId() + " Type: "
-					+ service.getServiceType());
-			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID,
-					flag, filter, firstResult, maxResults,result,
-					orderBy);
-			getControlPoint().execute(actionCallback);
-			while (actionCallback.getStatus() != Status.OK && actionCallback.getUpnpFailure() == null);
-		}
-		return result;			
-	}
-	
-	
-	/**
-	 * Browse ContenDirctory asynchronous
-	 * @param device the device to be browsed 
-	 * @param objectID the browsing root 
-	 * @return the browsing result
-	 */
-	public ContentDirectoryBrowseResult browseAsync(Device<?,?,?> device,String objectID){
-		return browseAsync(device, objectID,
-				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0] );
-	}
-
-	/**
-	 * Browse ContenDirctory asynchronous
-	 * @param device the device to be browsed 
-	 * @param objectID the browsing root
-	 * @param flag  kind of browsing @see {@link BrowseFlag}
-	 * @param filter a filter 
-	 * @param firstResult first result 
-	 * @param maxResults max result count
-	 * @param orderBy sorting criteria @see {@link SortCriterion} 
-	 * @return  the browsing result
-	 */
-	public ContentDirectoryBrowseResult browseAsync(Device<?,?,?> device,String objectID,
-			BrowseFlag flag, String filter, long firstResult, Long maxResults,
-			SortCriterion... orderBy ){
-		Service service = device.findService(new UDAServiceId("ContentDirectory"));
-		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
-		ContentDirectoryBrowseActionCallback actionCallback=null;
-		if (service != null) {
-			Log.d(getClass().getName(),"#####Service found: "
-					+ service.getServiceId() + " Type: "
-					+ service.getServiceType());
-			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID,
-					flag, filter, firstResult, maxResults,result,
-					orderBy);
-			getControlPoint().execute(actionCallback);			
-		}
-		return result;			
-	}
-
-	/**
-	 * Search asynchronously for all devices.
-	 */
-	public void searchDevices() {
-		if (isInitialized()) {
-			getAndroidUpnpService().getControlPoint().search();
-		}
 	}
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
@@ -336,7 +157,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	public void onServiceDisconnected(ComponentName className) {
 		setAndroidUpnpService(null);
-		
+
 	}
 
 	// ----------Implementation Upnp RegistryListener Interface
@@ -405,4 +226,530 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(), "afterShutdown ");
 	}
 
+	// ****************************************************
+
+	private Service getAVTransportService(Device<?, ?, ?> device) {
+		ServiceId serviceId = new UDAServiceId("AVTransport");
+		Service service = device.findService(serviceId);
+		if (service != null) {
+			Log.d(getClass().getName(),
+					"Service found: " + service.getServiceId() + " Type: "
+							+ service.getServiceType());
+		}
+		return service;
+	}
+
+	private void waitForActionComplete() {
+
+		watchdogFlag.set(false);
+		new Timer().schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				watchdogFlag.set(true);
+			}
+		}, 30000l); // 30sec. Watchdog
+
+		while (!actionFinished.get() && !watchdogFlag.get()) {
+			// wait for local device is connected
+		}
+		if (watchdogFlag.get()) {
+			Log.d(getClass().getName(), "Watchdog timeout!");
+		}
+	}
+
+	/**
+	 * Start an intent with Action.View;
+	 * 
+	 * @param mime
+	 *            the Mimetype to start
+	 * @param uri
+	 *            the uri to start
+	 * 
+	 */
+	protected void intentView(String mime, Uri uri) {
+		intentView(mime, uri, false);
+	}
+
+	/**
+	 * Start an intent with Action.View;
+	 * 
+	 * @param mime
+	 *            the Mimetype to start
+	 * @param uri
+	 *            the uri to start
+	 * @param backround
+	 *            starts a background activity
+	 */
+	protected void intentView(String mime, Uri uri, boolean background) {
+		Class activityclazz = null;
+		// test if special activity to choose
+		if (background) {
+			if (mime.indexOf("audio") > -1) {
+				Log.d(getClass().getName(), "Starting Background service... ");
+				Intent svc = new Intent(context, BackgroundMusicService.class);
+				svc.setData(uri);
+				context.startService(svc);
+			} else {
+				throw new IllegalStateException(
+						"no activity for starting in background found");
+			}
+			return;
+		}
+
+		if (mime == null) {
+			activityclazz = null;
+
+		} else if (mime.indexOf("image") > -1) {
+			activityclazz = ImageViewerActivity.class;
+		}
+
+		intentView(mime, uri, activityclazz);
+	}
+
+	protected void intentView(String mime, Uri uri, Class activityClazz) {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		if (activityClazz != null) {
+			intent = new Intent(context, activityClazz);
+		}
+
+		intent.setDataAndType(uri, mime);
+
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		context.startActivity(intent);
+	}
+
+	/**
+	 * Add an listener.
+	 * 
+	 * @param listener
+	 *            the listener to be added
+	 */
+	public void addUpnpClientListener(UpnpClientListener listener) {
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove the given listener.
+	 * 
+	 * @param listener
+	 *            the listener which is to be removed
+	 */
+	public void removeUpnpClientListener(UpnpClientListener listener) {
+		listeners.remove(listener);
+	}
+
+	protected AndroidUpnpService getAndroidUpnpService() {
+		return androidUpnpService;
+	}
+
+	/**
+	 * Returns all registered UpnpDevices.
+	 * 
+	 * @return the upnpDevices
+	 */
+	public Collection<Device> getDevices() {
+		if (isInitialized()) {
+			return getRegistry().getDevices();
+		}
+		return null;
+	}
+
+	/**
+	 * Returns a registered UpnpDevice.
+	 * 
+	 * @return the upnpDevice null if not found
+	 */
+	public Device<?, ?, ?> getDevice(String identifier) {
+		if (isInitialized()) {
+			return getRegistry().getDevice(new UDN(identifier), false);
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the cling UpnpService.
+	 * 
+	 * @return the cling UpnpService
+	 */
+	public UpnpService getUpnpService() {
+		if (!isInitialized()) {
+			return null;
+		}
+		return androidUpnpService.get();
+	}
+
+	/**
+	 * True if the client is initialized.
+	 * 
+	 * @return true or false
+	 */
+	public boolean isInitialized() {
+		return getAndroidUpnpService() != null;
+	}
+
+	public UpnpServiceConfiguration getConfiguration() {
+		if (!isInitialized()) {
+			return null;
+		}
+		return androidUpnpService.getConfiguration();
+	}
+
+	public ControlPoint getControlPoint() {
+		if (!isInitialized()) {
+			return null;
+		}
+		return androidUpnpService.getControlPoint();
+	}
+
+	public Registry getRegistry() {
+		if (!isInitialized()) {
+			return null;
+		}
+		return androidUpnpService.getRegistry();
+	}
+
+	/**
+	 * Setting an new upnpRegistryService. If the service is not null, refresh
+	 * the device list.
+	 * 
+	 * @param upnpService
+	 */
+	protected void setAndroidUpnpService(AndroidUpnpService upnpService) {
+		this.androidUpnpService = upnpService;
+
+	}
+
+	private void refreshUpnpDeviceCatalog() {
+		if (isInitialized()) {
+			for (Device<?, ?, ?> device : getAndroidUpnpService().getRegistry()
+					.getDevices()) {
+				this.deviceAdded(device);
+			}
+
+			// Getting ready for future device advertisements
+			getAndroidUpnpService().getRegistry().addListener(this);
+
+			searchDevices();
+		}
+	}
+
+	/**
+	 * Browse ContenDirctory synchronous
+	 * 
+	 * @param device
+	 *            the device to be browsed
+	 * @param objectID
+	 *            the browsing root
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
+			String objectID) {
+		return browseSync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*",
+				0L, null, new SortCriterion[0]);
+	}
+
+	/**
+	 * Browse ContenDirctory synchronous
+	 * 
+	 * @param device
+	 *            the device to be browsed
+	 * @param objectID
+	 *            the browsing root
+	 * @param flag
+	 *            kind of browsing @see {@link BrowseFlag}
+	 * @param filter
+	 *            a filter
+	 * @param firstResult
+	 *            first result
+	 * @param maxResults
+	 *            max result count
+	 * @param orderBy
+	 *            sorting criteria @see {@link SortCriterion}
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
+			String objectID, BrowseFlag flag, String filter, long firstResult,
+			Long maxResults, SortCriterion... orderBy) {
+		Service service = device.findService(new UDAServiceId(
+				"ContentDirectory"));
+		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
+		ContentDirectoryBrowseActionCallback actionCallback = null;
+		if (service != null) {
+			Log.d(getClass().getName(),
+					"#####Service found: " + service.getServiceId() + " Type: "
+							+ service.getServiceType());
+			actionCallback = new ContentDirectoryBrowseActionCallback(service,
+					objectID, flag, filter, firstResult, maxResults, result,
+					orderBy);
+			getControlPoint().execute(actionCallback);
+			while (actionCallback.getStatus() != Status.OK
+					&& actionCallback.getUpnpFailure() == null)
+				;
+		}
+		return result;
+	}
+
+	/**
+	 * Browse ContenDirctory asynchronous
+	 * 
+	 * @param device
+	 *            the device to be browsed
+	 * @param objectID
+	 *            the browsing root
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseAsync(Device<?, ?, ?> device,
+			String objectID) {
+		return browseAsync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*",
+				0L, null, new SortCriterion[0]);
+	}
+
+	/**
+	 * Browse ContenDirctory asynchronous
+	 * 
+	 * @param device
+	 *            the device to be browsed
+	 * @param objectID
+	 *            the browsing root
+	 * @param flag
+	 *            kind of browsing @see {@link BrowseFlag}
+	 * @param filter
+	 *            a filter
+	 * @param firstResult
+	 *            first result
+	 * @param maxResults
+	 *            max result count
+	 * @param orderBy
+	 *            sorting criteria @see {@link SortCriterion}
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseAsync(Device<?, ?, ?> device,
+			String objectID, BrowseFlag flag, String filter, long firstResult,
+			Long maxResults, SortCriterion... orderBy) {
+		Service service = device.findService(new UDAServiceId(
+				"ContentDirectory"));
+		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
+		ContentDirectoryBrowseActionCallback actionCallback = null;
+		if (service != null) {
+			Log.d(getClass().getName(),
+					"#####Service found: " + service.getServiceId() + " Type: "
+							+ service.getServiceType());
+			actionCallback = new ContentDirectoryBrowseActionCallback(service,
+					objectID, flag, filter, firstResult, maxResults, result,
+					orderBy);
+			getControlPoint().execute(actionCallback);
+		}
+		return result;
+	}
+
+	/**
+	 * Search asynchronously for all devices.
+	 */
+	public void searchDevices() {
+		if (isInitialized()) {
+			getAndroidUpnpService().getControlPoint().search();
+		}
+	}
+
+	/**
+	 * Starts playing item locally
+	 * 
+	 * @param item
+	 *            the item
+	 */
+	public void playLocal(Item item) {
+		if (item == null)
+			return;
+		Log.d(getClass().getName(), "ItemId: " + item.getId());
+		Res resource = item.getFirstResource();
+		if (resource == null)
+			return;
+
+		Log.d(getClass().getName(), "ImportUri: " + resource.getImportUri());
+		Log.d(getClass().getName(), "Duration: " + resource.getDuration());
+		Log.d(getClass().getName(),
+				"ProtocolInfo: " + resource.getProtocolInfo());
+		Log.d(getClass().getName(), "ContentFormat: "
+				+ resource.getProtocolInfo().getContentFormat());
+		Log.d(getClass().getName(), "Value: " + resource.getValue());
+		intentView(resource.getProtocolInfo().getContentFormat(),
+				Uri.parse(resource.getValue()));
+
+	}
+
+	/**
+	 * Starts playing a container locally. All items are played
+	 * 
+	 * @param item
+	 *            the item
+	 * 
+	 */
+	public void playLocal(Container container) {
+		playLocal(container, false);
+	}
+
+	/**
+	 * Starts playing a container locally. All items are played
+	 * 
+	 * @param item
+	 *            the item
+	 * @param background
+	 *            starts a background activity
+	 */
+	protected void playLocal(Container container, boolean background) {
+		if (container == null)
+			return;
+		Log.d(getClass().getName(), "ContainerId: " + container.getId());
+		for (Item item : container.getItems()) {
+
+			Res resource = item.getFirstResource();
+			if (resource == null)
+				return;
+
+			Log.d(getClass().getName(), "ImportUri: " + resource.getImportUri());
+			Log.d(getClass().getName(), "Duration: " + resource.getDuration());
+			Log.d(getClass().getName(),
+					"ProtocolInfo: " + resource.getProtocolInfo());
+			Log.d(getClass().getName(), "ContentFormat: "
+					+ resource.getProtocolInfo().getContentFormat());
+			Log.d(getClass().getName(), "Value: " + resource.getValue());
+			intentView(resource.getProtocolInfo().getContentFormat(),
+					Uri.parse(resource.getValue()), background);
+			// Wait Duration until next Item is send to receiver intent
+			// TODO intent should get a playlist instead of singel items
+			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+			long millis = 10000; // 10 sec. default
+			if (resource.getDuration() != null) {
+				try {
+					Date date = dateFormat.parse(resource.getDuration());
+					// silence 2 sec
+					millis = date.getTime() + 2000;
+
+				} catch (ParseException e) {
+					Log.d(getClass().getName(), "bad duration format", e);
+
+				}
+			}
+			try {
+				Thread.sleep(millis);
+			} catch (InterruptedException e) {
+				Log.d(getClass().getName(), "InterruptedException ", e);
+
+			}
+		}
+	}
+
+	/**
+	 * Starts playing a music container parallel with an image container
+	 * locally. All items are played
+	 * 
+	 * @param item
+	 *            the item
+	 * 
+	 */
+	public void playLocal(final Container imageContainer,
+			final Container musicContainer) {
+		if (imageContainer == null || musicContainer == null)
+			return;
+		Log.d(getClass().getName(),
+				"Image ContainerId: " + imageContainer.getId());
+		Log.d(getClass().getName(),
+				"Music ContainerId: " + musicContainer.getId());
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				playLocal(musicContainer, true);
+
+			}
+		}).start();
+
+		playLocal(imageContainer);
+
+	}
+
+	/**
+	 * Plays an item on an remote device
+	 * 
+	 * @param item
+	 * @param remoteDevice
+	 */
+	public void playRemote(Item item, Device<?, ?, ?> remoteDevice) {
+		if (item == null || remoteDevice == null)
+			return;
+		Log.d(getClass().getName(), "ItemId: " + item.getId());
+		Res resource = item.getFirstResource();
+		if (resource == null)
+			return;
+
+		Log.d(getClass().getName(), "ImportUri: " + resource.getImportUri());
+		Log.d(getClass().getName(), "Duration: " + resource.getDuration());
+		Log.d(getClass().getName(),
+				"ProtocolInfo: " + resource.getProtocolInfo());
+		Log.d(getClass().getName(), "ContentFormat: "
+				+ resource.getProtocolInfo().getContentFormat());
+		Log.d(getClass().getName(), "Value: " + resource.getValue());
+		Service<?, ?> service = getAVTransportService(remoteDevice);
+		if(service == null) {
+			Log.d(getClass().getName(), "No AVTransport-Servcie found on Device: " + remoteDevice.getDisplayString());
+			return;
+		}
+		Log.d(getClass().getName(), "Action SetAVTransportURI ");
+		actionFinished.set(false);
+		SetAVTransportURI setAVTransportURI = new SetAVTransportURI(service,
+				resource.getValue()) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusMessage());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusCode());
+				actionFinished.set(true);
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				actionFinished.set(true);
+
+			}
+
+		};
+		getControlPoint().execute(setAVTransportURI);
+		waitForActionComplete();
+		//Now start Playing
+		Log.d(getClass().getName(), "Action Play");
+		actionFinished.set(false);
+		Play actionCallback = new Play(service) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished.set(true);
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				actionFinished.set(true);
+
+			}
+
+		};
+		getControlPoint().execute(actionCallback);
+	}
 }

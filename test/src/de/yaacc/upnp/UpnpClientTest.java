@@ -95,6 +95,79 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		localUpnpServer = LocalUpnpServer.setup(getContext());
 	}
 
+	protected UpnpClient getInitializedUpnpClientWithLocalServer() {
+		return getInitializedUpnpClientWithDevice(LocalUpnpServer.UDN_ID);
+	}
+	
+	protected UpnpClient getInitializedUpnpClientWithDevice(String deviceId) {
+		UpnpClient upnpClient = new UpnpClient();
+		upnpClient.initialize(getContext());
+		flag = false;
+		new Timer().schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				flag = true;
+			}
+		}, 120000l); // 120sec. Watchdog
+
+		while (upnpClient.getDevice(deviceId) == null && !flag) {
+			// wait for local device is connected
+		}
+		assertFalse("Watchdog timeout No Device found!", flag);
+		return upnpClient;
+	}
+
+	public void testUseCaseBrowseAsync() {
+
+		UpnpClient upnpClient = new UpnpClient();
+		upnpClient.initialize(getContext());
+		flag = false;
+		new Timer().schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				flag = true;
+			}
+		}, 30000l); // 30sec. Watchdog
+
+		while (upnpClient.getDevice(LocalUpnpServer.UDN_ID) == null && !flag) {
+			// wait for local device is connected
+		}
+
+		assertFalse("Watchdog timeout No Device found!", flag);
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+		ContentDirectoryBrowseResult result = upnpClient.browseAsync(device,
+				"1", BrowseFlag.DIRECT_CHILDREN, "", 0, 999l, null);
+		while (result.getStatus() != Status.OK
+				&& result.getUpnpFailure() == null) {
+			// Do something very interesting while the asynchronous browse is
+			// running
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (result != null && result.getResult() != null) {
+			for (Container container : result.getResult().getContainers()) {
+				Log.d(getClass().getName(),
+						"Container: " + container.getTitle() + " ("
+								+ container.getChildCount() + ")");
+			}
+			for (Item item : result.getResult().getItems()) {
+				Log.d(getClass().getName(), "Item: "
+						+ item.getTitle()
+						+ " ("
+						+ item.getFirstResource().getProtocolInfo()
+								.getContentFormat() + ")");
+			}
+			assertEquals(3, result.getResult().getItems().size());
+		}
+
+	}
+	
 	public void testScan() throws Exception {
 
 		Context ctx = getContext();
@@ -467,6 +540,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				millis = date.getHours() * 60 * 60 * 1000;
 				millis += date.getMinutes() * 60 * 1000;
 				millis += date.getSeconds() * 1000;
+				assertEquals(date.getTime(), millis);
 				Log.d(getClass().getName(),
 						"HappyHappy Joy Joy Duration in Millis=" + millis);
 				Log.d(getClass().getName(), "Playing: " + item.getTitle());
@@ -667,79 +741,71 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	}
 
-	protected UpnpClient getInitializedUpnpClientWithLocalServer() {
-		return getInitializedUpnpClientWithDevice(LocalUpnpServer.UDN_ID);
+	public void testUseCasePlayLocalMusic() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"101");
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getItems());
+		assertNotNull(result.getResult().getItems().get(0));
+		upnpClient.playLocal(result.getResult().getItems().get(0));
+		
 	}
 	
-	protected UpnpClient getInitializedUpnpClientWithDevice(String deviceId) {
-		UpnpClient upnpClient = new UpnpClient();
-		upnpClient.initialize(getContext());
-		flag = false;
-		new Timer().schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				flag = true;
-			}
-		}, 120000l); // 120sec. Watchdog
-
-		while (upnpClient.getDevice(deviceId) == null && !flag) {
-			// wait for local device is connected
-		}
-		assertFalse("Watchdog timeout No Device found!", flag);
-		return upnpClient;
-	}
-
-	public void testUseCaseBrowseAsync() {
-
-		UpnpClient upnpClient = new UpnpClient();
-		upnpClient.initialize(getContext());
-		flag = false;
-		new Timer().schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				flag = true;
-			}
-		}, 30000l); // 30sec. Watchdog
-
-		while (upnpClient.getDevice(LocalUpnpServer.UDN_ID) == null && !flag) {
-			// wait for local device is connected
-		}
-
-		assertFalse("Watchdog timeout No Device found!", flag);
+	public void testUseCasePlayLocalImage() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
 		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
-		ContentDirectoryBrowseResult result = upnpClient.browseAsync(device,
-				"1", BrowseFlag.DIRECT_CHILDREN, "", 0, 999l, null);
-		while (result.getStatus() != Status.OK
-				&& result.getUpnpFailure() == null) {
-			// Do something very interesting while the asynchronous browse is
-			// running
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if (result != null && result.getResult() != null) {
-			for (Container container : result.getResult().getContainers()) {
-				Log.d(getClass().getName(),
-						"Container: " + container.getTitle() + " ("
-								+ container.getChildCount() + ")");
-			}
-			for (Item item : result.getResult().getItems()) {
-				Log.d(getClass().getName(), "Item: "
-						+ item.getTitle()
-						+ " ("
-						+ item.getFirstResource().getProtocolInfo()
-								.getContentFormat() + ")");
-			}
-			assertEquals(3, result.getResult().getItems().size());
-		}
-
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"202");		
+		//Image
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getItems());
+		assertNotNull(result.getResult().getItems().get(0));
+		upnpClient.playLocal(result.getResult().getItems().get(0));
+		myWait();
 	}
 
+	public void testUseCasePlayLocalMusicAlbum() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0");
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getContainers());
+		assertNotNull(result.getResult().getContainers().get(0));
+		upnpClient.playLocal(result.getResult().getContainers().get(0));
+		
+	}
+	
+	public void testUseCasePlayLocalPhotoShow() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0");
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getContainers());
+		assertNotNull(result.getResult().getContainers().get(1));
+		upnpClient.playLocal(result.getResult().getContainers().get(1));
+		
+	}
+	
+	public void testUseCasePlayLocalPhotoShowWithMusic() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0");
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getContainers());
+		assertNotNull(result.getResult().getContainers().get(0));
+		assertNotNull(result.getResult().getContainers().get(1));
+		upnpClient.playLocal(result.getResult().getContainers().get(1),result.getResult().getContainers().get(0));
+		
+	}
 }
 
 // TODO
