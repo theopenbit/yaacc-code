@@ -34,12 +34,17 @@ import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.support.avtransport.callback.GetMediaInfo;
 import org.teleal.cling.support.avtransport.callback.GetPositionInfo;
 import org.teleal.cling.support.avtransport.callback.GetTransportInfo;
+import org.teleal.cling.support.avtransport.callback.Pause;
+import org.teleal.cling.support.avtransport.callback.Play;
+import org.teleal.cling.support.avtransport.callback.Seek;
 import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.avtransport.callback.Stop;
+import org.teleal.cling.support.connectionmanager.callback.GetProtocolInfo;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.PositionInfo;
+import org.teleal.cling.support.model.ProtocolInfos;
 import org.teleal.cling.support.model.TransportInfo;
 import org.teleal.cling.support.renderingcontrol.callback.GetMute;
 import org.teleal.cling.support.renderingcontrol.callback.GetVolume;
@@ -71,14 +76,15 @@ import android.util.Log;
  */
 public class OpenbitTestCases extends UpnpClientTest {
 	private static final String OPENBIT_MEDIA_SERVER = "c8236ca5-1995-4ad5-a682-edce874c81eb";
-	private static final String OPENBIT_AVTRANSPORT_DEVICE = "00-30-8D-20-20-8C";
+	private static final String OPENBIT_AVTRANSPORT_DEVICE = "00-30-8D-20-20-83";//"00-30-8D-20-20-8C";
 	private static final String OPENBIT_AVTRANSPORT_DEVICE2 = "F00DBABE-SA5E-BABA-DADA00903EF555CB";
-	// http://192.168.0.102:49153/nmrDescription.xml
-	// 00-30-8D-20-20-8C, Descriptor: http://192.168.0.2:60826/
-	// uuid:65adeb42-L121-7607-70aa-01d221629, Descriptor:
-	// http://192.168.0.67:50226
-	// uuid:76889b9e-6657-8799-ed4b-00308D20208C, Descriptor:
-	// http://192.168.0.2:63068/,
+	private static final String OPENBIT_AVTRANSPORT_DEVICE3 = "00-30-8D-20-20-83";
+	//gz uuid:00-30-8D-20-20-83, Descriptor: http://192.168.0.98:62199/d
+	//wz F00DBABE-SA5E-BABA-DADA00903EF555CB, Descriptor: http://192.168.0.102:49153/nmrDescription.xml
+	//az 00-30-8D-20-20-8C, Descriptor: http://192.168.0.2:60826/ oder 51222
+	//n uuid:65adeb42-L121-7607-70aa-01d221629, Descriptor: http://192.168.0.67:50226
+	// uuid:76889b9e-6657-8799-ed4b-00308D20208C, Descriptor: http://192.168.0.2:63068/
+	//mt uuid:c8236ca5-1995-4ad5-a682-edce874c81eb, Descriptor: http://192.168.0.90:49153/description.xml
 	protected boolean actionFinished;
 	protected boolean watchdogFlag;
 
@@ -98,6 +104,16 @@ public class OpenbitTestCases extends UpnpClientTest {
 		assertFalse("Watchdog timeout!", watchdogFlag);
 	}
 
+	
+	private void displaySuccess(ActionInvocation invocation) {
+		Log.d(getClass().getName(), "Success:" + invocation.getAction().getName());
+		Set keySet = invocation.getOutputMap().keySet();
+		for (Object key : keySet) {
+			Log.d(getClass().getName(), "Key:  " + key + "Value: " + invocation.getOutputMap().get(key));
+			
+		}
+	}
+	
 	public void testStreamMP3Album() throws Exception {
 		streamMP3Album("432498", OPENBIT_MEDIA_SERVER);
 	}
@@ -165,6 +181,30 @@ public class OpenbitTestCases extends UpnpClientTest {
 						+ avservice.getServiceType());
 		return avservice;
 	}
+	
+	
+	
+	private Service getConnectionManagerService(Device<?, ?, ?> device) {	
+		ServiceId serviceId = new ServiceId(
+				UDAServiceId.BROKEN_DEFAULT_NAMESPACE, "ConnectionManager");
+		Service[] services = device.getServices();
+		Service avservice = null; // device.findService(serviceId);
+		for (Service service : services) {
+			if (service.getServiceType().toFriendlyString()
+					.indexOf("ConnectionManager") > -1) {
+				Log.d(getClass().getName(), serviceId.toString());
+				Log.d(getClass().getName(), service.getServiceType()
+						.toFriendlyString());
+				avservice = service;
+				break;
+			}
+		}
+		assertNotNull(avservice);
+		Log.d(getClass().getName(),
+				"Service found: " + avservice.getServiceId() + " Type: "
+						+ avservice.getServiceType());
+		return avservice;
+	}
 
 	public void testAVTransportActionMediaInfo() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
@@ -220,12 +260,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 			
 			@Override
 			public void success(ActionInvocation invocation) {		
-				Log.d(getClass().getName(), "Success: " + invocation);
-				Set keySet = invocation.getOutputMap().keySet();
-				for (Object key : keySet) {
-					Log.d(getClass().getName(), "Key:  " + key + "Value: " + invocation.getOutputMap().get(key));
-					
-				}
+				displaySuccess(invocation);
 				super.success(invocation);
 			}
 
@@ -264,6 +299,107 @@ public class OpenbitTestCases extends UpnpClientTest {
 		waitForActionComplete();
 	}
 
+	public void testAVTransportActionPlay() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Service avservice = getAVTransportService(device);
+		// Stop
+		Log.d(getClass().getName(), "Action Play");
+		actionFinished = false;
+		Play actionCallback = new Play(avservice) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				displaySuccess(actioninvocation);
+
+			}
+
+		};
+		upnpClient.getControlPoint().execute(actionCallback);
+		myWait(20000l);
+	}
+	
+	
+	public void testAVTransportActionSeek() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Service avservice = getAVTransportService(device);
+		// 
+		Log.d(getClass().getName(), "Action Seek");
+		actionFinished = false;
+		Seek actionCallback = new Seek(avservice,"100") {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				displaySuccess(actioninvocation);
+
+			}
+
+		};
+		upnpClient.getControlPoint().execute(actionCallback);
+		myWait(20000l);
+	}
+	
+	public void testAVTransportActionPause() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Service avservice = getAVTransportService(device);
+		// 
+		Log.d(getClass().getName(), "Action Pause");
+		actionFinished = false;
+		Pause actionCallback = new Pause(avservice) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				displaySuccess(actioninvocation);
+
+			}
+
+		};
+		upnpClient.getControlPoint().execute(actionCallback);
+		myWait(20000l);
+	}
+	
+	
 	public void testAVTransportActionStop() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
 		Device<?, ?, ?> device = upnpClient
@@ -288,7 +424,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 			@Override
 			public void success(ActionInvocation actioninvocation) {
 				super.success(actioninvocation);
-				Log.d(getClass().getName(), "Success " + actioninvocation);
+				displaySuccess(actioninvocation);
 
 			}
 
@@ -329,7 +465,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 
 			@Override
 			public void success(ActionInvocation actioninvocation) {
-				Log.d(getClass().getName(), "Success " + actioninvocation);
+				displaySuccess(actioninvocation);
 
 			}
 		};
@@ -390,7 +526,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 		actionFinished = false;
 		SetAVTransportURI transportInfoAC = new SetAVTransportURI(
 				avservice,
-				"http://api.jamendo.com/get2/stream/track/redirect/?id=310355&streamencoding=mp31") {
+				"http://190.168.0.90/nas/Medien/Musik/A/ACDC/High%20Voltage/04%20-%20Live%20Wire.mp3") {
 
 			@Override
 			public void failure(ActionInvocation actioninvocation,
@@ -399,6 +535,10 @@ public class OpenbitTestCases extends UpnpClientTest {
 						+ upnpresponse);
 				Log.d(getClass().getName(),
 						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusMessage());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusCode());
 				actionFinished = true;
 
 			}
@@ -406,7 +546,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 			@Override
 			public void success(ActionInvocation actioninvocation) {
 				super.success(actioninvocation);
-				Log.d(getClass().getName(), "Success " + actioninvocation);
+				displaySuccess(actioninvocation);
 
 			}
 
@@ -463,7 +603,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 			public void success(ActionInvocation invocation) {
 
 				super.success(invocation);
-				Log.d(getClass().getName(), "Success Volume set");
+				displaySuccess(invocation);
 			}
 
 			@Override
@@ -530,7 +670,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 			public void success(ActionInvocation invocation) {
 
 				super.success(invocation);
-				Log.d(getClass().getName(), "Success Mute set");
+				displaySuccess(invocation);
 			}
 
 			@Override
@@ -583,16 +723,131 @@ public class OpenbitTestCases extends UpnpClientTest {
 			}
 
 			@Override
-			public void success(ActionInvocation actioninvocation) {
-				Log.d(getClass().getName(), "Success " + actioninvocation);
-				Set keySet = actioninvocation.getOutputMap().keySet();
-				for (Object key : keySet) {
-					Log.d(getClass().getName(), "Key:  " + key + "Value: " + actioninvocation.getOutputMap().get(key));
-					
-				}
+			public void success(ActionInvocation actioninvocation) {				
+				displaySuccess(actioninvocation);
 				actionFinished = true;
 
 			}
+		};
+
+		upnpClient.getControlPoint().execute(actionCallback);
+		waitForActionComplete();
+
+	}
+	
+	public void testConnectionManagerActionGetProtocolInfo() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Service avservice = getConnectionManagerService(device); 
+		Log.d(getClass().getName(), "Action GetProtocolInfo ");
+		actionFinished = false;
+		ActionCallback actionCallback = new GetProtocolInfo(avservice) {
+
+			@Override
+			public void success(ActionInvocation invocation) {
+
+				super.success(invocation);
+				displaySuccess(invocation);
+			}
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished = true;
+
+			}
+
+			@Override
+			public void received(ActionInvocation arg0, ProtocolInfos arg1,
+					ProtocolInfos arg2) {
+				Log.d(getClass().getName(), "ProtocolInfos 1: " + arg1);
+				Log.d(getClass().getName(), "ProtocolInfos 2: " + arg2);
+				
+			}
+
+		};
+
+		upnpClient.getControlPoint().execute(actionCallback);
+		waitForActionComplete();
+
+	}
+
+	public void testConnectionManagerActionGetCurrentConnectionIDs() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Service avservice = getConnectionManagerService(device); 		
+		Log.d(getClass().getName(), "Action GetCurrentConnectionIDs ");
+		actionFinished = false;
+		ActionInvocation actionInvocation = new ActionInvocation(
+				avservice.getAction("GetCurrentConnectionIDs"));		
+		ActionCallback actionCallback = new ActionCallback(actionInvocation) {
+
+			@Override
+			public void success(ActionInvocation invocation) {
+
+				
+				displaySuccess(invocation);
+			}
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished = true;
+
+			}
+
+		
+
+		};
+
+		upnpClient.getControlPoint().execute(actionCallback);
+		waitForActionComplete();
+
+	}
+	
+	
+	public void testConnectionManagerActionGetCurrentConnectionInfo() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_AVTRANSPORT_DEVICE);
+		Service avservice = getConnectionManagerService(device); 		
+		Log.d(getClass().getName(), "Action GetCurrentConnectionInfo ");
+		actionFinished = false;
+		ActionInvocation actionInvocation = new ActionInvocation(
+				avservice.getAction("GetCurrentConnectionInfo"));	
+		actionInvocation.setInput("ConnectionID", "0");
+		ActionCallback actionCallback = new ActionCallback(actionInvocation) {
+
+			@Override
+			public void success(ActionInvocation invocation) {
+
+				
+				displaySuccess(invocation);
+			}
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				actionFinished = true;
+
+			}
+
+		
+
 		};
 
 		upnpClient.getControlPoint().execute(actionCallback);
