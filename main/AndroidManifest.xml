@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="10"
-        android:targetSdkVersion="15" />
+        android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -28,26 +28,32 @@
             </intent-filter>
         </activity>
 
-        <service android:enabled="true" android:name="de.yaacc.upnp.UpnpRegistryService" />
-        <service android:enabled="true" android:name="de.yaacc.BackgroundMusicService" />
+        <service
+            android:name="de.yaacc.upnp.UpnpRegistryService"
+            android:enabled="true" />
+        <service
+            android:name="de.yaacc.BackgroundMusicService"
+            android:enabled="true" />
 
         <activity
             android:name="de.yaacc.ImageViewerActivity"
             android:label="@string/title_activity_image_viewer" >
-             <intent-filter>                
-                <action android:name="android.intent.action.VIEW" />                
-                <category android:name="android.intent.category.DEFAULT" />                
-                <data android:mimeType="image/*" />	            	                 	        	            
-            </intent-filter>            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
         </activity>
-        
         <activity
             android:name="de.yaacc.config.SettingsActivity"
             android:label="@string/title_activity_settings" >
-             <intent-filter>                
-                <action android:name="android.intent.action.VIEW" />                
-                <category android:name="android.intent.category.DEFAULT" />        	        	            
-            </intent-filter>            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 
