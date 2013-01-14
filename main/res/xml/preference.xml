@@ -6,9 +6,9 @@
         
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_browsing">
-        <CheckBoxPreference android:summaryOn="@string/settings_browse_audio_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_audio_off"/>
-        <CheckBoxPreference android:summaryOn="@string/settings_browse_video_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_video_off"/>
-        <CheckBoxPreference android:summaryOn="@string/settings_browse_image_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_image_off"/>
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_audio_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_audio_off" android:key="@string/settings_audio_chkbx"/>
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_video_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_video_off" android:key="@string/settings_video_chkbx"/>
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_image_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_image_off" android:key="@string/settings_image_chkbx"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

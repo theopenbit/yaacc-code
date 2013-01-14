@@ -23,4 +23,8 @@
     <string name="settings_browse_video_off">Show no video files</string>
     <string name="settings_browse_image_on">Show image files</string>
     <string name="settings_browse_image_off">Show no image files</string>
+    
+    <string name="settings_audio_chkbx">audio_chkbx</string>
+    <string name="settings_video_chkbx">audio_chkbx</string>
+    <string name="settings_image_chkbx">audio_chkbx</string>
 </resources>
