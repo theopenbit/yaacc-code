@@ -31,83 +31,64 @@ import org.teleal.cling.support.model.item.Item;
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 /**
- * Result of a content directory browsing.
- * This object is used either in synchronous or asynchronous requests.
- * In case of asynchronous requests you have to query the status 
- * in order to know if the request completes.   
- *  
+ * ActionCallback for content directory browsing. 
+ * Connect an instance of this class to a MediaServer-Service.
+ * After calling run you will browse the MediaServer-Directory asynchronously 
  * @author Tobias Schöne (openbit)  
  *
  */
-public class ContentDirectoryBrowseResult {
-	private Status status = Status.NO_CONTENT;
-	private DIDLContent result  = null;
-	private UpnpFailure upnpFailure;
+public class ContentDirectoryBrowseActionCallback extends Browse {	
+	private ContentDirectoryBrowseResult browsingResult;
 	
 
 	
-	
+	public ContentDirectoryBrowseActionCallback(Service<?, ?> service, String objectID,
+			BrowseFlag flag, String filter, long firstResult, Long maxResults, ContentDirectoryBrowseResult browsingResult,
+			SortCriterion... orderBy) {
+		super(service, objectID, flag, filter, firstResult, maxResults, orderBy);
+		this.browsingResult = browsingResult;
 
-	/**
-	 * default constructor. 
-	 *
-	 *   
-	 */
-	public ContentDirectoryBrowseResult() {
-		super();
-		
 	}
 
+	
+	
 
-	/**
-	 * Returns the status of browsing, i.e. LAODING, NO_CONTENT, OK.
-	 * @return the status
-	 */
+	@Override
+	public void received(ActionInvocation actionInvocation, DIDLContent didl) {
+		this.browsingResult.setResult(didl);
+	}
+	
+
+	@Override
+	public void updateStatus(Status status) {
+		this.browsingResult.setStatus(status);
+	}
+
+	@Override
+	public void failure(ActionInvocation invocation, UpnpResponse operation,
+			String defaultMsg) {
+		this.browsingResult.setUpnpFailure(new UpnpFailure(invocation, operation, defaultMsg));
+
+	}
+
 	public Status getStatus() {
-		return status;
+		return this.browsingResult.getStatus();
 	}
 
 
 	/**
-	 * Returns the browsing result.
 	 * @return the result
 	 */
 	public DIDLContent getResult() {
-		return result;
+		return this.browsingResult.getResult();
 	}
 
 
 	/**
-	 * a failure object if anything goes wrong.
 	 * @return the upnpFailure
 	 */
 	public UpnpFailure getUpnpFailure() {
-		return upnpFailure;
-	}
-
-
-	/**
-	 * Set the status of browsing
-	 * @param status the status to set
-	 */
-	public void setStatus(Status status) {
-		this.status = status;
-	}
-
-
-	/**
-	 * @param result the result to set
-	 */
-	public void setResult(DIDLContent result) {
-		this.result = result;
-	}
-
-
-	/**
-	 * @param upnpFailure the upnpFailure to set
-	 */
-	public void setUpnpFailure(UpnpFailure upnpFailure) {
-		this.upnpFailure = upnpFailure;
+		return this.browsingResult.getUpnpFailure();
 	}
 
 }

@@ -61,11 +61,13 @@ public class ContentDirectory extends AbstractContentDirectoryService {
 		MusicAlbum musicAlbum = new MusicAlbum("1", rootContainer, "Music", "yaacc",musicTracks.size(),musicTracks);
 		musicAlbum.setSearchable(true);
 		musicAlbum.setRestricted(false);
+		rootContainer.addContainer(musicAlbum);
 		content.put(musicAlbum.getId(),musicAlbum);
 		List<Photo> photos = createPhotos("2"); 
 		PhotoAlbum photoAlbum = new PhotoAlbum("2", rootContainer, "Photos", "yaacc", photos.size(),photos);
 		photoAlbum.setSearchable(true);
 		photoAlbum.setRestricted(false);
+		rootContainer.addContainer(photoAlbum);
 		content.put(photoAlbum.getId(),photoAlbum);
 	    	
 	}
@@ -158,7 +160,7 @@ public class ContentDirectory extends AbstractContentDirectoryService {
 		}
 		BrowseResult result = null;
 		try {
-			result = new BrowseResult(new DIDLParser().generate(didl), childCount, 1);
+			result = new BrowseResult(new DIDLParser().generate(didl,true), childCount, 1);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
