@@ -1,20 +1,35 @@
 package de.yaacc;
 
-import de.yaacc.config.SettingsActivity;
+import java.util.LinkedList;
+
+import org.teleal.cling.model.meta.Device;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
+import de.yaacc.config.SettingsActivity;
+import de.yaacc.upnp.UpnpClient;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener{
 
-   
+	UpnpClient uClient = null;
+	
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        uClient = new UpnpClient();
+    	uClient.initialize(getApplicationContext());
+        
+    	final Button showDeviceNumber = (Button) findViewById(R.id.nbDev);
+    	showDeviceNumber.setOnClickListener(this);
     }
 
     @Override
@@ -34,4 +49,13 @@ public class MainActivity extends Activity {
     		return super.onOptionsItemSelected(item);
     	}
     }
+
+	@Override
+	public void onClick(View v) {
+		final TextView helloWorld = (TextView) findViewById(R.id.helloWorld);
+		LinkedList<Device> deviceList= new LinkedList<Device>();
+		deviceList.addAll(uClient.getDevices());
+    	helloWorld.setText(uClient.getDevices().size()+" devices found");
+		
+	}
 }
