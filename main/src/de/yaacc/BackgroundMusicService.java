@@ -1,6 +1,6 @@
-/**
+/*
  *
- * Copyright (C) 2012 Tobias Schoene www.schoenesnetz.de kontakt@schoenesnetz.de
+ * Copyright (C) 2013 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,21 +24,7 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.util.Log;
 
-/*
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version 3
- of the License, or (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 /**
  * A simple service for playing music in background.
  * 
@@ -66,6 +52,10 @@ public class BackgroundMusicService extends Service {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see android.app.Service#onDestroy()
+	 */
 	@Override
 	public void onDestroy() {
 		Log.d(this.getClass().getName(), "On Destroy");
@@ -75,6 +65,10 @@ public class BackgroundMusicService extends Service {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see android.app.Service#onBind(android.content.Intent)
+	 */
 	@Override
 	public IBinder onBind(Intent intent) {
 		Log.d(this.getClass().getName(), "On Bind");
@@ -82,7 +76,10 @@ public class BackgroundMusicService extends Service {
 	}
 
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see android.app.Service#onStart(android.content.Intent, int)
+	 */
 	 @Override
 	 public void onStart(Intent intent, int startid) {
 		 Log.d(this.getClass().getName(), "On Start");

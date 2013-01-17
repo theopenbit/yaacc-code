@@ -34,7 +34,10 @@
         <service
             android:name="de.yaacc.BackgroundMusicService"
             android:enabled="true" />
-
+         <service
+            android:name="de.yaacc.upnp.server.YaaccUpnpServerService"
+            android:enabled="true" />
+        
         <activity
             android:name="de.yaacc.ImageViewerActivity"
             android:label="@string/title_activity_image_viewer" >

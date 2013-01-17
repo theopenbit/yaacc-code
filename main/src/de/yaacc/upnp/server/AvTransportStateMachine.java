@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright (C) 2013 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
@@ -15,26 +16,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc;
+package de.yaacc.upnp.server;
 
-import android.annotation.TargetApi;
-import android.test.ActivityInstrumentationTestCase2;
-
+import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
+import org.teleal.common.statemachine.States;
 /**
- * This is a simple framework for a test of an Application.  See
- * {@link android.test.ApplicationTestCase ApplicationTestCase} for more information on
- * how to write and extend Application tests.
- * <p/>
- * To run this test, you can type:
- * adb shell am instrument -w \
- * -e class de.yaacc.MainActivityTest \
- * de.yaacc.tests/android.test.InstrumentationTestRunner
+ * @author Tobias Schöne (openbit)  
+ *
  */
-@TargetApi(3)
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    public MainActivityTest() {
-        super("de.yaacc", MainActivity.class);
-    }
-
+@States({
+	AvTransportMediaRendererNoMediaPresent.class,
+	AvTransportMediaRendererStopped.class,
+	AvTransportMediaRendererPlaying.class
+})
+public interface AvTransportStateMachine extends AVTransportStateMachine {
+	
 }
