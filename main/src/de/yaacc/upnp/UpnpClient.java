@@ -76,22 +76,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
-	public static final ThreadLocal<Boolean> watchdogFlag = new ThreadLocal<Boolean>(); // Watchdog
-																						// flag
-																						// for
-																						// async
-																						// calls
-	public static final ThreadLocal<Boolean> actionFinished = new ThreadLocal<Boolean>(); // Flag																						
-																							// that
-																							// indicates
-																							// an
-																							// async
-																							// call
-																							// has
-																							// finished
-
-	
-	
+		
 
 	public UpnpClient() {
 
@@ -106,9 +91,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public boolean initialize(Context context) {
 		this.context = context;
-		
+		//FIXME check if this is right: Context.BIND_AUTO_CREATE kills the service after closing the activity
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
+		
 	}
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
@@ -287,22 +273,26 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Wathdog for async calls to complete
 	 */
-	private void waitForActionComplete() {
+	private void waitForActionComplete(final ActionState actionState) {
 
-		watchdogFlag.set(false);
+		actionState.watchdogFlag = false;
 		new Timer().schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				watchdogFlag.set(true);
+				actionState.watchdogFlag=true;				
 			}
-		}, 30000l); // 30sec. Watchdog
+		}, 30000L); // 30sec. Watchdog
 
-		while (!actionFinished.get() && !watchdogFlag.get()) {
+		while (!(actionState.actionFinished || actionState.watchdogFlag)) {
 			// wait for local device is connected
 		}
-		if (watchdogFlag.get()) {
+		if (actionState.watchdogFlag) {
 			Log.d(getClass().getName(), "Watchdog timeout!");
+		}
+		
+		if (actionState.actionFinished) {
+			Log.d(getClass().getName(), "Action completed!");
 		}
 	}
 
@@ -649,7 +639,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(), "TransportUri: " + positionInfo.getTrackURI());
 		Log.d(getClass().getName(), "Duration: " + positionInfo.getTrackDuration());				
 		Log.d(getClass().getName(), "TrackMetaData: " + positionInfo.getTrackMetaData());
-		//FIXME Mimtype to be set
+		//FIXME Mimetype to be set
 		intentView("*/*",Uri.parse(positionInfo.getTrackURI()));
 	}
 	/**
@@ -792,42 +782,18 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(), "Value: " + resource.getValue());
 		Service<?, ?> service = getAVTransportService(remoteDevice);
 		if(service == null) {
-			Log.d(getClass().getName(), "No AVTransport-Servcie found on Device: " + remoteDevice.getDisplayString());
+			Log.d(getClass().getName(), "No AVTransport-Service found on Device: " + remoteDevice.getDisplayString());
 			return;
 		}
 		Log.d(getClass().getName(), "Action SetAVTransportURI ");
-		actionFinished.set(false);
-		SetAVTransportURI setAVTransportURI = new SetAVTransportURI(service,
-				resource.getValue()) {
-
-			@Override
-			public void failure(ActionInvocation actioninvocation,
-					UpnpResponse upnpresponse, String s) {
-				Log.d(getClass().getName(), "Failure UpnpResponse: "
-						+ upnpresponse);
-				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getResponseDetails());
-				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getStatusMessage());
-				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getStatusCode());
-				actionFinished.set(true);
-
-			}
-
-			@Override
-			public void success(ActionInvocation actioninvocation) {
-				super.success(actioninvocation);
-				actionFinished.set(true);
-
-			}
-
-		};
-		getControlPoint().execute(setAVTransportURI);
-		waitForActionComplete();
+		final ActionState actionState = new ActionState();
+		actionState.actionFinished=false;
+		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(service, resource.getValue(),actionState);
+		getControlPoint().execute(setAVTransportURI);						 
+		waitForActionComplete(actionState);
 		//Now start Playing
 		Log.d(getClass().getName(), "Action Play");
-		actionFinished.set(false);
+		actionState.actionFinished=false;
 		Play actionCallback = new Play(service) {
 
 			@Override
@@ -837,18 +803,53 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 						+ upnpresponse);
 				Log.d(getClass().getName(),
 						"UpnpResponse: " + upnpresponse.getResponseDetails());
-				actionFinished.set(true);
+				actionState.actionFinished = true;
 
 			}
 
 			@Override
 			public void success(ActionInvocation actioninvocation) {
 				super.success(actioninvocation);
-				actionFinished.set(true);
+				actionState.actionFinished=true;
 
 			}
 
 		};
 		getControlPoint().execute(actionCallback);
+	}
+	
+	private static class InternalSetAVTransportURI extends SetAVTransportURI {
+		ActionState actionState =null; 
+		private InternalSetAVTransportURI(Service service, String uri,ActionState actionState) {
+			super(service, uri);
+			this.actionState=actionState;
+		}
+
+		@Override
+		public void failure(ActionInvocation actioninvocation,
+				UpnpResponse upnpresponse, String s) {
+			Log.d(getClass().getName(), "Failure UpnpResponse: "
+					+ upnpresponse);
+			Log.d(getClass().getName(),
+					"UpnpResponse: " + upnpresponse.getResponseDetails());
+			Log.d(getClass().getName(),
+					"UpnpResponse: " + upnpresponse.getStatusMessage());
+			Log.d(getClass().getName(),
+					"UpnpResponse: " + upnpresponse.getStatusCode());
+			actionState.actionFinished=true;
+
+		}
+
+		@Override
+		public void success(ActionInvocation actioninvocation) {
+			super.success(actioninvocation);
+			actionState.actionFinished=true;
+
+		}
+	}
+
+	private static class ActionState{
+		public boolean actionFinished = false;
+		public boolean watchdogFlag = false;
 	}
 }

@@ -18,20 +18,13 @@
  */
 package de.yaacc.upnp;
 
-import java.util.List;
-
-import org.teleal.cling.model.XMLUtil;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.support.contentdirectory.callback.Browse;
-import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.BrowseFlag;
-import org.teleal.cling.support.model.BrowseResult;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.SortCriterion;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
 
 /**
  * ActionCallback for content directory browsing. 

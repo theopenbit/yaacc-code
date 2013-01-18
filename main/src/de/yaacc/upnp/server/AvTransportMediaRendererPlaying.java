@@ -26,7 +26,6 @@ import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.SeekMode;
 
 import android.util.Log;
-
 import de.yaacc.upnp.UpnpClient;
 
 public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
@@ -56,6 +55,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 		Log.d(this.getClass().getName(), "On Entry");
 		super.onEntry();
 		// Start playing now!
+		upnpClient.playLocal(getTransport());
 	}
 
 	/*
@@ -87,8 +87,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 	 */
 	@Override
 	public Class<? extends AbstractState> play(String speed) {
-		Log.d(this.getClass().getName(), "play");		
-		upnpClient.playLocal(getTransport());
+		Log.d(this.getClass().getName(), "play");				
 		return null;
 	}
 

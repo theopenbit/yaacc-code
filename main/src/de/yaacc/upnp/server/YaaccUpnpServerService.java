@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
-import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.teleal.cling.model.DefaultServiceManager;
 import org.teleal.cling.model.ValidationException;
@@ -36,18 +34,13 @@ import org.teleal.cling.model.meta.ManufacturerDetails;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
-import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
 
 import android.app.Service;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import de.yaacc.upnp.UpnpClient;
-import de.yaacc.upnp.UpnpRegistryService;
 
 /**
  * A simple local upnpserver implementation. This class encapsulate the creation
@@ -55,9 +48,9 @@ import de.yaacc.upnp.UpnpRegistryService;
  * service in order to run in background
  * 
  * @author Tobias Schöne (openbit)
- * 
+ * FIXME  Sever must create remote devices
  */
-public class YaaccUpnpServerService extends Service implements ServiceConnection {
+public class YaaccUpnpServerService extends Service  {
 	// Building a pseudo UUID for the device, which can't be null or a default
 	// value
 	public static final String UDN_ID = "35"
@@ -69,9 +62,6 @@ public class YaaccUpnpServerService extends Service implements ServiceConnection
 			+ Build.MODEL.length() % 10 + Build.PRODUCT.length() % 10
 			+ Build.TAGS.length() % 10 + Build.TYPE.length() % 10
 			+ Build.USER.length() % 10; // 13 digits;
-
-	private AndroidUpnpService androidUpnpService;
-	private LocalDevice localDevice;
 
 	private UpnpClient upnpClient;
 
@@ -96,10 +86,28 @@ public class YaaccUpnpServerService extends Service implements ServiceConnection
 	 */
 	@Override
 	public void onStart(Intent intent, int startid) {
-		Log.d(this.getClass().getName(), "On Start");
+		Log.d(this.getClass().getName(), "On Start ID: " + UDN_ID);
 		if (upnpClient == null) {
 			upnpClient = new UpnpClient();
 		}
+		//the footprint of the onStart() method must be small  
+		//otherwise android will kill the service
+		//in order of this circumstance we have to initialize the service asynchronous
+		Thread initializationThread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				initialize();				
+			}
+		});
+		initializationThread.start();
+		Log.d(this.getClass().getName(), "End On Start");
+	}
+
+	/**
+	 * 
+	 */
+	private void initialize() {
 		if (!upnpClient.isInitialized()) {
 			upnpClient.initialize(getApplicationContext());
 			watchdog = false;
@@ -130,7 +138,7 @@ public class YaaccUpnpServerService extends Service implements ServiceConnection
 		LocalDevice device;
 		try {
 			device = new LocalDevice(new DeviceIdentity(new UDN(UDN_ID)),
-					new UDADeviceType("YAACC MediaServer"), new DeviceDetails(
+					new UDADeviceType("YAACCMediaServer"), new DeviceDetails(
 							"YAACC-MediaServer", new ManufacturerDetails(
 									"www.yaacc.de")), createServices());
 
@@ -141,12 +149,50 @@ public class YaaccUpnpServerService extends Service implements ServiceConnection
 		
 	}
 
+	
+	
+	/**
+	 * tbc....
+	 * Create a remote upnp device 
+	 * @return the device
+	 */
+//	private RemoteDevice createDevice() {
+//		RemoteDevice device;
+//		WifiManager wifiMan = (WifiManager) this.getSystemService(
+//                Context.WIFI_SERVICE);
+//		WifiInfo wifiInf = wifiMan.getConnectionInfo();
+//		String macAddr = wifiInf.getMacAddress();
+//		int ipAddress = wifiInf.getIpAddress();
+//		String ipAddressStr = String.format("%d.%d.%d.%d", 
+//				(ipAddress & 0xff), 
+//				(ipAddress >> 8 & 0xff), 
+//				(ipAddress >> 16 & 0xff),
+//				(ipAddress >> 24 & 0xff));
+//		try {
+//			device = new RemoteDevice(
+//						new RemoteDeviceIdentity(new UDN(UDN_ID),
+//								300,
+//								new URI(InetAddress.getLocalHost().getCanonicalHostName()+ "/descriptor"), 
+//								macAddr.getBytes(), 
+//								InetAddress.getLocalHost()
+//					),
+//					new UDADeviceType("YAACCMediaServer"), new DeviceDetails(
+//							"YAACC-MediaServer", new ManufacturerDetails(
+//									"www.yaacc.de")), createServices());
+//
+//			return device;
+//		} catch (ValidationException e) {
+//			throw new IllegalStateException("Exception during device creation", e);			
+//		}
+//		
+//	}
+
 	/**
 	 * Create the services provided by this device
 	 * @return the services
 	 */
 	private LocalService[] createServices() {
-		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
+		List<LocalService> services = new ArrayList<LocalService>();
 		services.add(createAVTransportService());
 
 		return services.toArray(new LocalService[] {});
@@ -158,7 +204,7 @@ public class YaaccUpnpServerService extends Service implements ServiceConnection
 	 */
 	private LocalService<AbstractAVTransportService> createAVTransportService() {
 		LocalService<AbstractAVTransportService> avTransportService = new AnnotationLocalServiceBinder()
-				.read(AbstractContentDirectoryService.class);
+				.read(AbstractAVTransportService.class);
 		avTransportService
 				.setManager(new DefaultServiceManager<AbstractAVTransportService>(
 						avTransportService, null) {
@@ -171,32 +217,6 @@ public class YaaccUpnpServerService extends Service implements ServiceConnection
 		return avTransportService;
 	}
 
-	// Implementation of ServiceConnectionInterface
-	/*
-	 * (non-Javadoc)
-	 * @see android.content.ServiceConnection#onServiceConnected(android.content.ComponentName, android.os.IBinder)
-	 */
-	@Override
-	public void onServiceConnected(ComponentName componentName, IBinder binder) {
-		if (binder instanceof AndroidUpnpService) {
-			androidUpnpService = (AndroidUpnpService) binder;
-			localDevice = createDevice();
-			androidUpnpService.getRegistry().addDevice(localDevice);
-		}
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.content.ServiceConnection#onServiceDisconnected(android.content
-	 * .ComponentName)
-	 */
-	@Override
-	public void onServiceDisconnected(ComponentName componentName) {
-		androidUpnpService.getRegistry().removeDevice(localDevice);
-
-	}
+	
 
 }

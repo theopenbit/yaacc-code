@@ -28,7 +28,6 @@ import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.PositionInfo;
 
 import android.util.Log;
-
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -61,9 +60,8 @@ public class AvTransportMediaRendererNoMediaPresent extends
 	@Override
 	public Class<? extends AbstractState> setTransportURI(URI uri,
 			String metaData) {
-		Log.d(this.getClass().getName(), "set Transport");
-		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));
-
+		Log.d(this.getClass().getName(), "set Transport: " + uri + " metaData: " + metaData);
+		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));		
 		// If you can, you should find and set the duration of the track here!
 		getTransport().setPositionInfo(
 				new PositionInfo(1, metaData, uri.toString()));

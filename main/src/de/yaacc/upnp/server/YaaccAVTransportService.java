@@ -18,21 +18,10 @@
  */
 package de.yaacc.upnp.server;
 
-import java.beans.PropertyChangeSupport;
-
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-import org.teleal.cling.support.avtransport.AVTransportException;
-import org.teleal.cling.support.avtransport.AbstractAVTransportService;
 import org.teleal.cling.support.avtransport.impl.AVTransportService;
 import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
-import org.teleal.cling.support.igd.callback.GetStatusInfo;
-import org.teleal.cling.support.lastchange.LastChange;
 import org.teleal.cling.support.model.AVTransport;
-import org.teleal.cling.support.model.DeviceCapabilities;
-import org.teleal.cling.support.model.MediaInfo;
-import org.teleal.cling.support.model.PositionInfo;
-import org.teleal.cling.support.model.TransportInfo;
-import org.teleal.cling.support.model.TransportSettings;
 import org.teleal.common.statemachine.StateMachineBuilder;
 
 import de.yaacc.upnp.UpnpClient;

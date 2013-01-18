@@ -52,7 +52,6 @@ import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.BrowseFlag;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.Res;
-import org.teleal.cling.support.model.SortCriterion;
 import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
@@ -767,7 +766,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	
 	public void testUseCasePlayRemoteMusic() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
-		Device<?, ?, ?> device = upnpClient.getDevice(YaaccUpnpServerService.UDN_ID);
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);		
 		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"101");
 		//MusicTrack
 		assertNotNull(result);
@@ -775,7 +774,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
 		upnpClient.playRemote(result.getResult().getItems().get(0),upnpClient.getDevice(YaaccUpnpServerService.UDN_ID));
-		
+		myWait(120000L);
 	}
 	
 	public void testUseCasePlayLocalImage() {

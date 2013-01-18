@@ -26,7 +26,6 @@ import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.SeekMode;
 
 import android.util.Log;
-
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -96,7 +95,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 	public Class<? extends AbstractState> play(String speed) {
 		Log.d(this.getClass().getName(), "play");
 		// It's easier to let this classes' onEntry() method do the work
-		return AvTransportMediaRendererStopped.class;
+		return AvTransportMediaRendererPlaying.class;
 	}
 
 	/*
