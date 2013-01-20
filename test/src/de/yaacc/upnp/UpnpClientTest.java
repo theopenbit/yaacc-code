@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2013 www.yaacc.de 
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package de.yaacc.upnp;
 
 import java.text.ParseException;
@@ -35,7 +52,6 @@ import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.BrowseFlag;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.Res;
-import org.teleal.cling.support.model.SortCriterion;
 import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
@@ -49,23 +65,9 @@ import android.webkit.MimeTypeMap;
 import de.yaacc.BackgroundMusicService;
 import de.yaacc.ImageViewerActivity;
 import de.yaacc.upnp.server.LocalUpnpServer;
+import de.yaacc.upnp.server.YaaccUpnpServerService;
 
-/*
- * 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version 3
- of the License, or (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 /**
  * Testcase for UpnpClient-service class.
  * 
@@ -93,10 +95,18 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		super.setUp();
 
 		localUpnpServer = LocalUpnpServer.setup(getContext());
+		//Start upnpserver service for avtransport
+		Intent svc = new Intent(getContext(),
+				YaaccUpnpServerService.class);		
+		getContext().startService(svc);		
 	}
 
 	protected UpnpClient getInitializedUpnpClientWithLocalServer() {
 		return getInitializedUpnpClientWithDevice(LocalUpnpServer.UDN_ID);
+	}
+	
+	protected UpnpClient getInitializedUpnpClientWithYaaccUpnpServer() {
+		return getInitializedUpnpClientWithDevice(YaaccUpnpServerService.UDN_ID);
 	}
 	
 	protected UpnpClient getInitializedUpnpClientWithDevice(String deviceId) {
@@ -752,6 +762,19 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		upnpClient.playLocal(result.getResult().getItems().get(0));
 		
+	}
+	
+	public void testUseCasePlayRemoteMusic() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);		
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"101");
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getItems());
+		assertNotNull(result.getResult().getItems().get(0));
+		upnpClient.playRemote(result.getResult().getItems().get(0),upnpClient.getDevice(YaaccUpnpServerService.UDN_ID));
+		myWait(120000L);
 	}
 	
 	public void testUseCasePlayLocalImage() {
