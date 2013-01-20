@@ -34,7 +34,7 @@ public class SettingsActivity extends PreferenceActivity{
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.layout.preference);
+        addPreferencesFromResource(R.xml.preference);
         
 
         LinkedList<Device> devices = new LinkedList<Device>();

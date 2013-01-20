@@ -6,28 +6,36 @@ import org.teleal.cling.model.meta.Device;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ListView;
 import de.yaacc.config.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 
 public class MainActivity extends Activity implements OnClickListener{
 
-	UpnpClient uClient = null;
+	public static UpnpClient uClient = null;
 	
+	private BrowseItemAdapter bItemAdapter;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+         
         uClient = new UpnpClient();
     	uClient.initialize(getApplicationContext());
+    	
+    	
         
+    	
     	final Button showDeviceNumber = (Button) findViewById(R.id.nbDev);
     	showDeviceNumber.setOnClickListener(this);
     }
@@ -52,10 +60,23 @@ public class MainActivity extends Activity implements OnClickListener{
 
 	@Override
 	public void onClick(View v) {
-		final TextView helloWorld = (TextView) findViewById(R.id.helloWorld);
-		LinkedList<Device> deviceList= new LinkedList<Device>();
-		deviceList.addAll(uClient.getDevices());
-    	helloWorld.setText(uClient.getDevices().size()+" devices found");
+		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
+		LinkedList<Device> devices= new LinkedList<Device>();
+		devices.addAll(uClient.getDevices());
+		Device first = devices.peekFirst();
+		
+
+    	bItemAdapter = new BrowseItemAdapter(this);
+    	
+    	deviceList.setAdapter(bItemAdapter);
+		
+		/**ContentDirectoryBrowseResult result = uClient.browseSync(first,
+				"1", BrowseFlag.DIRECT_CHILDREN, "", 0, 999l, null);
+		List<Container> folders = result.getResult().getContainers();**/
+		
+		String toShow = devices.size()+" devices found";
+		toShow += first.getDetails().getFriendlyName();
 		
 	}
+	
 }
