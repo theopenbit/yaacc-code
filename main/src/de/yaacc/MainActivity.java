@@ -93,10 +93,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		 * folders = result.getResult().getContainers();
 		 **/
 
-		String toShow = devices.size() + " devices found";
-		for (Device device : devices) {
-			toShow += device.getDisplayString() + "\n";
-		}
+		String toShow = devices.size() + " devices found";		
 		toShow += first.getDetails().getFriendlyName();
 
 	}
