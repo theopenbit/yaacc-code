@@ -18,7 +18,6 @@
  */
 package de.yaacc.upnp.server;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -32,18 +31,12 @@ import org.teleal.cling.model.meta.DeviceIdentity;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
-import org.teleal.cling.model.meta.RemoteDevice;
-import org.teleal.cling.model.meta.RemoteDeviceIdentity;
-import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -54,8 +47,7 @@ import de.yaacc.upnp.UpnpClient;
  * and registration of local upnp services. it is implemented as a android
  * service in order to run in background
  * 
- * @author Tobias Schöne (openbit)
- * FIXME  Sever must create remote devices
+ * @author Tobias Schöne (openbit) 
  */
 public class YaaccUpnpServerService extends Service  {
 	// Building a pseudo UUID for the device, which can't be null or a default
@@ -141,6 +133,7 @@ public class YaaccUpnpServerService extends Service  {
 	 * Create a local upnp device 
 	 * @return the device
 	 */
+	//FIXME store servername in the stettings
 	private LocalDevice createDevice() {
 		LocalDevice device;
 		try {
@@ -158,82 +151,15 @@ public class YaaccUpnpServerService extends Service  {
 
 	
 	
-	/**
-	 * tbc....
-	 * Create a remote upnp device 
-	 * @return the device
-	 */
-//	private RemoteDevice createDevice() {
-//		RemoteDevice device;
-//		WifiManager wifiMan = (WifiManager) this.getSystemService(
-//                Context.WIFI_SERVICE);
-//		WifiInfo wifiInf = wifiMan.getConnectionInfo();
-//		String macAddr = wifiInf.getMacAddress();
-//		int ipAddress = wifiInf.getIpAddress();
-//		String ipAddressStr = String.format("%d.%d.%d.%d", 
-//				(ipAddress & 0xff), 
-//				(ipAddress >> 8 & 0xff), 
-//				(ipAddress >> 16 & 0xff),
-//				(ipAddress >> 24 & 0xff));
-//		try {
-//			device = new RemoteDevice(
-//						new RemoteDeviceIdentity(new UDN(UDN_ID),
-//								300,
-//								new URI(InetAddress.getLocalHost().getCanonicalHostName()+ "/descriptor"), 
-//								macAddr.getBytes(), 
-//								InetAddress.getLocalHost()
-//					),
-//					new UDADeviceType("YAACCMediaServer"), new DeviceDetails(
-//							"YAACC-MediaServer", new ManufacturerDetails(
-//									"www.yaacc.de")), createRemoteServices());
-//
-//			return device;
-//		} catch (ValidationException e) {
-//			throw new IllegalStateException("Exception during device creation", e);			
-//		}
-//		
-//	}
-//	
+
 	
-	/**
-	 * Create the services provided by this device
-	 * @return the services
-	 */
-//	private RemoteService[] createRemoteServices() {
-//		List<RemoteService> services = new ArrayList<RemoteService>();
-//		services.add(createRemoteAVTransportService());
-//
-//		return services.toArray(new RemoteService[] {});
-//	}
-	
-	
-	/**
-	 * creates an AVTransportService 
-	 * @return the service
-	 */
-//	private RemoteService createRemoteAVTransportService() {
-//		RemoteService avTransportService = new RemoteService() 
-//				
-//				RemAnnotationLocalServiceBinder()
-//				.read(AbstractAVTransportService.class);
-//		avTransportService
-//				.setManager(new DefaultServiceManager<AbstractAVTransportService>(
-//						avTransportService, null) {
-//					@Override
-//					protected AbstractAVTransportService createServiceInstance()
-//							throws Exception {
-//						return new YaaccAVTransportService(upnpClient);
-//					}
-//				});
-//		return avTransportService;
-//	}
 
 	/**
 	 * Create the services provided by this device
 	 * @return the services
 	 */
-	private LocalService[] createServices() {
-		List<LocalService> services = new ArrayList<LocalService>();
+	private LocalService<?>[] createServices() {
+		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createAVTransportService());
 
 		return services.toArray(new LocalService[] {});
@@ -243,6 +169,7 @@ public class YaaccUpnpServerService extends Service  {
 	 * creates an AVTransportService 
 	 * @return the service
 	 */
+	@SuppressWarnings("unchecked")
 	private LocalService<AbstractAVTransportService> createAVTransportService() {
 		LocalService<AbstractAVTransportService> avTransportService = new AnnotationLocalServiceBinder()
 				.read(AbstractAVTransportService.class);
