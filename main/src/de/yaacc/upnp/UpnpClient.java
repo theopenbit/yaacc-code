@@ -401,7 +401,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (isInitialized()) {
 			return getRegistry().getDevices();
 		}
-		return null;
+		return new ArrayList<Device>();
 	}
 
 	/**

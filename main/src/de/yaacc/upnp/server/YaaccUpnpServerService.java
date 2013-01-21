@@ -18,6 +18,7 @@
  */
 package de.yaacc.upnp.server;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -31,12 +32,18 @@ import org.teleal.cling.model.meta.DeviceIdentity;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
+import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.meta.RemoteDeviceIdentity;
+import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -178,13 +185,47 @@ public class YaaccUpnpServerService extends Service  {
 //					),
 //					new UDADeviceType("YAACCMediaServer"), new DeviceDetails(
 //							"YAACC-MediaServer", new ManufacturerDetails(
-//									"www.yaacc.de")), createServices());
+//									"www.yaacc.de")), createRemoteServices());
 //
 //			return device;
 //		} catch (ValidationException e) {
 //			throw new IllegalStateException("Exception during device creation", e);			
 //		}
 //		
+//	}
+//	
+	
+	/**
+	 * Create the services provided by this device
+	 * @return the services
+	 */
+//	private RemoteService[] createRemoteServices() {
+//		List<RemoteService> services = new ArrayList<RemoteService>();
+//		services.add(createRemoteAVTransportService());
+//
+//		return services.toArray(new RemoteService[] {});
+//	}
+	
+	
+	/**
+	 * creates an AVTransportService 
+	 * @return the service
+	 */
+//	private RemoteService createRemoteAVTransportService() {
+//		RemoteService avTransportService = new RemoteService() 
+//				
+//				RemAnnotationLocalServiceBinder()
+//				.read(AbstractAVTransportService.class);
+//		avTransportService
+//				.setManager(new DefaultServiceManager<AbstractAVTransportService>(
+//						avTransportService, null) {
+//					@Override
+//					protected AbstractAVTransportService createServiceInstance()
+//							throws Exception {
+//						return new YaaccAVTransportService(upnpClient);
+//					}
+//				});
+//		return avTransportService;
 //	}
 
 	/**
