@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		if(preferences.getBoolean("@string/settings_local_server_chkbx", true)){
+		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
 			// Start upnpserver service for avtransport
 			Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
 			getApplicationContext().startService(svc);
@@ -83,23 +83,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
-		LinkedList<Device> devices = new LinkedList<Device>();
-		devices.addAll(uClient.getDevices());
-		Device first = devices.peekFirst();
-
+		
 		bItemAdapter = new BrowseItemAdapter(this);
 
 		deviceList.setAdapter(bItemAdapter);
-
-		/**
-		 * ContentDirectoryBrowseResult result = uClient.browseSync(first, "1",
-		 * BrowseFlag.DIRECT_CHILDREN, "", 0, 999l, null); List<Container>
-		 * folders = result.getResult().getContainers();
-		 **/
-
-		String toShow = devices.size() + " devices found";		
-		toShow += first.getDetails().getFriendlyName();
-
 	}
 
 }

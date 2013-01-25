@@ -11,5 +11,8 @@
         <CheckBoxPreference android:summaryOn="@string/settings_browse_video_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_video_off" android:key="@string/settings_video_chkbx"/>
         <CheckBoxPreference android:summaryOn="@string/settings_browse_image_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_image_off" android:key="@string/settings_image_chkbx"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_local_server_title">
+        <CheckBoxPreference android:summaryOff="@string/settings_local_server_stopped" android:summaryOn="@string/settings_local_server_started" android:key="@string/settings_local_server_chkbx"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>
