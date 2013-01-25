@@ -28,29 +28,18 @@ public class BrowseItemAdapter extends BaseAdapter {
 		inflator = LayoutInflater.from(ctx);
 		
 		boolean foundNone = true;
-		Device first = null;
+		Device selectedDevice = null;
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
 	       
     	if(preferences.getString("provider_list", null) != null){
-    		first = MainActivity.uClient.getDevice(preferences.getString("provider_list", null));
+    		selectedDevice = MainActivity.uClient.getDevice(preferences.getString("provider_list", null));
     	}
 		
-    	if(first == null){
-			while(foundNone){
-			try{
-				first = MainActivity.uClient.getDevices().iterator().next();
-				foundNone = false;
-			} catch (NoSuchElementException e){
-				
-			}
-			}
-    	}
-		
-		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(first,"1");
+		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"1");
 		DIDLContent a = result.getResult(); //.getContainers();
+		
 		folders = a.getContainers();
-		List <Item> b = a.getItems();
 	}
 
 	@Override
@@ -89,8 +78,7 @@ public class BrowseItemAdapter extends BaseAdapter {
 		
 		Context ctx = parent.getContext();
 		
-		BrowseItem bItem = new BrowseItem(((Container)getItem(position)).getTitle());
-		holder.name.setText(bItem.getName());
+		holder.name.setText(((Container)getItem(position)).getTitle());
 		holder.icon.setImageResource(R.drawable.folder);
 		
 		return arg1;

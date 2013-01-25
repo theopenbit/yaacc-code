@@ -19,25 +19,9 @@ package de.yaacc.config;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import org.teleal.cling.model.ValidationException;
-import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.DeviceDetails;
-import org.teleal.cling.model.meta.DeviceIdentity;
-import org.teleal.cling.model.meta.LocalDevice;
-import org.teleal.cling.model.meta.LocalService;
-import org.teleal.cling.model.meta.StateVariable;
-import org.teleal.cling.model.meta.StateVariableTypeDetails;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.ServiceType;
-import org.teleal.cling.model.types.StringDatatype;
-import org.teleal.cling.model.types.UDADeviceType;
-import org.teleal.cling.model.types.UDN;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;

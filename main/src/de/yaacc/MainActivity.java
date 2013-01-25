@@ -49,11 +49,15 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		uClient = new UpnpClient();
 		uClient.initialize(getApplicationContext());
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		// Start upnpserver service for avtransport
-		Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
-		getApplicationContext().startService(svc);
-
+		if(preferences.getBoolean("@string/settings_local_server_chkbx", true)){
+			// Start upnpserver service for avtransport
+			Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
+			getApplicationContext().startService(svc);
+		}
+		
 		final Button showDeviceNumber = (Button) findViewById(R.id.nbDev);
 		showDeviceNumber.setOnClickListener(this);
 	}
