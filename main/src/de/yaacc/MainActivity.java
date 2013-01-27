@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -90,8 +91,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	       
-    	if(preferences.getString("provider_list", null) != null){
-    		selectedDevice = MainActivity.uClient.getDevice(preferences.getString("provider_list", null));
+		Log.d("restoring settings", "Load device: "+R.string.settings_selected_provider_title);
+		Log.d("restoring settings", "Load config: "+preferences.getString(getString(R.string.settings_selected_provider_title), null));
+    	if(preferences.getString(getString(R.string.settings_selected_provider_title), null) != null){
+    		selectedDevice = uClient.getDevice(preferences.getString(getString(R.string.settings_selected_provider_title), null));
     	}
     	
     	// Load adapter if selected device is configured and found

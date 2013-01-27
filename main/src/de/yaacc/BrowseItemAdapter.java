@@ -27,14 +27,10 @@ public class BrowseItemAdapter extends BaseAdapter {
 	public BrowseItemAdapter(Context ctx, Device selectedDevice){
 		inflator = LayoutInflater.from(ctx);
 		
-		boolean foundNone = true;
-		
-    	if(selectedDevice == null){
-    		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"1");
-    		DIDLContent a = result.getResult(); //.getContainers();
-		
-    		folders = a.getContainers();
-    	}
+    	ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"0");
+    	DIDLContent a = result.getResult(); //.getContainers();
+		folders = a.getContainers();
+    	
 	}
 
 	@Override

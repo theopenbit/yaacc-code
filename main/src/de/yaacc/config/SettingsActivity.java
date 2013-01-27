@@ -44,8 +44,7 @@ public class SettingsActivity extends PreferenceActivity{
        UpnpClient upnpClient = MainActivity.uClient;
         	
         if (upnpClient.isInitialized()){
-
-	        devices.addAll(upnpClient.getDevices());
+        	devices.addAll(upnpClient.getDevices());
 		}
 
 		
@@ -57,7 +56,7 @@ public class SettingsActivity extends PreferenceActivity{
         ArrayList<CharSequence> providerEntryValues = new ArrayList<CharSequence>();
         for(Device currentDevice: devices){
         	providerEntries.add(currentDevice.getDisplayString());
-        	providerEntryValues.add(currentDevice.getIdentity().toString());
+        	providerEntryValues.add(currentDevice.getIdentity().getUdn().getIdentifierString());
         }
         providerLp.setEntries(providerEntries.toArray(new CharSequence[providerEntries.size()]));
         providerLp.setEntryValues(providerEntryValues.toArray(new CharSequence[providerEntries.size()]));
