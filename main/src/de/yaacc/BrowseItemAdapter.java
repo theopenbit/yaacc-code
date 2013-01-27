@@ -21,25 +21,20 @@ import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
 public class BrowseItemAdapter extends BaseAdapter {
 	
-	private final LayoutInflater inflator;
-	private final List<Container> folders;
+	private LayoutInflater inflator;
+	private List<Container> folders;
 	
-	public BrowseItemAdapter(Context ctx){
+	public BrowseItemAdapter(Context ctx, Device selectedDevice){
 		inflator = LayoutInflater.from(ctx);
 		
 		boolean foundNone = true;
-		Device selectedDevice = null;
 		
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
-	       
-    	if(preferences.getString("provider_list", null) != null){
-    		selectedDevice = MainActivity.uClient.getDevice(preferences.getString("provider_list", null));
+    	if(selectedDevice == null){
+    		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"1");
+    		DIDLContent a = result.getResult(); //.getContainers();
+		
+    		folders = a.getContainers();
     	}
-		
-		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"1");
-		DIDLContent a = result.getResult(); //.getContainers();
-		
-		folders = a.getContainers();
 	}
 
 	@Override

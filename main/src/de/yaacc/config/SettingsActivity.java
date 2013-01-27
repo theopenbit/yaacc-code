@@ -49,9 +49,8 @@ public class SettingsActivity extends PreferenceActivity{
 		}
 
 		
-        
-        //Looks like this can not be connected via R.string.*
-        ListPreference providerLp = (ListPreference)findPreference("provider_list");
+       
+        ListPreference providerLp = (ListPreference)findPreference(getString(R.string.settings_selected_provider_title));
         
         // One entry per found device for providing media data
         ArrayList<CharSequence> providerEntries = new ArrayList<CharSequence>();
@@ -65,7 +64,7 @@ public class SettingsActivity extends PreferenceActivity{
         
         
         // One entry per found device for receiving media data
-        ListPreference receiverLp = (ListPreference)findPreference("receiver_list");
+        ListPreference receiverLp = (ListPreference)findPreference(getString(R.string.settings_selected_receiver_title));
         ArrayList<CharSequence> receiverEntries = new ArrayList<CharSequence>();
         ArrayList<CharSequence> receiverEntryValues = new ArrayList<CharSequence>();
         for(Device currentDevice: devices){

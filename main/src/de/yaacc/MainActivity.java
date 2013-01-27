@@ -17,11 +17,10 @@
  */
 package de.yaacc;
 
-import java.util.LinkedList;
-
 import org.teleal.cling.model.meta.Device;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,6 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 import de.yaacc.config.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
@@ -58,7 +58,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			getApplicationContext().startService(svc);
 		}
 		
-		final Button showDeviceNumber = (Button) findViewById(R.id.nbDev);
+		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
 		showDeviceNumber.setOnClickListener(this);
 	}
 
@@ -82,11 +82,31 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
+		// Define where to show the folder contents
 		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
 		
-		bItemAdapter = new BrowseItemAdapter(this);
+		// Get Try to get selected device
+		Device selectedDevice = null;
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	       
+    	if(preferences.getString("provider_list", null) != null){
+    		selectedDevice = MainActivity.uClient.getDevice(preferences.getString("provider_list", null));
+    	}
+    	
+    	// Load adapter if selected device is configured and found
+    	if(selectedDevice != null){
+	    	bItemAdapter = new BrowseItemAdapter(this,selectedDevice);
+	    	deviceList.setAdapter(bItemAdapter);
+    	} else {
+    		Context context = getApplicationContext();
+    		CharSequence text = getString(R.string.browse_no_content_found);
+    		int duration = Toast.LENGTH_SHORT;
 
-		deviceList.setAdapter(bItemAdapter);
+    		Toast toast = Toast.makeText(context, text, duration);
+    		toast.show();
+    	}
+		
 	}
 
 }
