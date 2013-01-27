@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -542,6 +543,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
 			String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
+		Object[] services = device.getServices();
 		Service service = device.findService(new UDAServiceId(
 				"ContentDirectory"));
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
