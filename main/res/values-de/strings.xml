@@ -2,24 +2,30 @@
 <resources>
 
     <string name="app_name">YAACC</string>
-    <string name="hello_world">Hallo Welt!</string>
+    <string name="browse_main_folder">Zeige Hauptverzeichnis</string>
     <string name="title_activity_main">YAACC</string>
-    <string name="title_activity_upnp_browser">UpnpBrowserActivity</string>
-    <string name="title_activity_image_viewer">ImageViewerActivity</string>
+    <string name="title_activity_upnp_browser">Verzeichnisdienst</string>
+    <string name="title_activity_image_viewer">Bildbetrachter</string>
     <string name="title_activity_settings">Einstellungen</string>
-    
+    <string name="title_activity_generic_browse">GenericBrowseActivity</string>
     <string name="settings_category_send_rec">Senden und Empfangen</string>
-    <string name="settings_category_browsing">Verhalten der Medienanzeige</string>
-    
-    <string name="settings_selected_provider_title">Aktueller Sender</string>
-    <string name="settings_change_provider">Hier druecken um Sender zu aendern</string>
-    <string name="settings_selected_receiver_title">Aktueller Empfaenger</string>
-    <string name="settings_change_receiver">Hier druecken um Empfaenger zu aendern</string>
+    <string name="settings_category_browsing">Verhalten der Medienverwaltung</string>
+    <string name="settings_selected_provider_title">Aktueller Medien-Sender</string>
+    <string name="settings_change_provider">Druecken sie hier um den Sender zu wechseln</string>
+    <string name="settings_selected_receiver_title">Aktueller Medien-Empfaenger</string>
+    <string name="settings_change_receiver">Druecken sie hier um den Empfaenger zu wechseln</string>
+    <string name="settings_browse_audio_on">Audiodateien anzeigen</string>
+    <string name="settings_browse_audio_off">Audiodateien verbergen</string>
+    <string name="settings_browse_video_on">Videodateien anzeigen</string>
+    <string name="settings_browse_video_off">Videodateien verbergen</string>
+    <string name="settings_browse_image_on">Bilddateien anzeigen</string>
+    <string name="settings_browse_image_off">Bilddateien verbergen</string>
+    <string name="settings_audio_chkbx">audio_chkbx</string>
+    <string name="settings_video_chkbx">video_chkbx</string>
+    <string name="settings_image_chkbx">image_chkbx</string>
+    <string name="settings_local_server_title">Lokale Serverkonfiguration</string>
+    <string name="settings_local_server_started">Lokaler server ist gestartet</string>
+    <string name="settings_local_server_stopped">Lokaler server ist gestoppt</string>
+    <string name="settings_local_server_chkbx">local_server_chkbx</string>
 
-    <string name="settings_browse_audio_on">Audio-Dateien werden angezeigt</string>
-    <string name="settings_browse_audio_off">Audio-Dateien werden ausgeblendet</string>
-    <string name="settings_browse_video_on">Video-Dateien werden angezeigt</string>
-    <string name="settings_browse_video_off">Video-Dateien werden ausgeblendet</string>
-    <string name="settings_browse_image_on">Bild-Dateien werden angezeigt</string>
-    <string name="settings_browse_image_off">Bild-Dateien werden ausgeblendet</string>
 </resources>
