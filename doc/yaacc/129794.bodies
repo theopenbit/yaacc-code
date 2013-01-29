@@ -1,0 +1,42 @@
+class SettingsActivity
+!!!130946.java!!!	onCreate(inout savedInstanceState : Bundle) : void
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preference);
+        
+
+        LinkedList<Device> devices = new LinkedList<Device>();
+        // TODO: populate with found devices
+		
+       UpnpClient upnpClient = MainActivity.uClient;
+        	
+        if (upnpClient.isInitialized()){
+        	devices.addAll(upnpClient.getDevices());
+		}
+
+		
+       
+        ListPreference providerLp = (ListPreference)findPreference(getString(R.string.settings_selected_provider_title));
+        
+        // One entry per found device for providing media data
+        ArrayList<CharSequence> providerEntries = new ArrayList<CharSequence>();
+        ArrayList<CharSequence> providerEntryValues = new ArrayList<CharSequence>();
+        for(Device currentDevice: devices){
+        	providerEntries.add(currentDevice.getDisplayString());
+        	providerEntryValues.add(currentDevice.getIdentity().getUdn().getIdentifierString());
+        }
+        providerLp.setEntries(providerEntries.toArray(new CharSequence[providerEntries.size()]));
+        providerLp.setEntryValues(providerEntryValues.toArray(new CharSequence[providerEntries.size()]));
+        
+        
+        // One entry per found device for receiving media data
+        ListPreference receiverLp = (ListPreference)findPreference(getString(R.string.settings_selected_receiver_title));
+        ArrayList<CharSequence> receiverEntries = new ArrayList<CharSequence>();
+        ArrayList<CharSequence> receiverEntryValues = new ArrayList<CharSequence>();
+        for(Device currentDevice: devices){
+        	receiverEntries.add(currentDevice.getDisplayString());
+        	receiverEntryValues.add(currentDevice.getIdentity().toString());
+        }
+        receiverLp.setEntries(receiverEntries.toArray(new CharSequence[receiverEntries.size()]));
+        receiverLp.setEntryValues(receiverEntryValues.toArray(new CharSequence[receiverEntries.size()]));
+        
+        

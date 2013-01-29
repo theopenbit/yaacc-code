@@ -1,0 +1,17 @@
+class UpnpFailure
+!!!139778.java!!!	UpnpFailure(inout invocation : ActionInvocation, inout response : UpnpResponse, in defaultMsg : String)
+		super();
+		this.invocation = invocation;
+		this.response = response;
+		this.defaultMsg = defaultMsg;
+!!!139906.java!!!	getInvocation() : ActionInvocation
+		return invocation;
+!!!140034.java!!!	getOperation() : UpnpResponse
+		return response;
+!!!140162.java!!!	getDefaultMsg() : String
+		return defaultMsg;
+!!!140290.java!!!	toString() : String
+		return "UpnpFailure ["
+				+ (invocation != null ? "invocation=" + invocation + ", " : "")
+				+ (response != null ? "response=" + response + ", " : "")
+				+ (defaultMsg != null ? "defaultMsg=" + defaultMsg : "") + "]";

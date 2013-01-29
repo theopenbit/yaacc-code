@@ -1,0 +1,18 @@
+class ContentDirectoryBrowseActionCallback
+!!!131074.java!!!	ContentDirectoryBrowseActionCallback(inout service : Service<?, ?>, in objectID : String, inout flag : BrowseFlag, in filter : String, in firstResult : long, inout maxResults : Long, inout browsingResult : ContentDirectoryBrowseResult, inout  : SortCriterion...orderBy)
+		super(service, objectID, flag, filter, firstResult, maxResults, orderBy);
+		this.browsingResult = browsingResult;
+
+!!!131202.java!!!	received(inout actionInvocation : ActionInvocation, inout didl : DIDLContent) : void
+		this.browsingResult.setResult(didl);
+!!!131330.java!!!	updateStatus(inout status : Status) : void
+		this.browsingResult.setStatus(status);
+!!!131458.java!!!	failure(inout invocation : ActionInvocation, inout operation : UpnpResponse, in defaultMsg : String) : void
+		this.browsingResult.setUpnpFailure(new UpnpFailure(invocation, operation, defaultMsg));
+
+!!!131586.java!!!	getStatus() : Status
+		return this.browsingResult.getStatus();
+!!!131714.java!!!	getResult() : DIDLContent
+		return this.browsingResult.getResult();
+!!!131842.java!!!	getUpnpFailure() : UpnpFailure
+		return this.browsingResult.getUpnpFailure();

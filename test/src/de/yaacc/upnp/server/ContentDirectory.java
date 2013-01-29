@@ -162,6 +162,7 @@ public class ContentDirectory extends AbstractContentDirectoryService {
 		}
 		BrowseResult result = null;
 		try {
+			//Generate output with nested items
 			result = new BrowseResult(new DIDLParser().generate(didl,true), childCount, 1);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
