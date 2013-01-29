@@ -1,16 +1,12 @@
 package de.yaacc;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
-public class BrowseItemAdapter extends BaseAdapter {
+public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;
 	private List<Container> folders;
@@ -30,6 +26,12 @@ public class BrowseItemAdapter extends BaseAdapter {
     	ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"0");
     	DIDLContent a = result.getResult(); //.getContainers();
 		folders = a.getContainers();
+    	
+	}
+	
+	public BrowseItemAdapter(Context ctx, Container selectedContainer){
+		inflator = LayoutInflater.from(ctx);
+		folders = selectedContainer.getContainers();
     	
 	}
 
@@ -66,12 +68,10 @@ public class BrowseItemAdapter extends BaseAdapter {
 		} else {
 			holder = (ViewHolder) arg1.getTag();
 		}
-		
-		Context ctx = parent.getContext();
-		
+				
 		holder.name.setText(((Container)getItem(position)).getTitle());
 		holder.icon.setImageResource(R.drawable.folder);
-		
+
 		return arg1;
 	}
 	
@@ -80,6 +80,14 @@ public class BrowseItemAdapter extends BaseAdapter {
 		ImageView icon;
 		TextView name;
 	}
+	
+	public Container getFolder(int position){
+		if(folders == null){
+			return null;
+		}
+		return folders.get(position);
+	}
+
 
 
 }

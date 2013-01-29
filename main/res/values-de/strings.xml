@@ -3,6 +3,7 @@
 
     <string name="app_name">YAACC</string>
     <string name="browse_main_folder">Zeige Hauptverzeichnis</string>
+	<string name="browse_no_content_found">Keine anzeigbaren Daten gefunden</string>
     <string name="title_activity_main">YAACC</string>
     <string name="title_activity_upnp_browser">Verzeichnisdienst</string>
     <string name="title_activity_image_viewer">Bildbetrachter</string>

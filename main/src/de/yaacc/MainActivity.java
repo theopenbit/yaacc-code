@@ -91,8 +91,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	       
-		Log.d("restoring settings", "Load device: "+R.string.settings_selected_provider_title);
-		Log.d("restoring settings", "Load config: "+preferences.getString(getString(R.string.settings_selected_provider_title), null));
     	if(preferences.getString(getString(R.string.settings_selected_provider_title), null) != null){
     		selectedDevice = uClient.getDevice(preferences.getString(getString(R.string.settings_selected_provider_title), null));
     	}
@@ -101,6 +99,9 @@ public class MainActivity extends Activity implements OnClickListener {
     	if(selectedDevice != null){
 	    	bItemAdapter = new BrowseItemAdapter(this,selectedDevice);
 	    	deviceList.setAdapter(bItemAdapter);
+	    	
+	    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+	    	deviceList.setOnItemClickListener(bItemClickListener);
     	} else {
     		Context context = getApplicationContext();
     		CharSequence text = getString(R.string.browse_no_content_found);

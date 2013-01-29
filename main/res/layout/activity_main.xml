@@ -10,7 +10,7 @@
         android:layout_centerVertical="true"/>
         
     
-    <Button android:id="@+id/nbDev"
+    <Button android:id="@+id/refreshMainFolder"
         android:text="@string/browse_main_folder"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"/>

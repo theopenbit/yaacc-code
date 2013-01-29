@@ -2,8 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="@string/settings_category_send_rec">
-      <ListPreference android:title="@string/settings_selected_provider_title" android:key="provider_list"/>
-      <ListPreference android:title="@string/settings_selected_receiver_title" android:key="receiver_list"/>
+      <ListPreference android:title="@string/settings_selected_provider_title" android:key="@string/settings_selected_provider_title"/>
+      <ListPreference android:title="@string/settings_selected_receiver_title" android:key="@string/settings_selected_receiver_title"/>
         
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_browsing">
