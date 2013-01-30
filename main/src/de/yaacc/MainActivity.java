@@ -98,7 +98,7 @@ public class MainActivity extends Activity implements OnClickListener {
     	
     	// Load adapter if selected device is configured and found
     	if(selectedDevice != null){
-	    	bItemAdapter = new BrowseItemAdapter(this,selectedDevice);
+	    	bItemAdapter = new BrowseItemAdapter(this,"0");
 	    	deviceList.setAdapter(bItemAdapter);
 	    	
 	    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
@@ -112,6 +112,22 @@ public class MainActivity extends Activity implements OnClickListener {
     		toast.show();
     	}
 		
+	}
+	
+	
+	@Override
+	public void onBackPressed() {
+
+		if("0".equals(this.uClient.getCurrentObjectId())){
+			super.finish();
+		}
+		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
+		
+		bItemAdapter = new BrowseItemAdapter(this,this.uClient.getLastVisitedObjectId());
+    	deviceList.setAdapter(bItemAdapter);
+    	
+    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+    	deviceList.setOnItemClickListener(bItemClickListener);
 	}
 	
 

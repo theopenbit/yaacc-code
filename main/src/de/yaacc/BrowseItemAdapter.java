@@ -19,22 +19,19 @@ public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;
 	private List<Container> folders;
-	
-	public BrowseItemAdapter(Context ctx, Device selectedDevice){
-		inflator = LayoutInflater.from(ctx);
-		
-    	ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(selectedDevice,"0");
-    	DIDLContent a = result.getResult(); //.getContainers();
-		folders = a.getContainers();
-    	
-	}
+	private String parentObjectId;
 	
 	public BrowseItemAdapter(Context ctx, String objectId){
+		
+		MainActivity.uClient.storeNewVisitedObjectId(objectId);
+		
 		inflator = LayoutInflater.from(ctx);
 		
 		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(MainActivity.uClient.getProviderDevice(),objectId);
-    	DIDLContent a = result.getResult(); //.getContainers();
+    	DIDLContent a = result.getResult();
 		folders = a.getContainers();
+		
+		
     	
 	}
 

@@ -23,8 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -65,7 +65,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import de.yaacc.BackgroundMusicService;
 import de.yaacc.ImageViewerActivity;
-import de.yaacc.MainActivity;
 import de.yaacc.R;
 
 
@@ -81,7 +80,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
+	private LinkedList<String> visitedObjectIds;
 	SharedPreferences preferences;
+	
 
 		
 
@@ -99,7 +100,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public boolean initialize(Context context) {
 		this.context = context;
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);;
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		this.visitedObjectIds = new LinkedList<String>();
+		
 		//FIXME check if this is right: Context.BIND_AUTO_CREATE kills the service after closing the activity
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
@@ -882,4 +885,24 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	    return this.getDevice(preferences.getString(context.getString(R.string.settings_selected_provider_title), null));
 
 	}
+
+	public String getLastVisitedObjectId(){
+		if(visitedObjectIds != null && !visitedObjectIds.isEmpty()){
+			this.visitedObjectIds.removeLast();
+		}
+		if (visitedObjectIds == null||visitedObjectIds.isEmpty()){
+			return "0";
+		}
+		return this.visitedObjectIds.pollLast();
+	}
+	
+	public void storeNewVisitedObjectId(String newVisitedObjectId){
+		this.visitedObjectIds.addLast(newVisitedObjectId);
+	}
+	
+	public String getCurrentObjectId(){
+		return this.visitedObjectIds.peekLast();
+	}
+	
+	
 }

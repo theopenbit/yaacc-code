@@ -15,7 +15,10 @@ public class BrowseItemClickListener implements OnItemClickListener {
 		ListView a = (ListView) listView.findViewById(R.id.deviceList);
 		BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
 		
-		BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(listView.getContext(),adapter.getFolder(position).getId());
+		// if the current id is null, go back to the top level
+		String newObjectId = adapter.getFolder(position).getId()==null?"0":adapter.getFolder(position).getId();
+		
+		BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(listView.getContext(),newObjectId);
     	a.setAdapter(bItemAdapter);
     	
     	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
