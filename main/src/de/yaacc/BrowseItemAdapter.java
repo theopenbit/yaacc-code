@@ -28,8 +28,14 @@ public class BrowseItemAdapter extends BaseAdapter{
 		inflator = LayoutInflater.from(ctx);
 		
 		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(MainActivity.uClient.getProviderDevice(),objectId);
-    	DIDLContent a = result.getResult();
-		folders = a.getContainers();
+    	//FIXME Attention: you have to check whether the result or the failure-Object is set!!		
+		DIDLContent a = result.getResult();
+		if(a != null){
+			folders = a.getContainers();
+		}else if(result.getUpnpFailure() != null) {
+			//FIXME do some errorhandling here
+		}
+		
 		
 		
     	
