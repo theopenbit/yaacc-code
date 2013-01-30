@@ -1,0 +1,825 @@
+format 74
+"yaacc" // src::de::yaacc
+  revision 1
+  modified_by 2 "tobias"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "/home/tobias/Programmierung/yaacc-code/main/src/de/yaacc/"
+  java_package "de.yaacc"
+  classview 128002 "yaacc"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 128002 "BackgroundMusicService"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "A simple service for playing music in background.
+
+@author Tobias Schöne (openbit)
+"
+      classrelation 128002 // <generalisation>
+	relation 128002 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128002 // <generalisation>
+	  b parent class_ref 128130 // Service
+      end
+
+      attribute 128002 "player"
+	package explicit_type "MediaPlayer"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 128002 "BackgroundMusicService"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 128130 "onCreate"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+
+@see android.app.Service#onCreate()"
+      end
+
+      operation 128258 "onDestroy"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see android.app.Service#onDestroy()"
+      end
+
+      operation 128386 "onBind"
+	public explicit_return_type "IBinder"
+	nparams 1
+	  param inout name "intent" explicit_type "Intent"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see android.app.Service#onBind(android.content.Intent)"
+      end
+
+      operation 128514 "onStart"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "intent" explicit_type "Intent"
+	  param in name "startid" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see android.app.Service#onStart(android.content.Intent, int)"
+      end
+    end
+
+    class 128258 "BrowseItemAdapter"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128130 // <generalisation>
+	relation 128130 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128130 // <generalisation>
+	  b parent class_ref 128386 // BaseAdapter
+      end
+
+      attribute 128130 "inflator"
+	private explicit_type "LayoutInflater"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 128258 "folders"
+	private explicit_type "Container"
+	stereotype "List"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 128642 "BrowseItemAdapter"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "ctx" explicit_type "Context"
+	  param inout name "selectedDevice" explicit_type "Device"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 128770 "BrowseItemAdapter"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "ctx" explicit_type "Context"
+	  param inout name "selectedContainer" explicit_type "Container"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 128898 "getCount"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 129026 "getItem"
+	public explicit_return_type "Object"
+	nparams 1
+	  param in name "arg0" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 129154 "getItemId"
+	public explicit_return_type "long"
+	nparams 1
+	  param in name "arg0" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 129282 "getView"
+	public explicit_return_type "View"
+	nparams 3
+	  param in name "position" explicit_type "int"
+	  param inout name "arg1" explicit_type "View"
+	  param inout name "parent" explicit_type "ViewGroup"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      class 128514 "ViewHolder"
+	visibility package 
+	cpp_decl ""
+	java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 128386 "icon"
+	  package explicit_type "ImageView"
+	  cpp_decl ""
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 128514 "name"
+	  package explicit_type "TextView"
+	  cpp_decl ""
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 129410 "getFolder"
+	public explicit_return_type "Container"
+	nparams 1
+	  param in name "position" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 128642 "BrowseItemClickListener"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128258 // <realization>
+	relation 128258 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128258 // <realization>
+	  b parent class_ref 128770 // OnItemClickListener
+      end
+
+      operation 129538 "onItemClick"
+	public explicit_return_type "void"
+	nparams 4
+	  param inout name "listView" explicit_type "AdapterView<?>"
+	  param inout name "arg1" explicit_type "View"
+	  param in name "position" explicit_type "int"
+	  param in name "id" explicit_type "long"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 128898 "ImageViewerActivity"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "a simple ImageViewer;
+
+@author Tobias Schöne (openbit)
+"
+      classrelation 128386 // <generalisation>
+	relation 128386 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128386 // <generalisation>
+	  b parent class_ref 129026 // Activity
+      end
+
+      attribute 128642 "imageView"
+	private explicit_type "ImageView"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 129666 "onCreate"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "savedInstanceState" explicit_type "Bundle"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 129794 "onCreateOptionsMenu"
+	public explicit_return_type "boolean"
+	nparams 1
+	  param inout name "menu" explicit_type "Menu"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 129922 "showImage"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "img" explicit_type "Drawable"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 129154 "MainActivity"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128514 // <generalisation>
+	relation 128514 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128514 // <generalisation>
+	  b parent class_ref 129026 // Activity
+      end
+
+      classrelation 128642 // <realization>
+	relation 128642 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128642 // <realization>
+	  b parent class_ref 129282 // OnClickListener
+      end
+
+      classrelation 128770 // uClient (<unidirectional association>)
+	relation 128770 --->
+	  a role_name "uClient" init_value " null" class_relation public
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 128770 // uClient (<unidirectional association>)
+	  b parent class_ref 129410 // UpnpClient
+      end
+
+      classrelation 128898 // bItemAdapter (<unidirectional association>)
+	relation 128898 --->
+	  a role_name "bItemAdapter" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 128898 // bItemAdapter (<unidirectional association>)
+	  b parent class_ref 128258 // BrowseItemAdapter
+      end
+
+      operation 130050 "onCreate"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "savedInstanceState" explicit_type "Bundle"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 130178 "onCreateOptionsMenu"
+	public explicit_return_type "boolean"
+	nparams 1
+	  param inout name "menu" explicit_type "Menu"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 130306 "onOptionsItemSelected"
+	public explicit_return_type "boolean"
+	nparams 1
+	  param inout name "item" explicit_type "MenuItem"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 130434 "onClick"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "v" explicit_type "View"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 129538 "RetrieveImageTask"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Background retriever for network images. 
+@author Tobias Schöne (openbit)  
+"
+      classrelation 129026 // <realization>
+	relation 129026 -_-|>
+	  stereotype "bind"
+	  a public
+	    java "${type}<Uri, Void, Drawable>"
+	    classrelation_ref 129026 // <realization>
+	  b parent class_ref 129666 // AsyncTask
+      end
+
+      classrelation 129154 // imageViewerActivity (<unidirectional association>)
+	relation 129154 --->
+	  a role_name "imageViewerActivity" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129154 // imageViewerActivity (<unidirectional association>)
+	  b parent class_ref 128898 // ImageViewerActivity
+      end
+
+      operation 130562 "RetrieveImageTask"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "imageViewerActivity" type class_ref 128898 // ImageViewerActivity
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 130690 "doInBackground"
+	protected explicit_return_type "Drawable"
+	nparams 1
+	  param inout name "" explicit_type "Uri...imageUris"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 130818 "onPostExecute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "Drawable"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment " (non-Javadoc)
+@see android.os.AsyncTask#onPostExecute(java.lang.Object)"
+      end
+    end
+  end
+
+  deploymentview 128002 "yaacc"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 128002 "BackgroundMusicService"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import android.app.Service;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.IBinder;
+import android.util.Log;
+${definition}"
+      associated_classes
+	class_ref 128002 // BackgroundMusicService
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 128130 "BrowseItemAdapter"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import org.teleal.cling.model.meta.Device;
+import org.teleal.cling.support.model.DIDLContent;
+import org.teleal.cling.support.model.container.Container;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import de.yaacc.upnp.ContentDirectoryBrowseResult;
+${definition}"
+      associated_classes
+	class_ref 128258 // BrowseItemAdapter
+      end
+    end
+
+    artifact 128258 "BrowseItemClickListener"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+${definition}"
+      associated_classes
+	class_ref 128642 // BrowseItemClickListener
+      end
+    end
+
+    artifact 128386 "ImageViewerActivity"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.Menu;
+import android.widget.ImageView;
+${definition}"
+      associated_classes
+	class_ref 128898 // ImageViewerActivity
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 128514 "MainActivity"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.model.meta.Device;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+import de.yaacc.config.SettingsActivity;
+import de.yaacc.upnp.UpnpClient;
+import de.yaacc.upnp.server.YaaccUpnpServerService;
+${definition}"
+      associated_classes
+	class_ref 129154 // MainActivity
+      end
+      comment "Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 128642 "RetrieveImageTask"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+${definition}"
+      associated_classes
+	class_ref 129538 // RetrieveImageTask
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+  end
+
+  package_ref 128514 // upnp
+
+  package_ref 128642 // config
+end

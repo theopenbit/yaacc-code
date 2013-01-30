@@ -1,0 +1,16 @@
+window_sizes 1280 996 497 777 807 112
+diagrams
+  active  classdiagram_ref 128002 // associations
+    777 807 100 4 0 0
+end
+show_stereotypes
+selected classdiagram_ref 128002 // associations
+open
+  class_ref 129154 // MainActivity
+  classview_ref 128258 // upnp
+  classview_ref 128514 // server
+  class_ref 129794 // SettingsActivity
+  deploymentview_ref 128130 // config
+  classview_ref 128642 // overview
+end
+end

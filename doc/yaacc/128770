@@ -1,0 +1,933 @@
+format 74
+"server" // src::de::yaacc::upnp::server
+  revision 1
+  modified_by 2 "tobias"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "/home/tobias/Programmierung/yaacc-code/main/src/de/yaacc/upnp/server/"
+  java_package "de.yaacc.upnp.server"
+  classview 128514 "server"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 131586 "AvTransportMediaRendererNoMediaPresent"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "@author Tobias Schöne (openbit)
+"
+      classrelation 130562 // <realization>
+	relation 130562 -_-|>
+	  stereotype "bind"
+	  a public
+	    java "${type}<AVTransport>"
+	    classrelation_ref 130562 // <realization>
+	  b parent class_ref 131714 // NoMediaPresent
+      end
+
+      classrelation 130690 // upnpClient (<unidirectional association>)
+	relation 130690 --->
+	  a role_name "upnpClient" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 130690 // upnpClient (<unidirectional association>)
+	  b parent class_ref 129410 // UpnpClient
+      end
+
+      operation 140418 "AvTransportMediaRendererNoMediaPresent"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "transport" explicit_type "AVTransport"
+	  param inout name "upnpClient" type class_ref 129410 // UpnpClient
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructor.
+
+@param transport
+           the state holder
+@param upnpClient
+           the upnpClient to use"
+      end
+
+      operation 140546 "setTransportURI"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 2
+	  param inout name "uri" explicit_type "URI"
+	  param in name "metaData" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.NoMediaPresent#setTransportURI(java.net.URI, java.lang.String)"
+      end
+    end
+
+    class 131842 "AvTransportMediaRendererPlaying"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 130818 // <realization>
+	relation 130818 -_-|>
+	  stereotype "bind"
+	  a public
+	    java "${type}<AVTransport>"
+	    classrelation_ref 130818 // <realization>
+	  b parent class_ref 131970 // Playing
+      end
+
+      classrelation 130946 // upnpClient (<unidirectional association>)
+	relation 130946 --->
+	  a role_name "upnpClient" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 130946 // upnpClient (<unidirectional association>)
+	  b parent class_ref 129410 // UpnpClient
+      end
+
+      operation 140674 "AvTransportMediaRendererPlaying"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "transport" explicit_type "AVTransport"
+	  param inout name "upnpClient" type class_ref 129410 // UpnpClient
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructor.
+
+@param transport
+           the state holder
+@param upnpClient
+           the upnpclient to use"
+      end
+
+      operation 140802 "onEntry"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#onEntry()"
+      end
+
+      operation 140930 "setTransportURI"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 2
+	  param inout name "uri" explicit_type "URI"
+	  param in name "metaData" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#setTransportURI(java.net.URI, java.lang.String)"
+      end
+
+      operation 141058 "stop"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#stop()"
+      end
+
+      operation 141186 "play"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 1
+	  param in name "speed" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#play(java.lang.String)"
+      end
+
+      operation 141314 "pause"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#pause()"
+      end
+
+      operation 141442 "next"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#next()"
+      end
+
+      operation 141570 "previous"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#previous()"
+      end
+
+      operation 141698 "seek"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 2
+	  param inout name "unit" explicit_type "SeekMode"
+	  param in name "target" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Playing#seek(org.teleal.cling.support.model.SeekMode, java.lang.String)"
+      end
+    end
+
+    class 132098 "AvTransportMediaRendererStopped"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "@author Tobias Schöne (openbit)
+"
+      classrelation 131074 // <realization>
+	relation 131074 -_-|>
+	  stereotype "bind"
+	  a public
+	    java "${type}<AVTransport>"
+	    classrelation_ref 131074 // <realization>
+	  b parent class_ref 132226 // Stopped
+      end
+
+      classrelation 131202 // upnpClient (<unidirectional association>)
+	relation 131202 --->
+	  a role_name "upnpClient" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 131202 // upnpClient (<unidirectional association>)
+	  b parent class_ref 129410 // UpnpClient
+      end
+
+      operation 141826 "AvTransportMediaRendererStopped"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "transport" explicit_type "AVTransport"
+	  param inout name "upnpClient" type class_ref 129410 // UpnpClient
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructor.
+@param transport the state holder
+@param upnpClient the upnpclient to use"
+      end
+
+      operation 141954 "onEntry"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#onEntry()"
+      end
+
+      operation 142082 "setTransportURI"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 2
+	  param inout name "uri" explicit_type "URI"
+	  param in name "metaData" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#setTransportURI(java.net.URI, java.lang.String)"
+      end
+
+      operation 142210 "stop"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#stop()"
+      end
+
+      operation 142338 "play"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 1
+	  param in name "speed" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#play(java.lang.String)"
+      end
+
+      operation 142466 "next"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#next()"
+      end
+
+      operation 142594 "previous"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#previous()"
+      end
+
+      operation 142722 "seek"
+	public explicit_return_type "Class<? extends AbstractState>"
+	nparams 2
+	  param inout name "unit" explicit_type "SeekMode"
+	  param in name "target" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.support.avtransport.impl.state.Stopped#seek(org.teleal.cling.support.model.SeekMode, java.lang.String)"
+      end
+    end
+
+    class 132354 "AvTransportStateMachine"
+      visibility public stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      java_annotation "@States({
+	AvTransportMediaRendererNoMediaPresent.class,
+	AvTransportMediaRendererStopped.class,
+	AvTransportMediaRendererPlaying.class
+})
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "@author Tobias Schöne (openbit)  
+"
+      classrelation 131330 // <generalisation>
+	relation 131330 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131330 // <generalisation>
+	  b parent class_ref 132482 // AVTransportStateMachine
+      end
+    end
+
+    class 132610 "YaaccAVTransportService"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "@author Tobias Schöne (openbit)
+"
+      classrelation 131458 // <realization>
+	relation 131458 -_-|>
+	  stereotype "bind"
+	  a public
+	    java "${type}<AVTransport>"
+	    classrelation_ref 131458 // <realization>
+	  b parent class_ref 132738 // AVTransportService
+      end
+
+      classrelation 131586 // upnpClient (<unidirectional association>)
+	relation 131586 --->
+	  a role_name "upnpClient" const_relation private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 131586 // upnpClient (<unidirectional association>)
+	  b parent class_ref 129410 // UpnpClient
+      end
+
+      operation 142850 "YaaccAVTransportService"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "upnpClient" type class_ref 129410 // UpnpClient
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 142978 "createStateMachine"
+	protected explicit_return_type "AVTransportStateMachine"
+	nparams 1
+	  param inout name "instanceId" explicit_type "UnsignedIntegerFourBytes"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Create a "
+      end
+    end
+
+    class 132866 "YaaccUpnpServerService"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "A simple local upnpserver implementation. This class encapsulate the creation
+and registration of local upnp services. it is implemented as a android
+service in order to run in background
+
+@author Tobias Schöne (openbit) "
+      classrelation 131714 // <generalisation>
+	relation 131714 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131714 // <generalisation>
+	  b parent class_ref 128130 // Service
+      end
+
+      attribute 129922 "UDN_ID"
+	class_attribute const_attribute public explicit_type "String"
+	init_value " \"35\"
+			+ // we make this look like a valid IMEI
+			Build.BOARD.length() % 10 + Build.BRAND.length() % 10
+			+ Build.CPU_ABI.length() % 10 + Build.DEVICE.length() % 10
+			+ Build.DISPLAY.length() % 10 + Build.HOST.length() % 10
+			+ Build.ID.length() % 10 + Build.MANUFACTURER.length() % 10
+			+ Build.MODEL.length() % 10 + Build.PRODUCT.length() % 10
+			+ Build.TAGS.length() % 10 + Build.TYPE.length() % 10
+			+ Build.USER.length() % 10"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Building a pseudo UUID for the device, which can't be null or a default
+ value
+ 13 digits;"
+      end
+
+      classrelation 131842 // upnpClient (<unidirectional association>)
+	relation 131842 --->
+	  a role_name "upnpClient" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 131842 // upnpClient (<unidirectional association>)
+	  b parent class_ref 129410 // UpnpClient
+      end
+
+      attribute 130050 "watchdog"
+	private explicit_type "boolean"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 143106 "onBind"
+	public explicit_return_type "IBinder"
+	nparams 1
+	  param inout name "intent" explicit_type "Intent"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+
+@see android.app.Service#onBind(android.content.Intent)"
+      end
+
+      operation 143234 "onStart"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "intent" explicit_type "Intent"
+	  param in name "startid" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+
+@see android.app.Service#onStart(android.content.Intent, int)"
+      end
+
+      operation 143362 "initialize"
+	private explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 143490 "createDevice"
+	private explicit_return_type "LocalDevice"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Create a local upnp device 
+@return the device
+
+FIXME store servername in the stettings"
+      end
+
+      operation 143618 "createServices"
+	private explicit_return_type "LocalService<?>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type}[] ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Create the services provided by this device
+@return the services"
+      end
+
+      operation 143746 "createAVTransportService"
+	private explicit_return_type "LocalService<AbstractAVTransportService>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@SuppressWarnings(\"unchecked\")
+"
+	
+	
+	
+	comment "creates an AVTransportService 
+@return the service"
+      end
+    end
+  end
+
+  deploymentview 128386 "server"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 129666 "AvTransportMediaRendererNoMediaPresent"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.net.URI;
+import org.teleal.cling.support.avtransport.impl.state.AbstractState;
+import org.teleal.cling.support.avtransport.impl.state.NoMediaPresent;
+import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
+import org.teleal.cling.support.model.AVTransport;
+import org.teleal.cling.support.model.MediaInfo;
+import org.teleal.cling.support.model.PositionInfo;
+import android.util.Log;
+import de.yaacc.upnp.UpnpClient;
+${definition}"
+      associated_classes
+	class_ref 131586 // AvTransportMediaRendererNoMediaPresent
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129794 "AvTransportMediaRendererPlaying"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.net.URI;
+import org.teleal.cling.support.avtransport.impl.state.AbstractState;
+import org.teleal.cling.support.avtransport.impl.state.Playing;
+import org.teleal.cling.support.model.AVTransport;
+import org.teleal.cling.support.model.SeekMode;
+import android.util.Log;
+import de.yaacc.upnp.UpnpClient;
+${definition}"
+      associated_classes
+	class_ref 131842 // AvTransportMediaRendererPlaying
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129922 "AvTransportMediaRendererStopped"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.net.URI;
+import org.teleal.cling.support.avtransport.impl.state.AbstractState;
+import org.teleal.cling.support.avtransport.impl.state.Stopped;
+import org.teleal.cling.support.model.AVTransport;
+import org.teleal.cling.support.model.SeekMode;
+import android.util.Log;
+import de.yaacc.upnp.UpnpClient;
+${definition}"
+      associated_classes
+	class_ref 132098 // AvTransportMediaRendererStopped
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 130050 "AvTransportStateMachine"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
+import org.teleal.common.statemachine.States;
+${definition}"
+      associated_classes
+	class_ref 132354 // AvTransportStateMachine
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 130178 "YaaccAVTransportService"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
+import org.teleal.cling.support.avtransport.impl.AVTransportService;
+import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
+import org.teleal.cling.support.model.AVTransport;
+import org.teleal.common.statemachine.StateMachineBuilder;
+import de.yaacc.upnp.UpnpClient;
+${definition}"
+      associated_classes
+	class_ref 132610 // YaaccAVTransportService
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 130306 "YaaccUpnpServerService"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
+import org.teleal.cling.model.DefaultServiceManager;
+import org.teleal.cling.model.ValidationException;
+import org.teleal.cling.model.meta.DeviceDetails;
+import org.teleal.cling.model.meta.DeviceIdentity;
+import org.teleal.cling.model.meta.LocalDevice;
+import org.teleal.cling.model.meta.LocalService;
+import org.teleal.cling.model.meta.ManufacturerDetails;
+import org.teleal.cling.model.types.UDADeviceType;
+import org.teleal.cling.model.types.UDN;
+import org.teleal.cling.support.avtransport.AbstractAVTransportService;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Build;
+import android.os.IBinder;
+import android.util.Log;
+import de.yaacc.upnp.UpnpClient;
+${definition}"
+      associated_classes
+	class_ref 132866 // YaaccUpnpServerService
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+  end
+end

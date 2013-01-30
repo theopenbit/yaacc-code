@@ -1,0 +1,1793 @@
+format 74
+"upnp" // src::de::yaacc::upnp
+  revision 1
+  modified_by 2 "tobias"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "/home/tobias/Programmierung/yaacc-code/main/src/de/yaacc/upnp/"
+  java_package "de.yaacc.upnp"
+  classview 128258 "upnp"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 129410 "UpnpClient"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "A client facade to the upnp lookup and access framework. This class provides
+all services to manage devices.
+
+@author Tobias Schöne (openbit)
+"
+      classrelation 129794 // <realization>
+	relation 129794 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129794 // <realization>
+	  b parent class_ref 130562 // RegistryListener
+      end
+
+      classrelation 129922 // <realization>
+	relation 129922 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129922 // <realization>
+	  b parent class_ref 130690 // ServiceConnection
+      end
+
+      classrelation 130050 // listeners (<unidirectional association>)
+	relation 130050 --->
+	  stereotype "List"
+	  a role_name "listeners" init_value " new ArrayList<UpnpClientListener>()" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 130050 // listeners (<unidirectional association>)
+	  b parent class_ref 130818 // UpnpClientListener
+      end
+
+      attribute 129026 "androidUpnpService"
+	private explicit_type "AndroidUpnpService"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 129154 "context"
+	private explicit_type "Context"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 132866 "UpnpClient"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 132994 "initialize"
+	public explicit_return_type "boolean"
+	nparams 1
+	  param inout name "context" explicit_type "Context"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Initialize the Object.
+
+@param context
+           the context
+@return true if initialization completes correctly"
+      end
+
+      operation 133122 "deviceAdded"
+	private explicit_return_type "void"
+	nparams 1
+	  param in name "device" explicit_type "Device"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}@SuppressWarnings(\"rawtypes\") final ${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 133250 "deviceRemoved"
+	private explicit_return_type "void"
+	nparams 1
+	  param in name "device" explicit_type "Device"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}@SuppressWarnings(\"rawtypes\") final ${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 133378 "deviceUpdated"
+	private explicit_return_type "void"
+	nparams 1
+	  param in name "device" explicit_type "Device"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}@SuppressWarnings(\"rawtypes\") final ${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 133506 "fireDeviceAdded"
+	private explicit_return_type "void"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 133634 "fireDeviceRemoved"
+	private explicit_return_type "void"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 133762 "fireDeviceUpdated"
+	private explicit_return_type "void"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 133890 "onServiceConnected"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "className" explicit_type "ComponentName"
+	  param inout name "service" explicit_type "IBinder"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment " interface implementation ServiceConnection
+ monitor android service creation and destruction
+
+(non-Javadoc)
+@see android.content.ServiceConnection#onServiceConnected(android.content.ComponentName, android.os.IBinder)"
+      end
+
+      operation 134018 "onServiceDisconnected"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "className" explicit_type "ComponentName"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see android.content.ServiceConnection#onServiceDisconnected(android.content.ComponentName)"
+      end
+
+      operation 134146 "remoteDeviceDiscoveryStarted"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "remotedevice" explicit_type "RemoteDevice"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment " ----------Implementation Upnp RegistryListener Interface"
+      end
+
+      operation 134274 "remoteDeviceDiscoveryFailed"
+	public explicit_return_type "void"
+	nparams 3
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "remotedevice" explicit_type "RemoteDevice"
+	  param inout name "exception" explicit_type "Exception"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#remoteDeviceDiscoveryFailed(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice, java.lang.Exception)"
+      end
+
+      operation 134402 "remoteDeviceAdded"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "remotedevice" explicit_type "RemoteDevice"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#remoteDeviceAdded(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)"
+      end
+
+      operation 134530 "remoteDeviceUpdated"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "remotedevice" explicit_type "RemoteDevice"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#remoteDeviceUpdated(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)"
+      end
+
+      operation 134658 "remoteDeviceRemoved"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "remotedevice" explicit_type "RemoteDevice"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#remoteDeviceRemoved(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)"
+      end
+
+      operation 134786 "localDeviceAdded"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "localdevice" explicit_type "LocalDevice"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#localDeviceAdded(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)"
+      end
+
+      operation 134914 "localDeviceRemoved"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "registry" explicit_type "Registry"
+	  param inout name "localdevice" explicit_type "LocalDevice"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#localDeviceRemoved(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)"
+      end
+
+      operation 135042 "beforeShutdown"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "registry" explicit_type "Registry"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#beforeShutdown(org.teleal.cling.registry.Registry)"
+      end
+
+      operation 135170 "afterShutdown"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+@see org.teleal.cling.registry.RegistryListener#afterShutdown()"
+      end
+
+      operation 135298 "getAVTransportService"
+	private explicit_return_type "Service"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment " ****************************************************
+
+Returns a Service of type AVTransport
+@param device the device which provides the service
+@return the service of null"
+      end
+
+      operation 135426 "waitForActionComplete"
+	private explicit_return_type "void"
+	nparams 1
+	  param in name "actionState" type class_ref 130946 // ActionState
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}final ${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Wathdog for async calls to complete"
+      end
+
+      operation 135554 "intentView"
+	protected explicit_return_type "void"
+	nparams 2
+	  param in name "mime" explicit_type "String"
+	  param inout name "uri" explicit_type "Uri"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Start an intent with Action.View;
+
+@param mime
+           the Mimetype to start
+@param uri
+           the uri to start
+"
+      end
+
+      operation 135682 "intentView"
+	protected explicit_return_type "void"
+	nparams 3
+	  param in name "mime" explicit_type "String"
+	  param inout name "uri" explicit_type "Uri"
+	  param inout name "background" explicit_type "boolean"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Start an intent with Action.View;
+
+@param mime
+           the Mimetype to start
+@param uri
+           the uri to start
+@param backround
+           starts a background activity"
+      end
+
+      operation 135810 "intentView"
+	protected explicit_return_type "void"
+	nparams 3
+	  param in name "mime" explicit_type "String"
+	  param inout name "uri" explicit_type "Uri"
+	  param inout name "activityClazz" explicit_type "Class"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Start an intent for action VIEW with a given activity class
+@param mime the mimetype to be viewed
+@param uri the uri to be viewed
+@param activityClazz the activity class to be used"
+      end
+
+      operation 135938 "addUpnpClientListener"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "listener" type class_ref 130818 // UpnpClientListener
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Add an listener.
+
+@param listener
+           the listener to be added"
+      end
+
+      operation 136066 "removeUpnpClientListener"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "listener" type class_ref 130818 // UpnpClientListener
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Remove the given listener.
+
+@param listener
+           the listener which is to be removed"
+      end
+
+      operation 136194 "getAndroidUpnpService"
+	protected explicit_return_type "AndroidUpnpService"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "returns the AndroidUpnpService
+@return the service"
+      end
+
+      operation 136322 "getDevices"
+	public explicit_return_type "Collection<Device>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Returns all registered UpnpDevices.
+
+@return the upnpDevices"
+      end
+
+      operation 136450 "getDevice"
+	public explicit_return_type "Device<?, ?, ?>"
+	nparams 1
+	  param in name "identifier" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Returns a registered UpnpDevice.
+
+@return the upnpDevice null if not found"
+      end
+
+      operation 136578 "getUpnpService"
+	public explicit_return_type "UpnpService"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Returns the cling UpnpService.
+
+@return the cling UpnpService"
+      end
+
+      operation 136706 "isInitialized"
+	public explicit_return_type "boolean"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "True if the client is initialized.
+
+@return true or false"
+      end
+
+      operation 136834 "getConfiguration"
+	public explicit_return_type "UpnpServiceConfiguration"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "returns the upnp service configuration
+@return the configuration"
+      end
+
+      operation 136962 "getControlPoint"
+	public explicit_return_type "ControlPoint"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "returns the upnp control point
+@return the control point"
+      end
+
+      operation 137090 "getRegistry"
+	public explicit_return_type "Registry"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Returns the upnp registry
+@return the registry"
+      end
+
+      operation 137218 "getContext"
+	public explicit_return_type "Context"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return the context"
+      end
+
+      operation 137346 "setAndroidUpnpService"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "upnpService" explicit_type "AndroidUpnpService"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Setting an new upnpRegistryService. If the service is not null, refresh
+the device list.
+
+@param upnpService"
+      end
+
+      operation 137474 "refreshUpnpDeviceCatalog"
+	private explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "refresh the device catalog"
+      end
+
+      operation 137602 "browseSync"
+	public return_type class_ref 130306 // ContentDirectoryBrowseResult
+	nparams 2
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	  param in name "objectID" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Browse ContenDirctory synchronous
+
+@param device
+           the device to be browsed
+@param objectID
+           the browsing root
+@return the browsing result"
+      end
+
+      operation 137730 "browseSync"
+	public return_type class_ref 130306 // ContentDirectoryBrowseResult
+	nparams 7
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	  param in name "objectID" explicit_type "String"
+	  param inout name "flag" explicit_type "BrowseFlag"
+	  param in name "filter" explicit_type "String"
+	  param in name "firstResult" explicit_type "long"
+	  param inout name "maxResults" explicit_type "Long"
+	  param inout name "" explicit_type "SortCriterion...orderBy"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}, ${t6} ${p6}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Browse ContenDirctory synchronous
+
+@param device
+           the device to be browsed
+@param objectID
+           the browsing root
+@param flag
+           kind of browsing @see {@link BrowseFlag}
+@param filter
+           a filter
+@param firstResult
+           first result
+@param maxResults
+           max result count
+@param orderBy
+           sorting criteria @see {@link SortCriterion}
+@return the browsing result"
+      end
+
+      operation 137858 "browseAsync"
+	public return_type class_ref 130306 // ContentDirectoryBrowseResult
+	nparams 2
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	  param in name "objectID" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Browse ContenDirctory asynchronous
+
+@param device
+           the device to be browsed
+@param objectID
+           the browsing root
+@return the browsing result"
+      end
+
+      operation 137986 "browseAsync"
+	public return_type class_ref 130306 // ContentDirectoryBrowseResult
+	nparams 7
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	  param in name "objectID" explicit_type "String"
+	  param inout name "flag" explicit_type "BrowseFlag"
+	  param in name "filter" explicit_type "String"
+	  param in name "firstResult" explicit_type "long"
+	  param inout name "maxResults" explicit_type "Long"
+	  param inout name "" explicit_type "SortCriterion...orderBy"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}, ${t6} ${p6}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Browse ContenDirctory asynchronous
+
+@param device
+           the device to be browsed
+@param objectID
+           the browsing root
+@param flag
+           kind of browsing @see {@link BrowseFlag}
+@param filter
+           a filter
+@param firstResult
+           first result
+@param maxResults
+           max result count
+@param orderBy
+           sorting criteria @see {@link SortCriterion}
+@return the browsing result"
+      end
+
+      operation 138114 "searchDevices"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Search asynchronously for all devices."
+      end
+
+      operation 138242 "playLocal"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "transport" explicit_type "AVTransport"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Starts playing avtransport object.
+
+@param transport  the transport object"
+      end
+
+      operation 138370 "playLocal"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "item" explicit_type "Item"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Starts playing item locally
+
+@param item
+           the item"
+      end
+
+      operation 138498 "playLocal"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "container" explicit_type "Container"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Starts playing a container locally. All items are played
+
+@param item
+           the item
+"
+      end
+
+      operation 138626 "playLocal"
+	protected explicit_return_type "void"
+	nparams 2
+	  param inout name "container" explicit_type "Container"
+	  param inout name "background" explicit_type "boolean"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Starts playing a container locally. All items are played
+
+@param item
+           the item
+@param background
+           starts a background activity"
+      end
+
+      operation 138754 "playLocal"
+	public explicit_return_type "void"
+	nparams 2
+	  param in name "imageContainer" explicit_type "Container"
+	  param in name "musicContainer" explicit_type "Container"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}final ${t0} ${p0}, final ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Starts playing a music container parallel with an image container
+locally. All items are played
+
+@param item
+           the item
+"
+      end
+
+      operation 138882 "playRemote"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "item" explicit_type "Item"
+	  param inout name "remoteDevice" explicit_type "Device<?, ?, ?>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Plays an item on an remote device
+
+@param item
+@param remoteDevice"
+      end
+
+      class 131074 "InternalSetAVTransportURI"
+	visibility private 
+	cpp_decl ""
+	java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 130178 // <generalisation>
+	  relation 130178 ---|>
+	    a public
+	      java "${type}"
+	      classrelation_ref 130178 // <generalisation>
+	    b parent class_ref 131202 // SetAVTransportURI
+	end
+
+	classrelation 130306 // actionState (<unidirectional association>)
+	  relation 130306 --->
+	    a role_name "actionState" init_value "null" package
+	      java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	      classrelation_ref 130306 // actionState (<unidirectional association>)
+	    b parent class_ref 130946 // ActionState
+	end
+
+	operation 139010 "InternalSetAVTransportURI"
+	  private explicit_return_type ""
+	  nparams 3
+	    param inout name "service" explicit_type "Service"
+	    param in name "uri" explicit_type "String"
+	    param inout name "actionState" type class_ref 130946 // ActionState
+	  
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	end
+
+	operation 139138 "failure"
+	  public explicit_return_type "void"
+	  nparams 3
+	    param inout name "actioninvocation" explicit_type "ActionInvocation"
+	    param inout name "upnpresponse" explicit_type "UpnpResponse"
+	    param in name "s" explicit_type "String"
+	  
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  java_annotation "@Override
+"
+	  
+	  
+	  
+	end
+
+	operation 139266 "success"
+	  public explicit_return_type "void"
+	  nparams 1
+	    param inout name "actioninvocation" explicit_type "ActionInvocation"
+	  
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  java_annotation "@Override
+"
+	  
+	  
+	  
+	end
+      end
+
+      class 130946 "ActionState"
+	visibility private 
+	cpp_decl ""
+	java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 129282 "actionFinished"
+	  public explicit_type "boolean"
+	  init_value " false"
+	  cpp_decl ""
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 129410 "watchdogFlag"
+	  public explicit_type "boolean"
+	  init_value " false"
+	  cpp_decl ""
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      classrelation 131970 // <dependency>
+	relation 131970 -_->
+	  a package
+	    comment "start an control"
+	    classrelation_ref 131970 // <dependency>
+	  b parent class_ref 128898 // ImageViewerActivity
+      end
+
+      classrelation 132098 // <dependency>
+	relation 132098 -_->
+	  a default
+	    classrelation_ref 132098 // <dependency>
+	  b parent class_ref 128002 // BackgroundMusicService
+      end
+    end
+
+    class 130050 "ContentDirectoryBrowseActionCallback"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "ActionCallback for content directory browsing. 
+Connect an instance of this class to a MediaServer-Service.
+After calling run you will browse the MediaServer-Directory asynchronously 
+@author Tobias Schöne (openbit)  
+"
+      classrelation 129410 // <generalisation>
+	relation 129410 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129410 // <generalisation>
+	  b parent class_ref 130178 // Browse
+      end
+
+      classrelation 129538 // browsingResult (<unidirectional association>)
+	relation 129538 --->
+	  a role_name "browsingResult" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129538 // browsingResult (<unidirectional association>)
+	  b parent class_ref 130306 // ContentDirectoryBrowseResult
+      end
+
+      operation 131074 "ContentDirectoryBrowseActionCallback"
+	public explicit_return_type ""
+	nparams 8
+	  param inout name "service" explicit_type "Service<?, ?>"
+	  param in name "objectID" explicit_type "String"
+	  param inout name "flag" explicit_type "BrowseFlag"
+	  param in name "filter" explicit_type "String"
+	  param in name "firstResult" explicit_type "long"
+	  param inout name "maxResults" explicit_type "Long"
+	  param inout name "browsingResult" type class_ref 130306 // ContentDirectoryBrowseResult
+	  param inout name "" explicit_type "SortCriterion...orderBy"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}, ${t6} ${p6}, ${t7} ${p7}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 131202 "received"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "actionInvocation" explicit_type "ActionInvocation"
+	  param inout name "didl" explicit_type "DIDLContent"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 131330 "updateStatus"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "status" explicit_type "Status"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 131458 "failure"
+	public explicit_return_type "void"
+	nparams 3
+	  param inout name "invocation" explicit_type "ActionInvocation"
+	  param inout name "operation" explicit_type "UpnpResponse"
+	  param in name "defaultMsg" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 131586 "getStatus"
+	public explicit_return_type "Status"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 131714 "getResult"
+	public explicit_return_type "DIDLContent"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return the result"
+      end
+
+      operation 131842 "getUpnpFailure"
+	public return_type class_ref 130434 // UpnpFailure
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return the upnpFailure"
+      end
+    end
+
+    class 130306 "ContentDirectoryBrowseResult"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Result of a content directory browsing.
+This object is used either in synchronous or asynchronous requests.
+In case of asynchronous requests you have to query the status 
+in order to know if the request completes.   
+ 
+@author Tobias Schöne (openbit)  
+"
+      attribute 128770 "status"
+	private explicit_type "Status"
+	init_value " Status.NO_CONTENT"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 128898 "result"
+	private explicit_type "DIDLContent"
+	init_value " null"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      classrelation 129666 // upnpFailure (<unidirectional association>)
+	relation 129666 --->
+	  a role_name "upnpFailure" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129666 // upnpFailure (<unidirectional association>)
+	  b parent class_ref 130434 // UpnpFailure
+      end
+
+      operation 131970 "ContentDirectoryBrowseResult"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "default constructor. 
+
+  "
+      end
+
+      operation 132098 "getStatus"
+	public explicit_return_type "Status"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Returns the status of browsing, i.e. LAODING, NO_CONTENT, OK.
+@return the status"
+      end
+
+      operation 132226 "getResult"
+	public explicit_return_type "DIDLContent"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Returns the browsing result.
+@return the result"
+      end
+
+      operation 132354 "getUpnpFailure"
+	public return_type class_ref 130434 // UpnpFailure
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "a failure object if anything goes wrong.
+@return the upnpFailure"
+      end
+
+      operation 132482 "setStatus"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "status" explicit_type "Status"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Set the status of browsing
+@param status the status to set"
+      end
+
+      operation 132610 "setResult"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "DIDLContent"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@param result the result to set"
+      end
+
+      operation 132738 "setUpnpFailure"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "upnpFailure" type class_ref 130434 // UpnpFailure
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@param upnpFailure the upnpFailure to set"
+      end
+    end
+
+    class 130434 "UpnpFailure"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Value holder for upnp failure information
+
+@author Tobias Schöne (openbit)
+"
+      attribute 129538 "invocation"
+	private explicit_type "ActionInvocation"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 129666 "response"
+	private explicit_type "UpnpResponse"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 129794 "defaultMsg"
+	private explicit_type "String"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 139778 "UpnpFailure"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "invocation" explicit_type "ActionInvocation"
+	  param inout name "response" explicit_type "UpnpResponse"
+	  param in name "defaultMsg" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructor.
+
+@param invocation
+           the ActionInvocation
+@param response
+           the Upnp response
+@param defaultMsg
+           a default message"
+      end
+
+      operation 139906 "getInvocation"
+	public explicit_return_type "ActionInvocation"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return the invocation"
+      end
+
+      operation 140034 "getOperation"
+	public explicit_return_type "UpnpResponse"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return the operation"
+      end
+
+      operation 140162 "getDefaultMsg"
+	public explicit_return_type "String"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return the defaultMsg"
+      end
+
+      operation 140290 "toString"
+	public explicit_return_type "String"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+	comment "(non-Javadoc)
+
+@see java.lang.Object#toString()"
+      end
+    end
+
+    class 130818 "UpnpClientListener"
+      visibility public stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Listener on events from an instance of UpnpClient. 
+@author Tobias Schöne (openbit) 
+"
+      operation 139394 "deviceAdded"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 139522 "deviceRemoved"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 139650 "deviceUpdated"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "device" explicit_type "Device<?, ?, ?>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 131330 "UpnpRegistryService"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This is an android service to provide access to an upnp registry. 
+@author Tobias Schöne (openbit)  
+"
+      classrelation 130434 // <generalisation>
+	relation 130434 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 130434 // <generalisation>
+	  b parent class_ref 131458 // AndroidUpnpServiceImpl
+      end
+    end
+  end
+
+  deploymentview 128258 "upnp"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 128898 "ContentDirectoryBrowseActionCallback"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.model.action.ActionInvocation;
+import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.support.contentdirectory.callback.Browse;
+import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.DIDLContent;
+import org.teleal.cling.support.model.SortCriterion;
+${definition}"
+      associated_classes
+	class_ref 130050 // ContentDirectoryBrowseActionCallback
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129026 "ContentDirectoryBrowseResult"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
+import org.teleal.cling.support.model.DIDLContent;
+${definition}"
+      associated_classes
+	class_ref 130306 // ContentDirectoryBrowseResult
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129154 "UpnpClient"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import org.teleal.cling.UpnpService;
+import org.teleal.cling.UpnpServiceConfiguration;
+import org.teleal.cling.android.AndroidUpnpService;
+import org.teleal.cling.controlpoint.ControlPoint;
+import org.teleal.cling.model.action.ActionInvocation;
+import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.Device;
+import org.teleal.cling.model.meta.LocalDevice;
+import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.types.ServiceId;
+import org.teleal.cling.model.types.UDAServiceId;
+import org.teleal.cling.model.types.UDN;
+import org.teleal.cling.registry.Registry;
+import org.teleal.cling.registry.RegistryListener;
+import org.teleal.cling.support.avtransport.callback.Play;
+import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
+import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
+import org.teleal.cling.support.model.AVTransport;
+import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.PositionInfo;
+import org.teleal.cling.support.model.Res;
+import org.teleal.cling.support.model.SortCriterion;
+import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.Item;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.net.Uri;
+import android.os.IBinder;
+import android.util.Log;
+import de.yaacc.BackgroundMusicService;
+import de.yaacc.ImageViewerActivity;
+${definition}"
+      associated_classes
+	class_ref 129410 // UpnpClient
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129282 "UpnpClientListener"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.model.meta.Device;
+${definition}"
+      associated_classes
+	class_ref 130818 // UpnpClientListener
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129410 "UpnpFailure"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.model.action.ActionInvocation;
+import org.teleal.cling.model.message.UpnpResponse;
+${definition}"
+      associated_classes
+	class_ref 130434 // UpnpFailure
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+
+    artifact 129538 "UpnpRegistryService"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import org.teleal.cling.UpnpService;
+import org.teleal.cling.UpnpServiceConfiguration;
+import org.teleal.cling.android.AndroidUpnpService;
+import org.teleal.cling.android.AndroidUpnpServiceConfiguration;
+import org.teleal.cling.android.AndroidUpnpServiceImpl;
+import org.teleal.cling.controlpoint.ControlPoint;
+import org.teleal.cling.registry.Registry;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.net.wifi.WifiManager;
+import android.os.IBinder;
+${definition}"
+      associated_classes
+	class_ref 131330 // UpnpRegistryService
+      end
+      comment "
+Copyright (C) 2013 www.yaacc.de 
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+    end
+  end
+
+  package_ref 128770 // server
+end

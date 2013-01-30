@@ -1,0 +1,59 @@
+class MainActivity
+!!!130050.java!!!	onCreate(inout savedInstanceState : Bundle) : void
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+
+		uClient = new UpnpClient();
+		uClient.initialize(getApplicationContext());
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
+			// Start upnpserver service for avtransport
+			Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
+			getApplicationContext().startService(svc);
+		}
+		
+		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
+		showDeviceNumber.setOnClickListener(this);
+!!!130178.java!!!	onCreateOptionsMenu(inout menu : Menu) : boolean
+		getMenuInflater().inflate(R.menu.activity_main, menu);
+		return true;
+!!!130306.java!!!	onOptionsItemSelected(inout item : MenuItem) : boolean
+		switch (item.getItemId()) {
+		case R.id.menu_settings:
+			Intent i = new Intent(this, SettingsActivity.class);
+			startActivity(i);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+!!!130434.java!!!	onClick(inout v : View) : void
+		// Define where to show the folder contents
+		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
+		
+		// Get Try to get selected device
+		Device selectedDevice = null;
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	       
+    	if(preferences.getString(getString(R.string.settings_selected_provider_title), null) != null){
+    		selectedDevice = uClient.getDevice(preferences.getString(getString(R.string.settings_selected_provider_title), null));
+    	}
+    	
+    	// Load adapter if selected device is configured and found
+    	if(selectedDevice != null){
+	    	bItemAdapter = new BrowseItemAdapter(this,selectedDevice);
+	    	deviceList.setAdapter(bItemAdapter);
+	    	
+	    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+	    	deviceList.setOnItemClickListener(bItemClickListener);
+    	} else {
+    		Context context = getApplicationContext();
+    		CharSequence text = getString(R.string.browse_no_content_found);
+    		int duration = Toast.LENGTH_SHORT;
+
+    		Toast toast = Toast.makeText(context, text, duration);
+    		toast.show();
+    	}
+		
