@@ -29,9 +29,12 @@ public class BrowseItemAdapter extends BaseAdapter{
     	
 	}
 	
-	public BrowseItemAdapter(Context ctx, Container selectedContainer){
+	public BrowseItemAdapter(Context ctx, String objectId){
 		inflator = LayoutInflater.from(ctx);
-		folders = selectedContainer.getContainers();
+		
+		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(MainActivity.uClient.getProviderDevice(),objectId);
+    	DIDLContent a = result.getResult(); //.getContainers();
+		folders = a.getContainers();
     	
 	}
 
@@ -69,6 +72,7 @@ public class BrowseItemAdapter extends BaseAdapter{
 			holder = (ViewHolder) arg1.getTag();
 		}
 				
+
 		holder.name.setText(((Container)getItem(position)).getTitle());
 		holder.icon.setImageResource(R.drawable.folder);
 

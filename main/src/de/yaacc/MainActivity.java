@@ -42,7 +42,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	public static UpnpClient uClient = null;
 
 	private BrowseItemAdapter bItemAdapter;
-
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -112,5 +113,7 @@ public class MainActivity extends Activity implements OnClickListener {
     	}
 		
 	}
+	
+
 
 }

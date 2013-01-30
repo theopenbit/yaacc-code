@@ -58,11 +58,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import de.yaacc.BackgroundMusicService;
 import de.yaacc.ImageViewerActivity;
+import de.yaacc.MainActivity;
+import de.yaacc.R;
 
 
 /**
@@ -77,7 +81,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
+	SharedPreferences preferences;
+
 		
+
 
 	public UpnpClient() {
 
@@ -92,6 +99,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public boolean initialize(Context context) {
 		this.context = context;
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);;
 		//FIXME check if this is right: Context.BIND_AUTO_CREATE kills the service after closing the activity
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
@@ -853,5 +861,25 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private static class ActionState{
 		public boolean actionFinished = false;
 		public boolean watchdogFlag = false;
+	}
+	
+
+
+	/**
+	 * @return the receiverDevice
+	 */
+	public Device getReceiverDevice() {
+		
+		 return this.getDevice(preferences.getString(context.getString(R.string.settings_selected_receiver_title), null));
+
+	}
+
+	/**
+	 * @return the provider device
+	 */
+	public Device getProviderDevice() {
+		
+	    return this.getDevice(preferences.getString(context.getString(R.string.settings_selected_provider_title), null));
+
 	}
 }
