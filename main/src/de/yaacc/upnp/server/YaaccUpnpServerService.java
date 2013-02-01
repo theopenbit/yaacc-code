@@ -28,9 +28,11 @@ import org.teleal.cling.model.DefaultServiceManager;
 import org.teleal.cling.model.ValidationException;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
+import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
+import org.teleal.cling.model.meta.ModelDetails;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
@@ -48,9 +50,9 @@ import de.yaacc.upnp.UpnpClient;
  * and registration of local upnp services. it is implemented as a android
  * service in order to run in background
  * 
- * @author Tobias Schöne (openbit) 
+ * @author Tobias Schöne (openbit)
  */
-public class YaaccUpnpServerService extends Service  {
+public class YaaccUpnpServerService extends Service {
 	// Building a pseudo UUID for the device, which can't be null or a default
 	// value
 	public static final String UDN_ID = "35"
@@ -90,14 +92,15 @@ public class YaaccUpnpServerService extends Service  {
 		if (upnpClient == null) {
 			upnpClient = new UpnpClient();
 		}
-		//the footprint of the onStart() method must be small  
-		//otherwise android will kill the service
-		//in order of this circumstance we have to initialize the service asynchronous
+		// the footprint of the onStart() method must be small
+		// otherwise android will kill the service
+		// in order of this circumstance we have to initialize the service
+		// asynchronous
 		Thread initializationThread = new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				initialize();				
+				initialize();
 			}
 		});
 		initializationThread.start();
@@ -131,32 +134,37 @@ public class YaaccUpnpServerService extends Service  {
 	}
 
 	/**
-	 * Create a local upnp device 
+	 * Create a local upnp device
+	 * 
 	 * @return the device
 	 */
-	//FIXME store servername in the stettings
+	// FIXME store servername in the stettings
 	private LocalDevice createDevice() {
 		LocalDevice device;
 		try {
-			device = new LocalDevice(new DeviceIdentity(new UDN(UDN_ID)),
-					new UDADeviceType("YAACCMediaServer"), new DeviceDetails(
-							"YAACC-MediaServer", new ManufacturerDetails(
-									"www.yaacc.de")), createServices());
+			device = new LocalDevice(
+					new DeviceIdentity(new UDN(UDN_ID)),
+					new UDADeviceType("MediaServer"),
+					new DeviceDetails(
+							"YAACC-MediaServer",
+							new ManufacturerDetails("www.yaacc.de",
+									"www.yaacc.de"),
+							new ModelDetails(
+									"YAACC-MediaServer",
+									"Free Android UPnP AV MediaServer, GNU GPL",
+									"1.0")),createServices());
 
 			return device;
 		} catch (ValidationException e) {
-			throw new IllegalStateException("Exception during device creation", e);			
+			throw new IllegalStateException("Exception during device creation",
+					e);
 		}
-		
+
 	}
-
-	
-	
-
-	
 
 	/**
 	 * Create the services provided by this device
+	 * 
 	 * @return the services
 	 */
 	private LocalService<?>[] createServices() {
@@ -166,32 +174,32 @@ public class YaaccUpnpServerService extends Service  {
 
 		return services.toArray(new LocalService[] {});
 	}
-	
 
-	
 	/**
-	 * Creates an ContentDirectoryService.
-	 * The content directory includes all Files of the MediaStore. 
-	 * @return The ContenDiractoryService. 
+	 * Creates an ContentDirectoryService. The content directory includes all
+	 * Files of the MediaStore.
+	 * 
+	 * @return The ContenDiractoryService.
 	 */
 	@SuppressWarnings("unchecked")
 	private LocalService<AbstractContentDirectoryService> createContentDirectoryService() {
 		LocalService<AbstractContentDirectoryService> contentDirectoryService = new AnnotationLocalServiceBinder()
 				.read(AbstractContentDirectoryService.class);
-		contentDirectoryService.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(
-				contentDirectoryService, null) {
-			@Override
-			protected AbstractContentDirectoryService createServiceInstance()
-					throws Exception {
-				return new YaaccContentDirectory();
-			}
-		});
+		contentDirectoryService
+				.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(
+						contentDirectoryService, null) {
+					@Override
+					protected AbstractContentDirectoryService createServiceInstance()
+							throws Exception {
+						return new YaaccContentDirectory();
+					}
+				});
 		return contentDirectoryService;
 	}
 
-
 	/**
-	 * creates an AVTransportService 
+	 * creates an AVTransportService
+	 * 
 	 * @return the service
 	 */
 	@SuppressWarnings("unchecked")
@@ -209,7 +217,5 @@ public class YaaccUpnpServerService extends Service  {
 				});
 		return avTransportService;
 	}
-
-	
 
 }
