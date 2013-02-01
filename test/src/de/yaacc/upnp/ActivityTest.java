@@ -17,11 +17,17 @@
  */
 package de.yaacc.upnp;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 
 import de.yaacc.ImageViewerActivity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -35,19 +41,41 @@ import android.util.Log;
  */
 public class ActivityTest extends AndroidTestCase {
 	
-	public void testImageViewerActivity() throws Exception{
-		Context context = getContext();
+	
+		
+	
+	public void testImageViewerActivityHDImage() throws Exception{
+		String filesDir = getContext().getFilesDir().toString();
+		String fileName = "CIMG5019_1920x1080.jpg";
+		copyAssetsToSdCard(fileName, filesDir);
+		Context context =  getContext();
+		
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		
 		intent = new Intent(context, ImageViewerActivity.class);		
 		
-		intent.setDataAndType(Uri.parse("file:///android_asset/CIMG5019_1920x1080.jpg"), "image/jpeg");
+		intent.setDataAndType(Uri.parse("file:///"+filesDir+"/"+fileName), "image/jpeg");
 
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		for (String element : context.getAssets().list(".")) {
-			Log.d(this.getClass().getName(), "element: " + element);
-			
-		}
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
+		
+		context.startActivity(intent);
+		myWait();
+	}
+	
+	
+	public void testImageViewerActivityBigImageFile() throws Exception{
+		String filesDir = getContext().getFilesDir().toString();
+		String fileName = "CIMG5019.JPG";
+		copyAssetsToSdCard(fileName, filesDir);
+		Context context =  getContext();
+		
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		
+		intent = new Intent(context, ImageViewerActivity.class);		
+		
+		intent.setDataAndType(Uri.parse("file:///"+filesDir+"/"+fileName), "image/jpeg");
+
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
 		
 		context.startActivity(intent);
 		myWait();
@@ -67,5 +95,46 @@ public class ActivityTest extends AndroidTestCase {
 		}
 
 	}
+	
+	/*
+	 * Copy all Test assets to the sdcard 
+	 * in order to access them from the main app.
+	 */
+	private void copyAssetsToSdCard(String fileName, String filesDir) throws Exception
+    {
+		 	    
+	    Context testContext = getContext().createPackageContext("de.yaacc.tests",
+                Context.CONTEXT_IGNORE_SECURITY);
+	    AssetManager assets = testContext.getAssets();	    
+        InputStream in = null;
+        OutputStream out = null;
+        File file = new File(filesDir, fileName);
+        try
+        {
+        	
+            in = assets.open(fileName);
+            out = getContext().openFileOutput(file.getName(), Context.MODE_WORLD_READABLE);
+
+            copyFile(in, out);
+            in.close();
+            in = null;
+            out.flush();
+            out.close();
+            out = null;
+        } catch (Exception e)
+        {
+            Log.e("tag", e.getMessage());
+        }
+    }
+
+    private void copyFile(InputStream in, OutputStream out) throws IOException
+    {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1)
+        {
+            out.write(buffer, 0, read);
+        }
+    }
 
 }
