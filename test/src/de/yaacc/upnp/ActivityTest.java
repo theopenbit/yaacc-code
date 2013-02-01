@@ -25,12 +25,17 @@ import java.net.URI;
 
 import de.yaacc.ImageViewerActivity;
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.v4.widget.CursorAdapter;
 import android.test.AndroidTestCase;
 import android.util.Log;
+import android.support.v4.widget.SimpleCursorAdapter;
 
 
 /**
@@ -41,7 +46,7 @@ import android.util.Log;
  */
 public class ActivityTest extends AndroidTestCase {
 	
-	
+	private static String[] imageFileNames = { "CIMG5019_1920x1080.jpg",  "CIMG5019.JPG" };
 		
 	
 	public void testImageViewerActivityHDImage() throws Exception{
@@ -80,6 +85,75 @@ public class ActivityTest extends AndroidTestCase {
 		context.startActivity(intent);
 		myWait();
 	}
+	
+	
+	
+	public void testMediaStoreAccess() throws Exception{
+		addAssetsToMediaStore();
+		 
+		// Query for all images on external storage
+	    String[] projection = { MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME ,MediaStore.Images.Media.DATA};
+	    String selection = "";
+	    String [] selectionArgs = null;
+	    Cursor mImageCursor = getContext().getContentResolver().query( MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+	                                 projection, selection, selectionArgs, null );
+
+	     
+	    if ( mImageCursor != null ) {
+	        mImageCursor.moveToFirst();
+	        while(!mImageCursor.isAfterLast()){
+	        	String id = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+	        	String name = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+	        	String data = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+	        	Log.d(getClass().getName(), "Image: " + id + " Name: " + name + " Data: " + data);
+	        	mImageCursor.moveToNext();
+	        }
+	    } else {
+	        Log.d(getClass().getName(), "System media store is empty.");
+	    }
+	    mImageCursor.close();
+	    removeAssestsFromMediaStore();
+	}
+
+
+	
+	
+	public void testImageViewerActivityByUsingMediaStore() throws Exception{
+		addAssetsToMediaStore();		
+		Context context =  getContext();
+		// Query for all images on external storage
+	    String[] projection = { MediaStore.Images.Media.DATA };
+	    String selection = "";
+	    String [] selectionArgs = null;
+	    Cursor mImageCursor = context.getContentResolver().query( MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+	                                 projection, selection, selectionArgs, null );
+		
+	    if ( mImageCursor != null ) {
+	        mImageCursor.moveToFirst();
+	        while(!mImageCursor.isAfterLast()){	        	
+	        	String data = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+	        	Log.d(getClass().getName(), "Image: " + " Data: " + data);
+	        	Intent intent = new Intent(Intent.ACTION_VIEW);
+	        	
+	        	intent = new Intent(context, ImageViewerActivity.class);		
+	        	
+	        	intent.setDataAndType(Uri.parse("file:///"+data), "image/jpeg");
+	        	
+	        	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
+	        	
+	        	context.startActivity(intent);
+	        	myWait(5000L);
+	        	mImageCursor.moveToNext();
+	        }
+	    } else {
+	        Log.d(getClass().getName(), "System media store is empty.");
+	    }
+	    mImageCursor.close();
+		myWait();
+		removeAssestsFromMediaStore();
+	}
+	
+	
 	
 	protected void myWait() {
 		myWait(30000l);
@@ -137,4 +211,25 @@ public class ActivityTest extends AndroidTestCase {
         }
     }
 
+    
+    private void addAssetsToMediaStore() throws Exception{    	
+    	String filesDir = getContext().getFilesDir().toString();
+    	for (String fileName : imageFileNames) {
+    		copyAssetsToSdCard(fileName, filesDir);
+    		ContentValues values = new ContentValues(3);
+    		values.put(MediaStore.Video.Media.TITLE, fileName);
+    		values.put(MediaStore.Video.Media.MIME_TYPE, "image/jpg");
+    		values.put(MediaStore.Video.Media.DATA, getContext().getFilesDir().getAbsolutePath() + "/" + fileName);
+    		getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);			
+		}
+    }
+    
+    /**
+	 * 
+	 */
+	private void removeAssestsFromMediaStore() {		
+    	for (String fileName : imageFileNames) {
+    		getContext().getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Video.Media.TITLE + "='"+fileName+"'", null);
+    	}
+	}
 }
