@@ -34,6 +34,7 @@ import org.teleal.cling.model.meta.ManufacturerDetails;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
+import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
 
 import android.app.Service;
 import android.content.Intent;
@@ -161,9 +162,33 @@ public class YaaccUpnpServerService extends Service  {
 	private LocalService<?>[] createServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createAVTransportService());
+		services.add(createContentDirectoryService());
 
 		return services.toArray(new LocalService[] {});
 	}
+	
+
+	
+	/**
+	 * Creates an ContentDirectoryService.
+	 * The content directory includes all Files of the MediaStore. 
+	 * @return The ContenDiractoryService. 
+	 */
+	@SuppressWarnings("unchecked")
+	private LocalService<AbstractContentDirectoryService> createContentDirectoryService() {
+		LocalService<AbstractContentDirectoryService> contentDirectoryService = new AnnotationLocalServiceBinder()
+				.read(AbstractContentDirectoryService.class);
+		contentDirectoryService.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(
+				contentDirectoryService, null) {
+			@Override
+			protected AbstractContentDirectoryService createServiceInstance()
+					throws Exception {
+				return new YaaccContentDirectory();
+			}
+		});
+		return contentDirectoryService;
+	}
+
 
 	/**
 	 * creates an AVTransportService 

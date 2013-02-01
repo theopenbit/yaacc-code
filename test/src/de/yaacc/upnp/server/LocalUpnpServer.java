@@ -103,7 +103,7 @@ public class LocalUpnpServer implements ServiceConnection{
 			@Override
 			protected AbstractContentDirectoryService createServiceInstance()
 					throws Exception {
-				return new ContentDirectory();
+				return new YaaccContentDirectory();
 			}
 		});
 		return contentDirectoryService;

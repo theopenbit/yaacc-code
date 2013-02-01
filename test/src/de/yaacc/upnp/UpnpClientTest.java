@@ -777,6 +777,20 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		myWait(120000L);
 	}
 	
+	
+	public void testUseCasePlayLocalMusicFromYaaccUpnpServer() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(YaaccUpnpServerService.UDN_ID);		
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"101");			
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		assertNotNull(result.getResult().getItems());
+		assertNotNull(result.getResult().getItems().get(0));
+		upnpClient.playLocal(result.getResult().getItems().get(0));
+		myWait(120000L);
+	}
+	
 	public void testUseCasePlayLocalImage() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
 		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
