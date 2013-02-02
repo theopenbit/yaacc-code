@@ -780,8 +780,8 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	
 	public void testUseCasePlayLocalMusicFromYaaccUpnpServer() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
-		Device<?, ?, ?> device = upnpClient.getDevice(YaaccUpnpServerService.UDN_ID);		
-		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"101");			
+		Device<?, ?, ?> device = upnpClient.getDevice(YaaccUpnpServerService.UDN_ID);			
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"102");			
 		//MusicTrack
 		assertNotNull(result);
 		assertNotNull(result.getResult());

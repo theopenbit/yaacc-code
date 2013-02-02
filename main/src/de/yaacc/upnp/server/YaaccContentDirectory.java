@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
 import org.teleal.cling.support.contentdirectory.ContentDirectoryException;
-import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.model.BrowseFlag;
 import org.teleal.cling.support.model.BrowseResult;
 import org.teleal.cling.support.model.DIDLContent;
@@ -43,6 +42,7 @@ import org.teleal.cling.support.model.item.Photo;
 import org.teleal.common.util.MimeType;
 
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
 
 /**
  * a content directory which uses the content of the
@@ -57,46 +57,53 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 	
 	public YaaccContentDirectory(){
 		StorageFolder rootContainer = new StorageFolder("0","-1","Root","yaacc",2,907000L);
-		rootContainer.setSearchable(true);
-		rootContainer.setRestricted(false);
+		rootContainer.setClazz(new DIDLObject.Class("object.container"));		
+		rootContainer.setRestricted(true);
 		content.put(rootContainer.getId(),rootContainer);
 		List<MusicTrack> musicTracks = createMusicTracks("1");
-		MusicAlbum musicAlbum = new MusicAlbum("1", rootContainer, "Music", "yaacc",musicTracks.size(),musicTracks);
-		musicAlbum.setSearchable(true);
-		musicAlbum.setRestricted(false);
+		MusicAlbum musicAlbum = new MusicAlbum("1", rootContainer, "Music", null ,musicTracks.size(),musicTracks);
+		musicAlbum.setClazz(new DIDLObject.Class("object.container"));		
+		musicAlbum.setRestricted(true);
 		rootContainer.addContainer(musicAlbum);
 		content.put(musicAlbum.getId(),musicAlbum);
 		List<Photo> photos = createPhotos("2"); 
-		PhotoAlbum photoAlbum = new PhotoAlbum("2", rootContainer, "Photos", "yaacc", photos.size(),photos);
-		photoAlbum.setSearchable(true);
-		photoAlbum.setRestricted(false);
-		rootContainer.addContainer(photoAlbum);
+		PhotoAlbum photoAlbum = new PhotoAlbum("2", rootContainer, "Photos", null, photos.size(),photos);
+		photoAlbum.setClazz(new DIDLObject.Class("object.container"));		
+		photoAlbum.setRestricted(true);
+		rootContainer.addContainer(photoAlbum);		
 		content.put(photoAlbum.getId(),photoAlbum);
 	    	
 	}
 	
 	private List<MusicTrack> createMusicTracks(String parentId) {		
-		String album = ("Voice Mail");
-		String creator = "Dr. Athur"; 
-		PersonWithRole artist = new PersonWithRole(creator, "special");		
+		String album = "Music"; //"Voice Mail";
+		String creator = null;//"Dr. Athur"; 
+		PersonWithRole artist = new PersonWithRole(creator, "");		
 		MimeType mimeType = new MimeType("audio", "mpeg");
 		List<MusicTrack> result = new ArrayList<MusicTrack>();
 		MusicTrack musicTrack = new MusicTrack("101", parentId, 
 						"Bluey Shoey", creator, album, artist, new Res(
-											mimeType, 123456l, "00:02:33", 8192l,
+											mimeType, 123456l, "00:02:33", 8192L,
 										"http://api.jamendo.com/get2/stream/track/redirect/?id=310355&streamencoding=mp31"));
+		musicTrack.setRestricted(true);
 		content.put(musicTrack.getId(),musicTrack);
 		result.add(musicTrack);
+		
+		
 		musicTrack = new MusicTrack("102", parentId, 
 				"8-Bit", creator, album, artist, new Res(
-									mimeType, 123456l, "00:02:01", 8192l,
+									mimeType, 123456l, "00:02:01", 8192L,
 								"http://api.jamendo.com/get2/stream/track/redirect/?id=310370&streamencoding=mp31"));
+		musicTrack.setRestricted(true);
 		content.put(musicTrack.getId(),musicTrack);
 		result.add(musicTrack);
+		
+		
 		musicTrack = new MusicTrack("103", parentId, 
 				"Spooky Number 3", creator, album, artist, new Res(
-									mimeType, 123456l, "00:02:18", 8192l,
+									mimeType, 123456l, "00:02:18", 8192L,
 								"http://api.jamendo.com/get2/stream/track/redirect/?id=310371&streamencoding=mp31"));
+		musicTrack.setRestricted(true);
 		content.put(musicTrack.getId(),musicTrack);
 		result.add(musicTrack);
 		return result;
@@ -105,36 +112,51 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 	private List<Photo> createPhotos(String parentId) {
 
 
-		String album = ("kde-look.org");
-		String creator = "http://kde-look.org/CONTENT/content-files/156304-DSC_0089-2-1600.jpg"; 				
+		String album =null;
+		String creator = null; 				
 		MimeType mimeType = new MimeType("image", "jpeg");
 		List<Photo> result = new ArrayList<Photo>();
 		
 		String url = "http://kde-look.org/CONTENT/content-files/156304-DSC_0089-2-1600.jpg";
-		creator = url;
-		Photo photo = new Photo("201",parentId,url,creator,album,new Res(mimeType,123456l,url));
+		
+		Photo photo = new Photo("201",parentId,url,creator,album,new Res(mimeType,123456L,url));
+		photo.setRestricted(true);
+		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		content.put(photo.getId(), photo);
 		result.add(photo); 
+		
 		url = "http://kde-look.org/CONTENT/content-files/156246-DSC_0021-1600.jpg";
-		creator = url;
-		photo=new Photo("202",parentId,url,creator,album,new Res(mimeType,123456l,url));
+		
+		photo=new Photo("202",parentId,url,creator,album,new Res(mimeType,123456L,url));
+		photo.setRestricted(true);
+		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		content.put(photo.getId(), photo);		
-		result.add(photo);		
+		result.add(photo);
+		
 		url = "http://kde-look.org/CONTENT/content-files/156225-raining-bolt-1920x1200.JPG";
-		creator = url;
+		
 		content.put(photo.getId(), photo);
-		photo=new Photo("203",parentId,url,creator,album,new Res(mimeType,123456l,url));
+		photo=new Photo("203",parentId,url,creator,album,new Res(mimeType,123456L,url));
+		photo.setRestricted(true);
+		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		result.add(photo);
+		
 		url = "http://kde-look.org/CONTENT/content-files/156223-kungsleden1900x1200.JPG";
-		creator = url;
-		photo=new Photo("204",parentId,url,creator,album,new Res(mimeType,123456l,url));
+		
+		photo=new Photo("204",parentId,url,creator,album,new Res(mimeType,123456L,url));
+		photo.setRestricted(true);
+		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		content.put(photo.getId(), photo);
 		result.add(photo);
+		
 		url = "http://kde-look.org/CONTENT/content-files/156218-DSC_0012-1600.jpg";
-		creator = url;
-		photo= new Photo("204",parentId,url,creator,album,new Res(mimeType,123456l,url));
+		
+		photo= new Photo("205",parentId,url,creator,album,new Res(mimeType,123456L,url));
+		photo.setRestricted(true);
+		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		content.put(photo.getId(), photo);
-		result.add(photo);		
+		result.add(photo);
+		
 		return result;
 	}
 	
@@ -162,9 +184,12 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 			childCount = 1;			
 		}
 		BrowseResult result = null;
+		
 		try {
 			//Generate output with nested items
-			result = new BrowseResult(new DIDLParser().generate(didl,true), childCount, 1);
+			String didlXml = new DIDLParser().generate(didl,false);
+			Log.d(getClass().getName(),"CDResponse: "  + didlXml);
+			result = new BrowseResult(didlXml, childCount, 1);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

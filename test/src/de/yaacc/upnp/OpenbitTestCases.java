@@ -39,6 +39,7 @@ import org.teleal.cling.support.avtransport.callback.Seek;
 import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.avtransport.callback.Stop;
 import org.teleal.cling.support.connectionmanager.callback.GetProtocolInfo;
+import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.MediaInfo;
@@ -49,6 +50,8 @@ import org.teleal.cling.support.renderingcontrol.callback.GetMute;
 import org.teleal.cling.support.renderingcontrol.callback.GetVolume;
 import org.teleal.cling.support.renderingcontrol.callback.SetMute;
 import org.teleal.cling.support.renderingcontrol.callback.SetVolume;
+
+import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 import android.util.Log;
 
@@ -64,11 +67,13 @@ public class OpenbitTestCases extends UpnpClientTest {
 	private static final String OPENBIT_AVTRANSPORT_DEVICE = "00-30-8D-20-20-83";//"00-30-8D-20-20-8C";
 	private static final String OPENBIT_AVTRANSPORT_DEVICE2 = "F00DBABE-SA5E-BABA-DADA00903EF555CB";
 	private static final String OPENBIT_AVTRANSPORT_DEVICE3 = "00-30-8D-20-20-83";
+	private static final String OPENBIT_TABLET = "357718866788936";
 	//gz uuid:00-30-8D-20-20-83, Descriptor: http://192.168.0.98:62199/d
 	//wz F00DBABE-SA5E-BABA-DADA00903EF555CB, Descriptor: http://192.168.0.102:49153/nmrDescription.xml
 	//az 00-30-8D-20-20-8C, Descriptor: http://192.168.0.2:60826/ oder 51222
 	//n uuid:65adeb42-L121-7607-70aa-01d221629, Descriptor: http://192.168.0.67:50226
 	// uuid:76889b9e-6657-8799-ed4b-00308D20208C, Descriptor: http://192.168.0.2:63068/
+	//tablet uuid:357718866788936
 	//mt uuid:c8236ca5-1995-4ad5-a682-edce874c81eb, Descriptor: http://192.168.0.90:49153/description.xml
 	protected boolean actionFinished;
 	protected boolean watchdogFlag;
@@ -837,6 +842,81 @@ public class OpenbitTestCases extends UpnpClientTest {
 
 		upnpClient.getControlPoint().execute(actionCallback);
 		waitForActionComplete();
+
+	}
+	
+	public void testAnalyzeOpenbitMediaServer() throws Exception {
+		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
+		Device<?, ?, ?> device = upnpClient.getDevice(OPENBIT_MEDIA_SERVER);
+					
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0"); 
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		//
+		result = upnpClient.browseSync(device,"1455"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"1458"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"380082"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"10"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));		
+		result = upnpClient.browseSync(device,"22"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"339532"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));		
+//		assertNotNull(result.getResult().getItems());
+//		assertNotNull(result.getResult().getItems().get(0));
+//		upnpClient.playLocal(result.getResult().getItems().get(0));
+//		myWait(120000L);
+	}
+	
+	public void testAnalyzeOpenbitTablet() throws Exception {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_TABLET);
+		Device<?, ?, ?> device = upnpClient.getDevice(OPENBIT_TABLET);
+					
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0"); 
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		//
+		result = upnpClient.browseSync(device,"1"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"2"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"101"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"102"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));		
+		result = upnpClient.browseSync(device,"201"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"202"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));		
 
 	}
 }
