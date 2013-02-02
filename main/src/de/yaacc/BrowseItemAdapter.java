@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
 public class BrowseItemAdapter extends BaseAdapter{
@@ -28,12 +29,21 @@ public class BrowseItemAdapter extends BaseAdapter{
 		inflator = LayoutInflater.from(ctx);
 		
 		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(MainActivity.uClient.getProviderDevice(),objectId);
-    	//FIXME Attention: you have to check whether the result or the failure-Object is set!!		
+    	
 		DIDLContent a = result.getResult();
 		if(a != null){
 			folders = a.getContainers();
-		}else if(result.getUpnpFailure() != null) {
-			//FIXME do some errorhandling here
+		}else  {
+
+			String text = ctx.getString(R.string.error_upnp_generic);
+			int duration = Toast.LENGTH_SHORT;
+
+			if(result.getUpnpFailure() != null){
+				text = ctx.getString(R.string.error_upnp_specific)+" "+result.getUpnpFailure();
+			}
+			
+    		Toast toast = Toast.makeText(ctx, text, duration);
+    		toast.show();
 		}
 		
 		

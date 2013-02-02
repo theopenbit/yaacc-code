@@ -122,8 +122,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			super.finish();
 		}
 		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
-		//FIXME isn't the lastVisitedObjectId an ui knowledge and not an information of the 
-		//upnpClient? Let us discuss this
+		
 		bItemAdapter = new BrowseItemAdapter(this,this.uClient.getLastVisitedObjectId());
     	deviceList.setAdapter(bItemAdapter);
     	
