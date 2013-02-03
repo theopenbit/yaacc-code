@@ -40,9 +40,12 @@ import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -53,6 +56,12 @@ import de.yaacc.upnp.UpnpClient;
  * @author Tobias Schöne (openbit)
  */
 public class YaaccUpnpServerService extends Service {
+
+	//make preferences available for the whole service, since there might be more things to configure in the future
+	SharedPreferences preferences;
+
+	
+	
 	// Building a pseudo UUID for the device, which can't be null or a default
 	// value
 	public static final String UDN_ID = "35"
@@ -88,6 +97,9 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@Override
 	public void onStart(Intent intent, int startid) {
+		// when the service starts, the preferences are initialized
+		preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		 
 		Log.d(this.getClass().getName(), "On Start ID: " + UDN_ID);
 		if (upnpClient == null) {
 			upnpClient = new UpnpClient();
@@ -146,7 +158,7 @@ public class YaaccUpnpServerService extends Service {
 					new DeviceIdentity(new UDN(UDN_ID)),
 					new UDADeviceType("MediaServer"),
 					new DeviceDetails(
-							"YAACC-MediaServer",
+							preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "YAACC - MediaServer"),
 							new ManufacturerDetails("www.yaacc.de",
 									"www.yaacc.de"),
 							new ModelDetails(

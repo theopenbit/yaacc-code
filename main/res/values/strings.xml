@@ -29,5 +29,9 @@
     <string name="settings_local_server_started">local server is started</string>
     <string name="settings_local_server_stopped">local server is stopped</string>
     <string name="settings_local_server_chkbx">local_server_chkbx</string>
+    <string name="settings_local_server_name">network name for local server</string>
+    <string name="settings_local_server_name_key">network name for local server</string>
+    <string name="error_upnp_generic">An unknown error happened while browsing</string>
+    <string name="error_upnp_specific">The following error occurred:</string>
 
 </resources>
