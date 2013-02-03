@@ -21,10 +21,14 @@ package de.yaacc.upnp;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.contentdirectory.callback.Browse;
 import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.BrowseResult;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.SortCriterion;
+
+import android.util.Log;
 
 /**
  * ActionCallback for content directory browsing. 
@@ -49,8 +53,22 @@ public class ContentDirectoryBrowseActionCallback extends Browse {
 	
 	
 
+	/* (non-Javadoc)
+	 * @see org.teleal.cling.support.contentdirectory.callback.Browse#receivedRaw(org.teleal.cling.model.action.ActionInvocation, org.teleal.cling.support.model.BrowseResult)
+	 */
 	@Override
-	public void received(ActionInvocation actionInvocation, DIDLContent didl) {
+	public boolean receivedRaw(ActionInvocation actionInvocation,
+			BrowseResult browseResult) {
+		// TODO Auto-generated method stub
+		Log.d(this.getClass().getName(), "RAW-Result: " + browseResult.getResult());
+		return super.receivedRaw(actionInvocation, browseResult);
+	}
+
+
+
+
+	@Override
+	public void received(ActionInvocation actionInvocation, DIDLContent didl) {		
 		this.browsingResult.setResult(didl);
 	}
 	
