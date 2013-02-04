@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.DIDLObject.Property;
-import org.teleal.cling.support.model.DescMeta;
 import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
+import org.teleal.cling.support.model.item.AudioItem;
+import org.teleal.cling.support.model.item.ImageItem;
+import org.teleal.cling.support.model.item.PlaylistItem;
+import org.teleal.cling.support.model.item.TextItem;
+import org.teleal.cling.support.model.item.VideoItem;
 
 import android.content.Context;
 import android.util.Log;
@@ -104,8 +106,18 @@ public class BrowseItemAdapter extends BaseAdapter{
 		
 		if(currentObject instanceof Container){
 			holder.icon.setImageResource(R.drawable.folder);
-		} else if(currentObject instanceof Item){
+		} else if(currentObject instanceof AudioItem){
 			holder.icon.setImageResource(R.drawable.cdtrack);
+		} else if(currentObject instanceof ImageItem){
+			holder.icon.setImageResource(R.drawable.image);
+		} else if(currentObject instanceof VideoItem){
+			holder.icon.setImageResource(R.drawable.video);
+		} else if(currentObject instanceof PlaylistItem){
+			holder.icon.setImageResource(R.drawable.playlist);
+		} else if(currentObject instanceof TextItem){
+			holder.icon.setImageResource(R.drawable.txt);
+		} else {
+			holder.icon.setImageResource(R.drawable.unknown);
 		}
 
 		return arg1;
