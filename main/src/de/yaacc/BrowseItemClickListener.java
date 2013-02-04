@@ -2,6 +2,7 @@ package de.yaacc;
 
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.Item;
 
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,7 +31,9 @@ public class BrowseItemClickListener implements OnItemClickListener {
     	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
     	a.setOnItemClickListener(bItemClickListener);
 		
-		}  
+		} else {
+			MainActivity.uClient.playRemote((Item)currentObject, MainActivity.uClient.getReceiverDevice());
+		}
 		
 		
 				    	
