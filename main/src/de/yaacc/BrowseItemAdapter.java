@@ -1,12 +1,17 @@
 package de.yaacc;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLContent;
+import org.teleal.cling.support.model.DIDLObject;
+import org.teleal.cling.support.model.DIDLObject.Property;
+import org.teleal.cling.support.model.DescMeta;
 import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.Item;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +24,7 @@ import de.yaacc.upnp.ContentDirectoryBrowseResult;
 public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;
-	private List<Container> folders;
+	private List<DIDLObject> objects;
 	private String parentObjectId;
 	
 	public BrowseItemAdapter(Context ctx, String objectId){
@@ -32,7 +37,13 @@ public class BrowseItemAdapter extends BaseAdapter{
     	
 		DIDLContent a = result.getResult();
 		if(a != null){
-			folders = a.getContainers();
+			
+			objects = new LinkedList<DIDLObject>();
+			
+			//Add all children in two steps to get containers first
+			objects.addAll(a.getContainers());
+			objects.addAll(a.getItems());
+			
 		}else  {
 
 			String text = ctx.getString(R.string.error_upnp_generic);
@@ -41,6 +52,8 @@ public class BrowseItemAdapter extends BaseAdapter{
 			if(result.getUpnpFailure() != null){
 				text = ctx.getString(R.string.error_upnp_specific)+" "+result.getUpnpFailure();
 			}
+			
+			Log.e("ResoveError",text);
 			
     		Toast toast = Toast.makeText(ctx, text, duration);
     		toast.show();
@@ -53,15 +66,15 @@ public class BrowseItemAdapter extends BaseAdapter{
 
 	@Override
 	public int getCount() {
-		if(folders == null){
+		if(objects == null){
 			return 0;
 		}
-		return folders.size();
+		return objects.size();
 	}
 
 	@Override
 	public Object getItem(int arg0) {
-		return folders.get(arg0);
+		return objects.get(arg0);
 	}
 
 	@Override
@@ -85,9 +98,15 @@ public class BrowseItemAdapter extends BaseAdapter{
 			holder = (ViewHolder) arg1.getTag();
 		}
 				
+		DIDLObject currentObject = (DIDLObject)getItem(position);
 
-		holder.name.setText(((Container)getItem(position)).getTitle());
-		holder.icon.setImageResource(R.drawable.folder);
+		holder.name.setText(currentObject.getTitle());
+		
+		if(currentObject instanceof Container){
+			holder.icon.setImageResource(R.drawable.folder);
+		} else if(currentObject instanceof Item){
+			holder.icon.setImageResource(R.drawable.cdtrack);
+		}
 
 		return arg1;
 	}
@@ -98,11 +117,11 @@ public class BrowseItemAdapter extends BaseAdapter{
 		TextView name;
 	}
 	
-	public Container getFolder(int position){
-		if(folders == null){
+	public DIDLObject getFolder(int position){
+		if(objects == null){
 			return null;
 		}
-		return folders.get(position);
+		return objects.get(position);
 	}
 
 
