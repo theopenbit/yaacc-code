@@ -32,7 +32,7 @@ public class BrowseItemClickListener implements OnItemClickListener {
     	a.setOnItemClickListener(bItemClickListener);
 		
 		} else {
-			MainActivity.uClient.playRemote((Item)currentObject, MainActivity.uClient.getReceiverDevice());
+			MainActivity.uClient.play((Item)currentObject);
 		}
 		
 		

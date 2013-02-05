@@ -44,7 +44,7 @@ public class SettingsActivity extends PreferenceActivity{
        UpnpClient upnpClient = MainActivity.uClient;
         	
         if (upnpClient.isInitialized()){
-        	devices.addAll(upnpClient.getDevices());
+        	devices.addAll(upnpClient.getDevicesProvidingContentDirectoryService());
 		}
 
 		
@@ -58,9 +58,14 @@ public class SettingsActivity extends PreferenceActivity{
         	providerEntries.add(currentDevice.getDisplayString());
         	providerEntryValues.add(currentDevice.getIdentity().getUdn().getIdentifierString());
         }
+            	
         providerLp.setEntries(providerEntries.toArray(new CharSequence[providerEntries.size()]));
         providerLp.setEntryValues(providerEntryValues.toArray(new CharSequence[providerEntries.size()]));
         
+        devices = new LinkedList<Device>();
+        devices.addAll(upnpClient.getDevicesProvidingAvTransportService());
+		
+
         
         // One entry per found device for receiving media data
         ListPreference receiverLp = (ListPreference)findPreference(getString(R.string.settings_selected_receiver_title));
@@ -70,6 +75,11 @@ public class SettingsActivity extends PreferenceActivity{
         	receiverEntries.add(currentDevice.getDisplayString());
         	receiverEntryValues.add(currentDevice.getIdentity().toString());
         }
+        
+        //Add a default entry for the local device
+        receiverEntries.add(android.os.Build.MODEL);
+        receiverEntryValues.add(UpnpClient.LOCAL_UID);
+    	
         receiverLp.setEntries(receiverEntries.toArray(new CharSequence[receiverEntries.size()]));
         receiverLp.setEntryValues(receiverEntryValues.toArray(new CharSequence[receiverEntries.size()]));
         
