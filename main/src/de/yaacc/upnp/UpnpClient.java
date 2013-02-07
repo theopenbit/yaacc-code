@@ -78,7 +78,6 @@ import de.yaacc.R;
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
 
-
 	public static String LOCAL_UID = "LOCAL_UID";
 
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
@@ -452,27 +451,27 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return new ArrayList<Device>();
 	}
-	
+
 	/**
 	 * Returns all registered UpnpDevices with a ContentDirectory Service.
 	 * 
 	 * @return the upnpDevices
 	 */
-	public Collection<Device> getDevicesProvidingContentDirectoryService(){
+	public Collection<Device> getDevicesProvidingContentDirectoryService() {
 		if (isInitialized()) {
-			return getRegistry().getDevices(new UDAServiceType("ContentDirectory"));
+			return getRegistry().getDevices(
+					new UDAServiceType("ContentDirectory"));
 
 		}
 		return new ArrayList<Device>();
 	}
-	
-	
+
 	/**
 	 * Returns all registered UpnpDevices with an AVTransport Service.
 	 * 
 	 * @return the upnpDevices
 	 */
-	public Collection<Device> getDevicesProvidingAvTransportService(){
+	public Collection<Device> getDevicesProvidingAvTransportService() {
 		if (isInitialized()) {
 			return getRegistry().getDevices(new UDAServiceType("AVTransport"));
 
@@ -485,7 +484,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 * @return the upnpDevice null if not found
 	 */
-	public  Device<?, ?, ?> getDevice(String identifier) {
+	public Device<?, ?, ?> getDevice(String identifier) {
 		if (isInitialized()) {
 			return getRegistry().getDevice(new UDN(identifier), true);
 		}
@@ -994,7 +993,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				Log.d(getClass().getName(), "Failure UpnpResponse: "
 						+ upnpresponse);
 				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getResponseDetails());
+						upnpresponse != null ? "UpnpResponse: "
+								+ upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(), "s: " + s);
 				actionState.actionFinished = true;
 
 			}
@@ -1023,12 +1024,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		public void failure(ActionInvocation actioninvocation,
 				UpnpResponse upnpresponse, String s) {
 			Log.d(getClass().getName(), "Failure UpnpResponse: " + upnpresponse);
-			Log.d(getClass().getName(),
-					"UpnpResponse: " + upnpresponse.getResponseDetails());
-			Log.d(getClass().getName(),
-					"UpnpResponse: " + upnpresponse.getStatusMessage());
-			Log.d(getClass().getName(),
-					"UpnpResponse: " + upnpresponse.getStatusCode());
+			if (upnpresponse != null) {
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusMessage());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusCode());
+			}
+			Log.d(getClass().getName(), "s: " + s);
 			actionState.actionFinished = true;
 
 		}
@@ -1102,5 +1106,4 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return this.visitedObjectIds.peekLast();
 	}
 
-	
 }
