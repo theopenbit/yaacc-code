@@ -73,7 +73,7 @@ public class SettingsActivity extends PreferenceActivity{
         ArrayList<CharSequence> receiverEntryValues = new ArrayList<CharSequence>();
         for(Device currentDevice: devices){
         	receiverEntries.add(currentDevice.getDisplayString());
-        	receiverEntryValues.add(currentDevice.getIdentity().toString());
+        	receiverEntryValues.add(currentDevice.getIdentity().getUdn().getIdentifierString());
         }
         
         //Add a default entry for the local device
