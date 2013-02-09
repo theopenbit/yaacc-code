@@ -187,20 +187,17 @@ public class YaaccUpnpServerService extends Service {
 	 * 
 	 * @return the device
 	 */
-	// FIXME store servername in the stettings
 	private LocalDevice createDevice() {
 		LocalDevice device;
 		try {
 			device = new LocalDevice(
 					new DeviceIdentity(new UDN(UDN_ID)),
 					new UDADeviceType("MediaServer"),
-					new DeviceDetails(preferences.getString(
-							getApplicationContext().getString(
-									R.string.settings_local_server_name_key),
-							"YAACC - MediaServer"), new ManufacturerDetails(
-							"www.yaacc.de", "www.yaacc.de"), new ModelDetails(
-							"YAACC-MediaServer",
-							"Free Android UPnP AV MediaServer, GNU GPL", "1.0")),
+					// Used for shown name: first part of ManufactDet, first part of ModelDet and version number
+					new DeviceDetails("YAACC - MediaServer", new ManufacturerDetails(
+							"yaacc.de", "www.yaacc.de"), new ModelDetails(
+									preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "MediaServer"),
+							"Free Android UPnP AV MediaServer, GNU GPL", "0.1")),
 					createServices());
 
 			return device;

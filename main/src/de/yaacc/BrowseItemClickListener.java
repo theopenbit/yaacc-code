@@ -6,11 +6,12 @@ import org.teleal.cling.support.model.item.Item;
 
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-public class BrowseItemClickListener implements OnItemClickListener {
+public class BrowseItemClickListener implements OnItemClickListener, OnItemLongClickListener {
 
 
 	@Override
@@ -39,4 +40,11 @@ public class BrowseItemClickListener implements OnItemClickListener {
 				    	
 	}
 
+	@Override
+	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
+			long arg3) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 }
