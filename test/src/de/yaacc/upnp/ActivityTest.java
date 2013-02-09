@@ -86,7 +86,9 @@ public class ActivityTest extends AndroidTestCase {
 		myWait();
 	}
 	
-	
+	public void testAddAssetsToMediaStore() throws Exception{
+		addAssetsToMediaStore();
+	}
 	
 	public void testMediaStoreAccess() throws Exception{
 		addAssetsToMediaStore();

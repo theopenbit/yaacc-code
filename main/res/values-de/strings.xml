@@ -28,5 +28,8 @@
     <string name="settings_local_server_started">Lokaler server ist gestartet</string>
     <string name="settings_local_server_stopped">Lokaler server ist gestoppt</string>
     <string name="settings_local_server_chkbx">local_server_chkbx</string>
+    <string name="settings_local_server_testcontent">Lokaler server verwendet Testinhalte</string>
+    <string name="settings_local_server_mediastore">Lokaler server verwendet den MediaStore</string>
+    <string name="settings_local_server_testcontent_chkbx">local_server_testcontent_chkbx</string>
 
 </resources>
