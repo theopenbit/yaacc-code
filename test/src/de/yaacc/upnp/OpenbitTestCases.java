@@ -725,6 +725,50 @@ public class OpenbitTestCases extends UpnpClientTest {
 
 	}
 	
+	public void testConnectionManagerActionGetProtocolInfoMS() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_TABLET);
+		Device<?, ?, ?> device = upnpClient
+				.getDevice(OPENBIT_TABLET);
+		Service avservice = getConnectionManagerService(device); 
+		Log.d(getClass().getName(), "Action GetProtocolInfo ");
+		actionFinished = false;
+		ActionCallback actionCallback = new GetProtocolInfo(avservice) {
+
+			@Override
+			public void success(ActionInvocation invocation) {
+
+				super.success(invocation);
+				displaySuccess(invocation);
+			}
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						upnpresponse != null? "UpnpResponse: " + upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(),
+						"s: " + s);
+				actionFinished = true;
+
+			}
+
+			@Override
+			public void received(ActionInvocation arg0, ProtocolInfos arg1,
+					ProtocolInfos arg2) {
+				Log.d(getClass().getName(), "ProtocolInfos 1: " + arg1);
+				Log.d(getClass().getName(), "ProtocolInfos 2: " + arg2);
+				
+			}
+
+		};
+
+		upnpClient.getControlPoint().execute(actionCallback);
+		waitForActionComplete();
+
+	}
+	
 	public void testConnectionManagerActionGetProtocolInfo() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_AVTRANSPORT_DEVICE);
 		Device<?, ?, ?> device = upnpClient
@@ -747,7 +791,9 @@ public class OpenbitTestCases extends UpnpClientTest {
 				Log.d(getClass().getName(), "Failure UpnpResponse: "
 						+ upnpresponse);
 				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getResponseDetails());
+						upnpresponse != null? "UpnpResponse: " + upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(),
+						"s: " + s);
 				actionFinished = true;
 
 			}

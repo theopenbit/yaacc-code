@@ -28,7 +28,6 @@ import org.teleal.cling.model.DefaultServiceManager;
 import org.teleal.cling.model.ValidationException;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
-import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
@@ -36,7 +35,11 @@ import org.teleal.cling.model.meta.ModelDetails;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
+import org.teleal.cling.support.connectionmanager.ConnectionManagerService;
 import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
+import org.teleal.cling.support.model.Protocol;
+import org.teleal.cling.support.model.ProtocolInfo;
+import org.teleal.cling.support.model.ProtocolInfos;
 
 import android.app.Service;
 import android.content.Intent;
@@ -57,11 +60,10 @@ import de.yaacc.upnp.UpnpClient;
  */
 public class YaaccUpnpServerService extends Service {
 
-	//make preferences available for the whole service, since there might be more things to configure in the future
+	// make preferences available for the whole service, since there might be
+	// more things to configure in the future
 	SharedPreferences preferences;
 
-	
-	
 	// Building a pseudo UUID for the device, which can't be null or a default
 	// value
 	public static final String UDN_ID = "35"
@@ -98,8 +100,9 @@ public class YaaccUpnpServerService extends Service {
 	@Override
 	public void onStart(Intent intent, int startid) {
 		// when the service starts, the preferences are initialized
-		preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		 
+		preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
 		Log.d(this.getClass().getName(), "On Start ID: " + UDN_ID);
 		if (upnpClient == null) {
 			upnpClient = new UpnpClient();
@@ -157,14 +160,14 @@ public class YaaccUpnpServerService extends Service {
 			device = new LocalDevice(
 					new DeviceIdentity(new UDN(UDN_ID)),
 					new UDADeviceType("MediaServer"),
-					new DeviceDetails(
-							preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "YAACC - MediaServer"),
-							new ManufacturerDetails("www.yaacc.de",
-									"www.yaacc.de"),
-							new ModelDetails(
-									"YAACC-MediaServer",
-									"Free Android UPnP AV MediaServer, GNU GPL",
-									"1.0")),createServices());
+					new DeviceDetails(preferences.getString(
+							getApplicationContext().getString(
+									R.string.settings_local_server_name_key),
+							"YAACC - MediaServer"), new ManufacturerDetails(
+							"www.yaacc.de", "www.yaacc.de"), new ModelDetails(
+							"YAACC-MediaServer",
+							"Free Android UPnP AV MediaServer, GNU GPL", "1.0")),
+					createServices());
 
 			return device;
 		} catch (ValidationException e) {
@@ -183,7 +186,7 @@ public class YaaccUpnpServerService extends Service {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createAVTransportService());
 		services.add(createContentDirectoryService());
-
+		services.add(createConnectionManagerService());
 		return services.toArray(new LocalService[] {});
 	}
 
@@ -230,4 +233,69 @@ public class YaaccUpnpServerService extends Service {
 		return avTransportService;
 	}
 
+	/**
+	 * creates a ConnectionManagerService.
+	 * 
+	 * @return the service
+	 */
+	@SuppressWarnings("unchecked")
+	private LocalService<ConnectionManagerService> createConnectionManagerService() {
+		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder()
+				.read(ConnectionManagerService.class);
+		final ProtocolInfos sourceProtocols = getProtocolInfos();
+		service.setManager(new DefaultServiceManager<ConnectionManagerService>(
+				service, ConnectionManagerService.class) {
+			@Override
+			protected ConnectionManagerService createServiceInstance()
+					throws Exception {
+				return new ConnectionManagerService(sourceProtocols, null);
+			}
+		});
+
+		return service;
+	}
+
+	/**
+	 * @return
+	 */
+	private ProtocolInfos getProtocolInfos() {
+		return new ProtocolInfos(
+				new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=1:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, "audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"),
+				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"),
+				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3X"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:*"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAPRO"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN"),
+				new ProtocolInfo("http-get:*:image/x-ycbcr-yuv420:*"),
+				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,"video/mpeg","DLNA.ORG_PN=MPEG1;DLNA.ORG_OP=01;DLNA.ORG_CI=0"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG1"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"),
+				new ProtocolInfo("http-get:*:video/wtv:*"),
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"),
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"),
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"),
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_MP3"));
+	}
 }

@@ -309,6 +309,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		getConnectionInfos(upnpClient, deviceHolder);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void getConnectionInfos(UpnpClient upnpClient,
 			final List<Device<?, ?, ?>> devices) throws Exception {
 		for (Device<?, ?, ?> device : devices) {
@@ -322,18 +323,21 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 						getCurrentConnectionIds);
 				ActionCallback getCurrentConnectionCallback = new ActionCallback(
 						getCurrentConnectionIdsInvocation) {
+					
 					@Override
 					public void success(ActionInvocation invocation) {
-						ActionArgumentValue connectionIds = invocation
-								.getOutput("ConnectionIds");
-						Log.d(getClass().getName(), connectionIds.getValue()
-								.toString());
+						ActionArgumentValue[] connectionIds = invocation
+								.getOutput();
+					    for (ActionArgumentValue connectionId : connectionIds) {
+					    	Log.d(getClass().getName(), connectionId.getValue().toString());
+							
+						}
 					}
 
 					@Override
 					public void failure(ActionInvocation actioninvocation,
 							UpnpResponse upnpresponse, String s) {
-						System.err.println("Failure:" + upnpresponse);
+						Log.d(getClass().getName(),"Failure:" + upnpresponse);
 
 					}
 				};
