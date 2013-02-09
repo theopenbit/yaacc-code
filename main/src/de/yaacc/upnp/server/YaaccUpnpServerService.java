@@ -158,7 +158,7 @@ public class YaaccUpnpServerService extends Service {
 					new DeviceIdentity(new UDN(UDN_ID)),
 					new UDADeviceType("MediaServer"),
 					new DeviceDetails(
-							preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "YAACC - MediaServer"),
+							"YAACC - MediaServer",
 							new ManufacturerDetails("www.yaacc.de",
 									"www.yaacc.de"),
 							new ModelDetails(
