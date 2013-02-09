@@ -39,7 +39,9 @@ import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.ServiceId;
+import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDAServiceId;
+import org.teleal.cling.model.types.UDAServiceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.registry.Registry;
 import org.teleal.cling.registry.RegistryListener;
@@ -67,7 +69,6 @@ import de.yaacc.BackgroundMusicService;
 import de.yaacc.ImageViewerActivity;
 import de.yaacc.R;
 
-
 /**
  * A client facade to the upnp lookup and access framework. This class provides
  * all services to manage devices.
@@ -77,15 +78,13 @@ import de.yaacc.R;
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
 
+	public static String LOCAL_UID = "LOCAL_UID";
+
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
 	private LinkedList<String> visitedObjectIds;
 	SharedPreferences preferences;
-	
-
-		
-
 
 	public UpnpClient() {
 
@@ -100,13 +99,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public boolean initialize(Context context) {
 		this.context = context;
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		this.preferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
 		this.visitedObjectIds = new LinkedList<String>();
-		
-		//FIXME check if this is right: Context.BIND_AUTO_CREATE kills the service after closing the activity
+
+		// FIXME check if this is right: Context.BIND_AUTO_CREATE kills the
+		// service after closing the activity
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
-		
+
 	}
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
@@ -145,7 +146,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see android.content.ServiceConnection#onServiceConnected(android.content.ComponentName, android.os.IBinder)
+	 * 
+	 * @see
+	 * android.content.ServiceConnection#onServiceConnected(android.content.
+	 * ComponentName, android.os.IBinder)
 	 */
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder service) {
@@ -157,7 +161,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see android.content.ServiceConnection#onServiceDisconnected(android.content.ComponentName)
+	 * 
+	 * @see
+	 * android.content.ServiceConnection#onServiceDisconnected(android.content
+	 * .ComponentName)
 	 */
 	@Override
 	public void onServiceDisconnected(ComponentName className) {
@@ -176,7 +183,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#remoteDeviceDiscoveryFailed(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice, java.lang.Exception)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#remoteDeviceDiscoveryFailed
+	 * (org.teleal.cling.registry.Registry,
+	 * org.teleal.cling.model.meta.RemoteDevice, java.lang.Exception)
 	 */
 	@Override
 	public void remoteDeviceDiscoveryFailed(Registry registry,
@@ -187,7 +198,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#remoteDeviceAdded(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#remoteDeviceAdded(org.teleal
+	 * .cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceAdded(Registry registry, RemoteDevice remotedevice) {
@@ -199,7 +213,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#remoteDeviceUpdated(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#remoteDeviceUpdated(org.teleal
+	 * .cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceUpdated(Registry registry, RemoteDevice remotedevice) {
@@ -210,7 +227,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#remoteDeviceRemoved(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#remoteDeviceRemoved(org.teleal
+	 * .cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceRemoved(Registry registry, RemoteDevice remotedevice) {
@@ -222,7 +242,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#localDeviceAdded(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#localDeviceAdded(org.teleal
+	 * .cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)
 	 */
 	@Override
 	public void localDeviceAdded(Registry registry, LocalDevice localdevice) {
@@ -234,7 +257,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#localDeviceRemoved(org.teleal.cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#localDeviceRemoved(org.teleal
+	 * .cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)
 	 */
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
@@ -246,17 +272,20 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.registry.RegistryListener#beforeShutdown(org.teleal.cling.registry.Registry)
+	 * 
+	 * @see
+	 * org.teleal.cling.registry.RegistryListener#beforeShutdown(org.teleal.
+	 * cling.registry.Registry)
 	 */
 	@Override
 	public void beforeShutdown(Registry registry) {
 		Log.d(getClass().getName(), "beforeShutdown: " + registry);
 
 	}
-	
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.teleal.cling.registry.RegistryListener#afterShutdown()
 	 */
 	@Override
@@ -268,7 +297,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * Returns a Service of type AVTransport
-	 * @param device the device which provides the service
+	 * 
+	 * @param device
+	 *            the device which provides the service
 	 * @return the service of null
 	 */
 	private Service getAVTransportService(Device<?, ?, ?> device) {
@@ -292,7 +323,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 			@Override
 			public void run() {
-				actionState.watchdogFlag=true;				
+				actionState.watchdogFlag = true;
 			}
 		}, 30000L); // 30sec. Watchdog
 
@@ -302,7 +333,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (actionState.watchdogFlag) {
 			Log.d(getClass().getName(), "Watchdog timeout!");
 		}
-		
+
 		if (actionState.actionFinished) {
 			Log.d(getClass().getName(), "Action completed!");
 		}
@@ -359,9 +390,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * Start an intent for action VIEW with a given activity class
-	 * @param mime the mimetype to be viewed
-	 * @param uri the uri to be viewed
-	 * @param activityClazz the activity class to be used
+	 * 
+	 * @param mime
+	 *            the mimetype to be viewed
+	 * @param uri
+	 *            the uri to be viewed
+	 * @param activityClazz
+	 *            the activity class to be used
 	 */
 	protected void intentView(String mime, Uri uri, Class activityClazz) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -398,6 +433,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * returns the AndroidUpnpService
+	 * 
 	 * @return the service
 	 */
 	protected AndroidUpnpService getAndroidUpnpService() {
@@ -417,13 +453,40 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
+	 * Returns all registered UpnpDevices with a ContentDirectory Service.
+	 * 
+	 * @return the upnpDevices
+	 */
+	public Collection<Device> getDevicesProvidingContentDirectoryService() {
+		if (isInitialized()) {
+			return getRegistry().getDevices(
+					new UDAServiceType("ContentDirectory"));
+
+		}
+		return new ArrayList<Device>();
+	}
+
+	/**
+	 * Returns all registered UpnpDevices with an AVTransport Service.
+	 * 
+	 * @return the upnpDevices
+	 */
+	public Collection<Device> getDevicesProvidingAvTransportService() {
+		if (isInitialized()) {
+			return getRegistry().getDevices(new UDAServiceType("AVTransport"));
+
+		}
+		return new ArrayList<Device>();
+	}
+
+	/**
 	 * Returns a registered UpnpDevice.
 	 * 
 	 * @return the upnpDevice null if not found
 	 */
 	public Device<?, ?, ?> getDevice(String identifier) {
 		if (isInitialized()) {
-			return getRegistry().getDevice(new UDN(identifier), false);
+			return getRegistry().getDevice(new UDN(identifier), true);
 		}
 		return null;
 	}
@@ -451,6 +514,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * returns the upnp service configuration
+	 * 
 	 * @return the configuration
 	 */
 	public UpnpServiceConfiguration getConfiguration() {
@@ -462,6 +526,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * returns the upnp control point
+	 * 
 	 * @return the control point
 	 */
 	public ControlPoint getControlPoint() {
@@ -473,6 +538,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * Returns the upnp registry
+	 * 
 	 * @return the registry
 	 */
 	public Registry getRegistry() {
@@ -639,7 +705,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Starts playing avtransport object.
 	 * 
-	 * @param transport  the transport object
+	 * @param transport
+	 *            the transport object
 	 */
 	public void playLocal(AVTransport transport) {
 		if (transport == null)
@@ -649,12 +716,75 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (positionInfo == null)
 			return;
 
-		Log.d(getClass().getName(), "TransportUri: " + positionInfo.getTrackURI());
-		Log.d(getClass().getName(), "Duration: " + positionInfo.getTrackDuration());				
-		Log.d(getClass().getName(), "TrackMetaData: " + positionInfo.getTrackMetaData());
-		//FIXME Mimetype to be set
-		intentView("*/*",Uri.parse(positionInfo.getTrackURI()));
+		Log.d(getClass().getName(),
+				"TransportUri: " + positionInfo.getTrackURI());
+		Log.d(getClass().getName(),
+				"Duration: " + positionInfo.getTrackDuration());
+		Log.d(getClass().getName(),
+				"TrackMetaData: " + positionInfo.getTrackMetaData());
+		// FIXME Mimetype to be set
+		intentView("*/*", Uri.parse(positionInfo.getTrackURI()));
 	}
+
+	/**
+	 * Starts playing an item on the receiver device, if the device id is equals @see
+	 * {@link UpnpClient.LOCAL_UID} a local play will start.
+	 * 
+	 * @param item
+	 *            the item to be played
+	 * 
+	 */
+	public void play(Item item) {
+		play(item, getReceiverDeviceId());
+	}
+
+	/**
+	 * Starts playing an item. if the device id is equals @see
+	 * {@link UpnpClient.LOCAL_UID} a local play will start.
+	 * 
+	 * @param item
+	 *            the item to be played
+	 * @param deviceId
+	 *            the device id
+	 */
+	public void play(Item item, String deviceId) {
+		if (LOCAL_UID.equals(deviceId)) {
+			playLocal(item);
+		} else {
+			playRemote(item, getDevice(deviceId));
+		}
+	}
+
+	/**
+	 * Starts playing a container on the receiverDevice if the device id is
+	 * equals @see {@link UpnpClient.LOCAL_UID} a local play will start.
+	 * 
+	 * @param contaienr
+	 *            the container to be played
+	 * @param deviceId
+	 *            the device id
+	 */
+	public void play(Container container) {
+		play(container, getReceiverDeviceId());
+	}
+
+	/**
+	 * Starts playing a container. if the device id is equals @see
+	 * {@link UpnpClient.LOCAL_UID} a local play will start.
+	 * 
+	 * @param contaienr
+	 *            the container to be played
+	 * @param deviceId
+	 *            the device id
+	 */
+	public void play(Container container, String deviceId) {
+		if (LOCAL_UID.equals(deviceId)) {
+			playLocal(container);
+		} else {
+			playRemote(container, getDevice(deviceId));
+		}
+	}
+
 	/**
 	 * Starts playing item locally
 	 * 
@@ -773,6 +903,51 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
+	 * Starts playing a container on a remote device. All items are played
+	 * 
+	 * @param container
+	 *            the container
+	 * @param device
+	 *            the device the container is played on
+	 */
+	public void playRemote(Container container, Device<?, ?, ?> device) {
+		if (container == null)
+			return;
+		Log.d(getClass().getName(), "ContainerId: " + container.getId());
+		for (Item item : container.getItems()) {
+
+			Res resource = item.getFirstResource();
+			if (resource == null)
+				return;
+
+			playRemote(item, device);
+			// Wait Duration until next Item is send to receiver intent
+			// TODO intent should get a playlist instead of singel items
+			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+			long millis = 10000; // 10 sec. default
+			if (resource.getDuration() != null) {
+				try {
+					Date date = dateFormat.parse(resource.getDuration());
+					// silence 2 sec
+					// FIXME silence must be configurable in the settings menu
+					// in order to play container without silence
+					millis = date.getTime() + 2000;
+
+				} catch (ParseException e) {
+					Log.d(getClass().getName(), "bad duration format", e);
+
+				}
+			}
+			try {
+				Thread.sleep(millis);
+			} catch (InterruptedException e) {
+				Log.d(getClass().getName(), "InterruptedException ", e);
+
+			}
+		}
+	}
+
+	/**
 	 * Plays an item on an remote device
 	 * 
 	 * @param item
@@ -794,19 +969,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				+ resource.getProtocolInfo().getContentFormat());
 		Log.d(getClass().getName(), "Value: " + resource.getValue());
 		Service<?, ?> service = getAVTransportService(remoteDevice);
-		if(service == null) {
-			Log.d(getClass().getName(), "No AVTransport-Service found on Device: " + remoteDevice.getDisplayString());
+		if (service == null) {
+			Log.d(getClass().getName(),
+					"No AVTransport-Service found on Device: "
+							+ remoteDevice.getDisplayString());
 			return;
 		}
 		Log.d(getClass().getName(), "Action SetAVTransportURI ");
 		final ActionState actionState = new ActionState();
-		actionState.actionFinished=false;
-		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(service, resource.getValue(),actionState);
-		getControlPoint().execute(setAVTransportURI);						 
+		actionState.actionFinished = false;
+		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
+				service, resource.getValue(), actionState);
+		getControlPoint().execute(setAVTransportURI);
 		waitForActionComplete(actionState);
-		//Now start Playing
+		// Now start Playing
 		Log.d(getClass().getName(), "Action Play");
-		actionState.actionFinished=false;
+		actionState.actionFinished = false;
 		Play actionCallback = new Play(service) {
 
 			@Override
@@ -815,7 +993,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				Log.d(getClass().getName(), "Failure UpnpResponse: "
 						+ upnpresponse);
 				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getResponseDetails());
+						upnpresponse != null ? "UpnpResponse: "
+								+ upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(), "s: " + s);
 				actionState.actionFinished = true;
 
 			}
@@ -823,86 +1003,107 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			@Override
 			public void success(ActionInvocation actioninvocation) {
 				super.success(actioninvocation);
-				actionState.actionFinished=true;
+				actionState.actionFinished = true;
 
 			}
 
 		};
 		getControlPoint().execute(actionCallback);
 	}
-	
+
 	private static class InternalSetAVTransportURI extends SetAVTransportURI {
-		ActionState actionState =null; 
-		private InternalSetAVTransportURI(Service service, String uri,ActionState actionState) {
+		ActionState actionState = null;
+
+		private InternalSetAVTransportURI(Service service, String uri,
+				ActionState actionState) {
 			super(service, uri);
-			this.actionState=actionState;
+			this.actionState = actionState;
 		}
 
 		@Override
 		public void failure(ActionInvocation actioninvocation,
 				UpnpResponse upnpresponse, String s) {
-			Log.d(getClass().getName(), "Failure UpnpResponse: "
-					+ upnpresponse);
-			Log.d(getClass().getName(),
-					"UpnpResponse: " + upnpresponse.getResponseDetails());
-			Log.d(getClass().getName(),
-					"UpnpResponse: " + upnpresponse.getStatusMessage());
-			Log.d(getClass().getName(),
-					"UpnpResponse: " + upnpresponse.getStatusCode());
-			actionState.actionFinished=true;
+			Log.d(getClass().getName(), "Failure UpnpResponse: " + upnpresponse);
+			if (upnpresponse != null) {
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusMessage());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusCode());
+			}
+			Log.d(getClass().getName(), "s: " + s);
+			actionState.actionFinished = true;
 
 		}
 
 		@Override
 		public void success(ActionInvocation actioninvocation) {
 			super.success(actioninvocation);
-			actionState.actionFinished=true;
+			actionState.actionFinished = true;
 
 		}
 	}
 
-	private static class ActionState{
+	private static class ActionState {
 		public boolean actionFinished = false;
 		public boolean watchdogFlag = false;
 	}
-	
 
+	/**
+	 * 
+	 * @return the receiverDeviceId
+	 */
+	public String getReceiverDeviceId() {
+		return preferences.getString(
+				context.getString(R.string.settings_selected_receiver_title),
+				null);
+	}
 
 	/**
 	 * @return the receiverDevice
 	 */
-	public Device getReceiverDevice() {
-		
-		 return this.getDevice(preferences.getString(context.getString(R.string.settings_selected_receiver_title), null));
+	public Device<?, ?, ?> getReceiverDevice() {
 
+		return this.getDevice(getReceiverDeviceId());
+
+	}
+
+	/**
+	 * 
+	 * @return the providerDeviceId
+	 */
+	public String getProviderDeviceId() {
+		return preferences.getString(
+				context.getString(R.string.settings_selected_provider_title),
+				null);
 	}
 
 	/**
 	 * @return the provider device
 	 */
-	public Device getProviderDevice() {
-		
-	    return this.getDevice(preferences.getString(context.getString(R.string.settings_selected_provider_title), null));
+	public Device<?, ?, ?> getProviderDevice() {
+
+		return this.getDevice(getProviderDeviceId());
 
 	}
 
-	public String getLastVisitedObjectId(){
-		if(visitedObjectIds != null && !visitedObjectIds.isEmpty()){
+	public String getLastVisitedObjectId() {
+		if (visitedObjectIds != null && !visitedObjectIds.isEmpty()) {
 			this.visitedObjectIds.removeLast();
 		}
-		if (visitedObjectIds == null||visitedObjectIds.isEmpty()){
+		if (visitedObjectIds == null || visitedObjectIds.isEmpty()) {
 			return "0";
 		}
 		return this.visitedObjectIds.pollLast();
 	}
-	
-	public void storeNewVisitedObjectId(String newVisitedObjectId){
+
+	public void storeNewVisitedObjectId(String newVisitedObjectId) {
 		this.visitedObjectIds.addLast(newVisitedObjectId);
 	}
-	
-	public String getCurrentObjectId(){
+
+	public String getCurrentObjectId() {
 		return this.visitedObjectIds.peekLast();
 	}
-	
-	
+
 }

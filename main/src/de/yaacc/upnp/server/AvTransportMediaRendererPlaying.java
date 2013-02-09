@@ -88,7 +88,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 	@Override
 	public Class<? extends AbstractState> play(String speed) {
 		Log.d(this.getClass().getName(), "play");				
-		return null;
+		return AvTransportMediaRendererPlaying.class;
 	}
 
 	/*
