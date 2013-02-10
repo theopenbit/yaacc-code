@@ -129,7 +129,8 @@ public class MainActivity extends Activity implements OnClickListener {
     	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
     	deviceList.setOnItemClickListener(bItemClickListener);
     	
-    	deviceList.setOnItemLongClickListener(bItemClickListener);
+
+    	deviceList.setOnCreateContextMenuListener(bItemClickListener);
 	}
 	
 

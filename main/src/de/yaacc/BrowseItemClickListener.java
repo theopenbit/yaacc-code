@@ -4,14 +4,17 @@ import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
 import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
-public class BrowseItemClickListener implements OnItemClickListener, OnItemLongClickListener {
+public class BrowseItemClickListener implements OnItemClickListener, OnCreateContextMenuListener{
 
 
 	@Override
@@ -41,10 +44,18 @@ public class BrowseItemClickListener implements OnItemClickListener, OnItemLongC
 	}
 
 	@Override
-	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
-			long arg3) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+			
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+		    menu.setHeaderTitle("Context menu");
+		    String[] menuItems = new String[2];
+		    menuItems[0] = "Play whole folder";
+		    menuItems[1] = "Download whole folder";
+		    for (int i = 0; i<menuItems.length; i++) {
+		      menu.add(Menu.NONE, i, i, menuItems[i]);
+		    }
+		  }
+		
 	
 }
