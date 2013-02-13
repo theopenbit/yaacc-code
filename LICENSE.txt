@@ -2,8 +2,11 @@
 The following license applies to the source code contained in the main/src/ and test/src
 folder of this project.
 
-Please be aware that the activation/ and javamail/ components are 
-governed by their own respective licenses.
+Please be aware that the project based on cling which is 
+governed by their own respective licenses. For further informations visit  http://4thline.org/projects/cling/
+
+The icons used by this project are governed by their own respective licenses, too. 
+For further informations visit  @Eyeless insert url here
 
 -----------------------------------------------------------------------
 
