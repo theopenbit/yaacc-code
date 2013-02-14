@@ -3,7 +3,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.yaacc.tests"
           android:versionCode="1"
-          android:versionName="1.0">
+          android:versionName="0.1">
     <!-- We add an application tag here just so that we can indicate that
          this package needs to link against the android.test library,
          which is needed when building test cases. -->

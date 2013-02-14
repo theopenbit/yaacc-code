@@ -56,9 +56,15 @@ public class LocalUpnpServer implements ServiceConnection{
 	public static final String UDN_ID = "YAACC-TEST-SEVER1";
 	private AndroidUpnpService androidUpnpService;
 	private LocalDevice localDevice;
+	private Context context;
+
+	public LocalUpnpServer(Context ctx) {
+		context = ctx;
+	}
+
 
 	public static LocalUpnpServer setup(Context ctx ) {
-		LocalUpnpServer upnpServer = new LocalUpnpServer();
+		LocalUpnpServer upnpServer = new LocalUpnpServer(ctx);
 		ctx.bindService(new Intent(ctx, UpnpRegistryService.class),
 				upnpServer, Context.BIND_AUTO_CREATE);		
 		return upnpServer;
@@ -100,10 +106,12 @@ public class LocalUpnpServer implements ServiceConnection{
 				.read(AbstractContentDirectoryService.class);
 		contentDirectoryService.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(
 				contentDirectoryService, null) {
+			
+
 			@Override
 			protected AbstractContentDirectoryService createServiceInstance()
 					throws Exception {
-				return new YaaccContentDirectory();
+				return new YaaccContentDirectory(context);
 			}
 		});
 		return contentDirectoryService;

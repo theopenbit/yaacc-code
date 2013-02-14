@@ -18,7 +18,11 @@
  */
 package de.yaacc.upnp.server;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +44,19 @@ import org.teleal.cling.support.model.container.StorageFolder;
 import org.teleal.cling.support.model.item.Item;
 import org.teleal.cling.support.model.item.MusicTrack;
 import org.teleal.cling.support.model.item.Photo;
+import org.teleal.cling.support.model.item.VideoItem;
 import org.teleal.common.util.MimeType;
 
+import android.app.Service;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
+import de.yaacc.R;
 
 /**
  * a content directory which uses the content of the MediaStore in order to
@@ -54,8 +68,31 @@ import android.util.Log;
 public class YaaccContentDirectory extends AbstractContentDirectoryService {
 
 	private Map<String, DIDLObject> content = new HashMap<String, DIDLObject>();
+	private Context context;
+	private SharedPreferences preferences;
 
-	public YaaccContentDirectory() {
+	public YaaccContentDirectory(Context context) {
+		this.context = context;
+		preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean usingTestContent = preferences.getBoolean(context
+				.getString(R.string.settings_local_server_testcontent_chkbx),
+				false);
+		if (usingTestContent) {
+			createTestContentDirectory();
+		} else {
+			createMediaStoreContentDirectory();
+		}
+
+	}
+
+	private Context getContext() {
+		return context;
+	}
+
+	/**
+	 * 
+	 */
+	private void createTestContentDirectory() {
 		StorageFolder rootContainer = new StorageFolder("0", "-1", "Root",
 				"yaacc", 2, 907000L);
 		rootContainer.setClazz(new DIDLObject.Class("object.container"));
@@ -75,7 +112,6 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		photoAlbum.setRestricted(true);
 		rootContainer.addContainer(photoAlbum);
 		content.put(photoAlbum.getId(), photoAlbum);
-
 	}
 
 	private List<MusicTrack> createMusicTracks(String parentId) {
@@ -200,7 +236,8 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		int childCount = 0;
 		DIDLObject didlObject = content.get(objectID);
 		if (didlObject == null) {
-			throw new ContentDirectoryException(ContentDirectoryErrorCode.NO_SUCH_OBJECT);
+			throw new ContentDirectoryException(
+					ContentDirectoryErrorCode.NO_SUCH_OBJECT);
 		}
 
 		DIDLContent didl = new DIDLContent();
@@ -231,10 +268,140 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 			Log.d(getClass().getName(), "CDResponse: " + didlXml);
 			result = new BrowseResult(didlXml, childCount, childCount);
 		} catch (Exception e) {
-			throw new ContentDirectoryException(ContentDirectoryErrorCode.CANNOT_PROCESS.getCode(),"Error while generating BrowseResult", e);
+			throw new ContentDirectoryException(
+					ContentDirectoryErrorCode.CANNOT_PROCESS.getCode(),
+					"Error while generating BrowseResult", e);
 		}
 		return result;
 
 	}
 
+	/**
+	 * creates the ContentDirectory based on the content of the android
+	 * mediastore.
+	 */
+	private void createMediaStoreContentDirectory() {
+		StorageFolder rootContainer = new StorageFolder("0", "-1", "Root",
+				"yaacc", 3, 907000L);
+
+		rootContainer.setRestricted(true);
+		content.put(rootContainer.getId(), rootContainer);
+		List<MusicTrack> musicTracks = createMediaStoreMusicTracks("1");
+		MusicAlbum musicAlbum = new MusicAlbum("1", rootContainer, "Audio",
+				null, musicTracks.size(), musicTracks);
+		musicAlbum.setRestricted(true);
+		rootContainer.addContainer(musicAlbum);
+		content.put(musicAlbum.getId(), musicAlbum);
+		List<Photo> photos = createMediaStorePhotos("2");
+		PhotoAlbum photoAlbum = new PhotoAlbum("2", rootContainer, "Images",
+				null, photos.size(), photos);
+		photoAlbum.setRestricted(true);
+		rootContainer.addContainer(photoAlbum);
+		content.put(photoAlbum.getId(), photoAlbum);
+		List<VideoItem> videos = createMediaStoreVidos("3");
+		StorageFolder videosFolder = new StorageFolder("3", rootContainer,
+				"Videos", "yaacc", videos.size(), 907000L);
+		for (VideoItem videoItem : videos) {
+			videosFolder.addItem(videoItem);
+		}
+		videosFolder.setRestricted(true);
+		rootContainer.addContainer(videosFolder);
+		content.put(videosFolder.getId(), videosFolder);
+	}
+
+	private List<VideoItem> createMediaStoreVidos(String string) {
+		List<VideoItem> result = new ArrayList<VideoItem>();
+		return result;
+	}
+
+	private List<Photo> createMediaStorePhotos(String parentID) {
+		List<Photo> result = new ArrayList<Photo>();
+		// Query for all images on external storage
+		String[] projection = { MediaStore.Images.Media._ID,
+				MediaStore.Images.Media.DISPLAY_NAME,
+				MediaStore.Images.Media.MIME_TYPE,
+				MediaStore.Images.Media.SIZE};
+		String selection = "";
+		String[] selectionArgs = null;
+		Cursor mImageCursor = getContext().getContentResolver().query(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
+				selection, selectionArgs, null);
+
+		if (mImageCursor != null) {
+			mImageCursor.moveToFirst();
+			while (!mImageCursor.isAfterLast()) {
+				String id = mImageCursor.getString(mImageCursor
+						.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+				String name = mImageCursor
+						.getString(mImageCursor
+								.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+//				String data = mImageCursor.getString(mImageCursor
+//						.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+				Long size = Long.valueOf(mImageCursor.getString(mImageCursor
+						.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
+				MimeType mimeType = MimeType
+						.valueOf(mImageCursor.getString(mImageCursor
+								.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+//				String uri = "http://" + getInetAddress().getHostAddress() + "?id=" + id;
+				String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "?id=" + id;
+				Res resource = new Res(mimeType, size, uri);
+				result.add(new Photo(id, parentID, name, "", "", resource));
+				Log.d(getClass().getName(), "Image: " + id + " Name: " + name
+						+ " uri: " + uri);
+				mImageCursor.moveToNext();
+			}
+		} else {
+			Log.d(getClass().getName(), "System media store is empty.");
+		}
+		mImageCursor.close();
+		return result;
+	}
+
+	private List<MusicTrack> createMediaStoreMusicTracks(String string) {
+		List<MusicTrack> result = new ArrayList<MusicTrack>();
+		return result;
+	}
+
+	/**
+	 * get the internet address of the device
+	 * @return the address or null if anything goes wrong  
+	 * 
+	 */
+	public InetAddress getInetAddress() {		
+		InetAddress result = null;
+		try {
+			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
+					.getNetworkInterfaces(); networkInterfaces
+					.hasMoreElements();) {
+				NetworkInterface networkInterface = networkInterfaces
+						.nextElement();
+				for (Enumeration<InetAddress> inetAddresses = networkInterface
+						.getInetAddresses(); inetAddresses.hasMoreElements();) {
+					InetAddress inetAddress = inetAddresses.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						return inetAddress;
+					}
+
+				}
+			}
+		} catch (SocketException se) {
+			Log.d(getClass().getName(),
+					"Error while retrieving network interfaces",se);
+		}
+		return result;
+	}
+
+	private String getIpAddress(){
+		WifiManager wifiManager = (WifiManager) getContext().getSystemService(Service.WIFI_SERVICE);
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+		int ip = wifiInfo.getIpAddress();
+		String ipString = String.format( 
+		 "%d.%d.%d.%d", 
+		 (ip & 0xff), 
+		 (ip >> 8 & 0xff),
+		 (ip >> 16 & 0xff),
+		 (ip >> 24 & 0xff)
+		);
+		return ipString;
+	}
 }

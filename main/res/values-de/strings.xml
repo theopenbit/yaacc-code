@@ -28,5 +28,9 @@
     <string name="settings_local_server_started">Lokaler server ist gestartet</string>
     <string name="settings_local_server_stopped">Lokaler server ist gestoppt</string>
     <string name="settings_local_server_chkbx">local_server_chkbx</string>
+    <string name="settings_local_server_testcontent">Lokaler Server verwendet Testinhalte</string>
+    <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>
+    <string name="settings_local_server_testcontent_chkbx">local_server_testcontent_chkbx</string>
+    <string name="error_no_activity_found">Keine Aktivität zum Abspielen vom Typ \'%1$s\' gefunden</string>
 
 </resources>

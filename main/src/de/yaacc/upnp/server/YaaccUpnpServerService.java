@@ -18,11 +18,34 @@
  */
 package de.yaacc.upnp.server;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.http.ConnectionClosedException;
+import org.apache.http.HttpException;
+import org.apache.http.HttpServerConnection;
+import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.DefaultHttpResponseFactory;
+import org.apache.http.impl.DefaultHttpServerConnection;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.BasicHttpProcessor;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpProcessor;
+import org.apache.http.protocol.HttpRequestHandlerRegistry;
+import org.apache.http.protocol.HttpService;
+import org.apache.http.protocol.ResponseConnControl;
+import org.apache.http.protocol.ResponseContent;
+import org.apache.http.protocol.ResponseDate;
+import org.apache.http.protocol.ResponseServer;
 import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.teleal.cling.model.DefaultServiceManager;
 import org.teleal.cling.model.ValidationException;
@@ -42,6 +65,7 @@ import org.teleal.cling.support.model.ProtocolInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -59,6 +83,8 @@ import de.yaacc.upnp.UpnpClient;
  * @author Tobias Schöne (openbit)
  */
 public class YaaccUpnpServerService extends Service {
+
+	public static int PORT = 4711;
 
 	// make preferences available for the whole service, since there might be
 	// more things to configure in the future
@@ -146,6 +172,14 @@ public class YaaccUpnpServerService extends Service {
 		} else {
 			throw new IllegalStateException("UpnpClient is not initialized!");
 		}
+
+		// Create a HttpService for providing content in the network.
+		try {
+			new RequestListenerThread(getApplicationContext()).start();
+		} catch (IOException e) {
+			throw new IllegalStateException("ContentProvider can not be initialized!", e);			
+		}
+
 	}
 
 	/**
@@ -203,7 +237,8 @@ public class YaaccUpnpServerService extends Service {
 					@Override
 					protected AbstractContentDirectoryService createServiceInstance()
 							throws Exception {
-						return new YaaccContentDirectory();
+						return new YaaccContentDirectory(
+								getApplicationContext());
 					}
 				});
 		return contentDirectoryService;
@@ -257,42 +292,172 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	private ProtocolInfos getProtocolInfos() {
 		return new ProtocolInfos(
-				new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=1:DLNA.ORG_PN=LPCM"),
-				new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"),
-				new ProtocolInfo("http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"),
-				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, "audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"),
+				new ProtocolInfo(
+						"http-get:*:audio/L16;rate=44100;channels=1:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo(
+						"http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo(
+						"http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,
+						"audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"),
 				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"),
 				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3X"),
 				new ProtocolInfo("http-get:*:audio/x-ms-wma:*"),
-				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"),
-				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
+				new ProtocolInfo(
+						"http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"),
+				new ProtocolInfo(
+						"http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
 				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAPRO"),
 				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG"),
 				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED"),
 				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM"),
 				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN"),
 				new ProtocolInfo("http-get:*:image/x-ycbcr-yuv420:*"),
-				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,"video/mpeg","DLNA.ORG_PN=MPEG1;DLNA.ORG_OP=01;DLNA.ORG_CI=0"),
+				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,
+						"video/mpeg",
+						"DLNA.ORG_PN=MPEG1;DLNA.ORG_OP=01;DLNA.ORG_CI=0"),
 				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG1"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"),
+				new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
+				new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"),
+				new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"),
+				new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
+				new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"),
+				new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"),
 				new ProtocolInfo("http-get:*:video/wtv:*"),
-				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"),
-				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"),
-				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"),
-				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"),
 				new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_MP3"));
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"),
+				new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_MP3"));
+	}
+
+	/**
+	 * 
+	 * Listener thread for http requests.
+	 * 
+	 */
+	static class RequestListenerThread extends Thread {
+		private ServerSocket serversocket;
+		private BasicHttpParams params;
+		private HttpService httpService;
+
+		public RequestListenerThread(Context context) throws IOException {
+			serversocket = new ServerSocket(PORT);
+			params = new BasicHttpParams();
+			params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000)
+					.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE,
+							8 * 1024)
+					.setBooleanParameter(
+							CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
+					.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
+					.setParameter(CoreProtocolPNames.ORIGIN_SERVER,
+							"HttpComponents/1.1");
+
+			// Set up the HTTP protocol processor
+			BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
+			httpProcessor.addInterceptor(new ResponseDate());
+			httpProcessor.addInterceptor(new ResponseServer());
+			httpProcessor.addInterceptor(new ResponseContent());
+			httpProcessor.addInterceptor(new ResponseConnControl());
+
+			// Set up the HTTP service
+			this.httpService = new YaaccHttpService(httpProcessor,
+					new DefaultConnectionReuseStrategy(),
+					new DefaultHttpResponseFactory(), context);
+
+		}
+
+		@Override
+		public void run() {
+			System.out.println("Listening on port "
+					+ serversocket.getLocalPort());
+			while (!Thread.interrupted()) {
+				try {
+					// Set up HTTP connection
+					Socket socket = serversocket.accept();
+					DefaultHttpServerConnection connection = new DefaultHttpServerConnection();
+					Log.d(getClass().getName(), "Incoming connection from "
+							+ socket.getInetAddress());
+					connection.bind(socket, params);
+					// Start worker thread
+					Thread workerThread = new WorkerThread(httpService,
+							connection);
+					workerThread.setDaemon(true);
+					workerThread.start();
+				} catch (InterruptedIOException ex) {
+					break;
+				} catch (IOException e) {
+					Log.d(getClass().getName(),
+							"I/O error initialising connection thread: ", e);
+					break;
+				}
+			}
+		}
+
+	}
+
+	static class WorkerThread extends Thread {
+
+		private final HttpService httpservice;
+		private final HttpServerConnection conn;
+
+		public WorkerThread(final HttpService httpservice,
+				final HttpServerConnection conn) {
+			super();
+			this.httpservice = httpservice;
+			this.conn = conn;
+		}
+
+		@Override
+		public void run() {
+			Log.d(getClass().getName(), "New connection thread");
+			HttpContext context = new BasicHttpContext(null);
+			try {
+				while (!Thread.interrupted() && conn.isOpen()) {
+					httpservice.handleRequest(conn, context);
+				}
+			} catch (ConnectionClosedException ex) {
+				Log.d(getClass().getName(), "Client closed connection", ex);
+			} catch (IOException ex) {
+				Log.d(getClass().getName(), "I/O error: ", ex);
+			} catch (HttpException ex) {
+				Log.d(getClass().getName(),
+						"Unrecoverable HTTP protocol violation: ", ex);
+			} finally {
+				try {
+					conn.shutdown();
+				} catch (IOException ignore) {
+					// ignore it
+				}
+
+			}
+		}
+
 	}
 }

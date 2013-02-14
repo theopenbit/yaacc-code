@@ -56,15 +56,18 @@ import org.teleal.cling.support.model.SortCriterion;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 import de.yaacc.BackgroundMusicService;
 import de.yaacc.ImageViewerActivity;
 import de.yaacc.R;
@@ -404,11 +407,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			intent = new Intent(context, activityClazz);
 		}
 
-		intent.setDataAndType(uri, mime);
+		if(mime == null || mime.equals("")){
+			intent.setData(uri);
+		}else{
+			intent.setDataAndType(uri, mime);
+		}
 
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		context.startActivity(intent);
+		try {
+			context.startActivity(intent);
+		} catch (ActivityNotFoundException anfe) {
+			Resources res = getContext().getResources();
+			String text = String.format(
+					res.getString(R.string.error_no_activity_found), mime);
+			Toast toast = Toast.makeText(getContext(), text, Toast.LENGTH_LONG);
+			toast.show();
+		}
 	}
 
 	/**
@@ -721,8 +735,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(),
 				"Duration: " + positionInfo.getTrackDuration());
 		Log.d(getClass().getName(),
-				"TrackMetaData: " + positionInfo.getTrackMetaData());
-		// FIXME Mimetype to be set
+				"TrackMetaData: " + positionInfo.getTrackMetaData());		
 		intentView("*/*", Uri.parse(positionInfo.getTrackURI()));
 	}
 
@@ -979,7 +992,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		final ActionState actionState = new ActionState();
 		actionState.actionFinished = false;
 		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
-				service, resource.getValue(), actionState);
+				service, resource.getValue(), actionState);		
 		getControlPoint().execute(setAVTransportURI);
 		waitForActionComplete(actionState);
 		// Now start Playing
