@@ -19,66 +19,87 @@
 package de.yaacc;
 
 import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 /**
- * Background retriever for network images. 
- * @author Tobias Schöne (openbit)  
+ * Background task for retrieving network images.
+ * 
+ * @author Tobias Schoene (openbit)
  * 
  */
-public class RetrieveImageTask extends AsyncTask<Uri, Void, Drawable>{
+public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
 	private ImageViewerActivity imageViewerActivity;
 
-	
 	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
 		this.imageViewerActivity = imageViewerActivity;
 	}
-	
-	@Override
-	protected Drawable doInBackground(Uri... imageUris) {
-		if(imageUris == null) return null;
-		Drawable image;
-		try {
-			Uri imageUri = imageUris[0];
-			System.out.println("imgeUri: " + imageUri);
-			InputStream is = (InputStream) new java.net.URL(imageUri.toString())
-					.getContent();
-			System.out.println("InputStram: " + is);
-			image = Drawable.createFromStream(is, "src");
-			System.out.println("image: " + image);
-		} catch (Exception e) {
-			image = Drawable.createFromPath("@drawable/ic_launcher");
-			e.printStackTrace();
 
-		}
-		return image;
-	}
-
-	/* (non-Javadoc)
-	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-	 */
 	@Override
-	protected void onPostExecute(Drawable result) {		
-		super.onPostExecute(result);
-		if(imageViewerActivity != null){
+	protected Void doInBackground(Uri... imageUris) {
+		if (imageUris == null)
+			return null;
+		for (Uri imageUri : imageUris) {
+			Drawable image;
 			try {
-				imageViewerActivity.showImage(get());
+				Log.d(getClass().getName(), "imgeUri: " + imageUri);
+				if (imageUri != null) {
+					InputStream is = (InputStream) new java.net.URL(
+							imageUri.toString()).getContent();
+					Log.d(getClass().getName(), "InputStram: " + is);
+					image = Drawable.createFromStream(is, "src");
+					if (imageViewerActivity != null) {
+						//TODO slide show in imageViewer imageViewerActivity.showImage(image);
+					}
+					Log.d(getClass().getName(), "image: " + image);
+				}
+			} catch (final Exception e) {
+				image = Drawable.createFromPath("@drawable/ic_launcher");
+				Log.d(getClass().getName(), "Error while processing image", e);
+				imageViewerActivity.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast toast = Toast.makeText(imageViewerActivity,
+								"Exception:" + e.getMessage(),
+								Toast.LENGTH_LONG);
+						toast.show();
+					}
+				});
+
+			}
+
+			try {
+				Thread.sleep(getDuration()); // duration
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d(getClass().getName(),
+						"Interrupted exception while waiting for next image");
 			}
 		}
-		
+		// This async task has no result
+		return null;
 	}
+
+	/**
+	 * Return the configured slide stay duration
+	 */
+	private int getDuration() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(imageViewerActivity);
+		return Integer
+				.parseInt(preferences.getString(
+						imageViewerActivity
+								.getString(R.string.image_viewer_settings_duration_key),
+						"2000"));
+	}
+	
+	
+		
 	
 	
 
