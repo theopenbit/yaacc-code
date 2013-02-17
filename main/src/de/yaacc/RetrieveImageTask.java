@@ -46,7 +46,18 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 	protected Void doInBackground(Uri... imageUris) {
 		if (imageUris == null)
 			return null;
-		for (Uri imageUri : imageUris) {
+		for (Uri imageUri : imageUris)
+			retrieveImage(imageUri);
+		// This async task has no result
+		return null;
+	}
+
+	/**
+	 * retrieves an image an stores them in the image cache of the ImageViewerActivity.
+	 * @param imageUri
+	 */
+	public void retrieveImage(Uri imageUri) {
+		{
 			Drawable image;
 			try {
 				Log.d(getClass().getName(), "imgeUri: " + imageUri);
@@ -56,7 +67,7 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 					Log.d(getClass().getName(), "InputStram: " + is);
 					image = Drawable.createFromStream(is, "src");
 					if (imageViewerActivity != null) {
-						//TODO slide show in imageViewer imageViewerActivity.showImage(image);
+						imageViewerActivity.addImageToCache(imageUri, image);
 					}
 					Log.d(getClass().getName(), "image: " + image);
 				}
@@ -74,29 +85,11 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
 			}
 
-			try {
-				Thread.sleep(getDuration()); // duration
-			} catch (InterruptedException e) {
-				Log.d(getClass().getName(),
-						"Interrupted exception while waiting for next image");
-			}
+			
 		}
-		// This async task has no result
-		return null;
 	}
 
-	/**
-	 * Return the configured slide stay duration
-	 */
-	private int getDuration() {
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(imageViewerActivity);
-		return Integer
-				.parseInt(preferences.getString(
-						imageViewerActivity
-								.getString(R.string.image_viewer_settings_duration_key),
-						"2000"));
-	}
+	
 	
 	
 		
