@@ -33,7 +33,12 @@
     <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>
     <string name="settings_local_server_testcontent_chkbx">local_server_testcontent_chkbx</string>
     <string name="error_no_activity_found">Keine Aktivität zum Abspielen vom Typ \'%1$s\' gefunden</string>
-    <string name="image_viewer_settings_duration">slide stay duration</string>    
-    <string name="no_valid_uri_data_found_to_display">Keine gültigen Uri-Informationen zum Anzeigen gefunden</string> 
+    <string name="image_viewer_settings_duration">Dauer der Bildanzeige</string>    
+    <string name="no_valid_uri_data_found_to_display">Keine gültigen Uri-Informationen zum Anzeigen gefunden</string>
+    <string name="play">spiele</string>
+    <string name="stop">stoppe</string>
+    <string name="pause">pausiere</string>
+    <string name="previous">vorheriges</string>
+    <string name="next">nächstes</string> 
 
 </resources>

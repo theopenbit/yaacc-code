@@ -46,8 +46,9 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 	protected Void doInBackground(Uri... imageUris) {
 		if (imageUris == null)
 			return null;
-		for (Uri imageUri : imageUris)
+		for (Uri imageUri : imageUris){
 			retrieveImage(imageUri);
+		}
 		// This async task has no result
 		return null;
 	}

@@ -10,5 +10,30 @@
         android:orderInCategory="110"
         android:showAsAction="never"
         android:title="@string/yaacc_menu_settings"/>        
+     <item
+        android:id="@+id/menu_play"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/play"/>
+      <item
+        android:id="@+id/menu_pause"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/pause"/>
+      <item
+        android:id="@+id/menu_stop"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/stop"/>
+      <item
+        android:id="@+id/menu_previous"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/previous"/>
+      <item
+        android:id="@+id/menu_next"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/next"/>
 
 </menu>

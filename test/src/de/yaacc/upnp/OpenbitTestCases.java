@@ -46,11 +46,13 @@ import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
 import org.teleal.cling.support.model.TransportInfo;
+import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.renderingcontrol.callback.GetMute;
 import org.teleal.cling.support.renderingcontrol.callback.GetVolume;
 import org.teleal.cling.support.renderingcontrol.callback.SetMute;
 import org.teleal.cling.support.renderingcontrol.callback.SetVolume;
 
+import de.yaacc.upnp.server.LocalUpnpServer;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 import android.util.Log;
@@ -121,6 +123,20 @@ public class OpenbitTestCases extends UpnpClientTest {
 	public void testStreamPhotoShow() throws Exception {
 		streamPhotoShow("380077", OPENBIT_MEDIA_SERVER);
 
+	}
+	
+	public void testUseCasePlayLocalPhotoShow() {
+		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_MEDIA_SERVER);
+		Device<?, ?, ?> device = upnpClient.getDevice(OPENBIT_MEDIA_SERVER);
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"380077");
+		//MusicTrack
+		assertNotNull(result);
+		assertNotNull(result.getResult());			
+		assertNotNull(result.getResult().getItems());
+		upnpClient.playLocal(result.getResult().getItems(), false);
+		
+		myWait(120000);
+		
 	}
 
 	private Service getAVTransportService(Device<?, ?, ?> device) {

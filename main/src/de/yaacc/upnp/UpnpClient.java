@@ -407,9 +407,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			intent = new Intent(context, activityClazz);
 		}
 
-		if(mime == null || mime.equals("")){
+		if (mime == null || mime.equals("")) {
 			intent.setData(uri);
-		}else{
+		} else {
 			intent.setDataAndType(uri, mime);
 		}
 
@@ -735,7 +735,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(),
 				"Duration: " + positionInfo.getTrackDuration());
 		Log.d(getClass().getName(),
-				"TrackMetaData: " + positionInfo.getTrackMetaData());		
+				"TrackMetaData: " + positionInfo.getTrackMetaData());
 		intentView("*/*", Uri.parse(positionInfo.getTrackURI()));
 	}
 
@@ -847,8 +847,24 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (container == null)
 			return;
 		Log.d(getClass().getName(), "ContainerId: " + container.getId());
-		for (Item item : container.getItems()) {
+		playLocal(container.getItems(), background);
+	}
 
+	/**
+	 * plays a list of items local.
+	 * 
+	 * @param items
+	 *            the items to be played
+	 * @param background
+	 *            should them played in background?
+	 * 
+	 * 
+	 */
+	public void playLocal(List<Item> items, boolean background) {
+		ArrayList<Uri> imageUris = new ArrayList<Uri>(); // FIXME only for
+															// testing
+		// purpose
+		for (Item item : items) {
 			Res resource = item.getFirstResource();
 			if (resource == null)
 				return;
@@ -860,28 +876,49 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			Log.d(getClass().getName(), "ContentFormat: "
 					+ resource.getProtocolInfo().getContentFormat());
 			Log.d(getClass().getName(), "Value: " + resource.getValue());
-			intentView(resource.getProtocolInfo().getContentFormat(),
-					Uri.parse(resource.getValue()), background);
-			// Wait Duration until next Item is send to receiver intent
-			// TODO intent should get a playlist instead of singel items
-			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-			long millis = 10000; // 10 sec. default
-			if (resource.getDuration() != null) {
-				try {
-					Date date = dateFormat.parse(resource.getDuration());
-					// silence 2 sec
-					millis = date.getTime() + 2000;
+			if (resource.getProtocolInfo().getContentFormat().indexOf("image") > -1) {
+				// FIXME only for testing purpose
+				imageUris.add(Uri.parse(resource.getValue()));
+			} else {
+				intentView(resource.getProtocolInfo().getContentFormat(),
+						Uri.parse(resource.getValue()), background);
+				// Wait Duration until next Item is send to receiver intent
+				// TODO intent should get a playlist instead of singel items
+				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+				long millis = 10000; // 10 sec. default
+				if (resource.getDuration() != null) {
+					try {
+						Date date = dateFormat.parse(resource.getDuration());
+						// silence 2 sec
+						millis = date.getTime() + 2000;
 
-				} catch (ParseException e) {
-					Log.d(getClass().getName(), "bad duration format", e);
+					} catch (ParseException e) {
+						Log.d(getClass().getName(), "bad duration format", e);
+
+					}
+				}
+				try {
+					Thread.sleep(millis);
+				} catch (InterruptedException e) {
+					Log.d(getClass().getName(), "InterruptedException ", e);
 
 				}
 			}
+		}
+		if (imageUris.size() > 0) {// FIXME only for testing purpose
+			Intent intent = new Intent(context, ImageViewerActivity.class);
+			intent.putExtra(ImageViewerActivity.URIS, imageUris);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			try {
-				Thread.sleep(millis);
-			} catch (InterruptedException e) {
-				Log.d(getClass().getName(), "InterruptedException ", e);
-
+				context.startActivity(intent);
+			} catch (ActivityNotFoundException anfe) {
+				Resources res = getContext().getResources();
+				String text = String.format(
+						res.getString(R.string.error_no_activity_found),
+						"image/*");
+				Toast toast = Toast.makeText(getContext(), text,
+						Toast.LENGTH_LONG);
+				toast.show();
 			}
 		}
 	}
@@ -992,7 +1029,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		final ActionState actionState = new ActionState();
 		actionState.actionFinished = false;
 		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
-				service, resource.getValue(), actionState);		
+				service, resource.getValue(), actionState);
 		getControlPoint().execute(setAVTransportURI);
 		waitForActionComplete(actionState);
 		// Now start Playing

@@ -32,6 +32,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.util.LruCache;
@@ -40,6 +41,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
+import de.yaacc.R.id;
 import de.yaacc.config.ImageViewerSettingsActivity;
 import de.yaacc.config.SettingsActivity;
 
@@ -58,8 +60,6 @@ import de.yaacc.config.SettingsActivity;
  * @author Tobias Schöne (openbit)
  * 
  */
-//Fixme New API
-@SuppressLint("NewApi")
 public class ImageViewerActivity extends Activity {
 
 	public static final String URIS = "URIS_PARAM";
@@ -69,6 +69,8 @@ public class ImageViewerActivity extends Activity {
 	private List<Uri> imageUris; // playlist
 	private int currentImageIndex = 0;
 	private Timer pictureShowTimer;
+	private TimerTask pictureShowTimerTask;
+	protected boolean ignoreTimerEvent;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -94,8 +96,9 @@ public class ImageViewerActivity extends Activity {
 			// start async task for showing images
 			retrieveImageTask = new RetrieveImageTask(this);
 			retrieveImageTask.execute(imageUris.toArray(new Uri[imageUris
-					.size()]));
+					.size()]));			
 			play();
+			startTimer();
 		} else {
 			runOnUiThread(new Runnable() {
 				public void run() {
@@ -111,10 +114,12 @@ public class ImageViewerActivity extends Activity {
 	private void initializeCache() {
 		// initialize Cache
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-		// Use 1/8th of the available memory for this memory cache.
-		final int cacheSize = maxMemory / 8;
+		// Use 1/4th of the available memory for this memory cache.
+		final int cacheSize = maxMemory / 4;
+		Log.d(getClass().getName(), "memory cache size: " + cacheSize);
 		imageCache = new LruCache<Uri, Drawable>(cacheSize) {
 
+			@SuppressLint("NewApi")
 			@Override
 			protected int sizeOf(Uri key, Drawable drawable) {
 				if (drawable == null) {
@@ -124,10 +129,11 @@ public class ImageViewerActivity extends Activity {
 				// number of items.
 				// New API: ((BitmapDrawable)
 				// drawable).getBitmap().getByteCount() / 1024;
-				// otherwise: assumption 24 bit per Pixel i.e. 3 byte
-				//return drawable.getBounds().height()
-				//		* drawable.getBounds().width() * 3 / 1024;
-				return ((BitmapDrawable)drawable).getBitmap().getByteCount() / 1024;
+				// otherwise: assumption 32 bit per Pixel i.e. 3 byte
+				//this does not work correctly
+				// return drawable.getBounds().height()
+				// * drawable.getBounds().width() * 4 / 1024;
+				return ((BitmapDrawable) drawable).getBitmap().getByteCount() / 1024;
 			}
 		};
 	}
@@ -151,30 +157,42 @@ public class ImageViewerActivity extends Activity {
 			i = new Intent(this, SettingsActivity.class);
 			startActivity(i);
 			return true;
+		case R.id.menu_next:
+			next();
+			return true;
+		case R.id.menu_pause:
+			pause();
+			return true;
+		case R.id.menu_play:
+			play();
+			return true;
+		case R.id.menu_previous:
+			previous();
+			return true;
+		case R.id.menu_stop:
+			stop();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	public void stopTimer() {
-		if (pictureShowTimer != null) {
-			pictureShowTimer.cancel();
-			pictureShowTimer.purge();
-			pictureShowTimer = null;
-		}
-	}
+	
 
 	/**
 	 * Create and start a timer for picture changing
 	 */
 	public void startTimer() {
-		if (pictureShowTimer == null) {
+		if(pictureShowTimer == null){
 			pictureShowTimer = new Timer();
 			pictureShowTimer.schedule(new TimerTask() {
 
 				@Override
 				public void run() {
-					ImageViewerActivity.this.next();
+					Log.d(getClass().getName(), "TimerEvent" + this);
+					if(!ignoreTimerEvent){
+						ImageViewerActivity.this.next();
+					}
 
 				}
 			}, 0, getDuration());
@@ -186,6 +204,13 @@ public class ImageViewerActivity extends Activity {
 	 */
 	public void play() {
 		if (currentImageIndex < imageUris.size()) {
+			runOnUiThread(new Runnable() {
+				public void run() {
+					Toast toast = Toast.makeText(ImageViewerActivity.this,
+							R.string.play, Toast.LENGTH_SHORT);
+					toast.show();
+				}
+			});
 			showImage(imageUris.get(currentImageIndex));
 		}
 	}
@@ -195,23 +220,46 @@ public class ImageViewerActivity extends Activity {
 	 * default image;
 	 */
 	public void stop() {
-		stopTimer();
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast toast = Toast.makeText(ImageViewerActivity.this,
+						R.string.stop, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
+		ignoreTimerEvent = true;
 		currentImageIndex = 0;
-		imageView.setImageDrawable(Resources.getSystem().getDrawable(
-				R.drawable.ic_launcher));
+		imageView.setImageDrawable(Drawable
+						.createFromPath("@drawable/ic_launcher"));
+		
+		
 	}
 
 	/**
 	 * Stop the timer.
 	 */
 	public void pause() {
-		stopTimer();
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast toast = Toast.makeText(ImageViewerActivity.this,
+						R.string.pause, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
+		ignoreTimerEvent = true;
 	}
 
 	/**
 	 * show the previous image
 	 */
 	public void previous() {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast toast = Toast.makeText(ImageViewerActivity.this,
+						R.string.previous, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
 		currentImageIndex--;
 		if (currentImageIndex < 0) {
 			if (imageUris.size() > 0) {
@@ -220,18 +268,25 @@ public class ImageViewerActivity extends Activity {
 				currentImageIndex = 0;
 			}
 		}
-		play();
+		showImage(imageUris.get(currentImageIndex));
 	}
 
 	/**
 	 * show the next image.
 	 */
 	public void next() {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast toast = Toast.makeText(ImageViewerActivity.this,
+						R.string.next, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
 		currentImageIndex++;
 		if (currentImageIndex > imageUris.size() - 1) {
 			currentImageIndex = 0;
 		}
-		play();
+		showImage(imageUris.get(currentImageIndex));
 	}
 
 	/**
@@ -243,26 +298,33 @@ public class ImageViewerActivity extends Activity {
 		if (uri != null) {
 			Drawable img = getImageFormCache(uri);
 			if (img == null) {
+				Log.d(getClass().getName(), "Image not in cache");
 				// Cache miss we have to load the image synchronous
 				// first we have to stop the timer, because loading might by
 				// slow
-				stopTimer();
+				//FIXME must be an async task
+				ignoreTimerEvent = true;
 				retrieveImageTask.retrieveImage(uri);
 				img = getImageFormCache(uri);
+			} else {
+				Log.d(getClass().getName(), "Image loaded from cache");
 			}
 			final Drawable finalImg = img;
 			runOnUiThread(new Runnable() {
 				public void run() {
-					imageView.setImageDrawable(finalImg);					
+					imageView.setImageDrawable(finalImg);
 				}
 			});
-			startTimer();
+			ignoreTimerEvent=false;
 		}
 
 	}
 
 	public void addImageToCache(Uri key, Drawable drawable) {
-		if(getImageFormCache(key) != null){
+		if(key == null || drawable == null){
+			return;
+		}
+		if (getImageFormCache(key) != null) {
 			removeImageFromCache(key);
 		}
 		imageCache.put(key, drawable);
@@ -273,7 +335,7 @@ public class ImageViewerActivity extends Activity {
 		imageCache.remove(key);
 
 	}
-	
+
 	public Drawable getImageFormCache(Uri key) {
 		return imageCache.get(key);
 	}

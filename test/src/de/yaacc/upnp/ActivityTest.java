@@ -85,7 +85,7 @@ public class ActivityTest extends AndroidTestCase {
 	
 	
 	
-	public void testImageViewerActivitySlideShow() throws Exception{
+	public void testImageViewerActivityPictureShow() throws Exception{
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		String filesDir = getContext().getFilesDir().toString();
 		String fileName = "CIMG5019.JPG";
@@ -105,7 +105,8 @@ public class ActivityTest extends AndroidTestCase {
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
 		
 		context.startActivity(intent);
-		myWait();
+		while(true);
+		//myWait();
 	}
 	
 	
