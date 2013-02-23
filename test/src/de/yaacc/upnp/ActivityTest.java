@@ -89,8 +89,8 @@ public class ActivityTest extends AndroidTestCase {
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		String filesDir = getContext().getFilesDir().toString();
 		String fileName = "CIMG5019.JPG";
-		copyAssetsToSdCard(fileName, filesDir);
-		uris.add(Uri.parse("file:///"+filesDir+"/"+fileName));
+		//copyAssetsToSdCard(fileName, filesDir);
+		//uris.add(Uri.parse("file:///"+filesDir+"/"+fileName));
 		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156304-DSC_0089-2-1600.jpg"));
 		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156246-DSC_0021-1600.jpg"));
 		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156225-raining-bolt-1920x1200.JPG"));

@@ -20,11 +20,12 @@ package de.yaacc;
 
 import java.io.InputStream;
 
-import android.content.SharedPreferences;
+import android.annotation.SuppressLint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -44,57 +45,59 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
 	@Override
 	protected Void doInBackground(Uri... imageUris) {
-		if (imageUris == null)
+		if (imageUris == null || imageUris.length == 0) {
 			return null;
-		for (Uri imageUri : imageUris){
-			retrieveImage(imageUri);
 		}
+		if (imageUris.length > 1) {
+			throw new IllegalStateException("more than one uri to be retrieved");
+		}
+		retrieveImage(imageUris[0]);
 		// This async task has no result
 		return null;
 	}
 
 	/**
-	 * retrieves an image an stores them in the image cache of the ImageViewerActivity.
+	 * retrieves an image an stores them in the image cache of the
+	 * ImageViewerActivity.
+	 * 
 	 * @param imageUri
 	 */
-	public void retrieveImage(Uri imageUri) {
+	private void retrieveImage(Uri imageUri) {
 		{
-			Drawable image;
-			try {
-				Log.d(getClass().getName(), "imgeUri: " + imageUri);
-				if (imageUri != null) {
-					InputStream is = (InputStream) new java.net.URL(
-							imageUri.toString()).getContent();
-					Log.d(getClass().getName(), "InputStram: " + is);
-					image = Drawable.createFromStream(is, "src");
-					if (imageViewerActivity != null) {
-						imageViewerActivity.addImageToCache(imageUri, image);
+			Log.d(getClass().getName(), "imgeUri: " + imageUri);			
+			Drawable image = imageViewerActivity.getImageFormCache(imageUri);
+			if (image == null) {
+				Log.d(getClass().getName(), "Image not in cache");
+				try {
+					if (imageUri != null) {
+						InputStream is = (InputStream) new java.net.URL(
+								imageUri.toString()).getContent();
+						Log.d(getClass().getName(), "InputStram: " + is);
+						image = Drawable.createFromStream(is, "src");
+						if (imageViewerActivity != null) {
+							imageViewerActivity
+									.addImageToCache(imageUri, image);
+						}
+						Log.d(getClass().getName(), "image: " + image);
 					}
-					Log.d(getClass().getName(), "image: " + image);
+				} catch (final Exception e) {
+					image = Drawable.createFromPath("@drawable/ic_launcher");
+					Log.d(getClass().getName(), "Error while processing image",
+							e);
+					imageViewerActivity.runOnUiThread(new Runnable() {
+						public void run() {
+							Toast toast = Toast.makeText(imageViewerActivity,
+									"Exception:" + e.getMessage(),
+									Toast.LENGTH_LONG);
+							toast.show();
+						}
+					});
+
 				}
-			} catch (final Exception e) {
-				image = Drawable.createFromPath("@drawable/ic_launcher");
-				Log.d(getClass().getName(), "Error while processing image", e);
-				imageViewerActivity.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast toast = Toast.makeText(imageViewerActivity,
-								"Exception:" + e.getMessage(),
-								Toast.LENGTH_LONG);
-						toast.show();
-					}
-				});
-
 			}
+			imageViewerActivity.showImage(image);
 
-			
 		}
 	}
-
-	
-	
-	
-		
-	
-	
 
 }
