@@ -1216,7 +1216,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				// silence 3 sec
 				// FIXME silence must be configurable in the settings menu
 				// in order to play container without silence
-				millis = date.getTime() + 3000;
+				millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date
+						.getSeconds()) * 1000 + 3000;
 
 			} catch (ParseException e) {
 				Log.d(getClass().getName(), "bad duration format", e);
@@ -1227,15 +1228,24 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (currentIndex != items.size() - 1) {
 			final int nextIndex = currentIndex + 1;
 			Timer nextItemTimer = new Timer();
-			nextItemTimer.schedule(new TimerTask() {
+			try {
+				Log.d(getClass().getName(), "Play item remote " + item.getId()
+						+ "; duration: " + millis);
+				nextItemTimer.schedule(new TimerTask() {
 
-				@Override
-				public void run() {
-					Log.d(getClass().getName(), "TimerEvent for next item"
-							+ this);
-					playRemote(items, nextIndex, device);
-				}
-			}, millis);
+					@Override
+					public void run() {
+						Log.d(getClass().getName(), "TimerEvent for next item"
+								+ this);
+						playRemote(items, nextIndex, device);
+					}
+				}, millis);
+			} catch (Exception e) {
+				Log.d(getClass().getName(),
+						"Exception during timer shedule item: (" + item.getId()
+								+ ", " + item.getTitle() + " millis:" + millis,
+						e);
+			}
 		}
 	}
 
@@ -1270,9 +1280,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				Date date = dateFormat.parse(resource.getDuration());
 				// silence 3 sec
 				// FIXME silence must be configurable in the settings menu
-				// in order to play container without silence				
-				millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000 + 3000;
-				
+				// in order to play container without silence
+				millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date
+						.getSeconds()) * 1000 + 3000;
 
 			} catch (ParseException e) {
 				Log.d(getClass().getName(), "bad duration format", e);
@@ -1283,7 +1293,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				Uri.parse(resource.getValue()), background);
 		if (currentIndex != items.size() - 1) {
 			final int nextIndex = currentIndex + 1;
-			Log.d(getClass().getName(), "Play item " + item.getId() + "; duration: " + millis);
+			Log.d(getClass().getName(), "Play item " + item.getId()
+					+ "; duration: " + millis);
 			Timer nextItemTimer = new Timer();
 			try {
 				nextItemTimer.schedule(new TimerTask() {
