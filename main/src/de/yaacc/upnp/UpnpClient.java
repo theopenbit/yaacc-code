@@ -39,7 +39,6 @@ import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDAServiceType;
 import org.teleal.cling.model.types.UDN;
@@ -77,6 +76,8 @@ import de.yaacc.R;
 /**
  * A client facade to the upnp lookup and access framework. This class provides
  * all services to manage devices.
+ * 
+ * TODO play methods must be refactored 
  * 
  * @author Tobias Schöne (openbit)
  * 
@@ -742,40 +743,39 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Starts playing a DIDLObject. 
-	 * The object is either an item or a container. 
-	 * In case of a container the content will be fetches synchronous.
-	 * All items of the container will be played. 
-	 * Included subcontainer won't be played.    
-	 * @param object the content to be played
+	 * Starts playing a DIDLObject. The object is either an item or a container.
+	 * In case of a container the content will be fetches synchronous. All items
+	 * of the container will be played. Included subcontainer won't be played.
+	 * 
+	 * @param object
+	 *            the content to be played
 	 */
-	public void play(DIDLObject didlObject){
+	public void play(DIDLObject didlObject) {
 		if (didlObject instanceof Container) {
 			Container container = (Container) didlObject;
-			ContentDirectoryBrowseResult result = browseSync(getProviderDevice(), container.getId());
-			if(result.getUpnpFailure() != null){
-				Toast toast = Toast.makeText(getContext(), result.getUpnpFailure().getDefaultMsg(),
-						Toast.LENGTH_LONG);
+			ContentDirectoryBrowseResult result = browseSync(
+					getProviderDevice(), container.getId());
+			if (result.getUpnpFailure() != null) {
+				Toast toast = Toast.makeText(getContext(), result
+						.getUpnpFailure().getDefaultMsg(), Toast.LENGTH_LONG);
 				toast.show();
 				return;
 			}
-			
+
 			DIDLContent content = result.getResult();
-			if(content.getContainers().size() > 0 ){
-				//TODO is it right to play the first container? 
-				//should we play only the  items?
+			if (content.getContainers().size() > 0) {
+				// TODO is it right to play the first container?
+				// should we play only the items?
 				play(content.getFirstContainer());
-			} else {				
+			} else {
 				play(content.getItems());
 			}
-			
 
 		} else if (didlObject instanceof Item) {
 			play((Item) didlObject);
 		}
 	}
-	
-	
+
 	/**
 	 * Starts playing an item on the receiver device, if the device id is equals @see
 	 * {@link UpnpClient.LOCAL_UID} a local play will start.
@@ -845,9 +845,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 */
 	public void play(List<Item> items) {
-		play(items,getReceiverDeviceId());
+		play(items, getReceiverDeviceId());
 	}
-	
+
 	/**
 	 * Starts playing a List of Items. if the device id is equals @see
 	 * {@link UpnpClient.LOCAL_UID} a local play will start.
@@ -932,50 +932,20 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 */
 	public void playLocal(List<Item> items, boolean background) {
-		ArrayList<Uri> imageUris = new ArrayList<Uri>(); // FIXME only for
-															// testing
-		// purpose
+		// FIXME only for testing purpose
+		// select all image uris 
+		ArrayList<Uri> imageUris = new ArrayList<Uri>(); 		
 		for (Item item : items) {
 			Res resource = item.getFirstResource();
-			if (resource == null)
-				return;
-
-			Log.d(getClass().getName(), "ImportUri: " + resource.getImportUri());
-			Log.d(getClass().getName(), "Duration: " + resource.getDuration());
-			Log.d(getClass().getName(),
-					"ProtocolInfo: " + resource.getProtocolInfo());
-			Log.d(getClass().getName(), "ContentFormat: "
-					+ resource.getProtocolInfo().getContentFormat());
-			Log.d(getClass().getName(), "Value: " + resource.getValue());
+			if (resource == null){
+				break;
+			}					
 			if (resource.getProtocolInfo().getContentFormat().indexOf("image") > -1) {
 				// FIXME only for testing purpose
 				imageUris.add(Uri.parse(resource.getValue()));
-			} else {
-				intentView(resource.getProtocolInfo().getContentFormat(),
-						Uri.parse(resource.getValue()), background);
-				// Wait Duration until next Item is send to receiver intent
-				// TODO intent should get a playlist instead of singel items
-				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-				long millis = 10000; // 10 sec. default
-				if (resource.getDuration() != null) {
-					try {
-						Date date = dateFormat.parse(resource.getDuration());
-						// silence 2 sec
-						millis = date.getTime() + 2000;
-
-					} catch (ParseException e) {
-						Log.d(getClass().getName(), "bad duration format", e);
-
-					}
-				}
-				try {
-					Thread.sleep(millis);
-				} catch (InterruptedException e) {
-					Log.d(getClass().getName(), "InterruptedException ", e);
-
-				}
 			}
-		}
+		}	
+			
 		if (imageUris.size() > 0) {// FIXME only for testing purpose
 			Intent intent = new Intent(context, ImageViewerActivity.class);
 			intent.putExtra(ImageViewerActivity.URIS, imageUris);
@@ -991,6 +961,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 						Toast.LENGTH_LONG);
 				toast.show();
 			}
+		}else {
+			playLocal(items, 0, background);
 		}
 	}
 
@@ -1048,37 +1020,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public void playRemote(List<Item> items, Device<?, ?, ?> device) {
 		if (items == null)
 			return;
-		for (Item item : items) {
 
-			Res resource = item.getFirstResource();
-			if (resource == null)
-				return;
-
-			playRemote(item, device);
-			// Wait Duration until next Item is send to receiver intent
-			// TODO intent should get a playlist instead of singel items
-			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-			long millis = 10000; // 10 sec. default
-			if (resource.getDuration() != null) {
-				try {
-					Date date = dateFormat.parse(resource.getDuration());
-					// silence 2 sec
-					// FIXME silence must be configurable in the settings menu
-					// in order to play container without silence
-					millis = date.getTime() + 2000;
-
-				} catch (ParseException e) {
-					Log.d(getClass().getName(), "bad duration format", e);
-
-				}
-			}
-			try {
-				Thread.sleep(millis);
-			} catch (InterruptedException e) {
-				Log.d(getClass().getName(), "InterruptedException ", e);
-
-			}
-		}
+		playRemote(items, 0, device);
 	}
 
 	/**
@@ -1240,4 +1183,115 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return this.visitedObjectIds.peekLast();
 	}
 
+	/**
+	 * Create and start a timer for the next content change. The timer runs only
+	 * once.
+	 * 
+	 */
+	private void playRemote(final List<Item> items, final int currentIndex,
+			final Device<?, ?, ?> device) {
+		if (currentIndex < 0 || currentIndex >= items.size()) {
+			return;
+		}
+		Item item = items.get(currentIndex);
+		if (item == null) {
+			Log.d(getClass().getName(), "Item is null");
+			return;
+		}
+		Res resource = item.getFirstResource();
+		if (resource == null) {
+			Log.d(getClass().getName(),
+					"No ressoucrce for item found: " + item.getId());
+			return;
+		}
+		// calculate duration
+		// Wait Duration until next Item is send to receiver intent
+		// TODO intent should get a playlist instead of singel items
+		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+		long millis = 10000; // 10 sec. default
+		if (resource.getDuration() != null) {
+			try {
+				Date date = dateFormat.parse(resource.getDuration());
+				// silence 3 sec
+				// FIXME silence must be configurable in the settings menu
+				// in order to play container without silence
+				millis = date.getTime() + 3000;
+
+			} catch (ParseException e) {
+				Log.d(getClass().getName(), "bad duration format", e);
+
+			}
+		}
+		playRemote(item, device);
+		if (currentIndex != items.size() - 1) {
+			final int nextIndex = currentIndex + 1;
+			Timer nextItemTimer = new Timer();
+			nextItemTimer.schedule(new TimerTask() {
+
+				@Override
+				public void run() {
+					Log.d(getClass().getName(), "TimerEvent for next item"
+							+ this);
+					playRemote(items, nextIndex, device);
+				}
+			}, millis);
+		}
+	}
+	
+	
+	/**
+	 * Create and start a timer for the next content change. The timer runs only
+	 * once.
+	 * 
+	 */
+	private void playLocal(final List<Item> items, final int currentIndex,
+			final boolean background) {
+		if (currentIndex < 0 || currentIndex >= items.size()) {
+			return;
+		}
+		Item item = items.get(currentIndex);
+		if (item == null) {
+			Log.d(getClass().getName(), "Item is null");
+			return;
+		}
+		Res resource = item.getFirstResource();
+		if (resource == null) {
+			Log.d(getClass().getName(),
+					"No ressoucrce for item found: " + item.getId());
+			return;
+		}
+		// calculate duration
+		// Wait Duration until next Item is send to receiver intent
+		// TODO intent should get a playlist instead of singel items
+		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+		long millis = 10000; // 10 sec. default
+		if (resource.getDuration() != null) {
+			try {
+				Date date = dateFormat.parse(resource.getDuration());
+				// silence 3 sec
+				// FIXME silence must be configurable in the settings menu
+				// in order to play container without silence
+				millis = date.getTime() + 3000;
+
+			} catch (ParseException e) {
+				Log.d(getClass().getName(), "bad duration format", e);
+
+			}
+		}
+		intentView(resource.getProtocolInfo().getContentFormat(),
+				Uri.parse(resource.getValue()), background);
+		if (currentIndex != items.size() - 1) {
+			final int nextIndex = currentIndex + 1;
+			Timer nextItemTimer = new Timer();
+			nextItemTimer.schedule(new TimerTask() {
+
+				@Override
+				public void run() {
+					Log.d(getClass().getName(), "TimerEvent for next item"
+							+ this);
+					playLocal(items, nextIndex, background);
+				}
+			}, millis);
+		}
+	}
 }

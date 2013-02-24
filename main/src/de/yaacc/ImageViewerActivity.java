@@ -24,11 +24,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask.Status;
@@ -66,11 +64,11 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	public static final String URIS = "URIS_PARAM";
 	private ImageView imageView;
 	private RetrieveImageTask retrieveImageTask;
-	private LruCache<Uri,Drawable> imageCache;
+	private LruCache<Uri, Drawable> imageCache;
 
 	private List<Uri> imageUris; // playlist
 	private int currentImageIndex = 0;
-	private Timer pictureShowTimer;
+
 	private boolean pictureShowActive = false;
 
 	@SuppressWarnings("unchecked")
@@ -157,18 +155,18 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * once.
 	 */
 	public void startTimer() {
-		if (pictureShowTimer == null) {
-			pictureShowTimer = new Timer();
-			pictureShowTimer.schedule(new TimerTask() {
 
-				@Override
-				public void run() {
-					Log.d(getClass().getName(), "TimerEvent" + this);
-					ImageViewerActivity.this.next();
+		Timer pictureShowTimer = new Timer();
+		pictureShowTimer.schedule(new TimerTask() {
 
-				}
-			}, getDuration());
-		}
+			@Override
+			public void run() {
+				Log.d(getClass().getName(), "TimerEvent" + this);
+				ImageViewerActivity.this.next();
+
+			}
+		}, getDuration());
+
 	}
 
 	/**
@@ -182,7 +180,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 							R.string.play, Toast.LENGTH_SHORT);
 					toast.show();
 				}
-			});			
+			});
 			loadImage();
 			// Start the pictureShow
 			pictureShowActive = true;
@@ -195,7 +193,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * 
 	 */
 	private void loadImage() {
-		if(retrieveImageTask.getStatus() == Status.RUNNING){
+		if (retrieveImageTask.getStatus() == Status.RUNNING) {
 			return;
 		}
 		retrieveImageTask = new RetrieveImageTask(this);
@@ -340,7 +338,6 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	}
 
-	
 	private void initializeCache() {
 		// initialize Cache
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -349,7 +346,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		Log.d(getClass().getName(), "memory cache size: " + cacheSize);
 		imageCache = new LruCache<Uri, Drawable>(cacheSize) {
 
-			//@SuppressLint("NewApi")
+			// @SuppressLint("NewApi")
 			@Override
 			protected int sizeOf(Uri key, Drawable drawable) {
 				if (drawable == null) {
@@ -360,15 +357,15 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				// New API: ((BitmapDrawable)
 				// drawable).getBitmap().getByteCount() / 1024;
 				// otherwise: assumption 32 bit per Pixel i.e. 3 byte
-				//this does not work correctly
-				 return drawable.getBounds().height()
-				 * drawable.getBounds().width() * 4 / 1024;
-				//return ((BitmapDrawable) drawable).getBitmap().getByteCount() / 1024;
+				// this does not work correctly
+				return drawable.getBounds().height()
+						* drawable.getBounds().width() * 4 / 1024;
+				// return ((BitmapDrawable) drawable).getBitmap().getByteCount()
+				// / 1024;
 			}
 		};
 	}
-	
-	
+
 	public void addImageToCache(Uri key, Drawable drawable) {
 		if (key == null || drawable == null) {
 			return;
