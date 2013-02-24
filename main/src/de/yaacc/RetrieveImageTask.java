@@ -95,7 +95,12 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
 				}
 			}
-			imageViewerActivity.showImage(image);
+			final Drawable finalImage = image;
+			imageViewerActivity.runOnUiThread(new Runnable() {
+				public void run() {
+						imageViewerActivity.showImage(finalImage);
+				}
+			});		
 
 		}
 	}
