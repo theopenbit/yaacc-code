@@ -50,6 +50,8 @@ import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.BrowseFlag;
+import org.teleal.cling.support.model.DIDLContent;
+import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.SortCriterion;
@@ -740,6 +742,41 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
+	 * Starts playing a DIDLObject. 
+	 * The object is either an item or a container. 
+	 * In case of a container the content will be fetches synchronous.
+	 * All items of the container will be played. 
+	 * Included subcontainer won't be played.    
+	 * @param object the content to be played
+	 */
+	public void play(DIDLObject didlObject){
+		if (didlObject instanceof Container) {
+			Container container = (Container) didlObject;
+			ContentDirectoryBrowseResult result = browseSync(getProviderDevice(), container.getId());
+			if(result.getUpnpFailure() != null){
+				Toast toast = Toast.makeText(getContext(), result.getUpnpFailure().getDefaultMsg(),
+						Toast.LENGTH_LONG);
+				toast.show();
+				return;
+			}
+			
+			DIDLContent content = result.getResult();
+			if(content.getContainers().size() > 0 ){
+				//TODO is it right to play the first container? 
+				//should we play only the  items?
+				play(content.getFirstContainer());
+			} else {				
+				play(content.getItems());
+			}
+			
+
+		} else if (didlObject instanceof Item) {
+			play((Item) didlObject);
+		}
+	}
+	
+	
+	/**
 	 * Starts playing an item on the receiver device, if the device id is equals @see
 	 * {@link UpnpClient.LOCAL_UID} a local play will start.
 	 * 
@@ -783,9 +820,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * Starts playing a container. if the device id is equals @see
-	 * {@link UpnpClient.LOCAL_UID} a local play will start.
+	 * {@link UpnpClient.LOCAL_UID} a local play will start. All items of the
+	 * container are played. Included containers will not played.
 	 * 
-	 * @param contaienr
+	 * @param container
 	 *            the container to be played
 	 * @param deviceId
 	 *            the device id
@@ -795,6 +833,37 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			playLocal(container);
 		} else {
 			playRemote(container, getDevice(deviceId));
+		}
+	}
+
+	/**
+	 * Starts playing a List of Items.
+	 * 
+	 * 
+	 * @param contaienr
+	 *            the container to be played
+	 * 
+	 */
+	public void play(List<Item> items) {
+		play(items,getReceiverDeviceId());
+	}
+	
+	/**
+	 * Starts playing a List of Items. if the device id is equals @see
+	 * {@link UpnpClient.LOCAL_UID} a local play will start.
+	 * 
+	 * 
+	 * @param contaienr
+	 *            the container to be played
+	 * @param deviceId
+	 *            the device id
+	 */
+	public void play(List<Item> items, String deviceId) {
+		if (LOCAL_UID.equals(deviceId)) {
+			// FIXME Handling background play must be included
+			playLocal(items, false);
+		} else {
+			playRemote(items, getDevice(deviceId));
 		}
 	}
 
@@ -825,7 +894,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Starts playing a container locally. All items are played
+	 * Starts playing a container locally. All items are played. Included
+	 * containers will not played.
 	 * 
 	 * @param item
 	 *            the item
@@ -836,7 +906,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Starts playing a container locally. All items are played
+	 * Starts playing a container locally. All items are played. Included
+	 * containers will not played.
 	 * 
 	 * @param item
 	 *            the item
@@ -953,7 +1024,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Starts playing a container on a remote device. All items are played
+	 * Starts playing a container on a remote device. All items are played.
+	 * Included containers will not played.
 	 * 
 	 * @param container
 	 *            the container
@@ -964,7 +1036,19 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (container == null)
 			return;
 		Log.d(getClass().getName(), "ContainerId: " + container.getId());
-		for (Item item : container.getItems()) {
+		playRemote(container.getItems(), device);
+	}
+
+	/**
+	 * Starts playing a list of items.
+	 * 
+	 * @param items
+	 * @param device
+	 */
+	public void playRemote(List<Item> items, Device<?, ?, ?> device) {
+		if (items == null)
+			return;
+		for (Item item : items) {
 
 			Res resource = item.getFirstResource();
 			if (resource == null)

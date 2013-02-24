@@ -314,6 +314,8 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		return result;
 	}
 
+	//FIXME media url have to include target filename i
+	//FIXME otherwise an upnp client isn't able to determine the mimetype 
 	private List<Photo> createMediaStorePhotos(String parentID) {
 		List<Photo> result = new ArrayList<Photo>();
 		// Query for all images on external storage
