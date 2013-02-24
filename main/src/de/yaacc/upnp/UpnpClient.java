@@ -21,6 +21,7 @@ package de.yaacc.upnp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -77,7 +78,7 @@ import de.yaacc.R;
  * A client facade to the upnp lookup and access framework. This class provides
  * all services to manage devices.
  * 
- * TODO play methods must be refactored 
+ * TODO play methods must be refactored
  * 
  * @author Tobias Schöne (openbit)
  * 
@@ -933,19 +934,19 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public void playLocal(List<Item> items, boolean background) {
 		// FIXME only for testing purpose
-		// select all image uris 
-		ArrayList<Uri> imageUris = new ArrayList<Uri>(); 		
+		// select all image uris
+		ArrayList<Uri> imageUris = new ArrayList<Uri>();
 		for (Item item : items) {
 			Res resource = item.getFirstResource();
-			if (resource == null){
+			if (resource == null) {
 				break;
-			}					
+			}
 			if (resource.getProtocolInfo().getContentFormat().indexOf("image") > -1) {
 				// FIXME only for testing purpose
 				imageUris.add(Uri.parse(resource.getValue()));
 			}
-		}	
-			
+		}
+
 		if (imageUris.size() > 0) {// FIXME only for testing purpose
 			Intent intent = new Intent(context, ImageViewerActivity.class);
 			intent.putExtra(ImageViewerActivity.URIS, imageUris);
@@ -961,7 +962,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 						Toast.LENGTH_LONG);
 				toast.show();
 			}
-		}else {
+		} else {
 			playLocal(items, 0, background);
 		}
 	}
@@ -1237,8 +1238,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			}, millis);
 		}
 	}
-	
-	
+
 	/**
 	 * Create and start a timer for the next content change. The timer runs only
 	 * once.
@@ -1270,8 +1270,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				Date date = dateFormat.parse(resource.getDuration());
 				// silence 3 sec
 				// FIXME silence must be configurable in the settings menu
-				// in order to play container without silence
-				millis = date.getTime() + 3000;
+				// in order to play container without silence				
+				millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000 + 3000;
+				
 
 			} catch (ParseException e) {
 				Log.d(getClass().getName(), "bad duration format", e);
@@ -1282,16 +1283,24 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				Uri.parse(resource.getValue()), background);
 		if (currentIndex != items.size() - 1) {
 			final int nextIndex = currentIndex + 1;
+			Log.d(getClass().getName(), "Play item " + item.getId() + "; duration: " + millis);
 			Timer nextItemTimer = new Timer();
-			nextItemTimer.schedule(new TimerTask() {
+			try {
+				nextItemTimer.schedule(new TimerTask() {
 
-				@Override
-				public void run() {
-					Log.d(getClass().getName(), "TimerEvent for next item"
-							+ this);
-					playLocal(items, nextIndex, background);
-				}
-			}, millis);
+					@Override
+					public void run() {
+						Log.d(getClass().getName(), "TimerEvent for next item"
+								+ this);
+						playLocal(items, nextIndex, background);
+					}
+				}, millis);
+			} catch (Exception e) {
+				Log.d(getClass().getName(),
+						"Exception during timer shedule item: (" + item.getId()
+								+ ", " + item.getTitle() + " millis:" + millis,
+						e);
+			}
 		}
 	}
 }
