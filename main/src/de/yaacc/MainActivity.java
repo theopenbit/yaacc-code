@@ -20,15 +20,22 @@ package de.yaacc;
 import java.util.ArrayList;
 
 import org.teleal.cling.model.meta.Device;
+import org.teleal.cling.support.model.DIDLContent;
+import org.teleal.cling.support.model.DIDLObject;
+import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.Item;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +46,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import de.yaacc.config.SettingsActivity;
+import de.yaacc.upnp.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -51,6 +59,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	BrowseItemClickListener bItemClickListener = null;
 	
 	
+
+	private DIDLObject selectedDIDLObject;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,11 +78,18 @@ public class MainActivity extends Activity implements OnClickListener {
 		bItemClickListener = new BrowseItemClickListener();
 		
 		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
+
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (preferences.getBoolean(
+				getString(R.string.settings_local_server_chkbx), true)) {
 			// Start upnpserver service for avtransport
-			Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
+			Intent svc = new Intent(getApplicationContext(),
+					YaaccUpnpServerService.class);
 			getApplicationContext().startService(svc);
 		}
-		
+
 		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
 		showDeviceNumber.setOnClickListener(this);
 	}
@@ -98,7 +116,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		// Define where to show the folder contents
 		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
-		
+
 		// Get Try to get selected device
 		Device selectedDevice = null;
 		
@@ -123,9 +141,37 @@ public class MainActivity extends Activity implements OnClickListener {
     		toast.show();
     	}
 		
+
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (preferences.getString(
+				getString(R.string.settings_selected_provider_title), null) != null) {
+			selectedDevice = uClient
+					.getDevice(preferences
+							.getString(
+									getString(R.string.settings_selected_provider_title),
+									null));
+		}
+
+		// Load adapter if selected device is configured and found
+		if (selectedDevice != null) {
+			bItemAdapter = new BrowseItemAdapter(this, "0");
+			deviceList.setAdapter(bItemAdapter);
+
+			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+			deviceList.setOnItemClickListener(bItemClickListener);
+		} else {
+			Context context = getApplicationContext();
+			CharSequence text = getString(R.string.browse_no_content_found);
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
+		}
+
 	}
-	
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		return bItemClickListener.onContextItemSelected(item, getApplicationContext());
@@ -135,22 +181,65 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onBackPressed() {
 
-		if("0".equals(this.uClient.getCurrentObjectId())){
+		if ("0".equals(this.uClient.getCurrentObjectId())) {
 			super.finish();
 		}
+		// FIXME Confusing variable names aren't useful
 		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
-		
-		bItemAdapter = new BrowseItemAdapter(this,this.uClient.getLastVisitedObjectId());
-    	deviceList.setAdapter(bItemAdapter);
-    	
-    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
-    	deviceList.setOnItemClickListener(bItemClickListener);
-    	
 
-    	deviceList.setOnCreateContextMenuListener(bItemClickListener);
-    	
+		bItemAdapter = new BrowseItemAdapter(this,
+				this.uClient.getLastVisitedObjectId());
+		deviceList.setAdapter(bItemAdapter);
+
+		BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+		deviceList.setOnItemClickListener(bItemClickListener);
+
+		registerForContextMenu(deviceList);
+
 	}
-	
 
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
 
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+		if (v instanceof ListView) {
+			ListView listView = (ListView) v;
+			Object item = listView.getAdapter().getItem(info.position);
+			if (item instanceof DIDLObject) {
+				selectedDIDLObject = (DIDLObject) item;
+			}
+		}
+		menu.setHeaderTitle(v.getContext().getString(
+				R.string.browse_context_title));
+
+		ArrayList<String> menuItems = new ArrayList<String>();
+
+		// TODO: I think there might be some item dependent actions in the
+		// future, so this is designed as a dynamic list
+		menuItems.add(v.getContext().getString(R.string.browse_context_play));
+		menuItems.add(v.getContext().getString(
+				R.string.browse_context_add_to_playplist));
+		menuItems.add(v.getContext()
+				.getString(R.string.browse_context_download));
+
+		// TODO: Check via bytecode whether listsize is calculated every loop or
+		// just once, if do calculation before calling the loop
+		for (int i = 0; i < menuItems.toArray(new String[menuItems.size()]).length; i++) {
+			menu.add(Menu.NONE, i, i, menuItems.get(i));
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		if (item.getTitle().equals(getString(R.string.browse_context_play))) {
+			uClient.play(selectedDIDLObject);
+		} else {
+			Toast toast = Toast.makeText(this, "Not yet implemented",
+					Toast.LENGTH_LONG);
+			toast.show();
+			return false;
+		}
+		return true;
+	}
 }

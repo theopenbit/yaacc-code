@@ -13,41 +13,42 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-public class BrowseItemClickListener implements OnItemClickListener, OnCreateContextMenuListener{
-
+public class BrowseItemClickListener implements OnItemClickListener
+		 {
 
 	@Override
-	public void onItemClick(AdapterView<?> listView, View arg1, int position, long id) {
+	public void onItemClick(AdapterView<?> listView, View arg1, int position,
+			long id) {
 
 		ListView a = (ListView) listView.findViewById(R.id.deviceList);
 		BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
-		
-		DIDLObject currentObject = adapter.getFolder(position);
-		
-		if(currentObject instanceof Container){
-			// if the current id is null, go back to the top level
-			String newObjectId = currentObject.getId()==null?"0":adapter.getFolder(position).getId();
-			
-		BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(listView.getContext(),newObjectId);
-    	a.setAdapter(bItemAdapter);
-    	
-    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
-    	a.setOnItemClickListener(bItemClickListener);
-		
-		} else {
-			MainActivity.uClient.play((Item)currentObject);
-		}
-		
-		
-				    	
-	}
 
+		DIDLObject currentObject = adapter.getFolder(position);
+
+		if (currentObject instanceof Container) {
+			// if the current id is null, go back to the top level
+			String newObjectId = currentObject.getId() == null ? "0" : adapter
+					.getFolder(position).getId();
+
+			BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
+					listView.getContext(), newObjectId);
+			a.setAdapter(bItemAdapter);
+
+			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+			a.setOnItemClickListener(bItemClickListener);
+
+		} else {
+			MainActivity.uClient.play((Item) currentObject);
+		}
+
+<<<<<<< HEAD
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
@@ -96,8 +97,11 @@ public class BrowseItemClickListener implements OnItemClickListener, OnCreateCon
 	}
 
 	
+=======
+	}
+
+>>>>>>> 5344dee9d375f5df4a652d409ac4e6c30af20367
 	
-	
-		
+  
 	
 }

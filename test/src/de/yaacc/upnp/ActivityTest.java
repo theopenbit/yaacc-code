@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.yaacc.ImageViewerActivity;
 import android.annotation.SuppressLint;
@@ -55,9 +57,7 @@ public class ActivityTest extends AndroidTestCase {
 		copyAssetsToSdCard(fileName, filesDir);
 		Context context =  getContext();
 		
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		
-		intent = new Intent(context, ImageViewerActivity.class);		
+		Intent intent = new Intent(context, ImageViewerActivity.class);		
 		
 		intent.setDataAndType(Uri.parse("file:///"+filesDir+"/"+fileName), "image/jpeg");
 
@@ -73,10 +73,7 @@ public class ActivityTest extends AndroidTestCase {
 		String fileName = "CIMG5019.JPG";
 		copyAssetsToSdCard(fileName, filesDir);
 		Context context =  getContext();
-		
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		
-		intent = new Intent(context, ImageViewerActivity.class);		
+		Intent intent = new Intent(context, ImageViewerActivity.class);		
 		
 		intent.setDataAndType(Uri.parse("file:///"+filesDir+"/"+fileName), "image/jpeg");
 
@@ -85,6 +82,34 @@ public class ActivityTest extends AndroidTestCase {
 		context.startActivity(intent);
 		myWait();
 	}
+	
+	
+	
+	public void testImageViewerActivityPictureShow() throws Exception{
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		String filesDir = getContext().getFilesDir().toString();
+		String fileName = "CIMG5019.JPG";
+		//copyAssetsToSdCard(fileName, filesDir);
+		//uris.add(Uri.parse("file:///"+filesDir+"/"+fileName));
+		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156304-DSC_0089-2-1600.jpg"));
+		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156246-DSC_0021-1600.jpg"));
+		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156225-raining-bolt-1920x1200.JPG"));
+		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156223-kungsleden1900x1200.JPG"));
+		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156218-DSC_0012-1600.jpg"));		
+		Context context =  getContext();		
+		Intent intent = new Intent(context, ImageViewerActivity.class);				
+		intent.putExtra(ImageViewerActivity.URIS,uris);
+		
+		//Starting an activity form outside any other activity have to be allowed 
+		//by this flag
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
+		
+		context.startActivity(intent);
+		while(true);
+		//myWait();
+	}
+	
+	
 	
 	public void testAddAssetsToMediaStore() throws Exception{
 		addAssetsToMediaStore();

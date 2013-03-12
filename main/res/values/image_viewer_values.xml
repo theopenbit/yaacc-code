@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="image_viewer_slide_stay_duration_entries">
+        <item>"1 sec"</item>
+        <item>"2 sec"</item>
+        <item>"3 sec"</item>
+        <item>"4 sec"</item>
+        <item>"5 sec"</item>
+        <item>"8 sec"</item>
+        <item>"10 sec"</item>
+    </string-array>
+    <string-array name="image_viewer_slide_stay_duration_values">
+        <item>"1000"</item>
+        <item>"2000"</item>
+        <item>"3000"</item>
+        <item>"4000"</item>
+        <item>"5000"</item>
+        <item>"8000"</item>
+        <item>"10000"</item>
+     </string-array>   
+</resources>

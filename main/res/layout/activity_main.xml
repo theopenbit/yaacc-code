@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ListView android:id="@+id/deviceList"
+    <ListView
+        android:id="@+id/deviceList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
-        
+        android:layout_below="@+id/refreshMainFolder"
+        android:layout_centerHorizontal="true" />
     
     <Button android:id="@+id/refreshMainFolder"
         android:text="@string/browse_main_folder"

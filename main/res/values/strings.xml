@@ -12,6 +12,7 @@
     <string name="title_activity_upnp_browser">UpnpBrowserActivity</string>
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_image_viewer_settings">Settings for image viewer</string>
     <string name="title_activity_generic_browse">GenericBrowseActivity</string>
     <string name="settings_category_send_rec">Sending and Receiving</string>
     <string name="settings_category_browsing">Media browsing behavior</string>
@@ -41,6 +42,15 @@
     <string name="error_upnp_generic">An unknown error happened while browsing</string>
     <string name="error_upnp_specific">The following error occurred:</string>
     <string name="error_no_activity_found">No activity found for playing mimetype \'%1$s\'</string>
+    <string name="image_viewer_settings_duration">picture stay duration</string>
+    <string name="image_viewer_settings_duration_key">image_viewer_settings_duration_key</string>
+    <string name="yaacc_menu_settings">YAACC settings</string>
+    <string name="no_valid_uri_data_found_to_display">No valid uri data found to display</string>
+    <string name="play">play</string>
+    <string name="stop">stop</string>
+    <string name="pause">pause</string>
+    <string name="previous">previous</string>
+    <string name="next">next</string>
     
 
 </resources>

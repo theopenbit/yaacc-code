@@ -19,67 +19,90 @@
 package de.yaacc;
 
 import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-
+import android.support.v4.util.LruCache;
+import android.util.Log;
+import android.widget.Toast;
 
 /**
- * Background retriever for network images. 
- * @author Tobias Schöne (openbit)  
+ * Background task for retrieving network images.
+ * 
+ * @author Tobias Schoene (openbit)
  * 
  */
-public class RetrieveImageTask extends AsyncTask<Uri, Void, Drawable>{
+public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
 	private ImageViewerActivity imageViewerActivity;
 
-	
 	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
 		this.imageViewerActivity = imageViewerActivity;
 	}
-	
-	@Override
-	protected Drawable doInBackground(Uri... imageUris) {
-		if(imageUris == null) return null;
-		Drawable image;
-		try {
-			Uri imageUri = imageUris[0];
-			System.out.println("imgeUri: " + imageUri);
-			InputStream is = (InputStream) new java.net.URL(imageUri.toString())
-					.getContent();
-			System.out.println("InputStram: " + is);
-			image = Drawable.createFromStream(is, "src");
-			System.out.println("image: " + image);
-		} catch (Exception e) {
-			image = Drawable.createFromPath("@drawable/ic_launcher");
-			e.printStackTrace();
 
+	@Override
+	protected Void doInBackground(Uri... imageUris) {
+		if (imageUris == null || imageUris.length == 0) {
+			return null;
 		}
-		return image;
+		if (imageUris.length > 1) {
+			throw new IllegalStateException("more than one uri to be retrieved");
+		}
+		retrieveImage(imageUris[0]);
+		// This async task has no result
+		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+	/**
+	 * retrieves an image an stores them in the image cache of the
+	 * ImageViewerActivity.
+	 * 
+	 * @param imageUri
 	 */
-	@Override
-	protected void onPostExecute(Drawable result) {		
-		super.onPostExecute(result);
-		if(imageViewerActivity != null){
-			try {
-				imageViewerActivity.showImage(get());
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	private void retrieveImage(Uri imageUri) {
+		{
+			Log.d(getClass().getName(), "imgeUri: " + imageUri);			
+			Drawable image = imageViewerActivity.getImageFormCache(imageUri);
+			if (image == null) {
+				Log.d(getClass().getName(), "Image not in cache");
+				try {
+					if (imageUri != null) {
+						InputStream is = (InputStream) new java.net.URL(
+								imageUri.toString()).getContent();
+						Log.d(getClass().getName(), "InputStram: " + is);
+						image = Drawable.createFromStream(is, "src");
+						if (imageViewerActivity != null) {
+							imageViewerActivity
+									.addImageToCache(imageUri, image);
+						}
+						Log.d(getClass().getName(), "image: " + image);
+					}
+				} catch (final Exception e) {
+					image = Drawable.createFromPath("@drawable/ic_launcher");
+					Log.d(getClass().getName(), "Error while processing image",
+							e);
+					imageViewerActivity.runOnUiThread(new Runnable() {
+						public void run() {
+							Toast toast = Toast.makeText(imageViewerActivity,
+									"Exception:" + e.getMessage(),
+									Toast.LENGTH_LONG);
+							toast.show();
+						}
+					});
+
+				}
 			}
+			final Drawable finalImage = image;
+			imageViewerActivity.runOnUiThread(new Runnable() {
+				public void run() {
+						imageViewerActivity.showImage(finalImage);
+				}
+			});		
+
 		}
-		
 	}
-	
-	
 
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="image_viewer_slide_stay_duration_entries">
+        <item>"1 Sek"</item>
+        <item>"2 Sek"</item>
+        <item>"3 Sek"</item>
+        <item>"4 Sek"</item>
+        <item>"5 Sek"</item>
+        <item>"8 Sek"</item>
+        <item>"10 Sek"</item>
+    </string-array>   
+</resources>
