@@ -27,7 +27,6 @@ public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;
 	private List<DIDLObject> objects;
-	private String parentObjectId;
 	
 	public BrowseItemAdapter(Context ctx, String objectId){
 		

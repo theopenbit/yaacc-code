@@ -17,6 +17,8 @@
  */
 package de.yaacc;
 
+import java.util.ArrayList;
+
 import org.teleal.cling.model.meta.Device;
 
 import android.app.Activity;
@@ -26,10 +28,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -43,17 +48,24 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private BrowseItemAdapter bItemAdapter;
 	
+	BrowseItemClickListener bItemClickListener = null;
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// local server startup
 		uClient = new UpnpClient();
 		uClient.initialize(getApplicationContext());
 		
+		// load preferences
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+		// initialize click listener
+		bItemClickListener = new BrowseItemClickListener();
+		
 		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
 			// Start upnpserver service for avtransport
 			Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
@@ -101,7 +113,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	    	bItemAdapter = new BrowseItemAdapter(this,"0");
 	    	deviceList.setAdapter(bItemAdapter);
 	    	
-	    	BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
 	    	deviceList.setOnItemClickListener(bItemClickListener);
     	} else {
     		Context context = getApplicationContext();
@@ -112,6 +123,12 @@ public class MainActivity extends Activity implements OnClickListener {
     		toast.show();
     	}
 		
+	}
+	
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		return bItemClickListener.onContextItemSelected(item, getApplicationContext());
 	}
 	
 	

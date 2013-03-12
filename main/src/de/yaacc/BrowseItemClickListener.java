@@ -6,6 +6,7 @@ import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
+import android.content.Context;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -13,8 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
 public class BrowseItemClickListener implements OnItemClickListener, OnCreateContextMenuListener{
@@ -49,10 +51,7 @@ public class BrowseItemClickListener implements OnItemClickListener, OnCreateCon
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
-			
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-		
-	    menu.setHeaderTitle(v.getContext().getString(R.string.browse_context_title));
+		menu.setHeaderTitle(v.getContext().getString(R.string.browse_context_title));
 	    
 	    ArrayList<String> menuItems = new ArrayList<String>();
 	    
@@ -65,7 +64,38 @@ public class BrowseItemClickListener implements OnItemClickListener, OnCreateCon
 	    for (int i = 0; i<menuItems.toArray(new String[menuItems.size()]).length; i++) {
 	      menu.add(Menu.NONE, i, i, menuItems.get(i));
 	     }
+		
 	}
+	
+	/**
+	 * Reacts on selecting an entry in the context menu.
+	 * 
+	 * Since this is the onContextClickListener also the reaction on clicking something in the context menu resides in this class
+	 * @param item
+	 * @return
+	 */
+	public boolean onContextItemSelected(MenuItem item, Context applicationContext) {
+		switch (item.getItemId()){
+		case 0:
+			AdapterContextMenuInfo menuinfo = (AdapterContextMenuInfo)item.getMenuInfo();
+    		int position = menuinfo.position;
+    		ListView a = (ListView) menuinfo.targetView.findViewById(R.id.deviceList);
+    		BrowseItemAdapter adapter = (BrowseItemAdapter) a.getAdapter();
+    		DIDLObject currentObject = adapter.getFolder(position);
+    		
+    		Toast toast1 = Toast.makeText(applicationContext, "position: "+ currentObject.getTitle(), Toast.LENGTH_SHORT);
+    		toast1.show();
+    		
+			break;
+		case 1:
+			Toast toast2 = Toast.makeText(applicationContext, "add to playlist pressed", Toast.LENGTH_SHORT);
+    		toast2.show();
+			break;
+		}
+		return true;
+	}
+
+	
 	
 	
 		
