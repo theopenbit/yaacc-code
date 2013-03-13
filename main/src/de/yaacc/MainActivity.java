@@ -79,9 +79,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
 
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-
 		if (preferences.getBoolean(
 				getString(R.string.settings_local_server_chkbx), true)) {
 			// Start upnpserver service for avtransport
@@ -92,6 +89,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
 		showDeviceNumber.setOnClickListener(this);
+		}
 	}
 
 	@Override
@@ -141,10 +139,6 @@ public class MainActivity extends Activity implements OnClickListener {
     		toast.show();
     	}
 		
-
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-
 		if (preferences.getString(
 				getString(R.string.settings_selected_provider_title), null) != null) {
 			selectedDevice = uClient
@@ -230,6 +224,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * 
+	 * There shall be no other ClickListeners than mine... ;)
+	 * 
+	 * But the idea with toasting 'will be implemented' is good
+	 * 
+	 * 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item.getTitle().equals(getString(R.string.browse_context_play))) {
@@ -241,5 +242,5 @@ public class MainActivity extends Activity implements OnClickListener {
 			return false;
 		}
 		return true;
-	}
+	}**/
 }

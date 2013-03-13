@@ -47,9 +47,8 @@ public class BrowseItemClickListener implements OnItemClickListener
 		} else {
 			MainActivity.uClient.play((Item) currentObject);
 		}
+	}
 
-<<<<<<< HEAD
-	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle(v.getContext().getString(R.string.browse_context_title));
@@ -95,12 +94,6 @@ public class BrowseItemClickListener implements OnItemClickListener
 		}
 		return true;
 	}
-
-	
-=======
-	}
-
->>>>>>> 5344dee9d375f5df4a652d409ac4e6c30af20367
 	
   
 	
