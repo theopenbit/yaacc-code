@@ -27,7 +27,7 @@ public class BrowseItemClickListener implements OnItemClickListener
 	public void onItemClick(AdapterView<?> listView, View arg1, int position,
 			long id) {
 
-		ListView a = (ListView) listView.findViewById(R.id.deviceList);
+		ListView a = (ListView) listView.findViewById(R.id.itemList);
 		BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
 
 		DIDLObject currentObject = adapter.getFolder(position);
@@ -74,23 +74,20 @@ public class BrowseItemClickListener implements OnItemClickListener
 	 * @param item
 	 * @return
 	 */
-	public boolean onContextItemSelected(MenuItem item, Context applicationContext) {
-		switch (item.getItemId()){
-		case 0:
-			AdapterContextMenuInfo menuinfo = (AdapterContextMenuInfo)item.getMenuInfo();
-    		int position = menuinfo.position;
-    		ListView a = (ListView) menuinfo.targetView.findViewById(R.id.deviceList);
-    		BrowseItemAdapter adapter = (BrowseItemAdapter) a.getAdapter();
-    		DIDLObject currentObject = adapter.getFolder(position);
-    		
-    		Toast toast1 = Toast.makeText(applicationContext, "position: "+ currentObject.getTitle(), Toast.LENGTH_SHORT);
-    		toast1.show();
-    		
-			break;
-		case 1:
-			Toast toast2 = Toast.makeText(applicationContext, "add to playlist pressed", Toast.LENGTH_SHORT);
+	public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
+		if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
+			    		MainActivity.uClient.play(selectedDIDLObject);
+    	} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
+			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemted)", Toast.LENGTH_SHORT);
+    		toast.show();
+			
+		} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))){
+			Toast toast2 = Toast.makeText(applicationContext, "download pressed (Not yet implemted)", Toast.LENGTH_SHORT);
     		toast2.show();
-			break;
+			
+		} else {
+			Toast toast3 = Toast.makeText(applicationContext, "Magic key pressed (Neither implemented nor defined ;))", Toast.LENGTH_SHORT);
+    		toast3.show();
 		}
 		return true;
 	}

@@ -113,7 +113,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		// Define where to show the folder contents
-		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
+		final ListView deviceList = (ListView) findViewById(R.id.itemList);
 
 		// Get Try to get selected device
 		Device selectedDevice = null;
@@ -168,7 +168,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		return bItemClickListener.onContextItemSelected(item, getApplicationContext());
+		return bItemClickListener.onContextItemSelected(selectedDIDLObject, item, getApplicationContext());
 	}
 	
 	
@@ -178,17 +178,17 @@ public class MainActivity extends Activity implements OnClickListener {
 		if ("0".equals(this.uClient.getCurrentObjectId())) {
 			super.finish();
 		}
-		// FIXME Confusing variable names aren't useful
-		final ListView deviceList = (ListView) findViewById(R.id.deviceList);
+
+		final ListView itemList = (ListView) findViewById(R.id.itemList);
 
 		bItemAdapter = new BrowseItemAdapter(this,
 				this.uClient.getLastVisitedObjectId());
-		deviceList.setAdapter(bItemAdapter);
+		itemList.setAdapter(bItemAdapter);
 
 		BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
-		deviceList.setOnItemClickListener(bItemClickListener);
+		itemList.setOnItemClickListener(bItemClickListener);
 
-		registerForContextMenu(deviceList);
+		registerForContextMenu(itemList);
 
 	}
 
@@ -224,23 +224,4 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	/**
-	 * 
-	 * There shall be no other ClickListeners than mine... ;)
-	 * 
-	 * But the idea with toasting 'will be implemented' is good
-	 * 
-	 * 
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		if (item.getTitle().equals(getString(R.string.browse_context_play))) {
-			uClient.play(selectedDIDLObject);
-		} else {
-			Toast toast = Toast.makeText(this, "Not yet implemented",
-					Toast.LENGTH_LONG);
-			toast.show();
-			return false;
-		}
-		return true;
-	}**/
 }
