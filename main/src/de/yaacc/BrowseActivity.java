@@ -50,7 +50,7 @@ import de.yaacc.upnp.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class BrowseActivity extends Activity implements OnClickListener {
 
 	public static UpnpClient uClient = null;
 

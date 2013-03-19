@@ -30,11 +30,11 @@ public class BrowseItemAdapter extends BaseAdapter{
 	
 	public BrowseItemAdapter(Context ctx, String objectId){
 		
-		MainActivity.uClient.storeNewVisitedObjectId(objectId);
+		BrowseActivity.uClient.storeNewVisitedObjectId(objectId);
 		
 		inflator = LayoutInflater.from(ctx);
 		
-		ContentDirectoryBrowseResult result = MainActivity.uClient.browseSync(MainActivity.uClient.getProviderDevice(),objectId);
+		ContentDirectoryBrowseResult result = BrowseActivity.uClient.browseSync(BrowseActivity.uClient.getProviderDevice(),objectId);
     	
 		DIDLContent a = result.getResult();
 		if(a != null){

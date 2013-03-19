@@ -25,7 +25,7 @@ import org.teleal.cling.model.meta.Device;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
-import de.yaacc.MainActivity;
+import de.yaacc.BrowseActivity;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 
@@ -39,7 +39,7 @@ public class SettingsActivity extends PreferenceActivity {
 		LinkedList<Device> devices = new LinkedList<Device>();
 		// TODO: populate with found devices
 
-		UpnpClient upnpClient = MainActivity.uClient;
+		UpnpClient upnpClient = BrowseActivity.uClient;
 		if (upnpClient != null) {
 			if (upnpClient.isInitialized()) {
 				devices.addAll(upnpClient
