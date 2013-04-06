@@ -65,7 +65,7 @@ public class BrowseActivity extends Activity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_browse);
 
 		// local server startup
 		uClient = new UpnpClient();
