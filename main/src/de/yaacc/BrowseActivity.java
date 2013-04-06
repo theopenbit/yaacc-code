@@ -20,33 +20,26 @@ package de.yaacc;
 import java.util.ArrayList;
 
 import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 import de.yaacc.config.SettingsActivity;
-import de.yaacc.upnp.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -90,6 +83,39 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
 		showDeviceNumber.setOnClickListener(this);
 		}
+		
+		//initialize buttons
+		ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
+		btnPrev.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				uClient.playbackPrev();
+				
+			}
+		});
+		
+		
+		ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+		btnStop.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				uClient.playbackStop();
+				ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+				btnStop.setVisibility(View.INVISIBLE);
+			}
+		});
+		
+		ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
+		btnNext.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				uClient.playbackNext();
+				
+			}
+		});
 	}
 
 	@Override

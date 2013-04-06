@@ -116,6 +116,19 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
 
 	}
+	
+	public void playbackStop(){
+		//TODO: implement...
+	}
+	
+	public void playbackPrev(){
+		//TODO: implement...
+	}
+
+	public void playbackNext(){
+		//TODO: implement...
+	}
+	
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
 		fireDeviceAdded(device);
