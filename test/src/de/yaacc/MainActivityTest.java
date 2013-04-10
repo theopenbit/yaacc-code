@@ -31,10 +31,10 @@ import android.test.ActivityInstrumentationTestCase2;
  * de.yaacc.tests/android.test.InstrumentationTestRunner
  */
 @TargetApi(3)
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class MainActivityTest extends ActivityInstrumentationTestCase2<BrowseActivity> {
 
     public MainActivityTest() {
-        super("de.yaacc", MainActivity.class);
+        super("de.yaacc", BrowseActivity.class);
     }
 
 }
