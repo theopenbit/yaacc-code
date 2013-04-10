@@ -174,22 +174,6 @@ public class BrowseActivity extends Activity implements OnClickListener {
 									null));
 		}
 
-		// Load adapter if selected device is configured and found
-		if (selectedDevice != null) {
-			bItemAdapter = new BrowseItemAdapter(this, "0");
-			deviceList.setAdapter(bItemAdapter);
-
-			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
-			deviceList.setOnItemClickListener(bItemClickListener);
-		} else {
-			Context context = getApplicationContext();
-			CharSequence text = getString(R.string.browse_no_content_found);
-			int duration = Toast.LENGTH_SHORT;
-
-			Toast toast = Toast.makeText(context, text, duration);
-			toast.show();
-		}
-
 	}
 
 	@Override

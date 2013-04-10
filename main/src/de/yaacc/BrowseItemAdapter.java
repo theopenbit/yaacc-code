@@ -12,6 +12,7 @@ import org.teleal.cling.support.model.item.PlaylistItem;
 import org.teleal.cling.support.model.item.TextItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class BrowseItemAdapter extends BaseAdapter{
 		ContentDirectoryBrowseResult result = BrowseActivity.uClient.browseSync(BrowseActivity.uClient.getProviderDevice(),objectId);
     	
 		DIDLContent a = result.getResult();
+		
 		if(a != null){
 			
 			objects = new LinkedList<DIDLObject>();
