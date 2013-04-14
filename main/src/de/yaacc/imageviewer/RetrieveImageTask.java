@@ -20,7 +20,14 @@ package de.yaacc.imageviewer;
 
 import java.io.InputStream;
 
+import de.yaacc.R;
+
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -38,6 +45,7 @@ import android.widget.Toast;
 public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
 	private ImageViewerActivity imageViewerActivity;
+	private ProgressDialog pd;
 
 	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
 		this.imageViewerActivity = imageViewerActivity;
@@ -56,6 +64,45 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+	 */
+	@Override
+	protected void onPostExecute(Void result) {
+		super.onPostExecute(result);
+		if (pd != null) {
+			pd.dismiss();
+		}
+		// Start Timer after new image is loaded
+		if (imageViewerActivity.isPictureShowActive()) {
+			imageViewerActivity.startTimer();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.os.AsyncTask#onPreExecute()
+	 */
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+		imageViewerActivity.runOnUiThread(new Runnable() {
+			public void run() {
+				pd = new ProgressDialog(imageViewerActivity);
+				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				pd.setIndeterminate(true);
+				pd.setCancelable(false);
+				pd.setMessage("Loading...");
+				pd.show();
+			}
+		});
+
+
+	}
+
 	/**
 	 * retrieves an image an stores them in the image cache of the
 	 * ImageViewerActivity.
@@ -64,7 +111,7 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 	 */
 	private void retrieveImage(Uri imageUri) {
 		{
-			Log.d(getClass().getName(), "imgeUri: " + imageUri);			
+			Log.d(getClass().getName(), "imgeUri: " + imageUri);
 			Drawable image = imageViewerActivity.getImageFormCache(imageUri);
 			if (image == null) {
 				Log.d(getClass().getName(), "Image not in cache");
@@ -73,7 +120,16 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 						InputStream is = (InputStream) new java.net.URL(
 								imageUri.toString()).getContent();
 						Log.d(getClass().getName(), "InputStram: " + is);
-						image = Drawable.createFromStream(is, "src");
+
+						int heightPixels = imageViewerActivity.getResources()
+								.getDisplayMetrics().heightPixels;
+						int widthPixels = imageViewerActivity.getResources()
+								.getDisplayMetrics().widthPixels;
+						Bitmap bitmap = decodeSampledBitmapFromStream(is,
+								widthPixels, heightPixels);
+						image = new BitmapDrawable(
+								imageViewerActivity.getResources(), bitmap);
+
 						if (imageViewerActivity != null) {
 							imageViewerActivity
 									.addImageToCache(imageUri, image);
@@ -98,11 +154,58 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 			final Drawable finalImage = image;
 			imageViewerActivity.runOnUiThread(new Runnable() {
 				public void run() {
-						imageViewerActivity.showImage(finalImage);
+					imageViewerActivity.showImage(finalImage);
 				}
-			});		
+			});
 
 		}
 	}
 
+	private Bitmap decodeSampledBitmapFromStream(InputStream stream,
+			int reqWidth, int reqHeight) {
+
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		// options.inJustDecodeBounds = true;
+		// BitmapFactory.decodeStream(stream, null, options);
+
+		// Calculate inSampleSize
+		// options.inSampleSize = calculateInSampleSize(options, reqWidth,
+		// reqHeight);
+		options.outWidth = reqWidth;
+		options.outHeight = reqHeight;
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+		Log.d(this.getClass().getName(), "free meomory before image load: "
+				+ Runtime.getRuntime().freeMemory());
+		Bitmap bitmap = BitmapFactory.decodeStream(stream, null, options);
+		Log.d(this.getClass().getName(), "free meomory after image load: "
+				+ Runtime.getRuntime().freeMemory());
+		return bitmap;
+	}
+
+	private int calculateInSampleSize(BitmapFactory.Options options,
+			int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+
+		if (height > reqHeight || width > reqWidth) {
+
+			// Calculate ratios of height and width to requested height and
+			// width
+			final int heightRatio = Math.round((float) height
+					/ (float) reqHeight);
+			final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+			// Choose the smallest ratio as inSampleSize value, this will
+			// guarantee
+			// a final image with both dimensions larger than or equal to the
+			// requested height and width.
+			inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+		}
+
+		return inSampleSize;
+	}
 }

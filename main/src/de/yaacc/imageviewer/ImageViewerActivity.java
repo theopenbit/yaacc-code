@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask.Status;
@@ -71,6 +73,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	private int currentImageIndex = 0;
 
 	private boolean pictureShowActive = false;
+	private boolean isProcessingCommand = false; //indicates an command processing
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -96,6 +99,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			}
 		}
 		if (imageUris.size() > 0) {
+			
 			initializeCache();
 			// display first image
 			retrieveImageTask = new RetrieveImageTask(this);
@@ -174,18 +178,20 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * Start playing the picture show.
 	 */
 	public void play() {
+		if (isProcessingCommand) return;
+		isProcessingCommand = true;
 		if (currentImageIndex < imageUris.size()) {
 			runOnUiThread(new Runnable() {
 				public void run() {
 					Toast toast = Toast.makeText(ImageViewerActivity.this,
-							R.string.play, Toast.LENGTH_SHORT);
+							getResources().getString(R.string.play) + " ("+ currentImageIndex +"/"+ imageUris.size() +")", Toast.LENGTH_SHORT);
 					toast.show();
 				}
 			});
 			loadImage();
 			// Start the pictureShow
-			pictureShowActive = true;
-			startTimer();
+			pictureShowActive = true;			
+			isProcessingCommand =false;
 
 		}
 	}
@@ -199,6 +205,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		}
 		retrieveImageTask = new RetrieveImageTask(this);
 		retrieveImageTask.execute(imageUris.get(currentImageIndex));
+		
 	}
 
 	/**
@@ -206,17 +213,20 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * default image;
 	 */
 	public void stop() {
+		if (isProcessingCommand) return;
+		isProcessingCommand = true;
+		currentImageIndex = 0;
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						R.string.stop, Toast.LENGTH_SHORT);
+						getResources().getString(R.string.stop) + " ("+ currentImageIndex +"/"+ imageUris.size() +")", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
-		currentImageIndex = 0;
 		showDefaultImage();
 
 		pictureShowActive = false;
+		isProcessingCommand = false;
 	}
 
 	/**
@@ -231,27 +241,25 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * Stop the timer.
 	 */
 	public void pause() {
+		if (isProcessingCommand) return;
+		isProcessingCommand = true;
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						R.string.pause, Toast.LENGTH_SHORT);
+						getResources().getString(R.string.pause) + " ("+ currentImageIndex +"/"+ imageUris.size() +")" , Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
 		pictureShowActive = false;
+		isProcessingCommand = false;
 	}
 
 	/**
 	 * show the previous image
 	 */
 	public void previous() {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						R.string.previous, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-		});
+		if (isProcessingCommand) return;
+		isProcessingCommand = true;		
 		currentImageIndex--;
 		if (currentImageIndex < 0) {
 			if (imageUris.size() > 0) {
@@ -260,29 +268,38 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				currentImageIndex = 0;
 			}
 		}
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast toast = Toast.makeText(ImageViewerActivity.this,
+						getResources().getString(R.string.previous) + " ("+ currentImageIndex +"/"+ imageUris.size() +")", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
 		loadImage();
+		isProcessingCommand = false;
 	}
 
 	/**
 	 * show the next image.
 	 */
 	public void next() {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						R.string.next, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-		});
+		if (isProcessingCommand) return;
+		isProcessingCommand = true;
 		currentImageIndex++;
 		if (currentImageIndex > imageUris.size() - 1) {
 			currentImageIndex = 0;
 			pictureShowActive = false;
 		}
-		loadImage();
-		if (pictureShowActive) {
-			startTimer();
-		}
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast toast = Toast.makeText(ImageViewerActivity.this,
+						getResources().getString(R.string.next)	+ " ("+ currentImageIndex +"/"+ imageUris.size() +")"		 , Toast.LENGTH_SHORT);
+				
+				toast.show();
+			}
+		});
+		loadImage();		
+		isProcessingCommand = false;
 	}
 
 	/**
@@ -341,8 +358,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	private void initializeCache() {
 		// initialize Cache
-		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+		final int maxMemory = (int) (Runtime.getRuntime().freeMemory() / 1024);
 		// Use 1/4th of the available memory for this memory cache.
+		//FIXME have to be a configurable property
 		final int cacheSize = maxMemory / 4;
 		Log.d(getClass().getName(), "memory cache size: " + cacheSize);
 		imageCache = new LruCache<Uri, Drawable>(cacheSize) {
@@ -359,10 +377,14 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				// drawable).getBitmap().getByteCount() / 1024;
 				// otherwise: assumption 32 bit per Pixel i.e. 3 byte
 				// this does not work correctly
-				return drawable.getBounds().height()
-						* drawable.getBounds().width() * 4 / 1024;
-				// return ((BitmapDrawable) drawable).getBitmap().getByteCount()
-				// / 1024;
+				//return drawable.getBounds().height()
+				//		* drawable.getBounds().width() * 4 / 1024;
+				if (drawable instanceof BitmapDrawable){
+				 return ((BitmapDrawable) drawable).getBitmap().getByteCount() / 1024;
+				}
+				//Fallback
+				return drawable.getBounds().height() * drawable.getBounds().width() * 4 / 1024;
+				
 			}
 		};
 	}
@@ -385,5 +407,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	public Drawable getImageFormCache(Uri key) {
 		return imageCache.get(key);
+	}
+
+	public boolean isPictureShowActive() {		
+		return pictureShowActive;
 	}
 }

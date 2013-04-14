@@ -21,7 +21,6 @@ package de.yaacc.upnp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -70,9 +69,9 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import de.yaacc.musicplayer.BackgroundMusicService;
-import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.R;
+import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.musicplayer.BackgroundMusicService;
 
 /**
  * A client facade to the upnp lookup and access framework. This class provides
