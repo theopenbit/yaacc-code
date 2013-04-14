@@ -32,14 +32,14 @@
             android:name="de.yaacc.upnp.UpnpRegistryService"
             android:enabled="true" />
         <service
-            android:name="de.yaacc.BackgroundMusicService"
+            android:name="de.yaacc.musicplayer.BackgroundMusicService"
             android:enabled="true" />
          <service
             android:name="de.yaacc.upnp.server.YaaccUpnpServerService"
             android:enabled="true" />
         
         <activity
-            android:name="de.yaacc.ImageViewerActivity"
+            android:name="de.yaacc.imageviewer.ImageViewerActivity"
             android:label="@string/title_activity_image_viewer" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

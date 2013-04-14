@@ -21,12 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
-import de.yaacc.ImageViewerActivity;
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -34,10 +30,9 @@ import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.v4.widget.CursorAdapter;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import android.support.v4.widget.SimpleCursorAdapter;
+import de.yaacc.imageviewer.ImageViewerActivity;
 
 
 /**

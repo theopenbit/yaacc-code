@@ -70,8 +70,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import de.yaacc.BackgroundMusicService;
-import de.yaacc.ImageViewerActivity;
+import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.R;
 
 /**
@@ -651,10 +651,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
 			String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
+		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
+		if(device == null){
+			return result;
+		}
 		Object[] services = device.getServices();
 		Service service = device.findService(new UDAServiceId(
 				"ContentDirectory"));
-		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		ContentDirectoryBrowseActionCallback actionCallback = null;
 		if (service != null) {
 			Log.d(getClass().getName(),

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc;
+package de.yaacc.imageviewer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,6 +43,7 @@ import de.yaacc.config.ImageViewerSettingsActivity;
 import de.yaacc.config.SettingsActivity;
 import de.yaacc.util.ActivitySwipeDetector;
 import de.yaacc.util.SwipeReceiver;
+import de.yaacc.R;
 
 /**
  * a simple ImageViewer based on the android ImageView component;

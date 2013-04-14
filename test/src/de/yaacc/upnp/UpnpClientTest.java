@@ -62,8 +62,8 @@ import android.net.Uri;
 import android.test.ServiceTestCase;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
-import de.yaacc.BackgroundMusicService;
-import de.yaacc.ImageViewerActivity;
+import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.upnp.server.LocalUpnpServer;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
