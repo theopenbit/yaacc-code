@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc;
+package de.yaacc.browser;
 
 import java.util.ArrayList;
 
@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
@@ -38,7 +39,13 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+import de.yaacc.R;
+import de.yaacc.R.id;
+import de.yaacc.R.layout;
+import de.yaacc.R.menu;
+import de.yaacc.R.string;
 import de.yaacc.config.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
@@ -70,6 +77,9 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		// initialize click listener
 		bItemClickListener = new BrowseItemClickListener();
 		
+		
+		
+		
 		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
 
 		if (preferences.getBoolean(
@@ -83,6 +93,13 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
 		showDeviceNumber.setOnClickListener(this);
 		}
+		
+		// remove the buttons if local playback is enabled and background playback is not enabled
+		// FIXME: Include background playback
+		if(uClient.isLocalPlaybackEnabled()){
+			RelativeLayout controls = (RelativeLayout) findViewById(R.id.controls);
+			controls.setVisibility(View.GONE);
+		} else {
 		
 		//initialize buttons
 		ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
@@ -116,6 +133,7 @@ public class BrowseActivity extends Activity implements OnClickListener {
 				
 			}
 		});
+		}
 	}
 
 	@Override

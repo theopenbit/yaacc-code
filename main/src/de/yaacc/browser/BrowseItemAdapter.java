@@ -1,4 +1,4 @@
-package de.yaacc;
+package de.yaacc.browser;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +22,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.yaacc.R;
+import de.yaacc.R.drawable;
+import de.yaacc.R.id;
+import de.yaacc.R.layout;
+import de.yaacc.R.string;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
 public class BrowseItemAdapter extends BaseAdapter{

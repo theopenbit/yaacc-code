@@ -25,8 +25,8 @@ import org.teleal.cling.model.meta.Device;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
-import de.yaacc.BrowseActivity;
 import de.yaacc.R;
+import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
 
 public class SettingsActivity extends PreferenceActivity {

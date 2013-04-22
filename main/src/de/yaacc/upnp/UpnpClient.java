@@ -46,6 +46,7 @@ import org.teleal.cling.registry.Registry;
 import org.teleal.cling.registry.RegistryListener;
 import org.teleal.cling.support.avtransport.callback.Play;
 import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
+import org.teleal.cling.support.avtransport.callback.Stop;
 import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
 import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.BrowseFlag;
@@ -117,7 +118,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 	
 	public void playbackStop(){
-		//TODO: implement...
+		this.stop();
 	}
 	
 	public void playbackPrev(){
@@ -322,6 +323,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the service of null
 	 */
 	private Service getAVTransportService(Device<?, ?, ?> device) {
+		if (device != null) {
+			Log.d(getClass().getName(),
+					"Device is null!");
+		}
 		ServiceId serviceId = new UDAServiceId("AVTransport");
 		Service service = device.findService(serviceId);
 		if (service != null) {
@@ -333,7 +338,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Wathdog for async calls to complete
+	 * Watchdog for async calls to complete
 	 */
 	private void waitForActionComplete(final ActionState actionState) {
 
@@ -603,6 +608,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (isInitialized()) {
 			for (Device<?, ?, ?> device : getAndroidUpnpService().getRegistry()
 					.getDevices()) {
+				//FIXME: What about removed devices?
 				this.deviceAdded(device);
 			}
 
@@ -814,7 +820,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the device id
 	 */
 	public void play(Item item, String deviceId) {
-		if (LOCAL_UID.equals(deviceId)) {
+		if (isLocalPlaybackEnabled()) {
 			playLocal(item);
 		} else {
 			playRemote(item, getDevice(deviceId));
@@ -845,7 +851,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the device id
 	 */
 	public void play(Container container, String deviceId) {
-		if (LOCAL_UID.equals(deviceId)) {
+		if (isLocalPlaybackEnabled()) {
 			playLocal(container);
 		} else {
 			playRemote(container, getDevice(deviceId));
@@ -875,7 +881,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the device id
 	 */
 	public void play(List<Item> items, String deviceId) {
-		if (LOCAL_UID.equals(deviceId)) {
+		if (isLocalPlaybackEnabled()) {
 			// FIXME Handling background play must be included
 			playLocal(items, false);
 		} else {
@@ -1038,6 +1044,57 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			return;
 
 		playRemote(items, 0, device);
+	}
+	
+	
+	public void stop(){
+		stopRemote(this.getReceiverDevice());
+	}
+	
+	
+	/**
+	 * Stops playback on remote device
+	 * 
+	 * @param item
+	 * @param remoteDevice
+	 */
+	private void stopRemote(Device<?, ?, ?> remoteDevice) {
+		Service<?, ?> service = getAVTransportService(remoteDevice);
+		if (service == null) {
+			Log.d(getClass().getName(),
+					"No AVTransport-Service found on Device: "
+							+ remoteDevice.getDisplayString());
+			return;
+		}
+		Log.d(getClass().getName(), "Action SetAVTransportURI ");
+		final ActionState actionState = new ActionState();
+		// Now start Stopping
+		Log.d(getClass().getName(), "Action Stop");
+		actionState.actionFinished = false;
+		Stop actionCallback = new Stop(service) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						upnpresponse != null ? "UpnpResponse: "
+								+ upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(), "s: " + s);
+				actionState.actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				actionState.actionFinished = true;
+
+			}
+
+		};
+		getControlPoint().execute(actionCallback);
 	}
 
 	/**
@@ -1328,5 +1385,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 						e);
 			}
 		}
+	}
+	
+	/**
+	 * Check's whether local or remote playback is enabled
+	 * @return true if local playback is enabled, false otherwise
+	 */
+	public Boolean isLocalPlaybackEnabled(){
+		return (LOCAL_UID.equals(getReceiverDeviceId()));
 	}
 }

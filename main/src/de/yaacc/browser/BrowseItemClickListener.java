@@ -1,10 +1,14 @@
-package de.yaacc;
+package de.yaacc.browser;
 
 import java.util.ArrayList;
 
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
+
+import de.yaacc.R;
+import de.yaacc.R.id;
+import de.yaacc.R.string;
 
 import android.content.Context;
 import android.view.ContextMenu;
