@@ -26,7 +26,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
@@ -42,11 +41,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import de.yaacc.R;
-import de.yaacc.R.id;
-import de.yaacc.R.layout;
-import de.yaacc.R.menu;
-import de.yaacc.R.string;
-import de.yaacc.config.SettingsActivity;
+import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -55,10 +50,8 @@ public class BrowseActivity extends Activity implements OnClickListener {
 	public static UpnpClient uClient = null;
 
 	private BrowseItemAdapter bItemAdapter;
-	
+
 	BrowseItemClickListener bItemClickListener = null;
-	
-	
 
 	private DIDLObject selectedDIDLObject;
 
@@ -70,70 +63,68 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		// local server startup
 		uClient = new UpnpClient();
 		uClient.initialize(getApplicationContext());
-		
+
 		// load preferences
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
 
 		// initialize click listener
 		bItemClickListener = new BrowseItemClickListener();
-		
-		
-		
-		
-		if(preferences.getBoolean(getString(R.string.settings_local_server_chkbx), true)){
 
 		if (preferences.getBoolean(
 				getString(R.string.settings_local_server_chkbx), true)) {
-			// Start upnpserver service for avtransport
-			Intent svc = new Intent(getApplicationContext(),
-					YaaccUpnpServerService.class);
-			getApplicationContext().startService(svc);
+
+			if (preferences.getBoolean(
+					getString(R.string.settings_local_server_chkbx), true)) {
+				// Start upnpserver service for avtransport
+				Intent svc = new Intent(getApplicationContext(),
+						YaaccUpnpServerService.class);
+				getApplicationContext().startService(svc);
+			}
+
+			final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
+			showDeviceNumber.setOnClickListener(this);
 		}
 
-		final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
-		showDeviceNumber.setOnClickListener(this);
-		}
-		
-		// remove the buttons if local playback is enabled and background playback is not enabled
+		// remove the buttons if local playback is enabled and background
+		// playback is not enabled
 		// FIXME: Include background playback
-		if(uClient.isLocalPlaybackEnabled()){
-			RelativeLayout controls = (RelativeLayout) findViewById(R.id.controls);
-			controls.setVisibility(View.GONE);
-		} else {
-		
-		//initialize buttons
-		ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
-		btnPrev.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				uClient.playbackPrev();
-				
-			}
-		});
-		
-		
-		ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-		btnStop.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				uClient.playbackStop();
-				ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-				btnStop.setVisibility(View.INVISIBLE);
-			}
-		});
-		
-		ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
-		btnNext.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				uClient.playbackNext();
-				
-			}
-		});
+		if (uClient.isLocalPlaybackEnabled()) {
+			activateControls(false);
 		}
+		
+			// initialize buttons
+			ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
+			btnPrev.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					uClient.playbackPrev();
+
+				}
+			});
+
+			ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+			btnStop.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					uClient.playbackStop();
+					ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+					btnStop.setVisibility(View.INVISIBLE);
+				}
+			});
+
+			ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
+			btnNext.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					uClient.playbackNext();
+
+				}
+			});
+		
 	}
 
 	@Override
@@ -161,28 +152,34 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 		// Get Try to get selected device
 		Device selectedDevice = null;
-		
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	       
-    	if(preferences.getString(getString(R.string.settings_selected_provider_title), null) != null){
-    		selectedDevice = uClient.getDevice(preferences.getString(getString(R.string.settings_selected_provider_title), null));
-    	}
-    	
-    	// Load adapter if selected device is configured and found
-    	if(selectedDevice != null){
-	    	bItemAdapter = new BrowseItemAdapter(this,"0");
-	    	deviceList.setAdapter(bItemAdapter);
-	    	
-	    	deviceList.setOnItemClickListener(bItemClickListener);
-    	} else {
-    		Context context = getApplicationContext();
-    		CharSequence text = getString(R.string.browse_no_content_found);
-    		int duration = Toast.LENGTH_SHORT;
 
-    		Toast toast = Toast.makeText(context, text, duration);
-    		toast.show();
-    	}
-		
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (preferences.getString(
+				getString(R.string.settings_selected_provider_title), null) != null) {
+			selectedDevice = uClient
+					.getDevice(preferences
+							.getString(
+									getString(R.string.settings_selected_provider_title),
+									null));
+		}
+
+		// Load adapter if selected device is configured and found
+		if (selectedDevice != null) {
+			bItemAdapter = new BrowseItemAdapter(this, "0");
+			deviceList.setAdapter(bItemAdapter);
+
+			deviceList.setOnItemClickListener(bItemClickListener);
+		} else {
+			Context context = getApplicationContext();
+			CharSequence text = getString(R.string.browse_no_content_found);
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
+		}
+
 		if (preferences.getString(
 				getString(R.string.settings_selected_provider_title), null) != null) {
 			selectedDevice = uClient
@@ -196,10 +193,10 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		return bItemClickListener.onContextItemSelected(selectedDIDLObject, item, getApplicationContext());
+		return bItemClickListener.onContextItemSelected(selectedDIDLObject,
+				item, getApplicationContext());
 	}
-	
-	
+
 	@Override
 	public void onBackPressed() {
 
@@ -251,5 +248,19 @@ public class BrowseActivity extends Activity implements OnClickListener {
 			menu.add(Menu.NONE, i, i, menuItems.get(i));
 		}
 	}
+
+	/**
+	 * Shows/Hides the controls
+	 * @param activated true if the controls should be shown
+	 */
+	public void activateControls(boolean activated) {
+		RelativeLayout controls = (RelativeLayout) findViewById(R.id.controls);
+		if (activated) {
+			controls.setVisibility(View.GONE);
+		} else {
+			controls.setVisibility(View.VISIBLE);
+		}
+	}
+
 
 }
