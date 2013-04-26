@@ -8,20 +8,21 @@ import org.teleal.cling.model.meta.Device;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.upnp.UpnpClientListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment implements UpnpClientListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		addPreferencesFromResource(R.xml.preference);
 		
-	
-
-		//populateDeviceLists();
+		populateDeviceLists();
+		
+		BrowseActivity.uClient.addUpnpClientListener(this);
 	}
 	
 	public void addDevice(){
@@ -78,6 +79,22 @@ public class SettingsFragment extends PreferenceFragment {
 			receiverLp.setEntryValues(receiverEntryValues
 					.toArray(new CharSequence[receiverEntries.size()]));
 		}
+	}
+
+	@Override
+	public void deviceAdded(Device<?, ?, ?> device) {
+		populateDeviceLists();
+	}
+
+	@Override
+	public void deviceRemoved(Device<?, ?, ?> device) {
+		populateDeviceLists();
+	}
+
+	@Override
+	public void deviceUpdated(Device<?, ?, ?> device) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

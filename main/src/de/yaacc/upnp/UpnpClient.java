@@ -1394,4 +1394,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public Boolean isLocalPlaybackEnabled(){
 		return (LOCAL_UID.equals(getReceiverDeviceId()));
 	}
+	
+	
 }
