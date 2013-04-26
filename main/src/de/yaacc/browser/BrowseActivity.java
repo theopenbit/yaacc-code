@@ -43,9 +43,12 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
-public class BrowseActivity extends Activity implements OnClickListener {
+public class BrowseActivity extends Activity implements OnClickListener, UpnpClientListener {
+	
+	private boolean displayingSomething = false;
 
 	public static UpnpClient uClient = null;
 
@@ -63,6 +66,8 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		// local server startup
 		uClient = new UpnpClient();
 		uClient.initialize(getApplicationContext());
+		
+		
 
 		// load preferences
 		SharedPreferences preferences = PreferenceManager
@@ -124,7 +129,34 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 				}
 			});
+			
+			
+			
+			
+			// add ourself as listener
+			uClient.addUpnpClientListener(this);
+			
+			if (!displayingSomething){
+				showMainFolder();
+			}
+	}
+	
+	private void showMainFolder(){
+		Device providerDevice = getProviderDevice();
 		
+		if (providerDevice != null) {
+			populateItemList(providerDevice);
+
+			displayingSomething = true;
+			
+		} else {
+			Context context = getApplicationContext();
+			CharSequence text = getString(R.string.browse_no_content_found);
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
+		}
 	}
 
 	@Override
@@ -147,48 +179,8 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// Define where to show the folder contents
-		final ListView deviceList = (ListView) findViewById(R.id.itemList);
-
-		// Get Try to get selected device
-		Device selectedDevice = null;
-
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-
-		if (preferences.getString(
-				getString(R.string.settings_selected_provider_title), null) != null) {
-			selectedDevice = uClient
-					.getDevice(preferences
-							.getString(
-									getString(R.string.settings_selected_provider_title),
-									null));
-		}
-
-		// Load adapter if selected device is configured and found
-		if (selectedDevice != null) {
-			bItemAdapter = new BrowseItemAdapter(this, "0");
-			deviceList.setAdapter(bItemAdapter);
-
-			deviceList.setOnItemClickListener(bItemClickListener);
-		} else {
-			Context context = getApplicationContext();
-			CharSequence text = getString(R.string.browse_no_content_found);
-			int duration = Toast.LENGTH_SHORT;
-
-			Toast toast = Toast.makeText(context, text, duration);
-			toast.show();
-		}
-
-		if (preferences.getString(
-				getString(R.string.settings_selected_provider_title), null) != null) {
-			selectedDevice = uClient
-					.getDevice(preferences
-							.getString(
-									getString(R.string.settings_selected_provider_title),
-									null));
-		}
-
+		Device providerDevice = getProviderDevice();
+		populateItemList(providerDevice);
 	}
 
 	@Override
@@ -260,6 +252,65 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		} else {
 			controls.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	
+	private void populateItemList(Device providerDevice){
+		
+		 this.runOnUiThread(
+	                new Runnable(){
+	                    public void run(){
+	                    	// Define where to show the folder contents
+	    					ListView deviceList = (ListView) findViewById(R.id.itemList);
+
+	    								// Load adapter if selected device is configured and found
+	    					bItemAdapter = new BrowseItemAdapter(getApplicationContext(), "0");
+	    					deviceList.setAdapter(bItemAdapter);
+
+	    					deviceList.setOnItemClickListener(bItemClickListener);
+	                    }
+	                });
+				
+	}
+	
+	
+	private Device getProviderDevice(){
+		// Get Try to get selected device
+		Device selectedDevice = null;
+
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (preferences.getString(
+				getString(R.string.settings_selected_provider_title), null) != null) {
+			selectedDevice = uClient
+					.getDevice(preferences
+							.getString(
+									getString(R.string.settings_selected_provider_title),
+									null));
+		}
+		
+		return selectedDevice;
+	}
+
+	@Override
+	public void deviceAdded(Device<?, ?, ?> device) {
+		if(!displayingSomething){
+			showMainFolder();
+		}
+		
+	}
+
+	@Override
+	public void deviceRemoved(Device<?, ?, ?> device) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deviceUpdated(Device<?, ?, ?> device) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
