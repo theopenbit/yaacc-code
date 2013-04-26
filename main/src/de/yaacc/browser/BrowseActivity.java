@@ -86,9 +86,6 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 						YaaccUpnpServerService.class);
 				getApplicationContext().startService(svc);
 			}
-
-			final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
-			showDeviceNumber.setOnClickListener(this);
 		}
 
 		// remove the buttons if local playback is enabled and background
@@ -141,6 +138,9 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 			}
 	}
 	
+	/**
+	 * Tries to populate the browsing area if a providing device is configured
+	 */
 	private void showMainFolder(){
 		Device providerDevice = getProviderDevice();
 		
@@ -254,7 +254,10 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 		}
 	}
 	
-	
+	/**
+	 * Selects the place in the UI where the items are shown and renders the content directory
+	 * @param providerDevice device to access
+	 */
 	private void populateItemList(Device providerDevice){
 		
 		 this.runOnUiThread(
@@ -273,7 +276,10 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 				
 	}
 	
-	
+	/**
+	 * Loads the device providing media files, as it is configured in the settings
+	 * @return configured device
+	 */
 	private Device getProviderDevice(){
 		// Get Try to get selected device
 		Device selectedDevice = null;
