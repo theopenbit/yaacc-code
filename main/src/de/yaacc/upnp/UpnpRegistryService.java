@@ -18,19 +18,7 @@
  */
 package de.yaacc.upnp;
 
-import org.teleal.cling.UpnpService;
-import org.teleal.cling.UpnpServiceConfiguration;
-import org.teleal.cling.android.AndroidUpnpService;
-import org.teleal.cling.android.AndroidUpnpServiceConfiguration;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
-import org.teleal.cling.controlpoint.ControlPoint;
-import org.teleal.cling.registry.Registry;
-
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.net.wifi.WifiManager;
-import android.os.IBinder;
 
 
 /**

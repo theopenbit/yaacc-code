@@ -40,7 +40,10 @@
         
         <activity
             android:name="de.yaacc.imageviewer.ImageViewerActivity"
-            android:label="@string/title_activity_image_viewer" >
+            android:label="@string/title_activity_image_viewer"
+            android:theme="@android:style/Theme.DeviceDefault.Wallpaper.NoTitleBar"
+            android:showAsAction="ifRoom" 
+             >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -60,7 +63,8 @@
         </activity>
         <activity
             android:name="de.yaacc.settings.ImageViewerSettingsActivity"
-            android:label="@string/title_activity_image_viewer_settings" >
+            android:label="@string/title_activity_image_viewer_settings"             
+            >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

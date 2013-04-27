@@ -12,7 +12,6 @@ import org.teleal.cling.support.model.item.PlaylistItem;
 import org.teleal.cling.support.model.item.TextItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,10 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
-import de.yaacc.R.drawable;
-import de.yaacc.R.id;
-import de.yaacc.R.layout;
-import de.yaacc.R.string;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
 public class BrowseItemAdapter extends BaseAdapter{

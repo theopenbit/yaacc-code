@@ -36,6 +36,11 @@ public class ActivitySwipeDetector implements OnTouchListener {
 		Log.i(logTag, "onBottomToTopSwipe!");
 		swipeReceiver.onBottomToTopSwipe();
 	}
+	
+	private void onBottomEdge() {
+		Log.i(logTag, "onBottomEdge!");
+		swipeReceiver.onBottomEdge();
+	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
@@ -87,9 +92,13 @@ public class ActivitySwipeDetector implements OnTouchListener {
 			}
 
 			return true;
-		}
+		}case MotionEvent.EDGE_BOTTOM:
+			this.onBottomEdge();
+			return true;
 		}
 		return false;
 	}
+
+	
 
 }

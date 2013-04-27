@@ -82,8 +82,8 @@ public class ActivityTest extends AndroidTestCase {
 	
 	public void testImageViewerActivityPictureShow() throws Exception{
 		ArrayList<Uri> uris = new ArrayList<Uri>();
-		String filesDir = getContext().getFilesDir().toString();
-		String fileName = "CIMG5019.JPG";
+//		String filesDir = getContext().getFilesDir().toString();
+//		String fileName = "CIMG5019.JPG";
 		//copyAssetsToSdCard(fileName, filesDir);
 		//uris.add(Uri.parse("file:///"+filesDir+"/"+fileName));
 		uris.add(Uri.parse("http://kde-look.org/CONTENT/content-files/156304-DSC_0089-2-1600.jpg"));
@@ -94,14 +94,14 @@ public class ActivityTest extends AndroidTestCase {
 		Context context =  getContext();		
 		Intent intent = new Intent(context, ImageViewerActivity.class);				
 		intent.putExtra(ImageViewerActivity.URIS,uris);
-		
+		intent.putExtra(ImageViewerActivity.AUTO_START_SHOW, true);
 		//Starting an activity form outside any other activity have to be allowed 
 		//by this flag
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
 		
 		context.startActivity(intent);
-		while(true);
-		//myWait();
+		//while(true);
+		myWait(30000);
 	}
 	
 	

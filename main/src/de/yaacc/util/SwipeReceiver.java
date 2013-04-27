@@ -27,4 +27,5 @@ public interface SwipeReceiver {
 	void onLeftToRightSwipe();
 	void onTopToBottomSwipe();
 	void onBottomToTopSwipe();
+	void onBottomEdge();
 }

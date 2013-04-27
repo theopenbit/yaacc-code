@@ -18,23 +18,25 @@
  */
 package de.yaacc.imageviewer;
 
+import java.io.FileNotFoundException;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 
-import de.yaacc.R;
-
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.res.Resources;
+import android.app.Dialog;
+import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.util.LruCache;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Window;
 import android.widget.Toast;
+import de.yaacc.R;
 
 /**
  * Background task for retrieving network images.
@@ -44,8 +46,32 @@ import android.widget.Toast;
  */
 public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
+	static class FlushedInputStream extends FilterInputStream {
+		public FlushedInputStream(InputStream inputStream) {
+			super(inputStream);
+		}
+
+		@Override
+		public long skip(long n) throws IOException {
+			long totalBytesSkipped = 0L;
+			while (totalBytesSkipped < n) {
+				long bytesSkipped = in.skip(n - totalBytesSkipped);
+				if (bytesSkipped == 0L) {
+					int byte_ = read();
+					if (byte_ < 0) {
+						break; // we reached EOF
+					} else {
+						bytesSkipped = 1; // we read one byte
+					}
+				}
+				totalBytesSkipped += bytesSkipped;
+			}
+			return totalBytesSkipped;
+		}
+	}
+
 	private ImageViewerActivity imageViewerActivity;
-	private ProgressDialog pd;
+	private Dialog pd;
 
 	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
 		this.imageViewerActivity = imageViewerActivity;
@@ -91,15 +117,14 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 		super.onPreExecute();
 		imageViewerActivity.runOnUiThread(new Runnable() {
 			public void run() {
-				pd = new ProgressDialog(imageViewerActivity);
-				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				pd.setIndeterminate(true);
-				pd.setCancelable(false);
-				pd.setMessage("Loading...");
+				pd = new Dialog(imageViewerActivity);
+				pd.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				pd.setContentView(R.layout.yaacc_progress_dialog);
+				pd.getWindow().setBackgroundDrawableResource(
+						android.R.color.transparent);
 				pd.show();
 			}
 		});
-
 
 	}
 
@@ -111,101 +136,101 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 	 */
 	private void retrieveImage(Uri imageUri) {
 		{
-			Log.d(getClass().getName(), "imgeUri: " + imageUri);
-			Drawable image = imageViewerActivity.getImageFormCache(imageUri);
-			if (image == null) {
-				Log.d(getClass().getName(), "Image not in cache");
-				try {
-					if (imageUri != null) {
-						InputStream is = (InputStream) new java.net.URL(
-								imageUri.toString()).getContent();
-						Log.d(getClass().getName(), "InputStram: " + is);
+			Log.d(getClass().getName(), "Load imageUri: " + imageUri);
+			Drawable image = null;
 
-						int heightPixels = imageViewerActivity.getResources()
-								.getDisplayMetrics().heightPixels;
-						int widthPixels = imageViewerActivity.getResources()
-								.getDisplayMetrics().widthPixels;
-						Bitmap bitmap = decodeSampledBitmapFromStream(is,
-								widthPixels, heightPixels);
-						image = new BitmapDrawable(
-								imageViewerActivity.getResources(), bitmap);
+			try {
+				if (imageUri != null) {
 
-						if (imageViewerActivity != null) {
-							imageViewerActivity
-									.addImageToCache(imageUri, image);
-						}
-						Log.d(getClass().getName(), "image: " + image);
-					}
-				} catch (final Exception e) {
-					image = Drawable.createFromPath("@drawable/ic_launcher");
-					Log.d(getClass().getName(), "Error while processing image",
-							e);
-					imageViewerActivity.runOnUiThread(new Runnable() {
-						public void run() {
-							Toast toast = Toast.makeText(imageViewerActivity,
-									"Exception:" + e.getMessage(),
-									Toast.LENGTH_LONG);
-							toast.show();
-						}
-					});
-
+					int heightPixels = imageViewerActivity.getResources()
+							.getDisplayMetrics().heightPixels;
+					int widthPixels = imageViewerActivity.getResources()
+							.getDisplayMetrics().widthPixels;
+					Log.d(getClass().getName(),
+							"Decode image: " + System.currentTimeMillis());
+					Log.d(getClass().getName(), "Size width,height: "
+							+ widthPixels + "," + heightPixels);
+					Bitmap bitmap = decodeSampledBitmapFromStream(imageUri,
+							widthPixels, heightPixels);
+					image = new BitmapDrawable(
+							imageViewerActivity.getResources(), bitmap);
+					Log.d(getClass().getName(),
+							"Got image: " + System.currentTimeMillis());
+					Log.d(getClass().getName(), "image: " + image);
 				}
+			} catch (final Exception e) {
+				image = Drawable.createFromPath("@drawable/ic_launcher");
+				Log.d(getClass().getName(), "Error while processing image", e);
+				imageViewerActivity.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast toast = Toast.makeText(imageViewerActivity,
+								"Exception:" + e.getMessage(),
+								Toast.LENGTH_LONG);
+						toast.show();
+					}
+				});
+
 			}
+
 			final Drawable finalImage = image;
 			imageViewerActivity.runOnUiThread(new Runnable() {
 				public void run() {
+					Log.d(getClass().getName(),
+							"Start show image: " + System.currentTimeMillis());
 					imageViewerActivity.showImage(finalImage);
+					Log.d(getClass().getName(),
+							"End show image: " + System.currentTimeMillis());
 				}
 			});
 
 		}
 	}
 
-	private Bitmap decodeSampledBitmapFromStream(InputStream stream,
-			int reqWidth, int reqHeight) {
+	/**
+	 * @param imageUri
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws MalformedURLException
+	 */
+	private InputStream getUriAsStream(Uri imageUri)
+			throws FileNotFoundException, IOException, MalformedURLException {
+		InputStream is = null;
+		Log.d(getClass().getName(), "Start load: " + System.currentTimeMillis());
+		if (ContentResolver.SCHEME_CONTENT.equals(imageUri.getScheme())) {
+			is = imageViewerActivity.getContentResolver().openInputStream(
+					imageUri);
+		} else {
+			is = (InputStream) new java.net.URL(imageUri.toString())
+					.getContent();
+		}
+		Log.d(getClass().getName(), "Stop load: " + System.currentTimeMillis());
+		Log.d(getClass().getName(), "InputStream: " + is);
+		return is;
+	}
 
-		// First decode with inJustDecodeBounds=true to check dimensions
+	private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
+			int reqHeight) throws IOException {
+		InputStream is = getUriAsStream(imageUri);
+
 		final BitmapFactory.Options options = new BitmapFactory.Options();
-		// options.inJustDecodeBounds = true;
-		// BitmapFactory.decodeStream(stream, null, options);
-
-		// Calculate inSampleSize
-		// options.inSampleSize = calculateInSampleSize(options, reqWidth,
-		// reqHeight);
-		options.outWidth = reqWidth;
-		options.outHeight = reqHeight;
-		// Decode bitmap with inSampleSize set
 		options.inJustDecodeBounds = false;
+		options.outHeight = reqHeight;
+		options.outWidth = reqWidth;
+		options.inPreferQualityOverSpeed = false;
+		options.inDensity = DisplayMetrics.DENSITY_LOW;
+		options.inTempStorage = new byte[7680016];
+		Log.d(this.getClass().getName(),
+				"displaying image size width, height, inSampleSize "
+						+ options.outWidth + "," + options.outHeight + ","
+						+ options.inSampleSize);
 		Log.d(this.getClass().getName(), "free meomory before image load: "
 				+ Runtime.getRuntime().freeMemory());
-		Bitmap bitmap = BitmapFactory.decodeStream(stream, null, options);
+		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
+				null, options);
 		Log.d(this.getClass().getName(), "free meomory after image load: "
 				+ Runtime.getRuntime().freeMemory());
 		return bitmap;
 	}
 
-	private int calculateInSampleSize(BitmapFactory.Options options,
-			int reqWidth, int reqHeight) {
-		// Raw height and width of image
-		final int height = options.outHeight;
-		final int width = options.outWidth;
-		int inSampleSize = 1;
-
-		if (height > reqHeight || width > reqWidth) {
-
-			// Calculate ratios of height and width to requested height and
-			// width
-			final int heightRatio = Math.round((float) height
-					/ (float) reqHeight);
-			final int widthRatio = Math.round((float) width / (float) reqWidth);
-
-			// Choose the smallest ratio as inSampleSize value, this will
-			// guarantee
-			// a final image with both dimensions larger than or equal to the
-			// requested height and width.
-			inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
-		}
-
-		return inSampleSize;
-	}
 }

@@ -23,29 +23,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import de.yaacc.R;
 import de.yaacc.settings.ImageViewerSettingsActivity;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.ActivitySwipeDetector;
 import de.yaacc.util.SwipeReceiver;
-import de.yaacc.R;
 
 /**
  * a simple ImageViewer based on the android ImageView component;
@@ -59,27 +58,33 @@ import de.yaacc.R;
  * (RetrieveImageTask). The images are written in a memory cache. The picture
  * show is processed by the ImageViewerActivity using the images in the cache.
  * 
- * @author Tobias Schöne (openbit)
+ * @author Tobias Schoene (openbit)
  * 
  */
 public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
-	public static final String URIS = "URIS_PARAM";
+	public static final String URIS = "URIS_PARAM"; // String Intent parameter
+	public static final String AUTO_START_SHOW = "AUTO_START_SHOW"; // Boolean
+																	// Intent
+																	// parameter
+																	// default
+																	// false
 	private ImageView imageView;
 	private RetrieveImageTask retrieveImageTask;
-	private LruCache<Uri, Drawable> imageCache;
 
 	private List<Uri> imageUris; // playlist
 	private int currentImageIndex = 0;
 
 	private boolean pictureShowActive = false;
-	private boolean isProcessingCommand = false; //indicates an command processing
+	private boolean isProcessingCommand = false; // indicates an command
+													// processing
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_image_viewer);
+		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 		imageView = (ImageView) findViewById(R.id.imageView);
 		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(
 				this);
@@ -98,12 +103,17 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				imageUris.add(i.getData());
 			}
 		}
+		pictureShowActive = i.getBooleanExtra(AUTO_START_SHOW, false);
+		currentImageIndex = 0; 
+		if(savedInstanceState !=null){
+			pictureShowActive = savedInstanceState.getBoolean("pictureShowActive");
+			currentImageIndex = savedInstanceState.getInt("currentImageIndex"); 
+		}
 		if (imageUris.size() > 0) {
-			
-			initializeCache();
+
 			// display first image
 			retrieveImageTask = new RetrieveImageTask(this);
-			retrieveImageTask.execute(imageUris.get(0));
+			retrieveImageTask.execute(imageUris.get(currentImageIndex));
 		} else {
 			runOnUiThread(new Runnable() {
 				public void run() {
@@ -156,6 +166,18 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	}
 
 	/**
+	 * In case of device rotation the activity will be restarted.
+	 * In this case the original intent which where used to start the activity 
+	 * won't change. So we only need to store the state of the activity.    
+	 */
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);		
+		savedInstanceState.putBoolean("pictureShowActive", pictureShowActive);		
+		savedInstanceState.putInt("currentImageIndex", currentImageIndex);		
+	}
+
+	/**
 	 * Create and start a timer for the next picture change. The timer runs only
 	 * once.
 	 */
@@ -178,20 +200,23 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * Start playing the picture show.
 	 */
 	public void play() {
-		if (isProcessingCommand) return;
+		if (isProcessingCommand)
+			return;
 		isProcessingCommand = true;
 		if (currentImageIndex < imageUris.size()) {
 			runOnUiThread(new Runnable() {
 				public void run() {
-					Toast toast = Toast.makeText(ImageViewerActivity.this,
-							getResources().getString(R.string.play) + " ("+ currentImageIndex +"/"+ imageUris.size() +")", Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(
+							ImageViewerActivity.this,
+							getResources().getString(R.string.play) +getPositionString(),
+							Toast.LENGTH_SHORT);
 					toast.show();
 				}
 			});
 			loadImage();
 			// Start the pictureShow
-			pictureShowActive = true;			
-			isProcessingCommand =false;
+			pictureShowActive = true;
+			isProcessingCommand = false;
 
 		}
 	}
@@ -205,7 +230,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		}
 		retrieveImageTask = new RetrieveImageTask(this);
 		retrieveImageTask.execute(imageUris.get(currentImageIndex));
-		
+
 	}
 
 	/**
@@ -213,13 +238,14 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * default image;
 	 */
 	public void stop() {
-		if (isProcessingCommand) return;
+		if (isProcessingCommand)
+			return;
 		isProcessingCommand = true;
 		currentImageIndex = 0;
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.stop) + " ("+ currentImageIndex +"/"+ imageUris.size() +")", Toast.LENGTH_SHORT);
+						getResources().getString(R.string.stop) + getPositionString(), Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
@@ -241,12 +267,13 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * Stop the timer.
 	 */
 	public void pause() {
-		if (isProcessingCommand) return;
+		if (isProcessingCommand)
+			return;
 		isProcessingCommand = true;
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.pause) + " ("+ currentImageIndex +"/"+ imageUris.size() +")" , Toast.LENGTH_SHORT);
+						getResources().getString(R.string.pause) + getPositionString(), Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
@@ -258,8 +285,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * show the previous image
 	 */
 	public void previous() {
-		if (isProcessingCommand) return;
-		isProcessingCommand = true;		
+		if (isProcessingCommand)
+			return;
+		isProcessingCommand = true;
 		currentImageIndex--;
 		if (currentImageIndex < 0) {
 			if (imageUris.size() > 0) {
@@ -271,7 +299,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.previous) + " ("+ currentImageIndex +"/"+ imageUris.size() +")", Toast.LENGTH_SHORT);
+						getResources().getString(R.string.previous) + getPositionString(), Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
@@ -279,11 +307,14 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		isProcessingCommand = false;
 	}
 
+	
+
 	/**
 	 * show the next image.
 	 */
 	public void next() {
-		if (isProcessingCommand) return;
+		if (isProcessingCommand)
+			return;
 		isProcessingCommand = true;
 		currentImageIndex++;
 		if (currentImageIndex > imageUris.size() - 1) {
@@ -293,12 +324,13 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.next)	+ " ("+ currentImageIndex +"/"+ imageUris.size() +")"		 , Toast.LENGTH_SHORT);
-				
+						getResources().getString(R.string.next) + getPositionString(), Toast.LENGTH_SHORT);
+
 				toast.show();
 			}
+
 		});
-		loadImage();		
+		loadImage();
 		isProcessingCommand = false;
 	}
 
@@ -312,9 +344,14 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			showDefaultImage();
 			return;
 		}
+		Log.d(this.getClass().getName(), "image bounds: " + image.getBounds());
 		runOnUiThread(new Runnable() {
 			public void run() {
+				Log.d(getClass().getName(),
+						"Start set image: " + System.currentTimeMillis());
 				imageView.setImageDrawable(image);
+				Log.d(getClass().getName(),
+						"End set image: " + System.currentTimeMillis());
 			}
 		});
 
@@ -356,60 +393,47 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	}
 
-	private void initializeCache() {
-		// initialize Cache
-		final int maxMemory = (int) (Runtime.getRuntime().freeMemory() / 1024);
-		// Use 1/4th of the available memory for this memory cache.
-		//FIXME have to be a configurable property
-		final int cacheSize = maxMemory / 4;
-		Log.d(getClass().getName(), "memory cache size: " + cacheSize);
-		imageCache = new LruCache<Uri, Drawable>(cacheSize) {
-
-			// @SuppressLint("NewApi")
-			@Override
-			protected int sizeOf(Uri key, Drawable drawable) {
-				if (drawable == null) {
-					return 0;
-				}
-				// The cache size will be measured in kilobytes rather than
-				// number of items.
-				// New API: ((BitmapDrawable)
-				// drawable).getBitmap().getByteCount() / 1024;
-				// otherwise: assumption 32 bit per Pixel i.e. 3 byte
-				// this does not work correctly
-				//return drawable.getBounds().height()
-				//		* drawable.getBounds().width() * 4 / 1024;
-				if (drawable instanceof BitmapDrawable){
-				 return ((BitmapDrawable) drawable).getBitmap().getByteCount() / 1024;
-				}
-				//Fallback
-				return drawable.getBounds().height() * drawable.getBounds().width() * 4 / 1024;
-				
-			}
-		};
+	public boolean isPictureShowActive() {
+		return pictureShowActive;
 	}
-
-	public void addImageToCache(Uri key, Drawable drawable) {
-		if (key == null || drawable == null) {
+	
+	private String getPositionString() {				
+		return  " ("
+				+ (currentImageIndex + 1) + "/" + imageUris.size()
+				+ ")";
+	}
+	
+	private void hideActionBar(){
+		ActionBar actionBar = getActionBar();
+		if(actionBar == null) {
+			Log.d(getClass().getName(), "hideActionBar ActionBar is null" );
 			return;
 		}
-		if (getImageFormCache(key) != null) {
-			removeImageFromCache(key);
+		actionBar.hide(); // slides out	
+	}
+	
+	private void showActionBar(){
+		ActionBar actionBar = getActionBar();
+		if(actionBar == null) {
+			Log.d(getClass().getName(), "showActionBar ActionBar is null" );
+			return;
 		}
-		imageCache.put(key, drawable);
-
+		actionBar.show(); // slides in
 	}
 
-	public void removeImageFromCache(Uri key) {
-		imageCache.remove(key);
+	@Override
+	public void onBottomEdge() {
+		showActionBar();
+		Timer actionBarHideTimer = new Timer();
+		actionBarHideTimer.schedule(new TimerTask() {
 
-	}
+			@Override
+			public void run() {
+				Log.d(getClass().getName(), "actionBarHide TimerEvent" + this);
+				ImageViewerActivity.this.hideActionBar();
 
-	public Drawable getImageFormCache(Uri key) {
-		return imageCache.get(key);
-	}
-
-	public boolean isPictureShowActive() {		
-		return pictureShowActive;
+			}
+		}, 1000);
+		
 	}
 }

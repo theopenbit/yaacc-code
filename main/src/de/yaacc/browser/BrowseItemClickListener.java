@@ -6,23 +6,17 @@ import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
-import de.yaacc.R;
-import de.yaacc.R.id;
-import de.yaacc.R.string;
-
 import android.content.Context;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnCreateContextMenuListener;
-import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
+import de.yaacc.R;
 
 public class BrowseItemClickListener implements OnItemClickListener
 		 {
