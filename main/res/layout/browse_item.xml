@@ -7,7 +7,7 @@
         android:contentDescription="Mime-Type-Image"
         android:layout_alignParentLeft="true"
     	android:layout_alignParentTop="true"
-    	android:layout_width="wrap_content"
+    	android:layout_width="70dp"
     	android:layout_height="wrap_content"
     	/>
     
@@ -15,7 +15,8 @@
         android:layout_toRightOf="@id/browseItemIcon"
         style="@android:style/TextAppearance.DeviceDefault.Large"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"/>
     
 
 </RelativeLayout>
