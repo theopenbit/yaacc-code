@@ -47,8 +47,9 @@ import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
-public class BrowseActivity extends Activity implements OnClickListener, UpnpClientListener {
-	
+public class BrowseActivity extends Activity implements OnClickListener,
+		UpnpClientListener {
+
 	private boolean displayingSomething = false;
 
 	public static UpnpClient uClient = null;
@@ -67,8 +68,6 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 		// local server startup
 		uClient = new UpnpClient();
 		uClient.initialize(getApplicationContext());
-		
-		
 
 		// load preferences
 		SharedPreferences preferences = PreferenceManager
@@ -79,14 +78,10 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 
 		if (preferences.getBoolean(
 				getString(R.string.settings_local_server_chkbx), true)) {
-
-			if (preferences.getBoolean(
-					getString(R.string.settings_local_server_chkbx), true)) {
-				// Start upnpserver service for avtransport
-				Intent svc = new Intent(getApplicationContext(),
-						YaaccUpnpServerService.class);
-				getApplicationContext().startService(svc);
-			}
+			// Start upnpserver service for avtransport
+			Intent svc = new Intent(getApplicationContext(),
+					YaaccUpnpServerService.class);
+			getApplicationContext().startService(svc);
 		}
 
 		// remove the buttons if local playback is enabled and background
@@ -95,69 +90,68 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 		if (uClient.isLocalPlaybackEnabled()) {
 			activateControls(false);
 		}
-		
-			// initialize buttons
-			ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
-			btnPrev.setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View v) {
-					uClient.playbackPrev();
+		// initialize buttons
+		ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
+		btnPrev.setOnClickListener(new OnClickListener() {
 
-				}
-			});
+			@Override
+			public void onClick(View v) {
+				uClient.playbackPrev();
 
-			ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-			btnStop.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					uClient.playbackStop();
-					ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-					btnStop.setVisibility(View.INVISIBLE);
-				}
-			});
-
-			ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
-			btnNext.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					uClient.playbackNext();
-
-				}
-			});
-			
-			
-			
-			
-			// add ourself as listener
-			uClient.addUpnpClientListener(this);
-			
-			if (!displayingSomething){
-				showMainFolder();
 			}
+		});
+
+		ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+		btnStop.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				uClient.playbackStop();
+				ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+				btnStop.setVisibility(View.INVISIBLE);
+			}
+		});
+
+		ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
+		btnNext.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				uClient.playbackNext();
+
+			}
+		});
+
+		// add ourself as listener
+		uClient.addUpnpClientListener(this);
+
+		if (!displayingSomething) {
+			showMainFolder();
+		}
 	}
-	
+
 	/**
 	 * Tries to populate the browsing area if a providing device is configured
 	 */
-	private void showMainFolder(){
+	private void showMainFolder() {
 		Device providerDevice = getProviderDevice();
-		
+
 		if (providerDevice != null) {
 			populateItemList(providerDevice);
 
 			displayingSomething = true;
-			
-		} else {
-			Context context = getApplicationContext();
-			CharSequence text = getString(R.string.browse_no_content_found);
-			int duration = Toast.LENGTH_SHORT;
 
-			Toast toast = Toast.makeText(context, text, duration);
+		} else {
+
+			this.runOnUiThread(new Runnable() {
+				  public void run() {
+			Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.browse_no_content_found), Toast.LENGTH_SHORT);
 			toast.show();
+				  }
+			});
 		}
+		
 	}
 
 	@Override
@@ -206,8 +200,6 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 		BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
 		itemList.setOnItemClickListener(bItemClickListener);
 
-		registerForContextMenu(itemList);
-
 	}
 
 	@Override
@@ -244,7 +236,9 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 
 	/**
 	 * Shows/Hides the controls
-	 * @param activated true if the controls should be shown
+	 * 
+	 * @param activated
+	 *            true if the controls should be shown
 	 */
 	public void activateControls(boolean activated) {
 		RelativeLayout controls = (RelativeLayout) findViewById(R.id.controls);
@@ -254,36 +248,41 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 			controls.setVisibility(View.VISIBLE);
 		}
 	}
-	
+
 	/**
-	 * Selects the place in the UI where the items are shown and renders the content directory
-	 * @param providerDevice device to access
+	 * Selects the place in the UI where the items are shown and renders the
+	 * content directory
+	 * 
+	 * @param providerDevice
+	 *            device to access
 	 */
-	private void populateItemList(Device providerDevice){
-		
-		 this.runOnUiThread(
-	                new Runnable(){
-	                    public void run(){
-	                    	// Define where to show the folder contents
-	    					ListView deviceList = (ListView) findViewById(R.id.itemList);
+	private void populateItemList(Device providerDevice) {
 
-	    								// Load adapter if selected device is configured and found
-	    					bItemAdapter = new BrowseItemAdapter(getApplicationContext(), "0");
-	    					deviceList.setAdapter(bItemAdapter);
+		this.runOnUiThread(new Runnable() {
+			public void run() {
+				// Define where to show the folder contents
+				ListView deviceList = (ListView) findViewById(R.id.itemList);
 
-	    					deviceList.setOnItemClickListener(bItemClickListener);
-	    					
-	    					registerForContextMenu(deviceList);
-	                    }
-	                });
-				
+				// Load adapter if selected device is configured and found
+				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
+						"0");
+				deviceList.setAdapter(bItemAdapter);
+
+				deviceList.setOnItemClickListener(bItemClickListener);
+
+				registerForContextMenu(deviceList);
+			}
+		});
+
 	}
-	
+
 	/**
-	 * Loads the device providing media files, as it is configured in the settings
+	 * Loads the device providing media files, as it is configured in the
+	 * settings
+	 * 
 	 * @return configured device
 	 */
-	private Device getProviderDevice(){
+	private Device getProviderDevice() {
 		// Get Try to get selected device
 		Device selectedDevice = null;
 
@@ -298,30 +297,28 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 									getString(R.string.settings_selected_provider_title),
 									null));
 		}
-		
+
 		return selectedDevice;
 	}
 
 	@Override
 	public void deviceAdded(Device<?, ?, ?> device) {
-		if(!displayingSomething){
+		if (!displayingSomething) {
 			showMainFolder();
 		}
-		
+
 	}
 
 	@Override
 	public void deviceRemoved(Device<?, ?, ?> device) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deviceUpdated(Device<?, ?, ?> device) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
 
 }
