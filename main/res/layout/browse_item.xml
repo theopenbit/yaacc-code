@@ -13,6 +13,7 @@
     
     <TextView android:id="@+id/browseItemName"
         android:layout_toRightOf="@id/browseItemIcon"
+        style="@android:style/TextAppearance.DeviceDefault.Large"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
     
