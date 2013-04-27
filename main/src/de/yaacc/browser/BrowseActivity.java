@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -271,6 +272,8 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 	    					deviceList.setAdapter(bItemAdapter);
 
 	    					deviceList.setOnItemClickListener(bItemClickListener);
+	    					
+	    					registerForContextMenu(deviceList);
 	                    }
 	                });
 				
@@ -318,6 +321,7 @@ public class BrowseActivity extends Activity implements OnClickListener, UpnpCli
 		// TODO Auto-generated method stub
 		
 	}
+
 
 
 }
