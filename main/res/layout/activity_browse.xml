@@ -3,18 +3,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <Button android:id="@+id/refreshMainFolder"
-        android:text="@string/browse_main_folder"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:gravity="top"/>
-
-    <ListView
+	<ListView
         android:id="@+id/itemList"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/refreshMainFolder"
-        android:layout_above="@+id/controls" />
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/controls"/>
     
     <RelativeLayout android:id="@+id/controls" 
         android:layout_alignParentBottom="true"

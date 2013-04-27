@@ -1097,6 +1097,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		getControlPoint().execute(actionCallback);
 	}
 
+	
 	/**
 	 * Plays an item on an remote device
 	 * 

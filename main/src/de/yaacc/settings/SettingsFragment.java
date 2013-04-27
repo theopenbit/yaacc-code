@@ -83,12 +83,16 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 
 	@Override
 	public void deviceAdded(Device<?, ?, ?> device) {
-		populateDeviceLists();
+		if (this.isVisible()){
+			populateDeviceLists();
+		}
 	}
 
 	@Override
 	public void deviceRemoved(Device<?, ?, ?> device) {
-		populateDeviceLists();
+		if(this.isVisible()){
+			populateDeviceLists();
+		}
 	}
 
 	@Override

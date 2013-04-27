@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -43,9 +44,13 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
-public class BrowseActivity extends Activity implements OnClickListener {
+public class BrowseActivity extends Activity implements OnClickListener,
+		UpnpClientListener {
+
+	private boolean displayingSomething = false;
 
 	public static UpnpClient uClient = null;
 
@@ -73,17 +78,10 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 		if (preferences.getBoolean(
 				getString(R.string.settings_local_server_chkbx), true)) {
-
-			if (preferences.getBoolean(
-					getString(R.string.settings_local_server_chkbx), true)) {
-				// Start upnpserver service for avtransport
-				Intent svc = new Intent(getApplicationContext(),
-						YaaccUpnpServerService.class);
-				getApplicationContext().startService(svc);
-			}
-
-			final Button showDeviceNumber = (Button) findViewById(R.id.refreshMainFolder);
-			showDeviceNumber.setOnClickListener(this);
+			// Start upnpserver service for avtransport
+			Intent svc = new Intent(getApplicationContext(),
+					YaaccUpnpServerService.class);
+			getApplicationContext().startService(svc);
 		}
 
 		// remove the buttons if local playback is enabled and background
@@ -92,38 +90,67 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		if (uClient.isLocalPlaybackEnabled()) {
 			activateControls(false);
 		}
-		
-			// initialize buttons
-			ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
-			btnPrev.setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View v) {
-					uClient.playbackPrev();
+		// initialize buttons
+		ImageButton btnPrev = (ImageButton) findViewById(R.id.controlPrev);
+		btnPrev.setOnClickListener(new OnClickListener() {
 
-				}
+			@Override
+			public void onClick(View v) {
+				uClient.playbackPrev();
+
+			}
+		});
+
+		ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+		btnStop.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				uClient.playbackStop();
+				ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+				btnStop.setVisibility(View.INVISIBLE);
+			}
+		});
+
+		ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
+		btnNext.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				uClient.playbackNext();
+
+			}
+		});
+
+		// add ourself as listener
+		uClient.addUpnpClientListener(this);
+
+		if (!displayingSomething) {
+			showMainFolder();
+		}
+	}
+
+	/**
+	 * Tries to populate the browsing area if a providing device is configured
+	 */
+	private void showMainFolder() {
+		Device providerDevice = getProviderDevice();
+
+		if (providerDevice != null) {
+			populateItemList(providerDevice);
+
+			displayingSomething = true;
+
+		} else {
+
+			this.runOnUiThread(new Runnable() {
+				  public void run() {
+			Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.browse_no_content_found), Toast.LENGTH_SHORT);
+			toast.show();
+				  }
 			});
-
-			ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-			btnStop.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					uClient.playbackStop();
-					ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-					btnStop.setVisibility(View.INVISIBLE);
-				}
-			});
-
-			ImageButton btnNext = (ImageButton) findViewById(R.id.controlNext);
-			btnNext.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					uClient.playbackNext();
-
-				}
-			});
+		}
 		
 	}
 
@@ -147,48 +174,8 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// Define where to show the folder contents
-		final ListView deviceList = (ListView) findViewById(R.id.itemList);
-
-		// Get Try to get selected device
-		Device selectedDevice = null;
-
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-
-		if (preferences.getString(
-				getString(R.string.settings_selected_provider_title), null) != null) {
-			selectedDevice = uClient
-					.getDevice(preferences
-							.getString(
-									getString(R.string.settings_selected_provider_title),
-									null));
-		}
-
-		// Load adapter if selected device is configured and found
-		if (selectedDevice != null) {
-			bItemAdapter = new BrowseItemAdapter(this, "0");
-			deviceList.setAdapter(bItemAdapter);
-
-			deviceList.setOnItemClickListener(bItemClickListener);
-		} else {
-			Context context = getApplicationContext();
-			CharSequence text = getString(R.string.browse_no_content_found);
-			int duration = Toast.LENGTH_SHORT;
-
-			Toast toast = Toast.makeText(context, text, duration);
-			toast.show();
-		}
-
-		if (preferences.getString(
-				getString(R.string.settings_selected_provider_title), null) != null) {
-			selectedDevice = uClient
-					.getDevice(preferences
-							.getString(
-									getString(R.string.settings_selected_provider_title),
-									null));
-		}
-
+		Device providerDevice = getProviderDevice();
+		populateItemList(providerDevice);
 	}
 
 	@Override
@@ -212,8 +199,6 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 		BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
 		itemList.setOnItemClickListener(bItemClickListener);
-
-		registerForContextMenu(itemList);
 
 	}
 
@@ -251,7 +236,9 @@ public class BrowseActivity extends Activity implements OnClickListener {
 
 	/**
 	 * Shows/Hides the controls
-	 * @param activated true if the controls should be shown
+	 * 
+	 * @param activated
+	 *            true if the controls should be shown
 	 */
 	public void activateControls(boolean activated) {
 		RelativeLayout controls = (RelativeLayout) findViewById(R.id.controls);
@@ -262,5 +249,76 @@ public class BrowseActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * Selects the place in the UI where the items are shown and renders the
+	 * content directory
+	 * 
+	 * @param providerDevice
+	 *            device to access
+	 */
+	private void populateItemList(Device providerDevice) {
+
+		this.runOnUiThread(new Runnable() {
+			public void run() {
+				// Define where to show the folder contents
+				ListView deviceList = (ListView) findViewById(R.id.itemList);
+
+				// Load adapter if selected device is configured and found
+				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
+						"0");
+				deviceList.setAdapter(bItemAdapter);
+
+				deviceList.setOnItemClickListener(bItemClickListener);
+
+				registerForContextMenu(deviceList);
+			}
+		});
+
+	}
+
+	/**
+	 * Loads the device providing media files, as it is configured in the
+	 * settings
+	 * 
+	 * @return configured device
+	 */
+	private Device getProviderDevice() {
+		// Get Try to get selected device
+		Device selectedDevice = null;
+
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
+		if (preferences.getString(
+				getString(R.string.settings_selected_provider_title), null) != null) {
+			selectedDevice = uClient
+					.getDevice(preferences
+							.getString(
+									getString(R.string.settings_selected_provider_title),
+									null));
+		}
+
+		return selectedDevice;
+	}
+
+	@Override
+	public void deviceAdded(Device<?, ?, ?> device) {
+		if (!displayingSomething) {
+			showMainFolder();
+		}
+
+	}
+
+	@Override
+	public void deviceRemoved(Device<?, ?, ?> device) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deviceUpdated(Device<?, ?, ?> device) {
+		// TODO Auto-generated method stub
+
+	}
 
 }
