@@ -65,6 +65,8 @@ import de.yaacc.util.SwipeReceiver;
  */
 public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
+	
+
 	public static final String URIS = "URIS_PARAM"; // String Intent parameter
 	public static final String AUTO_START_SHOW = "AUTO_START_SHOW"; // Boolean
 																	// Intent
@@ -131,6 +133,15 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				}
 			});
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPause()
+	 */
+	@Override
+	protected void onPause() {	
+		super.onPause();
+		cancleTimer();
 	}
 
 	@Override
@@ -349,7 +360,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		currentImageIndex++;
 		if (currentImageIndex > imageUris.size() - 1) {
 			currentImageIndex = 0;
-			pictureShowActive = false;
+			//pictureShowActive = false; restart after last image
 		}
 		runOnUiThread(new Runnable() {
 			public void run() {
