@@ -5,7 +5,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-
 public class ActivitySwipeDetector implements OnTouchListener {
 
 	static final String logTag = "ActivitySwipeDetector";
@@ -17,88 +16,97 @@ public class ActivitySwipeDetector implements OnTouchListener {
 		this.swipeReceiver = swipeReceiver;
 	}
 
-	public void onRightToLeftSwipe() {
+	private void onRightToLeftSwipe() {
 		Log.i(logTag, "RightToLeftSwipe!");
 		swipeReceiver.onRightToLeftSwipe();
 	}
 
-	public void onLeftToRightSwipe() {
+	private void onLeftToRightSwipe() {
 		Log.i(logTag, "LeftToRightSwipe!");
 		swipeReceiver.onLeftToRightSwipe();
 	}
 
-	public void onTopToBottomSwipe() {
+	private void onTopToBottomSwipe() {
 		Log.i(logTag, "onTopToBottomSwipe!");
 		swipeReceiver.onTopToBottomSwipe();
 	}
 
-	public void onBottomToTopSwipe() {
+	private void onBottomToTopSwipe() {
 		Log.i(logTag, "onBottomToTopSwipe!");
 		swipeReceiver.onBottomToTopSwipe();
 	}
-	
-	private void onBottomEdge() {
-		Log.i(logTag, "onBottomEdge!");
-		swipeReceiver.onBottomEdge();
+
+	private void endOnTouchProcessing(View v, MotionEvent event) {
+		Log.i(logTag, "endOnTouchProcessing!");
+		swipeReceiver.endOnTouchProcessing(v, event);
+
+	}
+
+	private void beginOnTouchProcessing(View v, MotionEvent event) {
+		Log.i(logTag, "beginOnTouchProcessing!");
+		swipeReceiver.beginOnTouchProcessing(v, event);
+
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN: {
-			downX = event.getX();
-			downY = event.getY();
-			return true;
-		}
-		case MotionEvent.ACTION_UP: {
-			upX = event.getX();
-			upY = event.getY();
+		beginOnTouchProcessing(v, event);
+		try {
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN: {
+				downX = event.getX();
+				downY = event.getY();
+				return true;
+			}
+			case MotionEvent.ACTION_UP: {
+				upX = event.getX();
+				upY = event.getY();
 
-			float deltaX = downX - upX;
-			float deltaY = downY - upY;
+				float deltaX = downX - upX;
+				float deltaY = downY - upY;
 
-			// swipe horizontal?
-			if (Math.abs(deltaX) > MIN_DISTANCE) {
-				// left or right
-				if (deltaX < 0) {
-					this.onLeftToRightSwipe();
-					return true;
+				// swipe horizontal?
+				if (Math.abs(deltaX) > MIN_DISTANCE) {
+					// left or right
+					if (deltaX < 0) {
+						this.onLeftToRightSwipe();
+						return true;
+					}
+					if (deltaX > 0) {
+						this.onRightToLeftSwipe();
+						return true;
+					}
+				} else {
+					Log.i(logTag, "Swipe was only " + Math.abs(deltaX)
+							+ " long, need at least " + MIN_DISTANCE);
+					return false; // We don't consume the event
 				}
-				if (deltaX > 0) {
-					this.onRightToLeftSwipe();
-					return true;
+
+				// swipe vertical?
+				if (Math.abs(deltaY) > MIN_DISTANCE) {
+					// top or down
+					if (deltaY < 0) {
+						this.onTopToBottomSwipe();
+						return true;
+					}
+					if (deltaY > 0) {
+						this.onBottomToTopSwipe();
+						return true;
+					}
+				} else {
+					Log.i(logTag, "Swipe was only " + Math.abs(deltaX)
+							+ " long, need at least " + MIN_DISTANCE);
+					return false; // We don't consume the event
 				}
-			} else {
-				Log.i(logTag, "Swipe was only " + Math.abs(deltaX)
-						+ " long, need at least " + MIN_DISTANCE);
-				return false; // We don't consume the event
+
+				return true;
+			}
 			}
 
-			// swipe vertical?
-			if (Math.abs(deltaY) > MIN_DISTANCE) {
-				// top or down
-				if (deltaY < 0) {
-					this.onTopToBottomSwipe();
-					return true;
-				}
-				if (deltaY > 0) {
-					this.onBottomToTopSwipe();
-					return true;
-				}
-			} else {
-				Log.i(logTag, "Swipe was only " + Math.abs(deltaX)
-						+ " long, need at least " + MIN_DISTANCE);
-				return false; // We don't consume the event
-			}
+			return false;
 
-			return true;
-		}case MotionEvent.EDGE_BOTTOM:
-			this.onBottomEdge();
-			return true;
+		} finally {
+			endOnTouchProcessing(v, event);
 		}
-		return false;
 	}
-
-	
-
 }

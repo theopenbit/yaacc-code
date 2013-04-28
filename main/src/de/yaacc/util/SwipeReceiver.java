@@ -17,6 +17,9 @@
  */
 package de.yaacc.util;
 
+import android.view.MotionEvent;
+import android.view.View;
+
 /**
  * An interface for an object which is able to receive swipe events.
  * @author Tobias Schoene (openbit)  
@@ -26,6 +29,7 @@ public interface SwipeReceiver {
 	void onRightToLeftSwipe();
 	void onLeftToRightSwipe();
 	void onTopToBottomSwipe();
-	void onBottomToTopSwipe();
-	void onBottomEdge();
+	void onBottomToTopSwipe();	
+	void beginOnTouchProcessing(View v, MotionEvent event);
+	void endOnTouchProcessing(View v, MotionEvent event);	
 }

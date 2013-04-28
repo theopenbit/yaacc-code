@@ -36,7 +36,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -77,14 +79,17 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	private boolean pictureShowActive = false;
 	private boolean isProcessingCommand = false; // indicates an command
+	private Timer pictureShowTimer;
 													// processing
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		menuBarsHide();
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 		setContentView(R.layout.activity_image_viewer);
-		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 		imageView = (ImageView) findViewById(R.id.imageView);
 		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(
 				this);
@@ -104,10 +109,11 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			}
 		}
 		pictureShowActive = i.getBooleanExtra(AUTO_START_SHOW, false);
-		currentImageIndex = 0; 
-		if(savedInstanceState !=null){
-			pictureShowActive = savedInstanceState.getBoolean("pictureShowActive");
-			currentImageIndex = savedInstanceState.getInt("currentImageIndex"); 
+		currentImageIndex = 0;
+		if (savedInstanceState != null) {
+			pictureShowActive = savedInstanceState
+					.getBoolean("pictureShowActive");
+			currentImageIndex = savedInstanceState.getInt("currentImageIndex");
 		}
 		if (imageUris.size() > 0) {
 
@@ -121,6 +127,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 							R.string.no_valid_uri_data_found_to_display,
 							Toast.LENGTH_LONG);
 					toast.show();
+					menuBarsHide();					
 				}
 			});
 		}
@@ -166,15 +173,15 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	}
 
 	/**
-	 * In case of device rotation the activity will be restarted.
-	 * In this case the original intent which where used to start the activity 
-	 * won't change. So we only need to store the state of the activity.    
+	 * In case of device rotation the activity will be restarted. In this case
+	 * the original intent which where used to start the activity won't change.
+	 * So we only need to store the state of the activity.
 	 */
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);		
-		savedInstanceState.putBoolean("pictureShowActive", pictureShowActive);		
-		savedInstanceState.putInt("currentImageIndex", currentImageIndex);		
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putBoolean("pictureShowActive", pictureShowActive);
+		savedInstanceState.putInt("currentImageIndex", currentImageIndex);
 	}
 
 	/**
@@ -183,7 +190,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 */
 	public void startTimer() {
 
-		Timer pictureShowTimer = new Timer();
+		pictureShowTimer = new Timer();
 		pictureShowTimer.schedule(new TimerTask() {
 
 			@Override
@@ -206,16 +213,17 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		if (currentImageIndex < imageUris.size()) {
 			runOnUiThread(new Runnable() {
 				public void run() {
-					Toast toast = Toast.makeText(
-							ImageViewerActivity.this,
-							getResources().getString(R.string.play) +getPositionString(),
-							Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(ImageViewerActivity.this,
+							getResources().getString(R.string.play)
+									+ getPositionString(), Toast.LENGTH_SHORT);
 					toast.show();
+					
 				}
 			});
 			loadImage();
 			// Start the pictureShow
 			pictureShowActive = true;
+			startMenuHideTimer();
 			isProcessingCommand = false;
 
 		}
@@ -239,28 +247,39 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 */
 	public void stop() {
 		if (isProcessingCommand)
-			return;
+			return;		
 		isProcessingCommand = true;
+		cancleTimer();
 		currentImageIndex = 0;
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.stop) + getPositionString(), Toast.LENGTH_SHORT);
-				toast.show();
+						getResources().getString(R.string.stop)
+								+ getPositionString(), Toast.LENGTH_SHORT);
+				toast.show();			
 			}
 		});
 		showDefaultImage();
 
 		pictureShowActive = false;
+		startMenuHideTimer();
 		isProcessingCommand = false;
 	}
 
 	/**
 	 * 
 	 */
+	private void cancleTimer() {
+		if (pictureShowTimer != null){
+			pictureShowTimer.cancel();
+		}
+	}
+
+	/**
+	 * 
+	 */
 	private void showDefaultImage() {
-		imageView.setImageDrawable(Drawable
-				.createFromPath("@drawable/ic_launcher"));
+		imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
 	}
 
 	/**
@@ -270,14 +289,18 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		if (isProcessingCommand)
 			return;
 		isProcessingCommand = true;
+		cancleTimer();
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.pause) + getPositionString(), Toast.LENGTH_SHORT);
+						getResources().getString(R.string.pause)
+								+ getPositionString(), Toast.LENGTH_SHORT);
 				toast.show();
+				
 			}
 		});
 		pictureShowActive = false;
+		startMenuHideTimer();
 		isProcessingCommand = false;
 	}
 
@@ -288,6 +311,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		if (isProcessingCommand)
 			return;
 		isProcessingCommand = true;
+		cancleTimer();
 		currentImageIndex--;
 		if (currentImageIndex < 0) {
 			if (imageUris.size() > 0) {
@@ -299,15 +323,20 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.previous) + getPositionString(), Toast.LENGTH_SHORT);
-				toast.show();
+						getResources().getString(R.string.previous)
+								+ getPositionString(), Toast.LENGTH_SHORT);
+				toast.show();				
 			}
 		});
 		loadImage();
+		runOnUiThread(new Runnable() {
+			public void run() {
+				menuBarsHide();				
+			}
+
+		});
 		isProcessingCommand = false;
 	}
-
-	
 
 	/**
 	 * show the next image.
@@ -316,6 +345,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		if (isProcessingCommand)
 			return;
 		isProcessingCommand = true;
+		cancleTimer();
 		currentImageIndex++;
 		if (currentImageIndex > imageUris.size() - 1) {
 			currentImageIndex = 0;
@@ -324,13 +354,15 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		runOnUiThread(new Runnable() {
 			public void run() {
 				Toast toast = Toast.makeText(ImageViewerActivity.this,
-						getResources().getString(R.string.next) + getPositionString(), Toast.LENGTH_SHORT);
+						getResources().getString(R.string.next)
+								+ getPositionString(), Toast.LENGTH_SHORT);
 
-				toast.show();
+				toast.show();								
 			}
 
 		});
 		loadImage();
+		startMenuHideTimer();
 		isProcessingCommand = false;
 	}
 
@@ -372,12 +404,19 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	// interface SwipeReceiver
 	@Override
 	public void onRightToLeftSwipe() {
-		next();
+
+		if (imageUris.size() > 1) {
+			next();
+		}
+
 	}
 
 	@Override
 	public void onLeftToRightSwipe() {
-		previous();
+
+		if (imageUris.size() > 1) {
+			previous();
+		}
 
 	}
 
@@ -393,47 +432,81 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	}
 
-	public boolean isPictureShowActive() {
-		return pictureShowActive;
-	}
-	
-	private String getPositionString() {				
-		return  " ("
-				+ (currentImageIndex + 1) + "/" + imageUris.size()
-				+ ")";
-	}
-	
-	private void hideActionBar(){
-		ActionBar actionBar = getActionBar();
-		if(actionBar == null) {
-			Log.d(getClass().getName(), "hideActionBar ActionBar is null" );
-			return;
-		}
-		actionBar.hide(); // slides out	
-	}
-	
-	private void showActionBar(){
-		ActionBar actionBar = getActionBar();
-		if(actionBar == null) {
-			Log.d(getClass().getName(), "showActionBar ActionBar is null" );
-			return;
-		}
-		actionBar.show(); // slides in
+	@Override
+	public void beginOnTouchProcessing(View v, MotionEvent event) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				menuBarsShow();
+			}
+		});
+
 	}
 
 	@Override
-	public void onBottomEdge() {
-		showActionBar();
-		Timer actionBarHideTimer = new Timer();
-		actionBarHideTimer.schedule(new TimerTask() {
+	public void endOnTouchProcessing(View v, MotionEvent event) {
+		startMenuHideTimer();
+	}
+
+	/**
+	 * 
+	 */
+	private void startMenuHideTimer() {
+		Timer menuHideTimer = new Timer();
+		menuHideTimer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				Log.d(getClass().getName(), "actionBarHide TimerEvent" + this);
-				ImageViewerActivity.this.hideActionBar();
-
+				runOnUiThread(new Runnable() {
+					public void run() {
+						menuBarsHide();
+					}
+				});
 			}
-		}, 1000);
-		
+		}, 3000);
 	}
+
+	public boolean isPictureShowActive() {
+		return pictureShowActive;
+	}
+
+	private String getPositionString() {
+		return " (" + (currentImageIndex + 1) + "/" + imageUris.size() + ")";
+	}
+
+	private void menuBarsHide() {
+		Log.d(getClass().getName(), "menuBarsHide");
+		ActionBar actionBar = getActionBar();
+		if (actionBar == null) {
+			Log.d(getClass().getName(), "menuBarsHide ActionBar is null");
+			return;
+		}
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LOW_PROFILE);
+
+		actionBar.hide(); // slides out
+
+	}
+
+	private void menuBarsShow() {
+		Log.d(getClass().getName(), "menuBarsShow");
+		ActionBar actionBar = getActionBar();
+		if (actionBar == null) {
+			Log.d(getClass().getName(), "menuBarsShowr ActionBar is null");
+			return;
+		}
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_VISIBLE);
+
+		actionBar.show(); 
+
+	}
+
 }
