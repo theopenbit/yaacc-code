@@ -17,22 +17,8 @@
  */
 package de.yaacc.settings;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import org.teleal.cling.model.meta.Device;
-
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import de.yaacc.R;
-import de.yaacc.browser.BrowseActivity;
-import de.yaacc.upnp.UpnpClient;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 public class SettingsActivity extends Activity {
 

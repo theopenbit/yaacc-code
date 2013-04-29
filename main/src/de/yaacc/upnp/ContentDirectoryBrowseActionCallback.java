@@ -21,7 +21,6 @@ package de.yaacc.upnp;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.contentdirectory.callback.Browse;
 import org.teleal.cling.support.model.BrowseFlag;
 import org.teleal.cling.support.model.BrowseResult;

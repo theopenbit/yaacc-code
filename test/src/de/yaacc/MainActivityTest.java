@@ -17,6 +17,7 @@
  */
 package de.yaacc;
 
+import de.yaacc.browser.BrowseActivity;
 import android.annotation.TargetApi;
 import android.test.ActivityInstrumentationTestCase2;
 
