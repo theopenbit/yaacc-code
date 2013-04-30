@@ -22,7 +22,10 @@ import java.net.URI;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.avtransport.impl.state.Playing;
+import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.teleal.cling.support.model.AVTransport;
+import org.teleal.cling.support.model.MediaInfo;
+import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.SeekMode;
 
 import android.util.Log;
@@ -66,7 +69,18 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 	public Class<? extends AbstractState> setTransportURI(URI uri,
 			String metaData) {
 		Log.d(this.getClass().getName(), "Set TransportURI");
-		// Your choice of action here, and what the next state is going to be!
+		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));		
+		// If you can, you should find and set the duration of the track here!
+		getTransport().setPositionInfo(
+				new PositionInfo(1, metaData, uri.toString()));
+
+		// It's up to you what "last changes" you want to announce to event
+		// listeners
+		getTransport().getLastChange().setEventedValue(
+				getTransport().getInstanceId(),
+				new AVTransportVariable.AVTransportURI(uri),
+				new AVTransportVariable.CurrentTrackURI(uri));
+
 		return AvTransportMediaRendererStopped.class;
 	}
 

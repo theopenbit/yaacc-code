@@ -22,7 +22,10 @@ import java.net.URI;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.avtransport.impl.state.Stopped;
+import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.teleal.cling.support.model.AVTransport;
+import org.teleal.cling.support.model.MediaInfo;
+import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.SeekMode;
 
 import android.util.Log;
@@ -38,16 +41,21 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 
 	/**
 	 * Constructor.
-	 * @param transport the state holder
-	 * @param upnpClient the upnpclient to use
+	 * 
+	 * @param transport
+	 *            the state holder
+	 * @param upnpClient
+	 *            the upnpclient to use
 	 */
-	public AvTransportMediaRendererStopped(AVTransport transport, UpnpClient upnpClient) {
+	public AvTransportMediaRendererStopped(AVTransport transport,
+			UpnpClient upnpClient) {
 		super(transport);
 		this.upnpClient = upnpClient;
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#onEntry()
 	 */
 	@Override
@@ -57,26 +65,41 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 		// Optional: Stop playing, release resources, etc.
 	}
 
-	
-
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#setTransportURI(java.net.URI, java.lang.String)
+	 * 
+	 * @see
+	 * org.teleal.cling.support.avtransport.impl.state.Stopped#setTransportURI
+	 * (java.net.URI, java.lang.String)
 	 */
 	@Override
-   public Class<? extends AbstractState> setTransportURI(URI uri, String metaData) {
+	public Class<? extends AbstractState> setTransportURI(URI uri,
+			String metaData) {
 		Log.d(this.getClass().getName(), "setTransportURI");
-		         // This operation can be triggered in any state, you should think
-		         // about how you'd want your player to react. If we are in Stopped
-		         // state nothing much will happen, except that you have to set
-		         // the media and position info, just like in MyRendererNoMediaPresent.
-		         // However, if this would be the MyRendererPlaying state, would you
-		         // prefer stopping first?
-		         return AvTransportMediaRendererStopped.class;
-		     }
+		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));
+		// If you can, you should find and set the duration of the track here!
+		getTransport().setPositionInfo(
+				new PositionInfo(1, metaData, uri.toString()));
+
+		// It's up to you what "last changes" you want to announce to event
+		// listeners
+		getTransport().getLastChange().setEventedValue(
+				getTransport().getInstanceId(),
+				new AVTransportVariable.AVTransportURI(uri),
+				new AVTransportVariable.CurrentTrackURI(uri));
+
+		// This operation can be triggered in any state, you should think
+		// about how you'd want your player to react. If we are in Stopped
+		// state nothing much will happen, except that you have to set
+		// the media and position info, just like in MyRendererNoMediaPresent.
+		// However, if this would be the MyRendererPlaying state, would you
+		// prefer stopping first?
+		return AvTransportMediaRendererStopped.class;
+	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#stop()
 	 */
 	@Override
@@ -89,7 +112,10 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#play(java.lang.String)
+	 * 
+	 * @see
+	 * org.teleal.cling.support.avtransport.impl.state.Stopped#play(java.lang
+	 * .String)
 	 */
 	@Override
 	public Class<? extends AbstractState> play(String speed) {
@@ -100,6 +126,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#next()
 	 */
 	@Override
@@ -110,6 +137,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#previous()
 	 */
 	@Override
@@ -120,7 +148,10 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#seek(org.teleal.cling.support.model.SeekMode, java.lang.String)
+	 * 
+	 * @see
+	 * org.teleal.cling.support.avtransport.impl.state.Stopped#seek(org.teleal
+	 * .cling.support.model.SeekMode, java.lang.String)
 	 */
 	@Override
 	public Class<? extends AbstractState> seek(SeekMode unit, String target) {
