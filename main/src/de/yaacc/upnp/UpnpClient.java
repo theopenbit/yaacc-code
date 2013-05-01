@@ -363,18 +363,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 	}
 
-	/**
-	 * Start an intent with Action.View;
-	 * 
-	 * @param mime
-	 *            the Mimetype to start
-	 * @param uri
-	 *            the uri to start
-	 * 
-	 */
-	protected void intentView(String mime, Uri uri) {
-		intentView(mime, uri, false);
-	}
 
 	/**
 	 * Start an intent with Action.View;
@@ -386,8 +374,12 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @param backround
 	 *            starts a background activity
 	 */
-	protected void intentView(String mime, Uri uri, boolean background) {
+	protected void intentView(String mime, Uri uri) {
 		Class activityclazz = null;
+		
+		boolean background = preferences.getBoolean(
+				context.getString(R.string.settings_audio_app), true);
+		
 		// test if special activity to choose
 		if (background) {
 			if (mime.indexOf("audio") > -1) {
@@ -910,8 +902,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(), "ContentFormat: "
 				+ resource.getProtocolInfo().getContentFormat());
 		Log.d(getClass().getName(), "Value: " + resource.getValue());
-		intentView(resource.getProtocolInfo().getContentFormat(),
-				Uri.parse(resource.getValue()));
+		intentView(resource.getProtocolInfo().getContentFormat(),Uri.parse(resource.getValue()));
 
 	}
 
@@ -984,7 +975,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				toast.show();
 			}
 		} else {
-			playLocal(items, 0, background);
+			playLocal(items, 0);
 		}
 	}
 
@@ -1327,8 +1318,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * once.
 	 * 
 	 */
-	private void playLocal(final List<Item> items, final int currentIndex,
-			final boolean background) {
+	private void playLocal(final List<Item> items, final int currentIndex) {
 		if (currentIndex < 0 || currentIndex >= items.size()) {
 			return;
 		}
@@ -1363,7 +1353,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			}
 		}
 		intentView(resource.getProtocolInfo().getContentFormat(),
-				Uri.parse(resource.getValue()), background);
+				Uri.parse(resource.getValue()));
 		if (currentIndex != items.size() - 1) {
 			final int nextIndex = currentIndex + 1;
 			Log.d(getClass().getName(), "Play item " + item.getId()
@@ -1376,7 +1366,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 					public void run() {
 						Log.d(getClass().getName(), "TimerEvent for next item"
 								+ this);
-						playLocal(items, nextIndex, background);
+						playLocal(items, nextIndex);
 					}
 				}, millis);
 			} catch (Exception e) {
