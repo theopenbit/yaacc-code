@@ -62,6 +62,8 @@ import org.teleal.cling.support.model.Protocol;
 import org.teleal.cling.support.model.ProtocolInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -150,6 +152,8 @@ public class YaaccUpnpServerService extends Service {
 	 * 
 	 */
 	private void initialize() {
+		
+			
 		if (!upnpClient.isInitialized()) {
 			upnpClient.initialize(getApplicationContext());
 			watchdog = false;
@@ -174,8 +178,11 @@ public class YaaccUpnpServerService extends Service {
 		// Create a HttpService for providing content in the network.
 		try {
 			new RequestListenerThread(getApplicationContext()).start();
-		} catch (IOException e) {
-			throw new IllegalStateException("ContentProvider can not be initialized!", e);			
+		} catch (IOException e) {		
+			//FIXME Ignored right error handling on rebind needed 
+			Log.w(this.getClass().getName(), "ContentProvider can not be initialized!", e);
+				//throw new IllegalStateException("ContentProvider can not be initialized!", e);
+			
 		}
 
 	}
@@ -435,9 +442,11 @@ public class YaaccUpnpServerService extends Service {
 		@Override
 		public void run() {
 			Log.d(getClass().getName(), "New connection thread");
-			HttpContext context = new BasicHttpContext(null);
 			try {
-				while (!Thread.interrupted() && conn.isOpen()) {
+				Log.d(getClass().getName(), "conn.isOpen(): " + conn.isOpen());
+				Log.d(getClass().getName(), "!Thread.interrupted(): " + !Thread.interrupted());
+				while (!Thread.interrupted() && conn.isOpen()) {					
+					HttpContext context = new BasicHttpContext();
 					httpservice.handleRequest(conn, context);
 				}
 			} catch (ConnectionClosedException ex) {
@@ -449,13 +458,25 @@ public class YaaccUpnpServerService extends Service {
 						"Unrecoverable HTTP protocol violation: ", ex);
 			} finally {
 				try {
+					Log.d(getClass().getName(), "Shutdown connection!");
 					conn.shutdown();
 				} catch (IOException ignore) {
 					// ignore it
+					Log.d(getClass().getName(), "Error closing connection: ", ignore);
 				}
 
 			}
 		}
 
+	}
+	
+	private boolean isYaaccUpnpServerServiceRunning() {
+	    ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (this.getClass().getName().equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 }

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.conn.util.InetAddressUtils;
 import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
 import org.teleal.cling.support.contentdirectory.ContentDirectoryErrorCode;
 import org.teleal.cling.support.contentdirectory.ContentDirectoryException;
@@ -56,6 +57,7 @@ import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import de.yaacc.R;
 
 /**
@@ -309,13 +311,49 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		content.put(videosFolder.getId(), videosFolder);
 	}
 
-	private List<VideoItem> createMediaStoreVidos(String string) {
+	private List<VideoItem> createMediaStoreVidos(String parentID) {
 		List<VideoItem> result = new ArrayList<VideoItem>();
+		String[] projection = { MediaStore.Video.Media._ID,
+				MediaStore.Video.Media.DISPLAY_NAME,
+				MediaStore.Video.Media.MIME_TYPE,				
+				MediaStore.Video.Media.SIZE};
+		String selection = "";
+		String[] selectionArgs = null;
+		Cursor mediaCursor = getContext().getContentResolver().query(
+				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection,
+				selection, selectionArgs, null);
+
+		if (mediaCursor != null) {
+			mediaCursor.moveToFirst();
+			while (!mediaCursor.isAfterLast()) {
+				String id = mediaCursor.getString(mediaCursor
+						.getColumnIndex(MediaStore.Video.VideoColumns._ID));
+				String name = mediaCursor
+						.getString(mediaCursor
+								.getColumnIndex(MediaStore.Video.VideoColumns.DISPLAY_NAME));
+				Long size = Long.valueOf(mediaCursor.getString(mediaCursor
+						.getColumnIndex(MediaStore.Video.VideoColumns.SIZE)));
+				Log.d(getClass().getName(), "Mimetype: " + mediaCursor.getString(mediaCursor
+						.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
+				MimeType mimeType = MimeType
+						.valueOf(mediaCursor.getString(mediaCursor
+								.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
+				//file parameter only needed for media players which decide the ability of playing a file by the file extension   
+				String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name +"'";
+				Res resource = new Res(mimeType, size, uri);
+				result.add(new VideoItem(id, parentID, name, "", resource));
+				Log.d(getClass().getName(), "VideoItem: " + id + " Name: " + name
+						+ " uri: " + uri);
+				mediaCursor.moveToNext();
+			}
+		} else {
+			Log.d(getClass().getName(), "System media store is empty.");
+		}
+		mediaCursor.close();
 		return result;
 	}
 
-	//FIXME media url have to include target filename i
-	//FIXME otherwise an upnp client isn't able to determine the mimetype 
+	
 	private List<Photo> createMediaStorePhotos(String parentID) {
 		List<Photo> result = new ArrayList<Photo>();
 		// Query for all images on external storage
@@ -337,15 +375,15 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 				String name = mImageCursor
 						.getString(mImageCursor
 								.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
-//				String data = mImageCursor.getString(mImageCursor
-//						.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
 				Long size = Long.valueOf(mImageCursor.getString(mImageCursor
 						.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
+				Log.d(getClass().getName(), "Mimetype: " + mImageCursor.getString(mImageCursor
+						.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
 				MimeType mimeType = MimeType
 						.valueOf(mImageCursor.getString(mImageCursor
 								.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
-//				String uri = "http://" + getInetAddress().getHostAddress() + "?id=" + id;
-				String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "?id=" + id;
+				//file parameter only needed for media players which decide the ability of playing a file by the file extension   
+				String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name +"'" ;
 				Res resource = new Res(mimeType, size, uri);
 				result.add(new Photo(id, parentID, name, "", "", resource));
 				Log.d(getClass().getName(), "Image: " + id + " Name: " + name
@@ -359,8 +397,45 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		return result;
 	}
 
-	private List<MusicTrack> createMediaStoreMusicTracks(String string) {
-		List<MusicTrack> result = new ArrayList<MusicTrack>();
+	private List<MusicTrack> createMediaStoreMusicTracks(String parentID) {
+		List<MusicTrack> result = new ArrayList<MusicTrack>();		
+		String[] projection = { MediaStore.Audio.Media._ID,
+				MediaStore.Audio.Media.DISPLAY_NAME,
+				MediaStore.Audio.Media.MIME_TYPE,
+				MediaStore.Audio.Media.SIZE};
+		String selection = "";
+		String[] selectionArgs = null;
+		Cursor mediaCursor = getContext().getContentResolver().query(
+				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
+				selection, selectionArgs, null);
+
+		if (mediaCursor != null) {
+			mediaCursor.moveToFirst();
+			while (!mediaCursor.isAfterLast()) {
+				String id = mediaCursor.getString(mediaCursor
+						.getColumnIndex(MediaStore.Audio.AudioColumns._ID));
+				String name = mediaCursor
+						.getString(mediaCursor
+								.getColumnIndex(MediaStore.Audio.AudioColumns.DISPLAY_NAME));
+				Long size = Long.valueOf(mediaCursor.getString(mediaCursor
+						.getColumnIndex(MediaStore.Audio.AudioColumns.SIZE)));
+				Log.d(getClass().getName(), "Mimetype: " + mediaCursor.getString(mediaCursor
+						.getColumnIndex(MediaStore.Audio.AudioColumns.MIME_TYPE)));
+				MimeType mimeType = MimeType
+						.valueOf(mediaCursor.getString(mediaCursor
+								.getColumnIndex(MediaStore.Audio.AudioColumns.MIME_TYPE)));
+				//file parameter only needed for media players which decide the ability of playing a file by the file extension   
+				String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name +"'";
+				Res resource = new Res(mimeType, size, uri);
+				result.add(new MusicTrack(id, parentID, name, "", "", "", resource));
+				Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name
+						+ " uri: " + uri);
+				mediaCursor.moveToNext();
+			}
+		} else {
+			Log.d(getClass().getName(), "System media store is empty.");
+		}
+		mediaCursor.close();
 		return result;
 	}
 
@@ -369,8 +444,7 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 	 * @return the address or null if anything goes wrong  
 	 * 
 	 */
-	public InetAddress getInetAddress() {		
-		InetAddress result = null;
+	public String getIpAddress() {				
 		try {
 			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
 					.getNetworkInterfaces(); networkInterfaces
@@ -380,8 +454,10 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 				for (Enumeration<InetAddress> inetAddresses = networkInterface
 						.getInetAddresses(); inetAddresses.hasMoreElements();) {
 					InetAddress inetAddress = inetAddresses.nextElement();
-					if (!inetAddress.isLoopbackAddress()) {
-						return inetAddress;
+					if (!inetAddress.isLoopbackAddress() 
+						 && InetAddressUtils.isIPv4Address(inetAddress.getHostAddress()) ) {
+						
+						return inetAddress.getHostAddress();
 					}
 
 				}
@@ -390,20 +466,20 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 			Log.d(getClass().getName(),
 					"Error while retrieving network interfaces",se);
 		}
-		return result;
+		return null;
 	}
 
-	private String getIpAddress(){
-		WifiManager wifiManager = (WifiManager) getContext().getSystemService(Service.WIFI_SERVICE);
-		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-		int ip = wifiInfo.getIpAddress();
-		String ipString = String.format( 
-		 "%d.%d.%d.%d", 
-		 (ip & 0xff), 
-		 (ip >> 8 & 0xff),
-		 (ip >> 16 & 0xff),
-		 (ip >> 24 & 0xff)
-		);
-		return ipString;
-	}
+//	private String getIpAddress(){
+//		WifiManager wifiManager = (WifiManager) getContext().getSystemService(Service.WIFI_SERVICE);
+//		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//		int ip = wifiInfo.getIpAddress();
+//		String ipString = String.format( 
+//		 "%d.%d.%d.%d", 
+//		 (ip & 0xff), 
+//		 (ip >> 8 & 0xff),
+//		 (ip >> 16 & 0xff),
+//		 (ip >> 24 & 0xff)
+//		);
+//		return ipString;
+//	}
 }
