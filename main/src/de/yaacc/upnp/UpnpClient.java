@@ -73,6 +73,9 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.player.PlayableItem;
+import de.yaacc.player.Player;
+import de.yaacc.player.PlayerFactory;
 
 /**
  * A client facade to the upnp lookup and access framework. This class provides
@@ -116,19 +119,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
 
 	}
-	
-	public void playbackStop(){
-		this.stop();
-	}
-	
-	public void playbackPrev(){
-		//TODO: implement...
-	}
-
-	public void playbackNext(){
-		//TODO: implement...
-	}
-	
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
 		fireDeviceAdded(device);
@@ -324,8 +314,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	private Service getAVTransportService(Device<?, ?, ?> device) {
 		if (device != null) {
-			Log.d(getClass().getName(),
-					"Device is null!");
+			Log.d(getClass().getName(), "Device is null!");
 		}
 		ServiceId serviceId = new UDAServiceId("AVTransport");
 		Service service = device.findService(serviceId);
@@ -363,78 +352,79 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 	}
 
-
 	/**
 	 * Start an intent with Action.View;
 	 * 
 	 * @param mime
 	 *            the Mimetype to start
-	 * @param uri
+	 * @param uris
 	 *            the uri to start
 	 * @param backround
 	 *            starts a background activity
 	 */
-	protected void intentView(String mime, Uri uri) {
-		Class activityclazz = null;
-		
-		boolean background = preferences.getBoolean(
-				context.getString(R.string.settings_audio_app), true);
-		
-		// test if special activity to choose
-		if (background) {
-			if (mime.indexOf("audio") > -1) {
-				Log.d(getClass().getName(), "Starting Background service... ");
-				Intent svc = new Intent(context, BackgroundMusicService.class);
-				svc.setData(uri);
-				context.startService(svc);
-			} else {
-				throw new IllegalStateException(
-						"no activity for starting in background found");
-			}
+	protected void intentView(String mime, Uri... uris) {
+		if (uris == null || uris.length == 0)
 			return;
+		Intent intent = null;
+		if (mime != null) {
+			// test if special activity to choose
+			if (mime.indexOf("audio") > -1) {
+				boolean background = preferences.getBoolean(
+						context.getString(R.string.settings_audio_app), true);
+				if (background) {
+					Log.d(getClass().getName(),
+							"Starting Background service... ");
+					Intent svc = new Intent(context,
+							BackgroundMusicService.class);
+					if (uris.length == 1) {
+						svc.setData(uris[0]);
+					} else {
+						svc.putExtra(BackgroundMusicService.URIS, uris);
+					}
+					context.startService(svc);
+					return;
+				} else {
+					intent = new Intent(Intent.ACTION_VIEW);
+					if (uris.length == 1) {
+						intent.setDataAndType(uris[0], mime);
+					} else {
+						// FIXME How to handle this...
+						throw new IllegalStateException("Not yet implemented");
+					}
+				}
+			} else if (mime.indexOf("image") > -1) {
+				boolean yaaccImageViewer = preferences.getBoolean(
+						context.getString(R.string.settings_image_app), true);
+				if (yaaccImageViewer) {
+					intent = new Intent(context, ImageViewerActivity.class);
+					if (uris.length == 1) {
+						intent.setDataAndType(uris[0], mime);
+					} else {
+						intent.putExtra(ImageViewerActivity.URIS, uris);
+					}
+				} else {
+					intent = new Intent(Intent.ACTION_VIEW);
+					if (uris.length == 1) {
+						intent.setDataAndType(uris[0], mime);
+					} else {
+						// FIXME How to handle this...
+						throw new IllegalStateException("Not yet implemented");
+					}
+				}
+			}
 		}
-
-		if (mime == null) {
-			activityclazz = null;
-
-		} else if (mime.indexOf("image") > -1) {
-			activityclazz = ImageViewerActivity.class;
-		}
-
-		intentView(mime, uri, activityclazz);
-	}
-
-	/**
-	 * Start an intent for action VIEW with a given activity class
-	 * 
-	 * @param mime
-	 *            the mimetype to be viewed
-	 * @param uri
-	 *            the uri to be viewed
-	 * @param activityClazz
-	 *            the activity class to be used
-	 */
-	protected void intentView(String mime, Uri uri, Class activityClazz) {
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		if (activityClazz != null) {
-			intent = new Intent(context, activityClazz);
-		}
-
-		if (mime == null || mime.equals("")) {
-			intent.setData(uri);
-		} else {
-			intent.setDataAndType(uri, mime);
-		}
-
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		try {
-			context.startActivity(intent);
-		} catch (ActivityNotFoundException anfe) {
-			Resources res = getContext().getResources();
-			String text = String.format(
-					res.getString(R.string.error_no_activity_found), mime);
-			Toast toast = Toast.makeText(getContext(), text, Toast.LENGTH_LONG);
-			toast.show();
+		if (intent != null) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			try {
+				context.startActivity(intent);
+			} catch (ActivityNotFoundException anfe) {
+				Resources res = getContext().getResources();
+				String text = String.format(
+						res.getString(R.string.error_no_activity_found), mime);
+				Toast toast = Toast.makeText(getContext(), text,
+						Toast.LENGTH_LONG);
+				toast.show();
+			}
 		}
 	}
 
@@ -600,7 +590,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (isInitialized()) {
 			for (Device<?, ?, ?> device : getAndroidUpnpService().getRegistry()
 					.getDevices()) {
-				//FIXME: What about removed devices?
+				// FIXME: What about removed devices?
 				this.deviceAdded(device);
 			}
 
@@ -649,7 +639,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
-		if(device == null){
+		if (device == null) {
 			return result;
 		}
 		Object[] services = device.getServices();
@@ -754,6 +744,88 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(),
 				"TrackMetaData: " + positionInfo.getTrackMetaData());
 		intentView("*/*", Uri.parse(positionInfo.getTrackURI()));
+
+	}
+	
+	/**
+	 * Returns a player instance initialized with the given didl object
+	 * 
+	 * @param didlObject
+	 *            the object which describes the content to be played
+	 * @return the player
+	 */
+	public Player initializePlayer(DIDLObject didlObject) {		
+		List<PlayableItem> playableItems = toPlayableItems(toItemList(didlObject));		
+		return PlayerFactory.createPlayer(context, playableItems);
+	}
+
+	private List<PlayableItem> toPlayableItems(List<Item> items){
+		List<PlayableItem> playableItems = new ArrayList<PlayableItem>();
+		for (Item item : items) {
+			PlayableItem playableItem = new PlayableItem();
+			playableItem.setTitle(item.getTitle());
+			Res resource = item.getFirstResource();
+			if(resource  != null) { 
+				playableItem.setUri(Uri.parse(resource.getValue()));
+				playableItem.setMimeType(resource.getProtocolInfo().getContentFormat());
+				// calculate duration
+				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+				long millis = 10000; // 10 sec. default
+				if (resource.getDuration() != null) {
+					try {
+						Date date = dateFormat.parse(resource.getDuration());						
+						millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date
+								.getSeconds()) * 1000;
+
+					} catch (ParseException e) {
+						Log.d(getClass().getName(), "bad duration format", e);
+
+					}
+				}
+				playableItem.setDuration(millis);
+			}
+			playableItems.add(playableItem);
+		}
+		return playableItems;
+	}
+	
+	/**
+	 * Converts the content of a didlObject into a list of playable items.
+	 * 
+	 * @param didlObject
+	 *            the content
+	 * @return the list of playable items
+	 */
+	private List<Item> toItemList(DIDLObject didlObject) {
+		List<Item> items = new ArrayList<Item>();
+		if (didlObject instanceof Container) {
+			DIDLContent content = loadContainer((Container) didlObject);
+			items.addAll(content.getItems());
+			for (Container includedContainer : content.getContainers()) {
+				items.addAll(toItemList(includedContainer));
+			}
+
+		} else if (didlObject instanceof Item) {
+			items.add((Item)didlObject);
+		}
+		return items;
+	}
+
+	/**
+	 * load the content of the container.
+	 * @param container the container to be loaded
+	 * @return the loaded content
+	 */
+	private DIDLContent loadContainer(Container container) {
+		ContentDirectoryBrowseResult result = browseSync(getProviderDevice(),
+				container.getId());
+		if (result.getUpnpFailure() != null) {
+			Toast toast = Toast.makeText(getContext(), result.getUpnpFailure()
+					.getDefaultMsg(), Toast.LENGTH_LONG);
+			toast.show();
+			return null;
+		}
+		return result.getResult();
 	}
 
 	/**
@@ -874,8 +946,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public void play(List<Item> items, String deviceId) {
 		if (isLocalPlaybackEnabled()) {
-			// FIXME Handling background play must be included
-			playLocal(items, false);
+			playLocal(items);
 		} else {
 			playRemote(items, getDevice(deviceId));
 		}
@@ -902,7 +973,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(), "ContentFormat: "
 				+ resource.getProtocolInfo().getContentFormat());
 		Log.d(getClass().getName(), "Value: " + resource.getValue());
-		intentView(resource.getProtocolInfo().getContentFormat(),Uri.parse(resource.getValue()));
+		intentView(resource.getProtocolInfo().getContentFormat(),
+				Uri.parse(resource.getValue()));
 
 	}
 
@@ -915,23 +987,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 */
 	public void playLocal(Container container) {
-		playLocal(container, false);
-	}
-
-	/**
-	 * Starts playing a container locally. All items are played. Included
-	 * containers will not played.
-	 * 
-	 * @param item
-	 *            the item
-	 * @param background
-	 *            starts a background activity
-	 */
-	protected void playLocal(Container container, boolean background) {
 		if (container == null)
 			return;
 		Log.d(getClass().getName(), "ContainerId: " + container.getId());
-		playLocal(container.getItems(), background);
+		playLocal(container.getItems());
 	}
 
 	/**
@@ -944,35 +1003,27 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 * 
 	 */
-	public void playLocal(List<Item> items, boolean background) {
+	public void playLocal(List<Item> items) {
 		// FIXME only for testing purpose
 		// select all image uris
-		ArrayList<Uri> imageUris = new ArrayList<Uri>();
-		for (Item item : items) {
-			Res resource = item.getFirstResource();
-			if (resource == null) {
-				break;
+		boolean yaaccImageViewer = preferences.getBoolean(
+				context.getString(R.string.settings_image_app), true);
+		if (yaaccImageViewer) {
+			ArrayList<Uri> imageUris = new ArrayList<Uri>();
+			for (Item item : items) {
+				Res resource = item.getFirstResource();
+				if (resource == null) {
+					break;
+				}
+				if (resource.getProtocolInfo().getContentFormat()
+						.indexOf("image") > -1) {
+					// FIXME only for testing purpose
+					imageUris.add(Uri.parse(resource.getValue()));
+				}
 			}
-			if (resource.getProtocolInfo().getContentFormat().indexOf("image") > -1) {
-				// FIXME only for testing purpose
-				imageUris.add(Uri.parse(resource.getValue()));
-			}
-		}
-
-		if (imageUris.size() > 0) {// FIXME only for testing purpose
-			Intent intent = new Intent(context, ImageViewerActivity.class);
-			intent.putExtra(ImageViewerActivity.URIS, imageUris);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			try {
-				context.startActivity(intent);
-			} catch (ActivityNotFoundException anfe) {
-				Resources res = getContext().getResources();
-				String text = String.format(
-						res.getString(R.string.error_no_activity_found),
-						"image/*");
-				Toast toast = Toast.makeText(getContext(), text,
-						Toast.LENGTH_LONG);
-				toast.show();
+			if (imageUris.size() > 1) {// FIXME only for testing purpose
+				intentView("image/*",
+						imageUris.toArray(new Uri[imageUris.size()]));
 			}
 		} else {
 			playLocal(items, 0);
@@ -999,7 +1050,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 			@Override
 			public void run() {
-				playLocal(musicContainer, true);
+				playLocal(musicContainer);
 
 			}
 		}).start();
@@ -1036,13 +1087,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 		playRemote(items, 0, device);
 	}
-	
-	
-	public void stop(){
+
+	public void stop() {
 		stopRemote(this.getReceiverDevice());
 	}
-	
-	
+
 	/**
 	 * Stops playback on remote device
 	 * 
@@ -1088,7 +1137,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		getControlPoint().execute(actionCallback);
 	}
 
-	
 	/**
 	 * Plays an item on an remote device
 	 * 
@@ -1193,14 +1241,16 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Gets the receiver ID, if none is defined the local device will be returned
+	 * Gets the receiver ID, if none is defined the local device will be
+	 * returned
+	 * 
 	 * @return the receiverDeviceId
 	 */
 	public String getReceiverDeviceId() {
-		String receiver =  preferences.getString(
+		String receiver = preferences.getString(
 				context.getString(R.string.settings_selected_receiver_title),
 				null);
-		if (receiver == null){
+		if (receiver == null) {
 			receiver = UpnpClient.LOCAL_UID;
 		}
 		return receiver;
@@ -1381,14 +1431,14 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			}
 		}
 	}
-	
+
 	/**
 	 * Check's whether local or remote playback is enabled
+	 * 
 	 * @return true if local playback is enabled, false otherwise
 	 */
-	public Boolean isLocalPlaybackEnabled(){
+	public Boolean isLocalPlaybackEnabled() {
 		return (LOCAL_UID.equals(getReceiverDeviceId()));
 	}
-	
-	
+
 }

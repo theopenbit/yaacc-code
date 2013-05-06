@@ -97,7 +97,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 			@Override
 			public void onClick(View v) {
-				uClient.playbackPrev();
+				// FIXME: uClient.playbackPrev();
 
 			}
 		});
@@ -107,9 +107,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 			@Override
 			public void onClick(View v) {
-				uClient.playbackStop();
-				ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
-				btnStop.setVisibility(View.INVISIBLE);
+				// FIXME: uClient.playbackStop();
+				// FIXME: ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
+				// FIXME: btnStop.setVisibility(View.INVISIBLE);
 			}
 		});
 
@@ -118,7 +118,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 			@Override
 			public void onClick(View v) {
-				uClient.playbackNext();
+				// FIXME: uClient.playbackNext();
 
 			}
 		});

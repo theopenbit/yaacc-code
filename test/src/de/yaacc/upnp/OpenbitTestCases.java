@@ -133,7 +133,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 		assertNotNull(result);
 		assertNotNull(result.getResult());			
 		assertNotNull(result.getResult().getItems());
-		upnpClient.playLocal(result.getResult().getItems(), false);
+		upnpClient.playLocal(result.getResult().getItems());
 		
 		myWait(120000);
 		

@@ -111,9 +111,9 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void setItems(PlayableItem... items) {
-		Intent intent = new Intent(Intent.ACTION_VIEW);
+		Intent intent = new Intent(context, ImageViewerActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		intent = new Intent(context, ImageViewerActivity.class);
+		intent.setAction(Intent.ACTION_VIEW);
 		Uri[] uris = new Uri[items.length];
 		for (int i = 0; i <items.length; i++) {
 			uris[i]= items[i].getUri();
