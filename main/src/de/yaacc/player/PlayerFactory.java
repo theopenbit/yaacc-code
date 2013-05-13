@@ -20,63 +20,80 @@ package de.yaacc.player;
 import java.util.List;
 
 import de.yaacc.R;
+import de.yaacc.upnp.UpnpClient;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
 
 /**
  * Factory for creating player instances-
- * @author Tobias Schoene (openbit)  
+ * 
+ * @author Tobias Schoene (openbit)
  * 
  */
 public class PlayerFactory {
-	
-	public static Player createPlayer(Context context, List<PlayableItem> items){
+
+	/**
+	 * Creates a player for the given content. Based on the configuration
+	 * settings in the upnpClient the player may be a player to play on a remote
+	 * device.
+	 * 
+	 * @param upnpClient
+	 *            the upnpClient
+	 * @param items
+	 *            the items to be played
+	 * @return the player
+	 */
+	public static Player createPlayer(UpnpClient upnpClient,
+			List<PlayableItem> items) {
 		Player result = null;
 		boolean video = false;
 		boolean image = false;
 		boolean music = false;
-		for (PlayableItem playableItem : items) {
-			image = image || playableItem.getMimeType().startsWith("image");
-			video = video || playableItem.getMimeType().startsWith("video");
-			music = music || playableItem.getMimeType().startsWith("audio");			
-		}
-		if(video && ! image && ! music){
-			//use videoplayer
-			//FIXME NOT JET IMPLEMENTED			
-			result = new MultiContentPlayer(context);
-		}else if (!video &&  image && ! music) {
-			//use imageplayer
-			result = createImagePlayer(context);
-		}else if (!video &&  !image &&  music) {
-			//use musicplayer
-			result = createMusicPlayer(context);
+		if (!upnpClient.getReceiverDeviceId().equals(UpnpClient.LOCAL_UID)) {
+			result = new AVTransportPlayer(upnpClient);
 		} else {
-			//use multiplayer
-			result = new MultiContentPlayer(context);
+			for (PlayableItem playableItem : items) {
+				image = image || playableItem.getMimeType().startsWith("image");
+				video = video || playableItem.getMimeType().startsWith("video");
+				music = music || playableItem.getMimeType().startsWith("audio");
+			}
+			if (video && !image && !music) {
+				// use videoplayer
+				// FIXME NOT JET IMPLEMENTED
+				result = new MultiContentPlayer(upnpClient);
+			} else if (!video && image && !music) {
+				// use imageplayer
+				result = createImagePlayer(upnpClient);
+			} else if (!video && !image && music) {
+				// use musicplayer
+				result = createMusicPlayer(upnpClient);
+			} else {
+				// use multiplayer
+				result = new MultiContentPlayer(upnpClient);
+			}			
 		}
-		if(result != null){
+		if (result != null) {
 			result.setItems(items.toArray(new PlayableItem[items.size()]));
 		}
 		return result;
 	}
 
-	private static Player createImagePlayer(Context context) {
-		
-		return new LocalImagePlayer(context);
+	private static Player createImagePlayer(UpnpClient upnpClient) {
+
+		return new LocalImagePlayer(upnpClient);
 	}
 
-	private static Player createMusicPlayer(Context context) {
-		boolean background = PreferenceManager
-				.getDefaultSharedPreferences(context).getBoolean(
-				context.getString(R.string.settings_audio_app), true);
+	private static Player createMusicPlayer(UpnpClient upnpClient) {
+		boolean background = PreferenceManager.getDefaultSharedPreferences(
+				upnpClient.getContext()).getBoolean(
+				upnpClient.getContext().getString(R.string.settings_audio_app),
+				true);
 		if (background) {
-			return new LocalBackgoundMusicPlayer(context);
+			return new LocalBackgoundMusicPlayer(upnpClient);
 		}
-		return new LocalThirdPartieMusicPlayer(context);
-		
+		return new LocalThirdPartieMusicPlayer(upnpClient);
+
 	}
-	
-	
 
 }

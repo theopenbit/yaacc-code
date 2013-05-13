@@ -17,9 +17,18 @@
  */
 package de.yaacc.player;
 
-import org.teleal.cling.model.meta.Device;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import android.content.Context;
+import org.teleal.cling.model.action.ActionInvocation;
+import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.support.avtransport.callback.Play;
+import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
+import org.teleal.cling.support.avtransport.callback.Stop;
+
+import android.util.Log;
+import de.yaacc.upnp.UpnpClient;
 
 /**
  * A Player for playing on a remote avtransport device 
@@ -28,13 +37,13 @@ import android.content.Context;
  */
 public class AVTransportPlayer extends AbstractPlayer {
 
-	private  Device<?, ?, ?> remoteDevice;
+	
 	
 	/**
 	 * @param context
 	 */
-	public AVTransportPlayer(Context context) {
-		super(context);
+	public AVTransportPlayer(UpnpClient upnpClient) {
+		super(upnpClient);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -43,7 +52,42 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected void stopItem(PlayableItem playableItem) {
-		// TODO Auto-generated method stub
+		Service<?, ?> service = getUpnpClient().getAVTransportService(getUpnpClient().getReceiverDevice());
+		if (service == null) {
+			Log.d(getClass().getName(),
+					"No AVTransport-Service found on Device: "
+							+ getUpnpClient().getReceiverDevice().getDisplayString());
+			return;
+		}
+		Log.d(getClass().getName(), "Action SetAVTransportURI ");
+		final ActionState actionState = new ActionState();
+		// Now start Stopping
+		Log.d(getClass().getName(), "Action Stop");
+		actionState.actionFinished = false;
+		Stop actionCallback = new Stop(service) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						upnpresponse != null ? "UpnpResponse: "
+								+ upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(), "s: " + s);
+				actionState.actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				actionState.actionFinished = true;
+
+			}
+
+		};
+		getUpnpClient().getControlPoint().execute(actionCallback);
 
 	}
 
@@ -51,9 +95,8 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 * @see de.yaacc.player.AbstractPlayer#loadItem(de.yaacc.player.PlayableItem)
 	 */
 	@Override
-	protected Object loadItem(PlayableItem playableItem) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Object loadItem(PlayableItem playableItem) {		
+		return playableItem;
 	}
 
 	/* (non-Javadoc)
@@ -61,8 +104,122 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected void startItem(PlayableItem playableItem, Object loadedItem) {
-		// TODO Auto-generated method stub
+		if (playableItem == null || getUpnpClient().getReceiverDevice() == null)
+			return;
+				
+		Log.d(getClass().getName(), "Uri: " + playableItem.getUri());
+		Log.d(getClass().getName(), "Duration: " + playableItem.getDuration());
+		Log.d(getClass().getName(),
+				"MimeType: " + playableItem.getMimeType());
+		
+		Log.d(getClass().getName(), "Title: " + playableItem.getTitle());
+		Service<?, ?> service = getUpnpClient().getAVTransportService(getUpnpClient().getReceiverDevice());
+		if (service == null) {
+			Log.d(getClass().getName(),
+					"No AVTransport-Service found on Device: "
+							+ getUpnpClient().getReceiverDevice().getDisplayString());
+			return;
+		}
+		Log.d(getClass().getName(), "Action SetAVTransportURI ");
+		final ActionState actionState = new ActionState();
+		actionState.actionFinished = false;
+		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
+				service, playableItem.getUri().toString(), actionState);
+		getUpnpClient().getControlPoint().execute(setAVTransportURI);
+		waitForActionComplete(actionState);
+		// Now start Playing
+		Log.d(getClass().getName(), "Action Play");
+		actionState.actionFinished = false;
+		Play actionCallback = new Play(service) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						upnpresponse != null ? "UpnpResponse: "
+								+ upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(), "s: " + s);
+				actionState.actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				actionState.actionFinished = true;
+
+			}
+
+		};
+		getUpnpClient().getControlPoint().execute(actionCallback);
 
 	}
 
+	
+	/**
+	 * Watchdog for async calls to complete
+	 */
+	private void waitForActionComplete(final ActionState actionState) {
+
+		actionState.watchdogFlag = false;
+		new Timer().schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				actionState.watchdogFlag = true;
+			}
+		}, 30000L); // 30sec. Watchdog
+
+		while (!(actionState.actionFinished || actionState.watchdogFlag)) {
+			// wait for local device is connected
+		}
+		if (actionState.watchdogFlag) {
+			Log.d(getClass().getName(), "Watchdog timeout!");
+		}
+
+		if (actionState.actionFinished) {
+			Log.d(getClass().getName(), "Action completed!");
+		}
+	}
+	
+	private static class InternalSetAVTransportURI extends SetAVTransportURI {
+		ActionState actionState = null;
+
+		private InternalSetAVTransportURI(Service service, String uri,
+				ActionState actionState) {
+			super(service, uri);
+			this.actionState = actionState;
+		}
+
+		@Override
+		public void failure(ActionInvocation actioninvocation,
+				UpnpResponse upnpresponse, String s) {
+			Log.d(getClass().getName(), "Failure UpnpResponse: " + upnpresponse);
+			if (upnpresponse != null) {
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getResponseDetails());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusMessage());
+				Log.d(getClass().getName(),
+						"UpnpResponse: " + upnpresponse.getStatusCode());
+			}
+			Log.d(getClass().getName(), "s: " + s);
+			actionState.actionFinished = true;
+
+		}
+
+		@Override
+		public void success(ActionInvocation actioninvocation) {
+			super.success(actioninvocation);
+			actionState.actionFinished = true;
+
+		}
+	}
+
+	private static class ActionState {
+		public boolean actionFinished = false;
+		public boolean watchdogFlag = false;
+	}
 }

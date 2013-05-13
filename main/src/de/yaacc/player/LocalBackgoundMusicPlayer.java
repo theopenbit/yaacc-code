@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.upnp.UpnpClient;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -44,9 +45,9 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	/**
 	 * @param context
 	 */
-	public LocalBackgoundMusicPlayer(Context context) {
-		super(context);
-
+	public LocalBackgoundMusicPlayer(UpnpClient upnpClient) {
+		super(upnpClient);
+        Context context = upnpClient.getContext();
 		Log.d(getClass().getName(), "Starting background music service... ");
 		Intent svc = new Intent(context, BackgroundMusicService.class);
 

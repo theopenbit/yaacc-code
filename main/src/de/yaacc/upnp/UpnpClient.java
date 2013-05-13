@@ -312,7 +312,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the device which provides the service
 	 * @return the service of null
 	 */
-	private Service getAVTransportService(Device<?, ?, ?> device) {
+	public Service getAVTransportService(Device<?, ?, ?> device) {
 		if (device != null) {
 			Log.d(getClass().getName(), "Device is null!");
 		}
@@ -326,31 +326,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return service;
 	}
 
-	/**
-	 * Watchdog for async calls to complete
-	 */
-	private void waitForActionComplete(final ActionState actionState) {
-
-		actionState.watchdogFlag = false;
-		new Timer().schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				actionState.watchdogFlag = true;
-			}
-		}, 30000L); // 30sec. Watchdog
-
-		while (!(actionState.actionFinished || actionState.watchdogFlag)) {
-			// wait for local device is connected
-		}
-		if (actionState.watchdogFlag) {
-			Log.d(getClass().getName(), "Watchdog timeout!");
-		}
-
-		if (actionState.actionFinished) {
-			Log.d(getClass().getName(), "Action completed!");
-		}
-	}
+	
 
 	/**
 	 * Start an intent with Action.View;
@@ -729,6 +705,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @param transport
 	 *            the transport object
 	 */
+	@Deprecated
 	public void playLocal(AVTransport transport) {
 		if (transport == null)
 			return;
@@ -756,9 +733,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public Player initializePlayer(DIDLObject didlObject) {		
 		List<PlayableItem> playableItems = toPlayableItems(toItemList(didlObject));		
-		return PlayerFactory.createPlayer(context, playableItems);
+		return PlayerFactory.createPlayer(this, playableItems);
 	}
 
+	
+	/**
+	 * Convert cling items into playable items 
+	 * @param items the cling items
+	 * @return  the playable items
+	 */
 	private List<PlayableItem> toPlayableItems(List<Item> items){
 		List<PlayableItem> playableItems = new ArrayList<PlayableItem>();
 		for (Item item : items) {
@@ -790,11 +773,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 	
 	/**
-	 * Converts the content of a didlObject into a list of playable items.
+	 * Converts the content of a didlObject into a list of cling items.
 	 * 
 	 * @param didlObject
 	 *            the content
-	 * @return the list of playable items
+	 * @return the list of cling items
 	 */
 	private List<Item> toItemList(DIDLObject didlObject) {
 		List<Item> items = new ArrayList<Item>();
@@ -828,417 +811,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return result.getResult();
 	}
 
-	/**
-	 * Starts playing a DIDLObject. The object is either an item or a container.
-	 * In case of a container the content will be fetches synchronous. All items
-	 * of the container will be played. Included subcontainer won't be played.
-	 * 
-	 * @param object
-	 *            the content to be played
-	 */
-	public void play(DIDLObject didlObject) {
-		if (didlObject instanceof Container) {
-			Container container = (Container) didlObject;
-			ContentDirectoryBrowseResult result = browseSync(
-					getProviderDevice(), container.getId());
-			if (result.getUpnpFailure() != null) {
-				Toast toast = Toast.makeText(getContext(), result
-						.getUpnpFailure().getDefaultMsg(), Toast.LENGTH_LONG);
-				toast.show();
-				return;
-			}
 
-			DIDLContent content = result.getResult();
-			if (content.getContainers().size() > 0) {
-				// TODO is it right to play the first container?
-				// should we play only the items?
-				play(content.getFirstContainer());
-			} else {
-				play(content.getItems());
-			}
 
-		} else if (didlObject instanceof Item) {
-			play((Item) didlObject);
-		}
-	}
-
-	/**
-	 * Starts playing an item on the receiver device, if the device id is equals @see
-	 * {@link UpnpClient.LOCAL_UID} a local play will start.
-	 * 
-	 * @param item
-	 *            the item to be played
-	 * 
-	 */
-	public void play(Item item) {
-		play(item, getReceiverDeviceId());
-	}
-
-	/**
-	 * Starts playing an item. if the device id is equals @see
-	 * {@link UpnpClient.LOCAL_UID} a local play will start.
-	 * 
-	 * @param item
-	 *            the item to be played
-	 * @param deviceId
-	 *            the device id
-	 */
-	public void play(Item item, String deviceId) {
-		if (isLocalPlaybackEnabled()) {
-			playLocal(item);
-		} else {
-			playRemote(item, getDevice(deviceId));
-		}
-	}
-
-	/**
-	 * Starts playing a container on the receiverDevice if the device id is
-	 * equals @see {@link UpnpClient.LOCAL_UID} a local play will start.
-	 * 
-	 * @param contaienr
-	 *            the container to be played
-	 * @param deviceId
-	 *            the device id
-	 */
-	public void play(Container container) {
-		play(container, getReceiverDeviceId());
-	}
-
-	/**
-	 * Starts playing a container. if the device id is equals @see
-	 * {@link UpnpClient.LOCAL_UID} a local play will start. All items of the
-	 * container are played. Included containers will not played.
-	 * 
-	 * @param container
-	 *            the container to be played
-	 * @param deviceId
-	 *            the device id
-	 */
-	public void play(Container container, String deviceId) {
-		if (isLocalPlaybackEnabled()) {
-			playLocal(container);
-		} else {
-			playRemote(container, getDevice(deviceId));
-		}
-	}
-
-	/**
-	 * Starts playing a List of Items.
-	 * 
-	 * 
-	 * @param contaienr
-	 *            the container to be played
-	 * 
-	 */
-	public void play(List<Item> items) {
-		play(items, getReceiverDeviceId());
-	}
-
-	/**
-	 * Starts playing a List of Items. if the device id is equals @see
-	 * {@link UpnpClient.LOCAL_UID} a local play will start.
-	 * 
-	 * 
-	 * @param contaienr
-	 *            the container to be played
-	 * @param deviceId
-	 *            the device id
-	 */
-	public void play(List<Item> items, String deviceId) {
-		if (isLocalPlaybackEnabled()) {
-			playLocal(items);
-		} else {
-			playRemote(items, getDevice(deviceId));
-		}
-	}
-
-	/**
-	 * Starts playing item locally
-	 * 
-	 * @param item
-	 *            the item
-	 */
-	public void playLocal(Item item) {
-		if (item == null)
-			return;
-		Log.d(getClass().getName(), "ItemId: " + item.getId());
-		Res resource = item.getFirstResource();
-		if (resource == null)
-			return;
-
-		Log.d(getClass().getName(), "ImportUri: " + resource.getImportUri());
-		Log.d(getClass().getName(), "Duration: " + resource.getDuration());
-		Log.d(getClass().getName(),
-				"ProtocolInfo: " + resource.getProtocolInfo());
-		Log.d(getClass().getName(), "ContentFormat: "
-				+ resource.getProtocolInfo().getContentFormat());
-		Log.d(getClass().getName(), "Value: " + resource.getValue());
-		intentView(resource.getProtocolInfo().getContentFormat(),
-				Uri.parse(resource.getValue()));
-
-	}
-
-	/**
-	 * Starts playing a container locally. All items are played. Included
-	 * containers will not played.
-	 * 
-	 * @param item
-	 *            the item
-	 * 
-	 */
-	public void playLocal(Container container) {
-		if (container == null)
-			return;
-		Log.d(getClass().getName(), "ContainerId: " + container.getId());
-		playLocal(container.getItems());
-	}
-
-	/**
-	 * plays a list of items local.
-	 * 
-	 * @param items
-	 *            the items to be played
-	 * @param background
-	 *            should them played in background?
-	 * 
-	 * 
-	 */
-	public void playLocal(List<Item> items) {
-		// FIXME only for testing purpose
-		// select all image uris
-		boolean yaaccImageViewer = preferences.getBoolean(
-				context.getString(R.string.settings_image_app), true);
-		if (yaaccImageViewer) {
-			ArrayList<Uri> imageUris = new ArrayList<Uri>();
-			for (Item item : items) {
-				Res resource = item.getFirstResource();
-				if (resource == null) {
-					break;
-				}
-				if (resource.getProtocolInfo().getContentFormat()
-						.indexOf("image") > -1) {
-					// FIXME only for testing purpose
-					imageUris.add(Uri.parse(resource.getValue()));
-				}
-			}
-			if (imageUris.size() > 1) {// FIXME only for testing purpose
-				intentView("image/*",
-						imageUris.toArray(new Uri[imageUris.size()]));
-			}
-		} else {
-			playLocal(items, 0);
-		}
-	}
-
-	/**
-	 * Starts playing a music container parallel with an image container
-	 * locally. All items are played
-	 * 
-	 * @param item
-	 *            the item
-	 * 
-	 */
-	public void playLocal(final Container imageContainer,
-			final Container musicContainer) {
-		if (imageContainer == null || musicContainer == null)
-			return;
-		Log.d(getClass().getName(),
-				"Image ContainerId: " + imageContainer.getId());
-		Log.d(getClass().getName(),
-				"Music ContainerId: " + musicContainer.getId());
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				playLocal(musicContainer);
-
-			}
-		}).start();
-
-		playLocal(imageContainer);
-
-	}
-
-	/**
-	 * Starts playing a container on a remote device. All items are played.
-	 * Included containers will not played.
-	 * 
-	 * @param container
-	 *            the container
-	 * @param device
-	 *            the device the container is played on
-	 */
-	public void playRemote(Container container, Device<?, ?, ?> device) {
-		if (container == null)
-			return;
-		Log.d(getClass().getName(), "ContainerId: " + container.getId());
-		playRemote(container.getItems(), device);
-	}
-
-	/**
-	 * Starts playing a list of items.
-	 * 
-	 * @param items
-	 * @param device
-	 */
-	public void playRemote(List<Item> items, Device<?, ?, ?> device) {
-		if (items == null)
-			return;
-
-		playRemote(items, 0, device);
-	}
-
-	public void stop() {
-		stopRemote(this.getReceiverDevice());
-	}
-
-	/**
-	 * Stops playback on remote device
-	 * 
-	 * @param item
-	 * @param remoteDevice
-	 */
-	private void stopRemote(Device<?, ?, ?> remoteDevice) {
-		Service<?, ?> service = getAVTransportService(remoteDevice);
-		if (service == null) {
-			Log.d(getClass().getName(),
-					"No AVTransport-Service found on Device: "
-							+ remoteDevice.getDisplayString());
-			return;
-		}
-		Log.d(getClass().getName(), "Action SetAVTransportURI ");
-		final ActionState actionState = new ActionState();
-		// Now start Stopping
-		Log.d(getClass().getName(), "Action Stop");
-		actionState.actionFinished = false;
-		Stop actionCallback = new Stop(service) {
-
-			@Override
-			public void failure(ActionInvocation actioninvocation,
-					UpnpResponse upnpresponse, String s) {
-				Log.d(getClass().getName(), "Failure UpnpResponse: "
-						+ upnpresponse);
-				Log.d(getClass().getName(),
-						upnpresponse != null ? "UpnpResponse: "
-								+ upnpresponse.getResponseDetails() : "");
-				Log.d(getClass().getName(), "s: " + s);
-				actionState.actionFinished = true;
-
-			}
-
-			@Override
-			public void success(ActionInvocation actioninvocation) {
-				super.success(actioninvocation);
-				actionState.actionFinished = true;
-
-			}
-
-		};
-		getControlPoint().execute(actionCallback);
-	}
-
-	/**
-	 * Plays an item on an remote device
-	 * 
-	 * @param item
-	 * @param remoteDevice
-	 */
-	public void playRemote(Item item, Device<?, ?, ?> remoteDevice) {
-		if (item == null || remoteDevice == null)
-			return;
-		Log.d(getClass().getName(), "ItemId: " + item.getId());
-		Res resource = item.getFirstResource();
-		if (resource == null)
-			return;
-
-		Log.d(getClass().getName(), "ImportUri: " + resource.getImportUri());
-		Log.d(getClass().getName(), "Duration: " + resource.getDuration());
-		Log.d(getClass().getName(),
-				"ProtocolInfo: " + resource.getProtocolInfo());
-		Log.d(getClass().getName(), "ContentFormat: "
-				+ resource.getProtocolInfo().getContentFormat());
-		Log.d(getClass().getName(), "Value: " + resource.getValue());
-		Service<?, ?> service = getAVTransportService(remoteDevice);
-		if (service == null) {
-			Log.d(getClass().getName(),
-					"No AVTransport-Service found on Device: "
-							+ remoteDevice.getDisplayString());
-			return;
-		}
-		Log.d(getClass().getName(), "Action SetAVTransportURI ");
-		final ActionState actionState = new ActionState();
-		actionState.actionFinished = false;
-		SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
-				service, resource.getValue(), actionState);
-		getControlPoint().execute(setAVTransportURI);
-		waitForActionComplete(actionState);
-		// Now start Playing
-		Log.d(getClass().getName(), "Action Play");
-		actionState.actionFinished = false;
-		Play actionCallback = new Play(service) {
-
-			@Override
-			public void failure(ActionInvocation actioninvocation,
-					UpnpResponse upnpresponse, String s) {
-				Log.d(getClass().getName(), "Failure UpnpResponse: "
-						+ upnpresponse);
-				Log.d(getClass().getName(),
-						upnpresponse != null ? "UpnpResponse: "
-								+ upnpresponse.getResponseDetails() : "");
-				Log.d(getClass().getName(), "s: " + s);
-				actionState.actionFinished = true;
-
-			}
-
-			@Override
-			public void success(ActionInvocation actioninvocation) {
-				super.success(actioninvocation);
-				actionState.actionFinished = true;
-
-			}
-
-		};
-		getControlPoint().execute(actionCallback);
-	}
-
-	private static class InternalSetAVTransportURI extends SetAVTransportURI {
-		ActionState actionState = null;
-
-		private InternalSetAVTransportURI(Service service, String uri,
-				ActionState actionState) {
-			super(service, uri);
-			this.actionState = actionState;
-		}
-
-		@Override
-		public void failure(ActionInvocation actioninvocation,
-				UpnpResponse upnpresponse, String s) {
-			Log.d(getClass().getName(), "Failure UpnpResponse: " + upnpresponse);
-			if (upnpresponse != null) {
-				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getResponseDetails());
-				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getStatusMessage());
-				Log.d(getClass().getName(),
-						"UpnpResponse: " + upnpresponse.getStatusCode());
-			}
-			Log.d(getClass().getName(), "s: " + s);
-			actionState.actionFinished = true;
-
-		}
-
-		@Override
-		public void success(ActionInvocation actioninvocation) {
-			super.success(actioninvocation);
-			actionState.actionFinished = true;
-
-		}
-	}
-
-	private static class ActionState {
-		public boolean actionFinished = false;
-		public boolean watchdogFlag = false;
-	}
 
 	/**
 	 * Gets the receiver ID, if none is defined the local device will be
@@ -1246,7 +820,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 * @return the receiverDeviceId
 	 */
-	public String getReceiverDeviceId() {
+	public String getReceiverDeviceId() {		
 		String receiver = preferences.getString(
 				context.getString(R.string.settings_selected_receiver_title),
 				null);
@@ -1255,7 +829,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return receiver;
 	}
-
+	
+	
 	/**
 	 * @return the receiverDevice
 	 */
@@ -1302,136 +877,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return this.visitedObjectIds.peekLast();
 	}
 
-	/**
-	 * Create and start a timer for the next content change. The timer runs only
-	 * once.
-	 * 
-	 */
-	private void playRemote(final List<Item> items, final int currentIndex,
-			final Device<?, ?, ?> device) {
-		if (currentIndex < 0 || currentIndex >= items.size()) {
-			return;
-		}
-		Item item = items.get(currentIndex);
-		if (item == null) {
-			Log.d(getClass().getName(), "Item is null");
-			return;
-		}
-		Res resource = item.getFirstResource();
-		if (resource == null) {
-			Log.d(getClass().getName(),
-					"No ressoucrce for item found: " + item.getId());
-			return;
-		}
-		// calculate duration
-		// Wait Duration until next Item is send to receiver intent
-		// TODO intent should get a playlist instead of singel items
-		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-		long millis = 10000; // 10 sec. default
-		if (resource.getDuration() != null) {
-			try {
-				Date date = dateFormat.parse(resource.getDuration());
-				// silence 3 sec
-				// FIXME silence must be configurable in the settings menu
-				// in order to play container without silence
-				millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date
-						.getSeconds()) * 1000 + 3000;
 
-			} catch (ParseException e) {
-				Log.d(getClass().getName(), "bad duration format", e);
 
-			}
-		}
-		playRemote(item, device);
-		if (currentIndex != items.size() - 1) {
-			final int nextIndex = currentIndex + 1;
-			Timer nextItemTimer = new Timer();
-			try {
-				Log.d(getClass().getName(), "Play item remote " + item.getId()
-						+ "; duration: " + millis);
-				nextItemTimer.schedule(new TimerTask() {
-
-					@Override
-					public void run() {
-						Log.d(getClass().getName(), "TimerEvent for next item"
-								+ this);
-						playRemote(items, nextIndex, device);
-					}
-				}, millis);
-			} catch (Exception e) {
-				Log.d(getClass().getName(),
-						"Exception during timer shedule item: (" + item.getId()
-								+ ", " + item.getTitle() + " millis:" + millis,
-						e);
-			}
-		}
-	}
-
-	/**
-	 * Create and start a timer for the next content change. The timer runs only
-	 * once.
-	 * 
-	 */
-	private void playLocal(final List<Item> items, final int currentIndex) {
-		if (currentIndex < 0 || currentIndex >= items.size()) {
-			return;
-		}
-		Item item = items.get(currentIndex);
-		if (item == null) {
-			Log.d(getClass().getName(), "Item is null");
-			return;
-		}
-		Res resource = item.getFirstResource();
-		if (resource == null) {
-			Log.d(getClass().getName(),
-					"No ressoucrce for item found: " + item.getId());
-			return;
-		}
-		// calculate duration
-		// Wait Duration until next Item is send to receiver intent
-		// TODO intent should get a playlist instead of singel items
-		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-		long millis = 10000; // 10 sec. default
-		if (resource.getDuration() != null) {
-			try {
-				Date date = dateFormat.parse(resource.getDuration());
-				// silence 3 sec
-				// FIXME silence must be configurable in the settings menu
-				// in order to play container without silence
-				millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date
-						.getSeconds()) * 1000 + 3000;
-
-			} catch (ParseException e) {
-				Log.d(getClass().getName(), "bad duration format", e);
-
-			}
-		}
-		intentView(resource.getProtocolInfo().getContentFormat(),
-				Uri.parse(resource.getValue()));
-		if (currentIndex != items.size() - 1) {
-			final int nextIndex = currentIndex + 1;
-			Log.d(getClass().getName(), "Play item " + item.getId()
-					+ "; duration: " + millis);
-			Timer nextItemTimer = new Timer();
-			try {
-				nextItemTimer.schedule(new TimerTask() {
-
-					@Override
-					public void run() {
-						Log.d(getClass().getName(), "TimerEvent for next item"
-								+ this);
-						playLocal(items, nextIndex);
-					}
-				}, millis);
-			} catch (Exception e) {
-				Log.d(getClass().getName(),
-						"Exception during timer shedule item: (" + item.getId()
-								+ ", " + item.getTitle() + " millis:" + millis,
-						e);
-			}
-		}
-	}
-
+	
 	/**
 	 * Check's whether local or remote playback is enabled
 	 * 

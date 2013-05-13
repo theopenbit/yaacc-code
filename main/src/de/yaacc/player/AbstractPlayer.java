@@ -28,6 +28,7 @@ import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.upnp.UpnpClient;
 
 /**
  * @author Tobias Schoene (openbit)
@@ -41,25 +42,32 @@ public abstract class AbstractPlayer implements Player {
 	private boolean isPlaying = false;
 	private boolean isProcessingCommand = false;
 
-	private Context context;
+	private UpnpClient upnpClient;
 
 	
 
 	/**
 	 * @param context
 	 */
-	public AbstractPlayer(Context context) {
+	public AbstractPlayer(UpnpClient upnpClient) {
 		super();
-		this.context = context;
+		this.upnpClient = upnpClient;
 	}
 
 	/**
 	 * @return the context
 	 */
 	public Context getContext() {
-		return context;
+		return upnpClient.getContext();
 	}
 	
+	/**
+	 * @return the upnpClient
+	 */
+	public UpnpClient getUpnpClient() {
+		return upnpClient;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -75,12 +83,14 @@ public abstract class AbstractPlayer implements Player {
 		if (currentIndex > items.size() - 1) {
 			currentIndex = 0;
 		}
-
-		Toast toast = Toast.makeText(context,
-				context.getResources().getString(R.string.next)
+		runOnUiThread(new Runnable() {
+			public void run() {
+		Toast toast = Toast.makeText(getContext(),
+				getContext().getResources().getString(R.string.next)
 						+ getPositionString(), Toast.LENGTH_SHORT);
 
 		toast.show();
+			}});
 		loadItem();
 		isProcessingCommand = false;
 	}
@@ -107,8 +117,8 @@ public abstract class AbstractPlayer implements Player {
 			}
 		}
 
-		Toast toast = Toast.makeText(context,
-				context.getResources().getString(R.string.previous)
+		Toast toast = Toast.makeText(getContext(),
+				getContext().getResources().getString(R.string.previous)
 						+ getPositionString(), Toast.LENGTH_SHORT);
 		toast.show();
 
@@ -129,8 +139,8 @@ public abstract class AbstractPlayer implements Player {
 		isProcessingCommand = true;
 		cancleTimer();
 
-		Toast toast = Toast.makeText(context,
-				context.getResources().getString(R.string.pause)
+		Toast toast = Toast.makeText(getContext(),
+				getContext().getResources().getString(R.string.pause)
 						+ getPositionString(), Toast.LENGTH_SHORT);
 		toast.show();
 		isPlaying = false;
@@ -149,15 +159,16 @@ public abstract class AbstractPlayer implements Player {
 		isProcessingCommand = true;
 		if (currentIndex < items.size()) {
 			
-					Toast toast = Toast.makeText(context,
-							context.getResources().getString(R.string.play)
+					Toast toast = Toast.makeText(getContext(),
+							getContext().getResources().getString(R.string.play)
 									+ getPositionString(), Toast.LENGTH_SHORT);
 					toast.show();
 					
 				
-			loadItem();
+			
 			// Start the pictureShow
-			isPlaying = true;			
+			isPlaying = true;
+			loadItem();
 			isProcessingCommand = false;
 
 		}
@@ -177,8 +188,8 @@ public abstract class AbstractPlayer implements Player {
 		cancleTimer();
 		currentIndex = 0;
 		
-				Toast toast = Toast.makeText(context,
-						context.getResources().getString(R.string.stop)
+				Toast toast = Toast.makeText(getContext(),
+						getContext().getResources().getString(R.string.stop)
 								+ getPositionString(), Toast.LENGTH_SHORT);
 				toast.show();			
 		stopItem(items.get(currentIndex));

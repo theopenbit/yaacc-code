@@ -58,10 +58,13 @@ import org.teleal.cling.support.model.item.Item;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.test.ServiceTestCase;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.upnp.server.LocalUpnpServer;
@@ -764,7 +767,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		upnpClient.playLocal(result.getResult().getItems().get(0));
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		
 	}
 	
@@ -777,7 +780,12 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		upnpClient.playRemote(result.getResult().getItems().get(0),upnpClient.getDevice(YaaccUpnpServerService.UDN_ID));
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
+		editor.putString(
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				YaaccUpnpServerService.UDN_ID);
+		editor.commit();
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		myWait(120000L);
 	}
 	
@@ -791,7 +799,12 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		upnpClient.playLocal(result.getResult().getItems().get(0));
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
+		editor.putString(
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				UpnpClient.LOCAL_UID);
+		editor.commit();
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		myWait(120000L);
 	}
 	
@@ -804,7 +817,12 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		upnpClient.playLocal(result.getResult().getItems().get(0));
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
+		editor.putString(
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				UpnpClient.LOCAL_UID);
+		editor.commit();
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		myWait();
 	}
 
@@ -817,7 +835,12 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getContainers());
 		assertNotNull(result.getResult().getContainers().get(0));
-		upnpClient.playLocal(result.getResult().getContainers().get(0));
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
+		editor.putString(
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				UpnpClient.LOCAL_UID);
+		editor.commit();
+		upnpClient.initializePlayer(result.getResult().getContainers().get(0)).play();
 		
 	}
 	
@@ -830,23 +853,28 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getContainers());
 		assertNotNull(result.getResult().getContainers().get(1));
-		upnpClient.playLocal(result.getResult().getContainers().get(1));
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
+		editor.putString(
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				UpnpClient.LOCAL_UID);
+		editor.commit();
+		upnpClient.initializePlayer(result.getResult().getContainers().get(1)).play();
 		
 	}
-	
-	public void testUseCasePlayLocalPhotoShowWithMusic() {
-		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
-		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
-		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0");
-		//MusicTrack
-		assertNotNull(result);
-		assertNotNull(result.getResult());
-		assertNotNull(result.getResult().getContainers());
-		assertNotNull(result.getResult().getContainers().get(0));
-		assertNotNull(result.getResult().getContainers().get(1));
-		upnpClient.playLocal(result.getResult().getContainers().get(1),result.getResult().getContainers().get(0));
-		
-	}
+// TODO must be implemented in another way	
+//	public void testUseCasePlayLocalPhotoShowWithMusic() {
+//		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
+//		Device<?, ?, ?> device = upnpClient.getDevice(LocalUpnpServer.UDN_ID);
+//		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0");
+//		//MusicTrack
+//		assertNotNull(result);
+//		assertNotNull(result.getResult());
+//		assertNotNull(result.getResult().getContainers());
+//		assertNotNull(result.getResult().getContainers().get(0));
+//		assertNotNull(result.getResult().getContainers().get(1));
+//		upnpClient.playLocal(result.getResult().getContainers().get(1),result.getResult().getContainers().get(0));
+//		
+//	}
 }
 
 // TODO

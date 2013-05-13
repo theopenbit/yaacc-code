@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.upnp.UpnpClient;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -43,8 +44,8 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	/**
 	 * @param context
 	 */
-	public LocalThirdPartieMusicPlayer(Context context) {
-		super(context);
+	public LocalThirdPartieMusicPlayer(UpnpClient upnpClient) {
+		super(upnpClient);
 
 	}
 
@@ -70,7 +71,8 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	protected Object loadItem(PlayableItem playableItem) {
 		Uri uri = playableItem.getUri();
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED );
 		intent.setDataAndType(uri, playableItem.getMimeType());		
 		return intent;
 	}

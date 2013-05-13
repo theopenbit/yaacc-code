@@ -18,6 +18,7 @@
 package de.yaacc.player;
 
 import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.upnp.UpnpClient;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -31,8 +32,8 @@ public class MultiContentPlayer extends AbstractPlayer {
 	/**
 	 * @param context
 	 */
-	public MultiContentPlayer(Context context) {
-		super(context);
+	public MultiContentPlayer(UpnpClient upnpClient) {
+		super(upnpClient);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -60,6 +61,7 @@ public class MultiContentPlayer extends AbstractPlayer {
 	@Override
 	protected void startItem(PlayableItem playableItem, Object loadedItem) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setDataAndType(playableItem.getUri(), playableItem.getMimeType());
 		getContext().startActivity(intent);

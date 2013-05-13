@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.upnp.UpnpClient;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -37,8 +38,8 @@ public class LocalImagePlayer implements Player {
 	/**
 	 * @param context
 	 */
-	public LocalImagePlayer(Context context) {
-		this.context = context;
+	public LocalImagePlayer(UpnpClient upnpClient) {
+		this.context = upnpClient.getContext();
 	}
 	
 	
@@ -49,6 +50,7 @@ public class LocalImagePlayer implements Player {
 	public void next() {
 		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
 		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		sendIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_NEXT);		
 		context.startActivity(sendIntent);

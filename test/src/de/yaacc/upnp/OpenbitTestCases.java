@@ -125,19 +125,19 @@ public class OpenbitTestCases extends UpnpClientTest {
 
 	}
 	
-	public void testUseCasePlayLocalPhotoShow() {
-		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_MEDIA_SERVER);
-		Device<?, ?, ?> device = upnpClient.getDevice(OPENBIT_MEDIA_SERVER);
-		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"380077");
-		//MusicTrack
-		assertNotNull(result);
-		assertNotNull(result.getResult());			
-		assertNotNull(result.getResult().getItems());
-		upnpClient.playLocal(result.getResult().getItems());
-		
-		myWait(120000);
-		
-	}
+//	public void testUseCasePlayLocalPhotoShow() {
+//		UpnpClient upnpClient = getInitializedUpnpClientWithDevice(OPENBIT_MEDIA_SERVER);
+//		Device<?, ?, ?> device = upnpClient.getDevice(OPENBIT_MEDIA_SERVER);
+//		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"380077");
+//		//MusicTrack
+//		assertNotNull(result);
+//		assertNotNull(result.getResult());			
+//		assertNotNull(result.getResult().getItems());
+//		upnpClient.initializePlayer(result.getResult()).play();
+//		
+//		myWait(120000);
+//		
+//	}
 
 	private Service getAVTransportService(Device<?, ?, ?> device) {
 		// urn:upnp-org:serviceId:urn:schemas-upnp-org:service:AVTransport

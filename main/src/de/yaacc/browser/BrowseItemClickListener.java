@@ -43,7 +43,7 @@ public class BrowseItemClickListener implements OnItemClickListener
 			a.setOnItemClickListener(bItemClickListener);
 
 		} else {
-			BrowseActivity.uClient.play((Item) currentObject);
+			BrowseActivity.uClient.initializePlayer(currentObject).play();
 		}
 	}
 
@@ -74,7 +74,7 @@ public class BrowseItemClickListener implements OnItemClickListener
 	 */
 	public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
 		if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
-			    		BrowseActivity.uClient.play(selectedDIDLObject);
+			    		BrowseActivity.uClient.initializePlayer(selectedDIDLObject).play();
     	} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
 			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemted)", Toast.LENGTH_SHORT);
     		toast.show();
