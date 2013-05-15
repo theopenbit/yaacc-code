@@ -50,7 +50,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
         Context context = upnpClient.getContext();
 		Log.d(getClass().getName(), "Starting background music service... ");
 		Intent svc = new Intent(context, BackgroundMusicService.class);
-
+//FIXME bindService, has a different behavior than startService  yet don't know why bind doesn't working
 		context.bindService(svc, new ServiceConnection() {
 
 			@Override

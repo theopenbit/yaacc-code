@@ -50,10 +50,9 @@ public class LocalImagePlayer implements Player {
 	public void next() {
 		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
 		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_NEXT);		
-		context.startActivity(sendIntent);
+		//FIXME does not work yet context.startActivity(sendIntent);
 
 	}
 
@@ -64,9 +63,9 @@ public class LocalImagePlayer implements Player {
 	public void previous() {
 		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
 		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_PREVIOUS);		
-		context.startActivity(sendIntent);
+		//FIXME does not work yet context.startActivity(sendIntent);
 	}
 
 	/* (non-Javadoc)
@@ -76,9 +75,9 @@ public class LocalImagePlayer implements Player {
 	public void pause() {
 		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
 		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_PAUSE);		
-		context.startActivity(sendIntent);
+		//FIXME does not work yet context.startActivity(sendIntent);
 
 	}
 
@@ -89,9 +88,9 @@ public class LocalImagePlayer implements Player {
 	public void play() {
 		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
 		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_PLAY);		
-		context.startActivity(sendIntent);
+		//FIXME context.startActivity(sendIntent);
 
 	}
 
@@ -102,9 +101,10 @@ public class LocalImagePlayer implements Player {
 	public void stop() {
 		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
 		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_STOP);		
-		context.startActivity(sendIntent);
+		//FIXME does not work yet context.startActivity(sendIntent);
+		
 
 	}
 
@@ -114,11 +114,11 @@ public class LocalImagePlayer implements Player {
 	@Override
 	public void setItems(PlayableItem... items) {
 		Intent intent = new Intent(context, ImageViewerActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setAction(Intent.ACTION_VIEW);
-		Uri[] uris = new Uri[items.length];
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);	
+		ArrayList<Uri> uris = new ArrayList<Uri>();
 		for (int i = 0; i <items.length; i++) {
-			uris[i]= items[i].getUri();
+			uris.add(items[i].getUri());
 		}
 		intent.putExtra(ImageViewerActivity.URIS, uris);
 		context.startActivity(intent);

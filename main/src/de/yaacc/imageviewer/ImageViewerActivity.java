@@ -105,8 +105,8 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreate(Bundle savedInstanceState) {		
+		super.onCreate(savedInstanceState);		
 		menuBarsHide();
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		getWindow().clearFlags(
@@ -116,18 +116,26 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(
 				this);
 		RelativeLayout layout = (RelativeLayout) this.findViewById(R.id.layout);
-		layout.setOnTouchListener(activitySwipeDetector);		
+		layout.setOnTouchListener(activitySwipeDetector);
 		currentImageIndex = 0;
+		imageUris = new ArrayList<Uri>();		
 		if (savedInstanceState != null) {
 			pictureShowActive = savedInstanceState
 					.getBoolean("pictureShowActive");
 			currentImageIndex = savedInstanceState.getInt("currentImageIndex");
+			imageUris = (List<Uri>) savedInstanceState
+					.getSerializable("imageUris");
 		}
-		Intent i = getIntent();
-		if (Intent.ACTION_SEND.equals(i.getAction()) && i.getStringExtra(EXTRA_COMMAND_PARAM) != null) {
-			Log.d(this.getClass().getName(), "Received Command: " + i.getStringExtra(EXTRA_COMMAND_PARAM));
+		Intent i = getIntent();		
+		if (Intent.ACTION_SEND.equals(i.getAction())
+				&& i.getStringExtra(EXTRA_COMMAND_PARAM) != null) {
+			Log.d(this.getClass().getName(),
+					"Received Command: "
+							+ i.getStringExtra(EXTRA_COMMAND_PARAM));
+			excecuteCommand(i.getStringExtra(EXTRA_COMMAND_PARAM));
 		} else {
-			imageUris = new ArrayList<Uri>();
+			Log.d(this.getClass().getName(),
+					"Received Action View! now setting items ");
 			Serializable urisData = i.getSerializableExtra(URIS);
 			if (urisData != null) {
 				if (urisData instanceof List) {
@@ -140,22 +148,33 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				}
 			}
 			pictureShowActive = i.getBooleanExtra(AUTO_START_SHOW, false);
+			if (imageUris.size() > 0) {
+				loadImage();
+			} else {
+				runOnUiThread(new Runnable() {
+					public void run() {
+						Toast toast = Toast.makeText(ImageViewerActivity.this,
+								R.string.no_valid_uri_data_found_to_display,
+								Toast.LENGTH_LONG);
+						toast.show();
+						menuBarsHide();
+					}
+				});
+			}
 		}
-		if (imageUris.size() > 0) {
+	}
 
-			// display first image
-			retrieveImageTask = new RetrieveImageTask(this);
-			retrieveImageTask.execute(imageUris.get(currentImageIndex));
-		} else {
-			runOnUiThread(new Runnable() {
-				public void run() {
-					Toast toast = Toast.makeText(ImageViewerActivity.this,
-							R.string.no_valid_uri_data_found_to_display,
-							Toast.LENGTH_LONG);
-					toast.show();
-					menuBarsHide();
-				}
-			});
+	private void excecuteCommand(String commandStr) {
+		if (EXTRA_COMMAND_PLAY.equals(commandStr)) {
+			play();
+		} else if (EXTRA_COMMAND_NEXT.equals(commandStr)) {
+			next();
+		} else if (EXTRA_COMMAND_PREVIOUS.equals(commandStr)) {
+			previous();
+		} else if (EXTRA_COMMAND_PAUSE.equals(commandStr)) {
+			pause();
+		} else if (EXTRA_COMMAND_STOP.equals(commandStr)) {
+			stop();
 		}
 	}
 
@@ -219,6 +238,11 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putBoolean("pictureShowActive", pictureShowActive);
 		savedInstanceState.putInt("currentImageIndex", currentImageIndex);
+		if (!(imageUris instanceof ArrayList)) {
+			imageUris = new ArrayList<Uri>(imageUris);
+		}
+		savedInstanceState.putSerializable("imageUris",
+				(ArrayList<Uri>) imageUris);
 	}
 
 	/**
@@ -270,7 +294,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	 * 
 	 */
 	private void loadImage() {
-		if (retrieveImageTask.getStatus() == Status.RUNNING) {
+		if (retrieveImageTask  != null && retrieveImageTask.getStatus() == Status.RUNNING) {
 			return;
 		}
 		retrieveImageTask = new RetrieveImageTask(this);
@@ -500,7 +524,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 					}
 				});
 			}
-		}, 3000);
+		}, 4000);
 	}
 
 	public boolean isPictureShowActive() {

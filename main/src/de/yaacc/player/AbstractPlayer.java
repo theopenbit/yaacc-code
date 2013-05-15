@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -44,8 +45,6 @@ public abstract class AbstractPlayer implements Player {
 
 	private UpnpClient upnpClient;
 
-	
-
 	/**
 	 * @param context
 	 */
@@ -60,7 +59,7 @@ public abstract class AbstractPlayer implements Player {
 	public Context getContext() {
 		return upnpClient.getContext();
 	}
-	
+
 	/**
 	 * @return the upnpClient
 	 */
@@ -83,14 +82,18 @@ public abstract class AbstractPlayer implements Player {
 		if (currentIndex > items.size() - 1) {
 			currentIndex = 0;
 		}
-		runOnUiThread(new Runnable() {
-			public void run() {
-		Toast toast = Toast.makeText(getContext(),
-				getContext().getResources().getString(R.string.next)
-						+ getPositionString(), Toast.LENGTH_SHORT);
+		Context context = getUpnpClient().getContext();
+		if (context instanceof Activity) {
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					Toast toast = Toast.makeText(getContext(), getContext()
+							.getResources().getString(R.string.next)
+							+ getPositionString(), Toast.LENGTH_SHORT);
 
-		toast.show();
-			}});
+					toast.show();
+				}
+			});
+		}
 		loadItem();
 		isProcessingCommand = false;
 	}
@@ -116,12 +119,17 @@ public abstract class AbstractPlayer implements Player {
 				currentIndex = 0;
 			}
 		}
-
-		Toast toast = Toast.makeText(getContext(),
-				getContext().getResources().getString(R.string.previous)
-						+ getPositionString(), Toast.LENGTH_SHORT);
-		toast.show();
-
+		Context context = getUpnpClient().getContext();
+		if (context instanceof Activity) {
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					Toast toast = Toast.makeText(getContext(), getContext()
+							.getResources().getString(R.string.previous)
+							+ getPositionString(), Toast.LENGTH_SHORT);
+					toast.show();
+				}
+			});
+		}
 		loadItem();
 		isProcessingCommand = false;
 
@@ -138,11 +146,17 @@ public abstract class AbstractPlayer implements Player {
 			return;
 		isProcessingCommand = true;
 		cancleTimer();
-
-		Toast toast = Toast.makeText(getContext(),
-				getContext().getResources().getString(R.string.pause)
-						+ getPositionString(), Toast.LENGTH_SHORT);
-		toast.show();
+		Context context = getUpnpClient().getContext();
+		if (context instanceof Activity) {
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					Toast toast = Toast.makeText(getContext(), getContext()
+							.getResources().getString(R.string.pause)
+							+ getPositionString(), Toast.LENGTH_SHORT);
+					toast.show();
+				}
+			});
+		}
 		isPlaying = false;
 		isProcessingCommand = false;
 	}
@@ -158,14 +172,17 @@ public abstract class AbstractPlayer implements Player {
 			return;
 		isProcessingCommand = true;
 		if (currentIndex < items.size()) {
-			
-					Toast toast = Toast.makeText(getContext(),
-							getContext().getResources().getString(R.string.play)
-									+ getPositionString(), Toast.LENGTH_SHORT);
-					toast.show();
-					
-				
-			
+			Context context = getUpnpClient().getContext();
+			if (context instanceof Activity) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						Toast toast = Toast.makeText(getContext(), getContext()
+								.getResources().getString(R.string.play)
+								+ getPositionString(), Toast.LENGTH_SHORT);
+						toast.show();
+					}
+				});
+			}
 			// Start the pictureShow
 			isPlaying = true;
 			loadItem();
@@ -183,17 +200,23 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public void stop() {
 		if (isProcessingCommand)
-			return;		
+			return;
 		isProcessingCommand = true;
 		cancleTimer();
 		currentIndex = 0;
-		
-				Toast toast = Toast.makeText(getContext(),
-						getContext().getResources().getString(R.string.stop)
-								+ getPositionString(), Toast.LENGTH_SHORT);
-				toast.show();			
+		Context context = getUpnpClient().getContext();
+		if (context instanceof Activity) {
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					Toast toast = Toast.makeText(getContext(), getContext()
+							.getResources().getString(R.string.stop)
+							+ getPositionString(), Toast.LENGTH_SHORT);
+					toast.show();
+				}
+			});
+		}
 		stopItem(items.get(currentIndex));
-		isPlaying = false;		
+		isPlaying = false;
 		isProcessingCommand = false;
 	}
 
@@ -241,27 +264,30 @@ public abstract class AbstractPlayer implements Player {
 		return " (" + (currentIndex + 1) + "/" + items.size() + ")";
 	}
 
-	private void loadItem(){
-		
+	private void loadItem() {
+
 		PlayableItem playableItem = items.get(currentIndex);
-		Object loadedItem = loadItem(playableItem);		
+		Object loadedItem = loadItem(playableItem);
 		startItem(playableItem, loadedItem);
-		if(isPlaying()){
+		if (isPlaying()) {
 			startTimer(playableItem.getDuration() + getSilenceDuration());
 		}
 	}
-	
+
 	/**
 	 * returns the duration between two items
+	 * 
 	 * @return dureaton in millis
 	 */
-	protected long getSilenceDuration(){
-		return 2000L; //Default 2 sec.
+	protected long getSilenceDuration() {
+		return 2000L; // Default 2 sec.
 	}
-	
+
 	/**
 	 * Start a timer for the next item change
-	 * @param duration in millis
+	 * 
+	 * @param duration
+	 *            in millis
 	 */
 	public void startTimer(final long duration) {
 
@@ -277,9 +303,12 @@ public abstract class AbstractPlayer implements Player {
 		}, duration);
 
 	}
-	
+
 	protected abstract void stopItem(PlayableItem playableItem);
-	protected abstract Object loadItem(PlayableItem playableItem);	
-	protected abstract void startItem(PlayableItem playableItem, Object loadedItem);
+
+	protected abstract Object loadItem(PlayableItem playableItem);
+
+	protected abstract void startItem(PlayableItem playableItem,
+			Object loadedItem);
 
 }
