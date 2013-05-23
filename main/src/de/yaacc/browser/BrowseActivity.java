@@ -33,10 +33,10 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -57,6 +57,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	private BrowseItemAdapter bItemAdapter;
 
 	BrowseItemClickListener bItemClickListener = null;
+	
+	BrowseDeviceClickListener bDeviceClickListener = null;
 
 	private DIDLObject selectedDIDLObject;
 
@@ -75,6 +77,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 		// initialize click listener
 		bItemClickListener = new BrowseItemClickListener();
+
+		// initialize click listener
+		bDeviceClickListener = new BrowseDeviceClickListener();
 
 		if (preferences.getBoolean(
 				getString(R.string.settings_local_server_chkbx), true)) {
@@ -127,7 +132,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		uClient.addUpnpClientListener(this);
 
 		if (!displayingSomething) {
-			showMainFolder();
+			//showMainFolder();
+			populateItemList();
+
 		}
 	}
 
@@ -153,6 +160,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		}
 		
 	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -187,18 +195,22 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	@Override
 	public void onBackPressed() {
 
+		// FIXME: Since there are now some magic values in here, they should be removed...
 		if ("0".equals(this.uClient.getCurrentObjectId())) {
+			populateItemList();
+		} else if ("-1".equals(this.uClient.getCurrentObjectId())){
 			super.finish();
+		} else {
+
+			final ListView itemList = (ListView) findViewById(R.id.itemList);
+	
+			bItemAdapter = new BrowseItemAdapter(this,
+					this.uClient.getLastVisitedObjectId());
+			itemList.setAdapter(bItemAdapter);
+	
+			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+			itemList.setOnItemClickListener(bItemClickListener);
 		}
-
-		final ListView itemList = (ListView) findViewById(R.id.itemList);
-
-		bItemAdapter = new BrowseItemAdapter(this,
-				this.uClient.getLastVisitedObjectId());
-		itemList.setAdapter(bItemAdapter);
-
-		BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
-		itemList.setOnItemClickListener(bItemClickListener);
 
 	}
 
@@ -275,6 +287,23 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		});
 
 	}
+	
+	private void populateItemList(){
+		this.runOnUiThread(new Runnable() {
+			public void run() {
+				
+				// Define where to show the folder contents
+				ListView deviceList = (ListView) findViewById(R.id.itemList);
+
+				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(uClient.getDevices()));
+				
+				deviceList.setAdapter(bDeviceAdapter);
+
+				deviceList.setOnItemClickListener(bDeviceClickListener);
+
+			}
+		});
+	}
 
 	/**
 	 * Loads the device providing media files, as it is configured in the
@@ -304,7 +333,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	@Override
 	public void deviceAdded(Device<?, ?, ?> device) {
 		if (!displayingSomething) {
-			showMainFolder();
+			// showMainFolder();
+			populateItemList();
 		}
 
 	}

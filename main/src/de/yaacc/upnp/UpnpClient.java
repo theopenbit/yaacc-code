@@ -64,6 +64,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.IBinder;
@@ -849,6 +850,17 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				context.getString(R.string.settings_selected_provider_title),
 				null);
 	}
+	
+	
+	/**
+	 * 
+	 * @param provider
+	 */
+	public void setProviderDevice(Device provider){
+		Editor prefEdit = preferences.edit();
+		prefEdit.putString(context.getString(R.string.settings_selected_provider_title), provider.getIdentity().getUdn().getIdentifierString());
+		prefEdit.apply();
+	}
 
 	/**
 	 * @return the provider device
@@ -864,12 +876,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			this.visitedObjectIds.removeLast();
 		}
 		if (visitedObjectIds == null || visitedObjectIds.isEmpty()) {
-			return "0";
+			return "-1";
 		}
 		return this.visitedObjectIds.pollLast();
 	}
 
+
+	
 	public void storeNewVisitedObjectId(String newVisitedObjectId) {
+
 		this.visitedObjectIds.addLast(newVisitedObjectId);
 	}
 
