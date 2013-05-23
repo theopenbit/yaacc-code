@@ -18,6 +18,7 @@
 package de.yaacc.browser;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLObject;
