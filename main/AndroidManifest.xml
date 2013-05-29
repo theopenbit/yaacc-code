@@ -40,7 +40,8 @@
         
         <activity
             android:name="de.yaacc.imageviewer.ImageViewerActivity"
-            android:label="@string/title_activity_image_viewer"                       
+            android:label="@string/title_activity_image_viewer"
+            android:launchMode="singleInstance"                       
              >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

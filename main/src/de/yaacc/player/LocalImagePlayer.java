@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.imageviewer.ImageViewerBroadcastReceiver;
 import de.yaacc.upnp.UpnpClient;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -48,11 +50,9 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void next() {
-		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
-		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_NEXT);		
-		//FIXME does not work yet context.startActivity(sendIntent);
+		Intent intent = new Intent();
+		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_NEXT);
+		 context.sendBroadcast(intent);
 
 	}
 
@@ -61,11 +61,9 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void previous() {
-		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
-		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_PREVIOUS);		
-		//FIXME does not work yet context.startActivity(sendIntent);
+		Intent intent = new Intent();
+		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_PREVIOUS);
+		 context.sendBroadcast(intent);
 	}
 
 	/* (non-Javadoc)
@@ -73,11 +71,9 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void pause() {
-		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
-		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_PAUSE);		
-		//FIXME does not work yet context.startActivity(sendIntent);
+		Intent intent = new Intent();
+		intent.setAction(ImageViewerBroadcastReceiver.ACTION_PAUSE);
+		context.sendBroadcast(intent);
 
 	}
 
@@ -86,12 +82,10 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void play() {
-		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
-		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_PLAY);		
-		//FIXME context.startActivity(sendIntent);
-
+		 Intent intent = new Intent();
+		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_PLAY);
+		 context.sendBroadcast(intent);
+	
 	}
 
 	/* (non-Javadoc)
@@ -99,11 +93,9 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void stop() {
-		Intent sendIntent = new Intent(context, ImageViewerActivity.class);
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
-		sendIntent.putExtra(ImageViewerActivity.EXTRA_COMMAND_PARAM, ImageViewerActivity.EXTRA_COMMAND_STOP);		
-		//FIXME does not work yet context.startActivity(sendIntent);
+		 Intent intent = new Intent();
+		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_STOP);
+		 context.sendBroadcast(intent);
 		
 
 	}

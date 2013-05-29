@@ -26,6 +26,8 @@ import java.util.TimerTask;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -33,6 +35,7 @@ import android.net.Uri;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,13 +103,18 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	private boolean pictureShowActive = false;
 	private boolean isProcessingCommand = false; // indicates an command
 	private Timer pictureShowTimer;
+	private ImageViewerBroadcastReceiver broadCastReceiver;
+	
+	
+	
 
 	// processing
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
-		super.onCreate(savedInstanceState);		
+		super.onCreate(savedInstanceState);
+		
 		menuBarsHide();
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		getWindow().clearFlags(
@@ -124,7 +132,11 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 					.getBoolean("pictureShowActive");
 			currentImageIndex = savedInstanceState.getInt("currentImageIndex");
 			imageUris = (List<Uri>) savedInstanceState
-					.getSerializable("imageUris");
+					.getSerializable("imageUris");			
+		} 
+		if(broadCastReceiver == null){
+			broadCastReceiver = new ImageViewerBroadcastReceiver(this);
+			broadCastReceiver.registerReceiver();
 		}
 		Intent i = getIntent();		
 		if (Intent.ACTION_SEND.equals(i.getAction())
@@ -163,6 +175,21 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			}
 		}
 	}
+
+	
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+		
+		super.onDestroy();
+		//unregister BroadcastReceiver
+		unregisterReceiver(broadCastReceiver );
+	}
+
+
 
 	private void excecuteCommand(String commandStr) {
 		if (EXTRA_COMMAND_PLAY.equals(commandStr)) {
@@ -281,9 +308,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 				}
 			});
-			loadImage();
 			// Start the pictureShow
 			pictureShowActive = true;
+			loadImage();
 			startMenuHideTimer();
 			isProcessingCommand = false;
 
