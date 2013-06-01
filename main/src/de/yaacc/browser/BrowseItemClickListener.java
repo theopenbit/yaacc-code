@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
 
 import android.content.Context;
 import android.view.ContextMenu;

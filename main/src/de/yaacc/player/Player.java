@@ -66,6 +66,10 @@ public interface Player {
      */
 	void clear();
 	
+	/**
+	 * Kill the  player.
+	 */
+	void onDestroy();
 
 	
 }

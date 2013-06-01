@@ -18,24 +18,27 @@
 package de.yaacc.player;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import de.yaacc.imageviewer.ImageViewerActivity;
-import de.yaacc.imageviewer.ImageViewerBroadcastReceiver;
-import de.yaacc.upnp.UpnpClient;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
+import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.imageviewer.ImageViewerBroadcastReceiver;
+import de.yaacc.upnp.UpnpClient;
 
 /**
  * Player for local image viewing activity
- * @author Tobias Schoene (openbit)  
+ * 
+ * @author Tobias Schoene (openbit)
  * 
  */
 public class LocalImagePlayer implements Player {
 
 	private Context context;
+	private Timer commandExecutionTimer;
 
 	/**
 	 * @param context
@@ -43,73 +46,150 @@ public class LocalImagePlayer implements Player {
 	public LocalImagePlayer(UpnpClient upnpClient) {
 		this.context = upnpClient.getContext();
 	}
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#next()
 	 */
 	@Override
 	public void next() {
-		Intent intent = new Intent();
-		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_NEXT);
-		 context.sendBroadcast(intent);
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(ImageViewerBroadcastReceiver.ACTION_NEXT);
+				context.sendBroadcast(intent);
+
+			}
+		}, 500L);
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#previous()
 	 */
 	@Override
 	public void previous() {
-		Intent intent = new Intent();
-		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_PREVIOUS);
-		 context.sendBroadcast(intent);
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(ImageViewerBroadcastReceiver.ACTION_PREVIOUS);
+				context.sendBroadcast(intent);
+
+			}
+		}, 500L);
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#pause()
 	 */
 	@Override
 	public void pause() {
-		Intent intent = new Intent();
-		intent.setAction(ImageViewerBroadcastReceiver.ACTION_PAUSE);
-		context.sendBroadcast(intent);
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(ImageViewerBroadcastReceiver.ACTION_PAUSE);
+				context.sendBroadcast(intent);
+
+			}
+		}, 500L);
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#play()
 	 */
 	@Override
 	public void play() {
-		 Intent intent = new Intent();
-		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_PLAY);
-		 context.sendBroadcast(intent);
-	
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Log.d(this.getClass().getName(), "send play");
+				Intent intent = new Intent();
+				intent.setAction(ImageViewerBroadcastReceiver.ACTION_PLAY);
+				context.sendBroadcast(intent);
+
+			}
+		}, 500L);
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#stop()
 	 */
 	@Override
 	public void stop() {
-		 Intent intent = new Intent();
-		 intent.setAction(ImageViewerBroadcastReceiver.ACTION_STOP);
-		 context.sendBroadcast(intent);
-		
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(ImageViewerBroadcastReceiver.ACTION_STOP);
+				context.sendBroadcast(intent);
+
+			}
+		}, 500L);
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#setItems(de.yaacc.player.PlayableItem[])
 	 */
 	@Override
 	public void setItems(PlayableItem... items) {
 		Intent intent = new Intent(context, ImageViewerActivity.class);
 		intent.setAction(Intent.ACTION_VIEW);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);	
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		ArrayList<Uri> uris = new ArrayList<Uri>();
-		for (int i = 0; i <items.length; i++) {
+		for (int i = 0; i < items.length; i++) {
 			uris.add(items[i].getUri());
 		}
 		intent.putExtra(ImageViewerActivity.URIS, uris);
@@ -117,7 +197,9 @@ public class LocalImagePlayer implements Player {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#addItem(de.yaacc.player.PlayableItem)
 	 */
 	@Override
@@ -126,7 +208,9 @@ public class LocalImagePlayer implements Player {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#clear()
 	 */
 	@Override
@@ -134,5 +218,16 @@ public class LocalImagePlayer implements Player {
 		// TODO Auto-generated method stub
 
 	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#onDestroy()
+	 */
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 }

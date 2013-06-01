@@ -17,13 +17,13 @@
  */
 package de.yaacc.player;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import android.preference.PreferenceManager;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
-
-import android.content.Context;
-import android.preference.PreferenceManager;
 
 /**
  * Factory for creating player instances-
@@ -32,6 +32,10 @@ import android.preference.PreferenceManager;
  * 
  */
 public class PlayerFactory {
+
+	private static List<Player> currentPlayers = new ArrayList<Player>();
+	
+	
 
 	/**
 	 * Creates a player for the given content. Based on the configuration
@@ -74,6 +78,7 @@ public class PlayerFactory {
 			}			
 		}
 		if (result != null) {
+			currentPlayers.add(result);
 			result.setItems(items.toArray(new PlayableItem[items.size()]));
 		}
 		return result;
@@ -88,7 +93,7 @@ public class PlayerFactory {
 		boolean background = PreferenceManager.getDefaultSharedPreferences(
 				upnpClient.getContext()).getBoolean(
 				upnpClient.getContext().getString(R.string.settings_audio_app),
-				true);
+				false);
 		if (background) {
 			return new LocalBackgoundMusicPlayer(upnpClient);
 		}
@@ -96,4 +101,22 @@ public class PlayerFactory {
 
 	}
 
+	/**
+	 * returns all current players
+	 * @return the currentPlayer
+	 */
+	public static List<Player> getCurrentPlayers() {
+		return Collections.unmodifiableList(currentPlayers);
+	}
+	
+	/**
+	 * Kills the given Player
+	 * @param player
+	 */
+	public static void kill(Player player){
+		assert(player != null);
+		currentPlayers.remove(player);
+		player.onDestroy();
+	}
+	
 }

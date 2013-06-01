@@ -15,36 +15,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc.imageviewer;
+package de.yaacc.musicplayer;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.util.Log;
 
 /**
  * @author Tobias Schoene (openbit)  
  * 
  */
-public class ImageViewerBroadcastReceiver extends BroadcastReceiver {
+public class BackgroundMusicBroadcastReceiver extends BroadcastReceiver {
 
-	public static String ACTION_PLAY = "de.yaacc.imageviewer.ActionPlay";
-	public static String ACTION_STOP = "de.yaacc.imageviewer.ActionStop";
-	public static String ACTION_PAUSE = "de.yaacc.imageviewer.ActionPause";
-	public static String ACTION_NEXT = "de.yaacc.imageviewer.ActionNext";
-	public static String ACTION_PREVIOUS = "de.yaacc.imageviewer.ActionPrevious";
+	public static String ACTION_PLAY = "de.yaacc.musicplayer.ActionPlay";
+	public static String ACTION_STOP = "de.yaacc.musicplayer.ActionStop";
+	public static String ACTION_PAUSE = "de.yaacc.musicplayer.ActionPause";
+	public static String ACTION_SET_DATA = "de.yaacc.musicplayer.ActionSetData";
+	public static String ACTION_SET_DATA_URI_PARAM = "de.yaacc.musicplayer.ActionSetDataUriParam";
 	
 	
-	private ImageViewerActivity imageViewer;
+	
+	private BackgroundMusicService backgroundMusicService;
 
 	/**
 	 * 
 	 */
-	public ImageViewerBroadcastReceiver(ImageViewerActivity imageViewer) {
+	public BackgroundMusicBroadcastReceiver(BackgroundMusicService backgroundMusicService) {
 		Log.d(this.getClass().getName(), "Starting Broadcast Receiver..." );
-		assert(imageViewer != null);
-		this.imageViewer = imageViewer;
+		assert(backgroundMusicService != null);
+		this.backgroundMusicService = backgroundMusicService;
 		
 	}
 
@@ -54,18 +56,16 @@ public class ImageViewerBroadcastReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d(this.getClass().getName(), "Received Action: " + intent.getAction());		
-		if(imageViewer == null) return;
-		Log.d(this.getClass().getName(), "Execute Action on imageViewer: " + imageViewer);
+		if(backgroundMusicService == null) return;
+		Log.d(this.getClass().getName(), "Execute Action on backgroundMusicService: " + backgroundMusicService);
 		if(ACTION_PLAY.equals(intent.getAction())){
-			imageViewer.play();
+			backgroundMusicService.play();
 		}else if(ACTION_PAUSE.equals(intent.getAction())){
-			imageViewer.pause();
+			backgroundMusicService.pause();
 		}else if(ACTION_STOP.equals(intent.getAction())){
-			imageViewer.stop();
-		}else if(ACTION_PREVIOUS.equals(intent.getAction())){
-			imageViewer.previous();
-		}else if(ACTION_NEXT.equals(intent.getAction())){
-			imageViewer.next();
+			backgroundMusicService.stop();
+		}else if(ACTION_SET_DATA.equals(intent.getAction())){
+			backgroundMusicService.setMusicUri((Uri)intent.getParcelableExtra(ACTION_SET_DATA_URI_PARAM));
 		}
 		
 			
@@ -75,11 +75,10 @@ public class ImageViewerBroadcastReceiver extends BroadcastReceiver {
 		Log.d(this.getClass().getName(), "Register Receiver" );		
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ACTION_PLAY);
-		intentFilter.addAction(ACTION_PAUSE);
-		intentFilter.addAction(ACTION_NEXT);
-		intentFilter.addAction(ACTION_PREVIOUS);
-		intentFilter.addAction(ACTION_STOP);		
-		imageViewer.registerReceiver(this, intentFilter);
+		intentFilter.addAction(ACTION_PAUSE);		
+		intentFilter.addAction(ACTION_STOP);
+		intentFilter.addAction(ACTION_SET_DATA);
+		backgroundMusicService.registerReceiver(this, intentFilter);
 
 		
 	}

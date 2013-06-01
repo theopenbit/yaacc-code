@@ -28,7 +28,6 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
-import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -36,6 +35,8 @@ import de.yaacc.upnp.UpnpClient;
  * 
  */
 public abstract class AbstractPlayer implements Player {
+
+	
 
 	private List<PlayableItem> items = new ArrayList<PlayableItem>();
 	private int currentIndex = 0;
@@ -310,5 +311,15 @@ public abstract class AbstractPlayer implements Player {
 
 	protected abstract void startItem(PlayableItem playableItem,
 			Object loadedItem);
+
+	
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#onDestroy()
+	 */
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

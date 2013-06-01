@@ -24,7 +24,6 @@ import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLObject;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,15 +33,15 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.player.Player;
+import de.yaacc.player.PlayerFactory;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
@@ -113,6 +112,10 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 			@Override
 			public void onClick(View v) {
+				if(PlayerFactory.getCurrentPlayers().size() > 0){
+				    Player player = PlayerFactory.getCurrentPlayers().get(0);
+				    player.stop();
+				}
 				// FIXME: uClient.playbackStop();
 				// FIXME: ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
 				// FIXME: btnStop.setVisibility(View.INVISIBLE);

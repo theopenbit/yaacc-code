@@ -17,17 +17,24 @@
  */
 package de.yaacc.player;
 
-import de.yaacc.imageviewer.ImageViewerActivity;
-import de.yaacc.upnp.UpnpClient;
+import java.util.List;
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Process;
+import android.util.Log;
+import de.yaacc.upnp.UpnpClient;
 
 /**
  * @author Tobias Schoene (openbit)  
  * 
  */
 public class MultiContentPlayer extends AbstractPlayer {
+
+	private int appPid;
 
 	/**
 	 * @param context
@@ -42,7 +49,9 @@ public class MultiContentPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected void stopItem(PlayableItem playableItem) {
-		// TODO Auto-generated method stub
+		if(appPid != 0){
+			Process.killProcess(appPid);
+		}	
 
 	}
 
@@ -51,7 +60,7 @@ public class MultiContentPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected Object loadItem(PlayableItem playableItem) {
-		// TODO Auto-generated method stub
+		//DO nothing special
 		return null;
 	}
 
@@ -65,7 +74,36 @@ public class MultiContentPlayer extends AbstractPlayer {
 		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setDataAndType(playableItem.getUri(), playableItem.getMimeType());
 		getContext().startActivity(intent);
+		discoverStartedActivityPid();
 
 	}
 
+	
+	private void discoverStartedActivityPid() {
+		
+		ActivityManager activityManager = (ActivityManager) getContext()
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> services = activityManager
+				.getRunningTasks(Integer.MAX_VALUE);
+		List<RunningAppProcessInfo> apps = activityManager.getRunningAppProcesses();
+		String packageName = services.get(0).topActivity.getPackageName(); //fist Task is the last started task		
+		for (int i = 0; i < apps.size(); i++) {
+		    if(apps.get(i).processName .equals(packageName)){
+		    	appPid = apps.get(i).pid;
+		    	Log.d(getClass().getName(), "Found activity process: " + apps.get(i).processName + " PID: " + appPid);
+		    }
+			
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#onDestroy()
+	 */
+	@Override
+	public void onDestroy() {		
+		super.onDestroy();
+		if(appPid != 0){
+			Process.killProcess(appPid);
+		}
+	}	
 }

@@ -18,8 +18,6 @@
  */
 package de.yaacc.musicplayer;
 
-import java.io.IOException;
-
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -37,6 +35,7 @@ public class BackgroundMusicService extends Service {
 
 	public static final String URIS = "URIS_PARAM"; // String Intent parameter
 	MediaPlayer player;
+	private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
 
 	public BackgroundMusicService() {
 		super();
@@ -67,6 +66,7 @@ public class BackgroundMusicService extends Service {
 			player.stop();
 			player.release();
 		}
+		unregisterReceiver(backgroundMusicBroadcastReceiver);
 	}
 
 	/*
@@ -88,23 +88,25 @@ public class BackgroundMusicService extends Service {
 	@Override
 	public void onStart(Intent intent, int startid) {
 		Log.d(this.getClass().getName(), "On Start");
+		backgroundMusicBroadcastReceiver = new BackgroundMusicBroadcastReceiver(
+				this);
+		backgroundMusicBroadcastReceiver.registerReceiver();
 		if (player == null) {
-			player = MediaPlayer.create(this, intent.getData());
+			player = new MediaPlayer();
 		} else {
 			player.stop();
-			try {
-				if (intent.getData() != null) {
-					player.setDataSource(this, intent.getData());
-				}
-			} catch (Exception e) {
-				Log.e(this.getClass().getName(),
-						"Exception while changing datasource uri", e);
-
+		}
+		try {
+			if (intent.getData() != null) {
+				player.setDataSource(this, intent.getData());
 			}
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(),
+					"Exception while changing datasource uri", e);
+
 		}
 		if (player != null) {
 			player.setVolume(100, 100);
-			player.start();
 			Log.i(this.getClass().getName(), "is Playing:" + player.isPlaying());
 		}
 	}
@@ -112,7 +114,7 @@ public class BackgroundMusicService extends Service {
 	/**
 	 * stop current music play
 	 */
-	public void stopMusic() {
+	public void stop() {
 		if (player != null) {
 			player.stop();
 		}
@@ -121,25 +123,45 @@ public class BackgroundMusicService extends Service {
 	/**
 	 * start current music play
 	 */
-	public void playMusic() {
-		if (player != null) {
+	public void play() {
+		if (player != null && !player.isPlaying()) {
 			player.start();
 		}
 	}
-	
-	/**
-	 * change music uri
-	 * @param uri
-	 */
-	public void setMusicUri(Uri uri){
-		if (player != null) {
-			try {
-				player.setDataSource(this, uri);
-			} catch (Exception e) {
-				Log.e(this.getClass().getName(),
-						"Exception while changing datasource uri", e);
 
-			}
+	/**
+	 * pause current music play
+	 */
+	public void pause() {
+		if (player != null) {
+			player.pause();
 		}
 	}
+
+	/**
+	 * change music uri
+	 * 
+	 * @param uri
+	 */
+	public void setMusicUri(Uri uri) {
+		Log.e(this.getClass().getName(),
+				"changing datasource uri to:" + uri.toString());
+		if (player != null) {
+			player.release();
+		}
+		player = new MediaPlayer();
+		try {
+			if (player.isPlaying()) {
+				stop();
+			}
+			player.setDataSource(this, uri);
+			player.prepare();
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(),
+					"Exception while changing datasource uri", e);
+
+		}
+
+	}
+
 }

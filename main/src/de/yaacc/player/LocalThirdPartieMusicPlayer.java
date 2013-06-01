@@ -17,20 +17,22 @@
  */
 package de.yaacc.player;
 
-import de.yaacc.R;
-import de.yaacc.musicplayer.BackgroundMusicService;
-import de.yaacc.upnp.UpnpClient;
+import java.util.List;
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
+import de.yaacc.R;
+import de.yaacc.upnp.UpnpClient;
 
 /**
  * A Player for local music playing
@@ -39,8 +41,8 @@ import android.widget.Toast;
  * 
  */
 public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
-
-
+	PendingIntent pendingIntent;
+	private int musicAppPid=0; 
 	/**
 	 * @param context
 	 */
@@ -56,9 +58,10 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	 * de.yaacc.player.AbstractPlayer#stopItem(de.yaacc.player.PlayableItem)
 	 */
 	@Override
-	protected void stopItem(PlayableItem playableItem) {		
-			// FIXME NOT yet implemented because I don't know how to send an
-			// message to an activity
+	protected void stopItem(PlayableItem playableItem) {
+		if(musicAppPid != 0){
+			Process.killProcess(musicAppPid);
+		}	
 	}
 
 	/*
@@ -72,8 +75,8 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 		Uri uri = playableItem.getUri();
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED );
-		intent.setDataAndType(uri, playableItem.getMimeType());		
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		intent.setDataAndType(uri, playableItem.getMimeType());
 		return intent;
 	}
 
@@ -85,11 +88,15 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	 * java.lang.Object)
 	 */
 	@Override
-	protected void startItem(PlayableItem playableItem, Object loadedItem) {
+	protected void startItem(PlayableItem playableItem, Object loadedItem) {		
 		if (loadedItem instanceof Intent) {
+			
 			Intent intent = (Intent) loadedItem;
-			try {
+			try {				
 				getContext().startActivity(intent);
+				discoverMusicActivityPid();
+				
+
 			} catch (ActivityNotFoundException anfe) {
 				Resources res = getContext().getResources();
 				String text = String.format(
@@ -101,8 +108,38 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 			}
 		} else {
 			Log.d(getClass().getName(),
-					"Hey thats stange loadeditem isn't an intent");
+					"Hey thats stange loaded item isn't an intent");
 		}
 	}
+
+	private void discoverMusicActivityPid() {
+		
+		ActivityManager activityManager = (ActivityManager) getContext()
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> services = activityManager
+				.getRunningTasks(Integer.MAX_VALUE);
+		List<RunningAppProcessInfo> apps = activityManager.getRunningAppProcesses();
+		String packageName = services.get(0).topActivity.getPackageName(); //fist Task is the last started task		
+		for (int i = 0; i < apps.size(); i++) {
+		    if(apps.get(i).processName .equals(packageName)){
+		    	musicAppPid = apps.get(i).pid;
+		    	Log.d(getClass().getName(), "Found music activity process: " + apps.get(i).processName + " PID: " + musicAppPid);
+		    }
+			
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#onDestroy()
+	 */
+	@Override
+	public void onDestroy() {		
+		super.onDestroy();
+		if(musicAppPid != 0){
+			Process.killProcess(musicAppPid);
+		}
+	}	
+	
+	
 
 }

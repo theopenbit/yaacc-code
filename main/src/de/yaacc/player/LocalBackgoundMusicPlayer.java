@@ -17,20 +17,16 @@
  */
 package de.yaacc.player;
 
-import de.yaacc.R;
-import de.yaacc.musicplayer.BackgroundMusicService;
-import de.yaacc.upnp.UpnpClient;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.res.Resources;
 import android.net.Uri;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
+import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
+import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.upnp.UpnpClient;
 
 /**
  * A Player for local music playing in background
@@ -41,38 +37,29 @@ import android.widget.Toast;
 public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	private boolean background = true;
 	private BackgroundMusicService musicService;
+	private Timer commandExecutionTimer;
 
 	/**
 	 * @param context
 	 */
 	public LocalBackgoundMusicPlayer(UpnpClient upnpClient) {
 		super(upnpClient);
-        Context context = upnpClient.getContext();
+		Context context = upnpClient.getContext();
 		Log.d(getClass().getName(), "Starting background music service... ");
 		Intent svc = new Intent(context, BackgroundMusicService.class);
-//FIXME bindService, has a different behavior than startService  yet don't know why bind doesn't working
-		context.bindService(svc, new ServiceConnection() {
+		context.startService(svc);
+	}
 
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				Log.d(getClass().getName(),
-						"background music service disconnected!");
-				musicService = null;
-
-			}
-
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				Log.d(getClass().getName(),
-						"background music service connected!");
-
-				musicService = (BackgroundMusicService) service;
-
-			}
-		}
-
-		, Context.BIND_AUTO_CREATE);
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.yaacc.player.AbstractPlayer#onDestroy()
+	 */
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Intent svc = new Intent(getContext(), BackgroundMusicService.class);
+		getContext().stopService(svc);
 	}
 
 	/*
@@ -84,9 +71,22 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	@Override
 	protected void stopItem(PlayableItem playableItem) {
 
-		if (musicService != null) {
-			musicService.stopMusic();
-		}
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_STOP);
+				getContext().sendBroadcast(intent);
+
+			}
+		}, 1000L);
 
 	}
 
@@ -98,12 +98,23 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected Object loadItem(PlayableItem playableItem) {
-		Uri uri = playableItem.getUri();
+		final Uri uri = playableItem.getUri();
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
 
-		if (musicService != null) {
-			musicService.setMusicUri(uri);
-		}
-
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_SET_DATA);
+				intent.putExtra(BackgroundMusicBroadcastReceiver.ACTION_SET_DATA_URI_PARAM, uri);
+				getContext().sendBroadcast(intent);				
+			}
+		}, 500L);				
 		return uri;
 	}
 
@@ -117,10 +128,21 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	@Override
 	protected void startItem(PlayableItem playableItem, Object loadedItem) {
 
-		if (musicService != null) {
-			musicService.playMusic();
-		}
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
 
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_PLAY);
+				getContext().sendBroadcast(intent);				
+			}
+		}, 600L);
 	}
 
 }
