@@ -3,4 +3,5 @@
         android:title="@string/title_activity_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    
 </menu>
