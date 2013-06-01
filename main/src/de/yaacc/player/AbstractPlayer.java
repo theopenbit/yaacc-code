@@ -265,11 +265,11 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	private void loadItem() {
-
+		if (items == null) return;
 		PlayableItem playableItem = items.get(currentIndex);
 		Object loadedItem = loadItem(playableItem);
 		startItem(playableItem, loadedItem);
-		if (isPlaying()) {
+		if (isPlaying() && items.size() > 1) {
 			startTimer(playableItem.getDuration() + getSilenceDuration());
 		}
 	}
