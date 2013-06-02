@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import org.teleal.cling.model.meta.Device;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.icon = (ImageView) convertView.findViewById(R.id.browseItemIcon);
 			holder.name = (TextView) convertView.findViewById(R.id.browseItemName);
+			holder.name.setTextColor(Color.BLACK);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
