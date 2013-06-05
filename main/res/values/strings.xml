@@ -8,10 +8,10 @@
     <string name="browse_context_play">Play item</string>
     <string name="browse_context_download">Download item</string>
     <string name="browse_context_add_to_playplist">Add item to playlist</string>
-	<string name="browse_no_content_found">No data found</string>
-	<string name="browse_button_prev">Previous Item</string>
+    <string name="browse_no_content_found">No data found</string>
+    <string name="browse_button_prev">Previous Item</string>
     <string name="browse_button_stop">Stop Playback</string>
-    <string name="browse_button_next">Next Item</string> 
+    <string name="browse_button_next">Next Item</string>
     <string name="title_activity_main">YAACC</string>
     <string name="title_activity_upnp_browser">UpnpBrowserActivity</string>
     <string name="title_activity_image_viewer">ImageViewerActivity</string>
@@ -24,15 +24,15 @@
     <string name="settings_change_provider">Tab to change current provider</string>
     <string name="settings_selected_receiver_title">Current media receiver</string>
     <string name="settings_change_receiver">Tab to change current receiver</string>
-    <string name="settings_audio_app">Audio Playback</string> 
+    <string name="settings_audio_app">Audio Playback</string>
     <string name="settings_video_app">Image Playback</string>
-    <string name="settings_image_app">Video Playback</string>  
-    <string name="settings_audio_app_on">Local audio playback directly in YAACC is enabled</string>    
-    <string name="settings_audio_app_off">Local audio playback opens a third party application</string> 
-    <string name="settings_image_app_on">Local image playback directly in YAACC is enabled</string>    
-    <string name="settings_image_app_off">Local image playback opens a third party application</string>  
-    <string name="settings_video_app_on">Local video playback directly in YAACC is enabled</string>    
-    <string name="settings_video_app_off">Local video playback opens a third party application</string>    
+    <string name="settings_image_app">Video Playback</string>
+    <string name="settings_audio_app_on">Local audio playback directly in YAACC is enabled</string>
+    <string name="settings_audio_app_off">Local audio playback opens a third party application</string>
+    <string name="settings_image_app_on">Local image playback directly in YAACC is enabled</string>
+    <string name="settings_image_app_off">Local image playback opens a third party application</string>
+    <string name="settings_video_app_on">Local video playback directly in YAACC is enabled</string>
+    <string name="settings_video_app_off">Local video playback opens a third party application</string>
     <string name="settings_browse_audio_on">Show audio files</string>
     <string name="settings_browse_audio_off">Show no audio files</string>
     <string name="settings_browse_video_on">Show video files</string>
@@ -64,6 +64,8 @@
     <string name="pause">pause</string>
     <string name="previous">previous</string>
     <string name="next">next</string>
-    
+    <string name="exit">exit</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_music_player">MusicPlayerActivity</string>
 
 </resources>

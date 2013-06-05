@@ -18,11 +18,18 @@
  */
 package de.yaacc.musicplayer;
 
+import de.yaacc.R;
+import de.yaacc.imageviewer.ImageViewerActivity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -34,8 +41,9 @@ import android.util.Log;
 public class BackgroundMusicService extends Service {
 
 	public static final String URIS = "URIS_PARAM"; // String Intent parameter
-	MediaPlayer player;
+	private MediaPlayer player;
 	private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
+
 
 	public BackgroundMusicService() {
 		super();
@@ -51,6 +59,7 @@ public class BackgroundMusicService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Log.d(this.getClass().getName(), "On Create");
+		showNotification();
 
 	}
 
@@ -162,6 +171,23 @@ public class BackgroundMusicService extends Service {
 
 		}
 
+	}
+	
+	private void showNotification(){	
+		Intent notificationIntent = new Intent(this,
+			    MusicPlayerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+			    notificationIntent, 0);
+	    NotificationCompat.Builder mBuilder =
+	            new NotificationCompat.Builder(this)
+	            .setSmallIcon(R.drawable.ic_launcher)
+	            .setContentTitle("Yaacc Music player")
+	            .setContentText("Current Title").setContentIntent(contentIntent).setOngoing(true);
+	    NotificationManager mNotificationManager =
+	    	    (NotificationManager) getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.notify(1, mBuilder.build());
 	}
 
 }

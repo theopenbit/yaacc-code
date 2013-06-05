@@ -53,5 +53,6 @@
     <string name="pause">pausiere</string>
     <string name="previous">vorheriges</string>
     <string name="next">nächstes</string> 
+    <string name="exit">beenden</string>
 
 </resources>
