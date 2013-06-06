@@ -24,7 +24,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
@@ -45,6 +49,7 @@ public abstract class AbstractPlayer implements Player {
 	private boolean isProcessingCommand = false;
 
 	private UpnpClient upnpClient;
+	private String name;
 
 	/**
 	 * @param context
@@ -229,6 +234,7 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public void setItems(PlayableItem... playableItems) {
 		items.addAll(Arrays.asList(playableItems));
+		showNotification();
 	}
 
 	/*
@@ -305,6 +311,93 @@ public abstract class AbstractPlayer implements Player {
 
 	}
 
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#setName(java.lang.String)
+	 */
+	@Override
+	public void setName(String name) {
+		this.name=name;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#getName()
+	 */
+	@Override
+	public String getName() {
+		
+		return name;
+	}
+
+	
+	
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#exit()
+	 */
+	@Override
+	public void exit() {
+		PlayerFactory.shutdown(this);
+		
+	}
+	
+	/**
+	 * Displays the notification.
+	 */
+	private void showNotification(){	
+		
+	    NotificationCompat.Builder mBuilder =
+	            new NotificationCompat.Builder(getContext())
+	    		.setOngoing(true)
+	            .setSmallIcon(R.drawable.ic_launcher)
+	            .setContentTitle("Yaacc player " + (getName() == null ? "" : getName()));
+	            //.setContentText("Current Title");
+	    PendingIntent contentIntent = getNotificationIntent();
+	    if(contentIntent != null){        
+	      mBuilder.setContentIntent(contentIntent);
+	    }
+	    NotificationManager mNotificationManager =
+	    	    (NotificationManager) getContext().getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.notify(getNotificationId(), mBuilder.build());
+	}
+
+
+	/**
+	 *  Cancels the notification.  
+	 */
+	private void cancleNotification() {
+		NotificationManager mNotificationManager =
+	    	    (NotificationManager) getContext().getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.cancel(getNotificationId());
+		
+	}
+
+	
+	/**
+	 * Returns the notification id of the player
+	 * @return
+	 */
+	protected int getNotificationId() {
+ 
+		return 0;
+	}
+
+	/**
+	 * Returns the intent which is to be started by pushing the notification entry
+	 * @return the peneding intent
+	 */
+	protected PendingIntent getNotificationIntent(){
+		return null;
+	}
+		
+	
+	
 	protected abstract void stopItem(PlayableItem playableItem);
 
 	protected abstract Object loadItem(PlayableItem playableItem);
@@ -318,8 +411,9 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
+		cancleNotification();
 		
 	}
 
+	
 }

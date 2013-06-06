@@ -70,6 +70,23 @@ public interface Player {
 	 * Kill the  player.
 	 */
 	void onDestroy();
+	
+	/**
+	 * Set the name of the player.
+	 * @param name the name
+	 */
+	void setName(String name);
+	
+	/**
+	 * Get the player name.
+	 * @return the name
+	 */
+	String getName();
+
+	/**
+	 * Exit the player.
+	 */
+	void exit();
 
 	
 }

@@ -39,6 +39,7 @@ public class LocalImagePlayer implements Player {
 
 	private Context context;
 	private Timer commandExecutionTimer;
+	private String name;
 
 	/**
 	 * @param context
@@ -208,6 +209,35 @@ public class LocalImagePlayer implements Player {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#setName(java.lang.String)
+	 */
+	@Override
+	public void setName(String name) {
+		this.name=name;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#getName()
+	 */
+	@Override
+	public String getName() {
+		
+		return name;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#exit()
+	 */
+	@Override
+	public void exit() {
+		PlayerFactory.shutdown(this);
+		
+	}
+
+	
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -20,6 +20,7 @@ package de.yaacc.player;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -35,6 +36,7 @@ import de.yaacc.upnp.UpnpClient;
  * 
  */
 public class LocalBackgoundMusicPlayer extends AbstractPlayer {
+	private static final int NOTIFICATION_ID = 1; //Id of notification
 	private boolean background = true;
 	private BackgroundMusicService musicService;
 	private Timer commandExecutionTimer;
@@ -144,5 +146,26 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 			}
 		}, 600L);
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+	 */
+	@Override
+	protected PendingIntent getNotificationIntent(){
+		Intent notificationIntent = new Intent(getContext(),
+			    MusicPlayerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+			    notificationIntent, 0);
+			return contentIntent;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
+	 */
+	@Override
+	protected int getNotificationId() {
+		 
+		return NOTIFICATION_ID;
+	}
 }

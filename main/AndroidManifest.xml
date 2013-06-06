@@ -75,7 +75,7 @@
         </receiver>
 
         <activity
-            android:name="de.yaacc.musicplayer.MusicPlayerActivity"
+            android:name="de.yaacc.player.MusicPlayerActivity"
             android:label="@string/title_activity_music_player" >
              <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

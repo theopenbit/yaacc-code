@@ -109,11 +109,28 @@ public class PlayerFactory {
 		return Collections.unmodifiableList(currentPlayers);
 	}
 	
+	
+	/**
+	 * returns all current players of the given type.
+	 * @param typeClazz the requested type
+	 * @return the currentPlayer
+	 */
+	public static List<Player> getCurrentPlayersOfType(Class typeClazz) {
+		List<Player> players = new ArrayList<Player>();
+		for (Player player : currentPlayers) {
+			if (typeClazz.isInstance(player)){
+				players.add(player);
+			}
+		}
+		return Collections.unmodifiableList(players);
+	}
+	
+	
 	/**
 	 * Kills the given Player
 	 * @param player
 	 */
-	public static void kill(Player player){
+	public static void shutdown(Player player){
 		assert(player != null);
 		currentPlayers.remove(player);
 		player.onDestroy();

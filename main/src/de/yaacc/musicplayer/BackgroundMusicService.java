@@ -20,6 +20,7 @@ package de.yaacc.musicplayer;
 
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.player.MusicPlayerActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -58,8 +59,7 @@ public class BackgroundMusicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(this.getClass().getName(), "On Create");
-		showNotification();
+		Log.d(this.getClass().getName(), "On Create");		
 
 	}
 
@@ -173,21 +173,7 @@ public class BackgroundMusicService extends Service {
 
 	}
 	
-	private void showNotification(){	
-		Intent notificationIntent = new Intent(this,
-			    MusicPlayerActivity.class);
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-			    notificationIntent, 0);
-	    NotificationCompat.Builder mBuilder =
-	            new NotificationCompat.Builder(this)
-	            .setSmallIcon(R.drawable.ic_launcher)
-	            .setContentTitle("Yaacc Music player")
-	            .setContentText("Current Title").setContentIntent(contentIntent).setOngoing(true);
-	    NotificationManager mNotificationManager =
-	    	    (NotificationManager) getSystemService(Context
-	    	    		.NOTIFICATION_SERVICE);
-	    	// mId allows you to update the notification later on.
-	    	mNotificationManager.notify(1, mBuilder.build());
-	}
+	
+	
 
 }
