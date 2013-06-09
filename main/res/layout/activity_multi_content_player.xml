@@ -2,10 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MusicPlayerActivity" >
+    tools:context=".MultiContentPlayerActivity" >
 
      <RelativeLayout
-         android:id="@+id/musicActivityControls"
+         android:id="@+id/multiContentPlayerActivityControls"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
@@ -13,7 +13,7 @@
          android:orientation="horizontal" >
 
          <ImageButton
-             android:id="@+id/musicActivityControlPrev"
+             android:id="@+id/multiContentPlayerActivityControlPrev"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentLeft="true"
@@ -22,60 +22,60 @@
              android:src="@drawable/player_start" />
 
          <ImageButton
-             android:id="@+id/musicActivityControlPlay"
+             android:id="@+id/multiContentPlayerActivityControlPlay"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
-             android:layout_toRightOf="@+id/musicActivityControlPrev"
+             android:layout_toRightOf="@+id/multiContentPlayerActivityControlPrev"
              android:contentDescription="@string/play"
              android:src="@drawable/player_play" />
 
          <ImageButton
-             android:id="@+id/musicActivityControlPause"
+             android:id="@+id/multiContentPlayerActivityControlPause"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
-             android:layout_toRightOf="@+id/musicActivityControlPlay"
+             android:layout_toRightOf="@+id/multiContentPlayerActivityControlPlay"
              android:contentDescription="@string/pause"
              android:src="@drawable/player_pause" />
 
          <ImageButton
-             android:id="@+id/musicActivityControlStop"
+             android:id="@+id/multiContentPlayerActivityControlStop"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
              android:layout_centerHorizontal="true"
-             android:layout_toRightOf="@+id/musicActivityControlPause"
+             android:layout_toRightOf="@+id/multiContentPlayerActivityControlPause"
              android:contentDescription="@string/stop"
              android:src="@drawable/player_stop" />
 
          <ImageButton
-             android:id="@+id/musicActivityControlNext"
+             android:id="@+id/multiContentPlayerActivityControlNext"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
-             android:layout_toRightOf="@+id/musicActivityControlStop"
+             android:layout_toRightOf="@+id/multiContentPlayerActivityControlStop"
              android:contentDescription="@string/next"
              android:src="@drawable/player_end" />
           <ImageButton
-             android:id="@+id/musicActivityControlExit"
+             android:id="@+id/multiContentPlayerActivityControlExit"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
-             android:layout_toRightOf="@+id/musicActivityControlNext"
+             android:layout_toRightOf="@+id/multiContentPlayerActivityControlNext"
              android:contentDescription="@string/exit"
              android:src="@drawable/button_cancel" />
      </RelativeLayout>
 
      <ImageView
-         android:id="@+id/musicActivityImageView"
-         android:contentDescription="@string/musicActivityImageView"
+         android:id="@+id/multiContentPlayerActivityImageView"
+         android:contentDescription="@string/multiContentPlayerActivityImageView"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_above="@+id/musicActivityControls"
+         android:layout_above="@+id/multiContentPlayerActivityControls"
          android:layout_alignParentLeft="true"
          android:layout_alignParentRight="true"
          android:layout_alignParentTop="true"
-         android:src="@drawable/cdtrack" />
+         android:src="@drawable/ic_launcher" />
 
 </RelativeLayout>

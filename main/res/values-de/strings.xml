@@ -54,5 +54,14 @@
     <string name="previous">vorheriges</string>
     <string name="next">nächstes</string> 
     <string name="exit">beenden</string>
+    <string name="musicActivityImageView">Albumbild</string>
+    <string name="avtransportPlayerActivityImageView">Gerät</string>
+    <string name="playerNameMusic">Musik</string>
+    <string name="playerNameImage">Bilder</string>
+    <string name="playerNameMultiContent">Multi</string>
+    <string name="playerNameAvTransport">Entfernd</string>
+    <string name="multiContentPlayerActivityImageView">variabler Inhalt</string>
+    <string name="title_activity_avtransport_player">Yaacc Netwerk player</string>
+    <string name="title_activity_multi_content_player">Yaacc Standard player</string>
 
 </resources>

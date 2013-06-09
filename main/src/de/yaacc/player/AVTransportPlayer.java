@@ -27,8 +27,11 @@ import org.teleal.cling.support.avtransport.callback.Play;
 import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.avtransport.callback.Stop;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.util.Log;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * A Player for playing on a remote avtransport device 
@@ -38,6 +41,15 @@ import de.yaacc.upnp.UpnpClient;
 public class AVTransportPlayer extends AbstractPlayer {
 
 	
+	/**
+	 * @param context
+	 * @param name playerName
+	 * 
+	 */
+	public AVTransportPlayer(UpnpClient upnpClient, String name) {		
+		this(upnpClient);
+		setName(name);
+	}
 	
 	/**
 	 * @param context
@@ -221,5 +233,28 @@ public class AVTransportPlayer extends AbstractPlayer {
 	private static class ActionState {
 		public boolean actionFinished = false;
 		public boolean watchdogFlag = false;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+	 */
+	@Override
+	protected PendingIntent getNotificationIntent(){
+		Intent notificationIntent = new Intent(getContext(),
+			    AVTransportPlayerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+			    notificationIntent, 0);
+			return contentIntent;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
+	 */
+	@Override
+	protected int getNotificationId() {
+		 
+		return NotificationId.AVTRANSPORT_PLAYER.getId();
 	}
 }

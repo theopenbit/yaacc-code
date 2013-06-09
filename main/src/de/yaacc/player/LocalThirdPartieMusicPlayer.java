@@ -43,6 +43,18 @@ import de.yaacc.upnp.UpnpClient;
 public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	PendingIntent pendingIntent;
 	private int musicAppPid=0; 
+	
+	/**
+	 * @param context
+	 * @param name playerName
+	 * 
+	 */
+	public LocalThirdPartieMusicPlayer(UpnpClient upnpClient, String name) {		
+		this(upnpClient);
+		setName(name);
+	}
+	
+	
 	/**
 	 * @param context
 	 */

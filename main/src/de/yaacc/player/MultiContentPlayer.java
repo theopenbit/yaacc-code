@@ -20,6 +20,7 @@ package de.yaacc.player;
 import java.util.List;
 
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.content.Intent;
 import android.os.Process;
 import android.util.Log;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * @author Tobias Schoene (openbit)  
@@ -36,6 +38,17 @@ public class MultiContentPlayer extends AbstractPlayer {
 
 	private int appPid;
 
+	
+	/**
+	 * @param context
+	 * @param name playerName
+	 * 
+	 */
+	public MultiContentPlayer(UpnpClient upnpClient, String name) {		
+		this(upnpClient);
+		setName(name);
+	}
+	
 	/**
 	 * @param context
 	 */
@@ -105,5 +118,28 @@ public class MultiContentPlayer extends AbstractPlayer {
 		if(appPid != 0){
 			Process.killProcess(appPid);
 		}
-	}	
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+	 */
+	@Override
+	protected PendingIntent getNotificationIntent(){
+		Intent notificationIntent = new Intent(getContext(),
+			    MultiContentPlayerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+			    notificationIntent, 0);
+			return contentIntent;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
+	 */
+	@Override
+	protected int getNotificationId() {
+		 
+		return NotificationId.MULTI_CONTENT_PLAYER.getId();
+	}
 }

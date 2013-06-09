@@ -28,6 +28,7 @@ import android.util.Log;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * A Player for local music playing in background
@@ -36,11 +37,21 @@ import de.yaacc.upnp.UpnpClient;
  * 
  */
 public class LocalBackgoundMusicPlayer extends AbstractPlayer {
-	private static final int NOTIFICATION_ID = 1; //Id of notification
+	
 	private boolean background = true;
 	private BackgroundMusicService musicService;
 	private Timer commandExecutionTimer;
 
+	/**
+	 * @param context
+	 * @param name playerName
+	 * 
+	 */
+	public LocalBackgoundMusicPlayer(UpnpClient upnpClient, String name) {		
+		this(upnpClient);
+		setName(name);
+	}
+	
 	/**
 	 * @param context
 	 */
@@ -166,6 +177,6 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	@Override
 	protected int getNotificationId() {
 		 
-		return NOTIFICATION_ID;
+		return NotificationId.LOCAL_BACKGROUND_MUSIC_PLAYER.getId();
 	}
 }

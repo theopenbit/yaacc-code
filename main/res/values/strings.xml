@@ -66,6 +66,16 @@
     <string name="next">next</string>
     <string name="exit">exit</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_music_player">MusicPlayerActivity</string>
+    <string name="title_activity_music_player">Yaacc Music player</string>
+    <string name="musicActivityImageView">Cover</string>
+    <string name="avtransportPlayerActivityImageView">Device</string>
+    <string name="playerNameMusic">music</string>
+    <string name="playerNameImage">image</string>
+    <string name="playerNameMultiContent">multi</string>
+    <string name="playerNameAvTransport">remote</string>
+    <string name="multiContentPlayerActivityImageView">multi content</string>
+    <string name="title_activity_avtransport_player">Yaacc Remote player</string>
+    <string name="title_activity_multi_content_player">Yaacc Default player</string>
+   
 
 </resources>

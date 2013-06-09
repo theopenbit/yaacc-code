@@ -232,7 +232,7 @@ public abstract class AbstractPlayer implements Player {
 	 * @see de.yaacc.player.Player#setItems(de.yaacc.player.PlayableItem[])
 	 */
 	@Override
-	public void setItems(PlayableItem... playableItems) {
+	public void setItems(PlayableItem... playableItems) {		
 		items.addAll(Arrays.asList(playableItems));
 		showNotification();
 	}
