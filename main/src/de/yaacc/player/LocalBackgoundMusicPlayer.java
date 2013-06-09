@@ -75,6 +75,25 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 		getContext().stopService(svc);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#pause()
+	 */
+	@Override
+	public void pause() {		
+		super.pause();
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_PAUSE);
+				getContext().sendBroadcast(intent);
+
+			}
+		}, 1000L);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

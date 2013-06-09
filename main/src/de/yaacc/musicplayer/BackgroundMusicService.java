@@ -153,7 +153,7 @@ public class BackgroundMusicService extends Service {
 	 * @param uri
 	 */
 	public void setMusicUri(Uri uri) {
-		Log.e(this.getClass().getName(),
+		Log.d(this.getClass().getName(),
 				"changing datasource uri to:" + uri.toString());
 		if (player != null) {
 			player.release();

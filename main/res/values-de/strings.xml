@@ -63,5 +63,6 @@
     <string name="multiContentPlayerActivityImageView">variabler Inhalt</string>
     <string name="title_activity_avtransport_player">Yaacc Netwerk player</string>
     <string name="title_activity_multi_content_player">Yaacc Standard player</string>
+    <string name="can_not_start_activity">"Die App kann nicht gestartet werden! Grund: "</string>
 
 </resources>

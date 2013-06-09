@@ -76,6 +76,7 @@
     <string name="multiContentPlayerActivityImageView">multi content</string>
     <string name="title_activity_avtransport_player">Yaacc Remote player</string>
     <string name="title_activity_multi_content_player">Yaacc Default player</string>
+    <string name="can_not_start_activity">"Can not start app! Reason: "</string>
    
 
 </resources>
