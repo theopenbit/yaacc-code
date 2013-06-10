@@ -57,8 +57,7 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 			
 			holder = new ViewHolder();
 			holder.icon = (ImageView) convertView.findViewById(R.id.browseItemIcon);
-			holder.name = (TextView) convertView.findViewById(R.id.browseItemName);
-			holder.name.setTextColor(Color.BLACK);
+			holder.name = (TextView) convertView.findViewById(R.id.browseItemName);			
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
