@@ -352,8 +352,8 @@ public abstract class AbstractPlayer implements Player {
 	            new NotificationCompat.Builder(getContext())
 	    		.setOngoing(true)
 	            .setSmallIcon(R.drawable.ic_launcher)
-	            .setContentTitle("Yaacc player " + (getName() == null ? "" : getName()));
-	            //.setContentText("Current Title");
+	            .setContentTitle("Yaacc player" )
+	            .setContentText(getName() == null ? "" : getName());
 	    PendingIntent contentIntent = getNotificationIntent();
 	    if(contentIntent != null){        
 	      mBuilder.setContentIntent(contentIntent);

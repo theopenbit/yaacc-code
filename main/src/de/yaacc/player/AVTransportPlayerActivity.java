@@ -44,10 +44,7 @@ public class AVTransportPlayerActivity extends Activity {
 		setContentView(R.layout.activity_avtransport_player);
 		// initialize buttons
 		
-	    List<Player> players = PlayerFactory.getCurrentPlayersOfType(LocalBackgoundMusicPlayer.class);
-	    if(players != null && players.size() == 1){ //assume that there is only one background music player on this device  
-	    	player = players.get(0);
-	    }
+		Player player = getPlayer();
 	    ImageButton btnPrev = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPrev);
 	    ImageButton btnNext = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlNext);
 	    ImageButton btnStop = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlStop);
@@ -73,7 +70,10 @@ public class AVTransportPlayerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Player player = getPlayer();
+				if (player != null) {
 				player.previous();
+				}
 
 			}
 		});
@@ -81,7 +81,10 @@ public class AVTransportPlayerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Player player = getPlayer();
+				if (player != null) {
 				player.next();
+				}
 
 			}
 		});	    
@@ -89,7 +92,10 @@ public class AVTransportPlayerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Player player = getPlayer();
+				if (player != null) {
 				player.play();
+				}
 
 			}
 		});
@@ -97,7 +103,10 @@ public class AVTransportPlayerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Player player = getPlayer();
+				if (player != null) {
 				player.pause();
+				}
 
 			}
 		});
@@ -105,7 +114,10 @@ public class AVTransportPlayerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Player player = getPlayer();
+				if (player != null) {
 				player.stop();
+				}
 
 			}
 		});
@@ -113,10 +125,27 @@ public class AVTransportPlayerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Player player = getPlayer();
+				if (player != null) {
 				player.exit();
+				}
 
 			}
 		});
+	}
+	
+	private Player getPlayer() {
+		Player player = null;
+		List<Player> players = PlayerFactory
+				.getCurrentPlayersOfType(AVTransportPlayer.class);
+		if (players != null && players.size() == 1) { // assume that there
+														// is only one
+														// background music
+														// player on this
+														// device
+			player = players.get(0);
+		}
+		return player;
 	}
 
 	@Override
