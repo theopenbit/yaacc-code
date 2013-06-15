@@ -47,6 +47,7 @@ import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
+import de.yaacc.util.AboutActivity;
 
 public class BrowseActivity extends Activity implements OnClickListener,
 		UpnpClientListener {
@@ -209,6 +210,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
 			Intent i = new Intent(this, SettingsActivity.class);
 			startActivity(i);
 			return true;
+		case R.id.yaacc_about:
+			AboutActivity.showAbout(this);
+			return true;				
 		default:
 			return super.onOptionsItemSelected(item);
 		}

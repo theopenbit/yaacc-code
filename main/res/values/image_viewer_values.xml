@@ -28,7 +28,7 @@
         <item>"8 sec"</item>
         <item>"10 sec"</item>
     </string-array>
-    <string-array name="image_viewer_slide_stay_duration_values">
+    <string-array name="image_viewer_slide_stay_duration_values" translatable="false">
         <item>"1000"</item>
         <item>"2000"</item>
         <item>"3000"</item>

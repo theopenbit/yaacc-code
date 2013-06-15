@@ -67,23 +67,23 @@
     <string name="settings_local_server_chkbx">local_server_chkbx</string>
     <string name="settings_local_server_testcontent">local server using test content</string>
     <string name="settings_local_server_mediastore">local server using mediastore</string>
-    <string name="settings_local_server_testcontent_chkbx">local_server_testcontent_chkbx</string>
+    <string name="settings_local_server_testcontent_chkbx" translatable="false">local_server_testcontent_chkbx</string>
     <string name="settings_local_server_name">network name for local server</string>
     <string name="settings_local_server_name_key">Local server name</string>
     <string name="error_upnp_generic">An unknown error happened while browsing</string>
     <string name="error_upnp_specific">The following error occurred:</string>
     <string name="error_no_activity_found">No activity found for playing mimetype \'%1$s\'</string>
     <string name="image_viewer_settings_duration">picture stay duration</string>
-    <string name="image_viewer_settings_duration_key">image_viewer_settings_duration_key</string>
+    <string name="image_viewer_settings_duration_key" translatable="false">image_viewer_settings_duration_key</string>
     <string name="yaacc_menu_settings">YAACC settings</string>
+    <string name="yaacc_about">About</string>
     <string name="no_valid_uri_data_found_to_display">No valid uri data found to display</string>
     <string name="play">play</string>
     <string name="stop">stop</string>
     <string name="pause">pause</string>
     <string name="previous">previous</string>
     <string name="next">next</string>
-    <string name="exit">exit</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="exit">exit</string>    
     <string name="title_activity_music_player">Yaacc Music player</string>
     <string name="musicActivityImageView">Cover</string>
     <string name="avtransportPlayerActivityImageView">Device</string>
@@ -95,6 +95,8 @@
     <string name="title_activity_avtransport_player">Yaacc Remote player</string>
     <string name="title_activity_multi_content_player">Yaacc Default player</string>
     <string name="can_not_start_activity">"Can not start app! Reason: "</string>
-   
+    <string name="app_descrip">Yet Another Android Client Controller\nBring your UPnP devices in your local network together with android!\n<a href="www.yaacc.de">www.yaacc.de</a></string>
+    <string name="app_credits">YAACC is developed under GPLv3. Feel free to use and share it without any warranty. Licence details are documented at <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a></string>
+    <string name="app_credits_third_partie">Further licences are:\nThe UPNP implementation is based on <a href="http://4thline.org/projects/cling">Cling</a>\nIcons are used came from <a href="http://www.carpicon.com">black + white icons 2.0</a> and <a href="http://developer.android.com/about/index.html">Android</a> itself. Android is a trademark of Google Inc</string>
 
 </resources>

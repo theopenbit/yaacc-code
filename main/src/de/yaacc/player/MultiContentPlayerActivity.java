@@ -23,9 +23,13 @@ import de.yaacc.R;
 import de.yaacc.R.layout;
 import de.yaacc.R.menu;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.settings.SettingsActivity;
+import de.yaacc.util.AboutActivity;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -157,6 +161,19 @@ public class MultiContentPlayerActivity extends Activity {
 		return true;
 	}
 
-	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_settings:
+			Intent i = new Intent(this, SettingsActivity.class);
+			startActivity(i);
+			return true;
+		case R.id.yaacc_about:
+			AboutActivity.showAbout(this);
+			return true;				
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 }
