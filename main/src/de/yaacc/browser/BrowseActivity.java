@@ -102,6 +102,11 @@ public class BrowseActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// FIXME: uClient.playbackPrev();
+				//FIXME: Until context menu isn't working using the prev-button for playAll
+				//a little easter egg	
+				if(BrowseItemClickListener.currentObject != null){
+					uClient.initializePlayer(BrowseItemClickListener.currentObject).play();
+				}
 
 			}
 		});
@@ -127,7 +132,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// FIXME: uClient.playbackNext();
-
+				//FIXME: Until there is no refresh button using the next button
+				uClient.searchDevices();
 			}
 		});
 
