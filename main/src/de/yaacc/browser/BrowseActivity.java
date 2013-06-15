@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -62,6 +63,10 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 	private DIDLObject selectedDIDLObject;
 
+	private SharedPreferences preferences = null;
+	
+	private Intent serverService = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -72,7 +77,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		uClient.initialize(getApplicationContext());
 
 		// load preferences
-		SharedPreferences preferences = PreferenceManager
+		preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
 		// initialize click listener
@@ -81,13 +86,6 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		// initialize click listener
 		bDeviceClickListener = new BrowseDeviceClickListener();
 
-		if (preferences.getBoolean(
-				getString(R.string.settings_local_server_chkbx), true)) {
-			// Start upnpserver service for avtransport
-			Intent svc = new Intent(getApplicationContext(),
-					YaaccUpnpServerService.class);
-			getApplicationContext().startService(svc);
-		}
 
 		// remove the buttons if local playback is enabled and background
 		// playback is not enabled
@@ -140,6 +138,38 @@ public class BrowseActivity extends Activity implements OnClickListener,
 			populateItemList();
 
 		}
+	}
+	
+	@Override
+	public void onResume() {
+		
+		// Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
+
+		if (preferences.getBoolean(
+				getString(R.string.settings_local_server_chkbx), false)) {
+			// Start upnpserver service for avtransport
+			getApplicationContext().startService(getYaaccUpnpServerService());
+			Log.d(this.getClass().getName(), "Starting local service");
+		} else {
+			getApplicationContext().stopService(getYaaccUpnpServerService());
+			Log.d(this.getClass().getName(), "Stopping local service");
+		}
+		
+		
+		super.onResume();
+	}
+	
+	/**
+	 * Singleton to avoid multiple instances when switch
+	 * @return
+	 */
+	private Intent getYaaccUpnpServerService(){
+		if (serverService == null){
+			serverService = new Intent(getApplicationContext(),
+					YaaccUpnpServerService.class);
+		}
+		
+		return serverService;
 	}
 
 	/**
@@ -345,7 +375,11 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void deviceRemoved(Device<?, ?, ?> device) {
-		// TODO Auto-generated method stub
+		Log.d(this.getClass().toString(), "device removal called");
+		if (!displayingSomething) {
+			// showMainFolder();
+			populateItemList();
+		}
 
 	}
 

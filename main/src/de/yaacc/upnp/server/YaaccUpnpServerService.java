@@ -73,6 +73,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.yaacc.R;
+import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -85,6 +86,8 @@ import de.yaacc.upnp.UpnpClient;
 public class YaaccUpnpServerService extends Service {
 
 	public static int PORT = 4711;
+	
+	private LocalDevice localServer;
 
 	// make preferences available for the whole service, since there might be
 	// more things to configure in the future
@@ -147,6 +150,15 @@ public class YaaccUpnpServerService extends Service {
 		initializationThread.start();
 		Log.d(this.getClass().getName(), "End On Start");
 	}
+	
+	@Override
+	public void onDestroy(){
+		Log.d(this.getClass().getName(), "Destroying the service");
+		BrowseActivity.uClient.localDeviceRemoved(BrowseActivity.uClient.getRegistry(), localServer);
+		localServer = null;
+		super.onDestroy();
+	}
+	
 
 	/**
 	 * 
@@ -170,7 +182,8 @@ public class YaaccUpnpServerService extends Service {
 			}
 		}
 		if (upnpClient.isInitialized()) {
-			upnpClient.getRegistry().addDevice(createDevice());
+			localServer = createDevice();
+			upnpClient.getRegistry().addDevice(localServer);
 		} else {
 			throw new IllegalStateException("UpnpClient is not initialized!");
 		}

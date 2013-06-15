@@ -23,8 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceConfiguration;
@@ -34,6 +36,7 @@ import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.types.DeviceType;
 import org.teleal.cling.model.types.ServiceId;
 import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDAServiceType;
@@ -85,6 +88,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public static String LOCAL_UID = "LOCAL_UID";
 
 	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
+	private Set<Device> knownDevices = new HashSet<Device>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
 	private LinkedList<String> visitedObjectIds;
@@ -116,7 +120,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
 		fireDeviceAdded(device);
-
 	}
 
 	private void deviceRemoved(@SuppressWarnings("rawtypes") final Device device) {
@@ -255,7 +258,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public void localDeviceAdded(Registry registry, LocalDevice localdevice) {
 		Log.d(getClass().getName(),
 				"localDeviceAdded: " + localdevice.getDisplayString());
-		deviceAdded(localdevice);
+		this.getRegistry().addDevice(localdevice);
+		this.deviceAdded(localdevice);
 
 	}
 
@@ -270,7 +274,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
 		Log.d(getClass().getName(),
 				"localDeviceRemoved: " + localdevice.getDisplayString());
-		deviceRemoved(localdevice);
+		this.getRegistry().removeDevice(localdevice);
+		this.deviceRemoved(localdevice);
 
 	}
 
