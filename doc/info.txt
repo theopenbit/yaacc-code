@@ -1,2 +1,1 @@
-the subfolder yaacc includes the bouml-project 
 file yaacc-doc is the doxygen configuration file
