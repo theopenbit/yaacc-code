@@ -773,10 +773,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		String mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);		
 		Log.d(getClass().getName(),
 				"MimeType: " + playableItem.getMimeType());					
-		List<Player> players = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
+		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
 		Player result=null;
-		if(players != null && players.size() > 0){
-			result = players.get(0);
+		if(avTransportPlayers != null && avTransportPlayers.size() > 0){
+			result = avTransportPlayers.get(0);
 		}
 		return result;
 	}
