@@ -53,6 +53,7 @@ import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.SortCriterion;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
+import org.teleal.common.util.MimeType;
 
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -66,6 +67,7 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
@@ -312,8 +314,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the service of null
 	 */
 	public Service getAVTransportService(Device<?, ?, ?> device) {
-		if (device != null) {
+		if (device == null) {
 			Log.d(getClass().getName(), "Device is null!");
+			return null;
 		}
 		ServiceId serviceId = new UDAServiceId("AVTransport");
 		Service service = device.findService(serviceId);
@@ -698,30 +701,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 	}
 
-	/**
-	 * Starts playing avtransport object.
-	 * 
-	 * @param transport
-	 *            the transport object
-	 */
-	@Deprecated
-	public void playLocal(AVTransport transport) {
-		if (transport == null)
-			return;
-		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
-		PositionInfo positionInfo = transport.getPositionInfo();
-		if (positionInfo == null)
-			return;
-
-		Log.d(getClass().getName(),
-				"TransportUri: " + positionInfo.getTrackURI());
-		Log.d(getClass().getName(),
-				"Duration: " + positionInfo.getTrackDuration());
-		Log.d(getClass().getName(),
-				"TrackMetaData: " + positionInfo.getTrackMetaData());
-		intentView("*/*", Uri.parse(positionInfo.getTrackURI()));
-
-	}
+	
 	
 	/**
 	 * Returns a player instance initialized with the given didl object
@@ -735,6 +715,39 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return PlayerFactory.createPlayer(this, playableItems);
 	}
 
+	
+	/**
+	 * Returns a player instance initialized with the given didl object
+	 * 
+	 * @param didlObject
+	 *            the object which describes the content to be played
+	 * @return the player
+	 */
+	public Player initializePlayer(AVTransport transport) {
+		PlayableItem playableItem = new PlayableItem();
+		List<PlayableItem>items = new ArrayList<PlayableItem>();
+		if (transport == null)
+			return PlayerFactory.createPlayer(this, items); 
+		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
+		PositionInfo positionInfo = transport.getPositionInfo();
+		if (positionInfo == null)
+			return PlayerFactory.createPlayer(this, items);
+
+		playableItem.setTitle(positionInfo.getTrackMetaData());
+		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
+		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
+		playableItem.setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension));
+		items.add(playableItem);
+		Log.d(getClass().getName(),
+				"TransportUri: " + positionInfo.getTrackURI());
+		Log.d(getClass().getName(),
+				"Current duration: " + positionInfo.getTrackDuration());
+		Log.d(getClass().getName(),
+				"TrackMetaData: " + positionInfo.getTrackMetaData());
+		Log.d(getClass().getName(),
+				"MimeType: " + playableItem.getMimeType());					
+		return PlayerFactory.createPlayer(this, items);
+	}
 	
 	/**
 	 * Convert cling items into playable items 

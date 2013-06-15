@@ -57,8 +57,8 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 	public void onEntry() {
 		Log.d(this.getClass().getName(), "On Entry");
 		super.onEntry();
-		// Start playing now!
-		upnpClient.playLocal(getTransport());
+		// Start playing now!		
+		upnpClient.initializePlayer(getTransport()).play();
 	}
 
 	/*

@@ -9,10 +9,10 @@
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />    
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission  android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:allowBackup="true"
@@ -35,21 +35,21 @@
         <service
             android:name="de.yaacc.musicplayer.BackgroundMusicService"
             android:enabled="true" />
-         <service
+        <service
             android:name="de.yaacc.upnp.server.YaaccUpnpServerService"
             android:enabled="true" />
-        
+
         <activity
             android:name="de.yaacc.imageviewer.ImageViewerActivity"
             android:label="@string/title_activity_image_viewer"
-            android:launchMode="singleInstance"                       
-             >
+            android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.LAUNCHER" />
-                <data android:mimeType="image/*" />          
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
         <activity
@@ -63,17 +63,47 @@
         </activity>
         <activity
             android:name="de.yaacc.settings.ImageViewerSettingsActivity"
-            android:label="@string/title_activity_image_viewer_settings"             
-            >
+            android:label="@string/title_activity_image_viewer_settings" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
-        <receiver android:name="de.yaacc.imageviewer.ImageViewerBroadcastReceiver" >        
+
+        <receiver android:name="de.yaacc.imageviewer.ImageViewerBroadcastReceiver" >
         </receiver>
+
+        <activity
+            android:name="de.yaacc.player.MusicPlayerActivity"
+            android:label="@string/title_activity_music_player" >
+             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+         <activity
+            android:name="de.yaacc.player.AVTransportPlayerActivity"
+            android:label="@string/title_activity_avtransport_player" >
+             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+         <activity
+            android:name="de.yaacc.player.MultiContentPlayerActivity"
+            android:label="@string/title_activity_multi_content_player" >
+             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> 
+         
     </application>
 
 </manifest>

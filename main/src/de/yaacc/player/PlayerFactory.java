@@ -55,7 +55,7 @@ public class PlayerFactory {
 		boolean image = false;
 		boolean music = false;
 		if (!upnpClient.getReceiverDeviceId().equals(UpnpClient.LOCAL_UID)) {
-			result = new AVTransportPlayer(upnpClient);
+			result = new AVTransportPlayer(upnpClient,upnpClient.getContext().getString(R.string.playerNameAvTransport));
 		} else {
 			for (PlayableItem playableItem : items) {
 				image = image || playableItem.getMimeType().startsWith("image");
@@ -65,7 +65,7 @@ public class PlayerFactory {
 			if (video && !image && !music) {
 				// use videoplayer
 				// FIXME NOT JET IMPLEMENTED
-				result = new MultiContentPlayer(upnpClient);
+				result = new MultiContentPlayer(upnpClient, upnpClient.getContext().getString(R.string.playerNameMultiContent));
 			} else if (!video && image && !music) {
 				// use imageplayer
 				result = createImagePlayer(upnpClient);
@@ -74,7 +74,7 @@ public class PlayerFactory {
 				result = createMusicPlayer(upnpClient);
 			} else {
 				// use multiplayer
-				result = new MultiContentPlayer(upnpClient);
+				result = new MultiContentPlayer(upnpClient,upnpClient.getContext().getString(R.string.playerNameMultiContent));
 			}			
 		}
 		if (result != null) {
@@ -86,7 +86,7 @@ public class PlayerFactory {
 
 	private static Player createImagePlayer(UpnpClient upnpClient) {
 
-		return new LocalImagePlayer(upnpClient);
+		return new LocalImagePlayer(upnpClient,upnpClient.getContext().getString(R.string.playerNameImage));
 	}
 
 	private static Player createMusicPlayer(UpnpClient upnpClient) {
@@ -95,9 +95,9 @@ public class PlayerFactory {
 				upnpClient.getContext().getString(R.string.settings_audio_app),
 				false);
 		if (background) {
-			return new LocalBackgoundMusicPlayer(upnpClient);
+			return new LocalBackgoundMusicPlayer(upnpClient, upnpClient.getContext().getString(R.string.playerNameMusic));
 		}
-		return new LocalThirdPartieMusicPlayer(upnpClient);
+		return new LocalThirdPartieMusicPlayer(upnpClient, upnpClient.getContext().getString(R.string.playerNameMusic));
 
 	}
 
@@ -109,11 +109,28 @@ public class PlayerFactory {
 		return Collections.unmodifiableList(currentPlayers);
 	}
 	
+	
+	/**
+	 * returns all current players of the given type.
+	 * @param typeClazz the requested type
+	 * @return the currentPlayer
+	 */
+	public static List<Player> getCurrentPlayersOfType(Class typeClazz) {
+		List<Player> players = new ArrayList<Player>();
+		for (Player player : currentPlayers) {
+			if (typeClazz.isInstance(player)){
+				players.add(player);
+			}
+		}
+		return Collections.unmodifiableList(players);
+	}
+	
+	
 	/**
 	 * Kills the given Player
 	 * @param player
 	 */
-	public static void kill(Player player){
+	public static void shutdown(Player player){
 		assert(player != null);
 		currentPlayers.remove(player);
 		player.onDestroy();

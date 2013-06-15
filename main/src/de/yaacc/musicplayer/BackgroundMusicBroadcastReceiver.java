@@ -33,7 +33,7 @@ public class BackgroundMusicBroadcastReceiver extends BroadcastReceiver {
 	public static String ACTION_PLAY = "de.yaacc.musicplayer.ActionPlay";
 	public static String ACTION_STOP = "de.yaacc.musicplayer.ActionStop";
 	public static String ACTION_PAUSE = "de.yaacc.musicplayer.ActionPause";
-	public static String ACTION_SET_DATA = "de.yaacc.musicplayer.ActionSetData";
+	public static String ACTION_SET_DATA = "de.yaacc.musicplayer.ActionSetData";	
 	public static String ACTION_SET_DATA_URI_PARAM = "de.yaacc.musicplayer.ActionSetDataUriParam";
 	
 	
@@ -77,6 +77,7 @@ public class BackgroundMusicBroadcastReceiver extends BroadcastReceiver {
 		intentFilter.addAction(ACTION_PLAY);
 		intentFilter.addAction(ACTION_PAUSE);		
 		intentFilter.addAction(ACTION_STOP);
+		
 		intentFilter.addAction(ACTION_SET_DATA);
 		backgroundMusicService.registerReceiver(this, intentFilter);
 

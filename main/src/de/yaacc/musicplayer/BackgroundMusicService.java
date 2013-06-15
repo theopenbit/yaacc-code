@@ -18,11 +18,19 @@
  */
 package de.yaacc.musicplayer;
 
+import de.yaacc.R;
+import de.yaacc.imageviewer.ImageViewerActivity;
+import de.yaacc.player.MusicPlayerActivity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -34,8 +42,9 @@ import android.util.Log;
 public class BackgroundMusicService extends Service {
 
 	public static final String URIS = "URIS_PARAM"; // String Intent parameter
-	MediaPlayer player;
+	private MediaPlayer player;
 	private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
+
 
 	public BackgroundMusicService() {
 		super();
@@ -50,7 +59,7 @@ public class BackgroundMusicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(this.getClass().getName(), "On Create");
+		Log.d(this.getClass().getName(), "On Create");		
 
 	}
 
@@ -144,7 +153,7 @@ public class BackgroundMusicService extends Service {
 	 * @param uri
 	 */
 	public void setMusicUri(Uri uri) {
-		Log.e(this.getClass().getName(),
+		Log.d(this.getClass().getName(),
 				"changing datasource uri to:" + uri.toString());
 		if (player != null) {
 			player.release();
@@ -163,5 +172,8 @@ public class BackgroundMusicService extends Service {
 		}
 
 	}
+	
+	
+	
 
 }

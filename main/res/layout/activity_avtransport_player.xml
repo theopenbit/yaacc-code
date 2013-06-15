@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AVTransportPlayerActivity" >
+
+     <RelativeLayout
+         android:id="@+id/avtransportPlayerActivityControls"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentLeft="true"
+         android:orientation="horizontal" >
+
+         <ImageButton
+             android:id="@+id/avtransportPlayerActivityControlPrev"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentLeft="true"
+             android:layout_alignParentTop="true"
+             android:contentDescription="@string/previous"
+             android:src="@drawable/player_start" />
+
+         <ImageButton
+             android:id="@+id/avtransportPlayerActivityControlPlay"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:layout_toRightOf="@+id/avtransportPlayerActivityControlPrev"
+             android:contentDescription="@string/play"
+             android:src="@drawable/player_play" />
+
+         <ImageButton
+             android:id="@+id/avtransportPlayerActivityControlPause"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:layout_toRightOf="@+id/avtransportPlayerActivityControlPlay"
+             android:contentDescription="@string/pause"
+             android:src="@drawable/player_pause" />
+
+         <ImageButton
+             android:id="@+id/avtransportPlayerActivityControlStop"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:layout_centerHorizontal="true"
+             android:layout_toRightOf="@+id/avtransportPlayerActivityControlPause"
+             android:contentDescription="@string/stop"
+             android:src="@drawable/player_stop" />
+
+         <ImageButton
+             android:id="@+id/avtransportPlayerActivityControlNext"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:layout_toRightOf="@+id/avtransportPlayerActivityControlStop"
+             android:contentDescription="@string/next"
+             android:src="@drawable/player_end" />
+          <ImageButton
+             android:id="@+id/avtransportPlayerActivityControlExit"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:layout_toRightOf="@+id/avtransportPlayerActivityControlNext"
+             android:contentDescription="@string/exit"
+             android:src="@drawable/button_cancel" />
+     </RelativeLayout>
+
+     <ImageView
+         android:id="@+id/avtransportPlayerActivityImageView"
+         android:contentDescription="@string/avtransportPlayerActivityImageView"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@+id/avtransportPlayerActivityControls"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentRight="true"
+         android:layout_alignParentTop="true"
+         android:src="@drawable/device" />
+
+</RelativeLayout>

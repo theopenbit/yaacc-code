@@ -20,6 +20,7 @@ package de.yaacc.player;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import android.util.Log;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * A Player for local music playing in background
@@ -35,10 +37,21 @@ import de.yaacc.upnp.UpnpClient;
  * 
  */
 public class LocalBackgoundMusicPlayer extends AbstractPlayer {
+	
 	private boolean background = true;
 	private BackgroundMusicService musicService;
 	private Timer commandExecutionTimer;
 
+	/**
+	 * @param context
+	 * @param name playerName
+	 * 
+	 */
+	public LocalBackgoundMusicPlayer(UpnpClient upnpClient, String name) {		
+		this(upnpClient);
+		setName(name);
+	}
+	
 	/**
 	 * @param context
 	 */
@@ -60,6 +73,25 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 		super.onDestroy();
 		Intent svc = new Intent(getContext(), BackgroundMusicService.class);
 		getContext().stopService(svc);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#pause()
+	 */
+	@Override
+	public void pause() {		
+		super.pause();
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_PAUSE);
+				getContext().sendBroadcast(intent);
+
+			}
+		}, 1000L);
 	}
 
 	/*
@@ -144,5 +176,26 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 			}
 		}, 600L);
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+	 */
+	@Override
+	protected PendingIntent getNotificationIntent(){
+		Intent notificationIntent = new Intent(getContext(),
+			    MusicPlayerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+			    notificationIntent, 0);
+			return contentIntent;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
+	 */
+	@Override
+	protected int getNotificationId() {
+		 
+		return NotificationId.LOCAL_BACKGROUND_MUSIC_PLAYER.getId();
+	}
 }

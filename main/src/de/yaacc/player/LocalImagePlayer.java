@@ -18,16 +18,22 @@
 package de.yaacc.player;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.imageviewer.ImageViewerBroadcastReceiver;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * Player for local image viewing activity
@@ -39,7 +45,18 @@ public class LocalImagePlayer implements Player {
 
 	private Context context;
 	private Timer commandExecutionTimer;
+	private String name;
 
+	/**
+	 * @param context
+	 * @param name playerName
+	 * 
+	 */
+	public LocalImagePlayer(UpnpClient upnpClient, String name) {		
+		this(upnpClient);
+		setName(name);
+	}
+	
 	/**
 	 * @param context
 	 */
@@ -194,7 +211,7 @@ public class LocalImagePlayer implements Player {
 		}
 		intent.putExtra(ImageViewerActivity.URIS, uris);
 		context.startActivity(intent);
-
+		showNotification(uris);
 	}
 
 	/*
@@ -208,6 +225,35 @@ public class LocalImagePlayer implements Player {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#setName(java.lang.String)
+	 */
+	@Override
+	public void setName(String name) {
+		this.name=name;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#getName()
+	 */
+	@Override
+	public String getName() {
+		
+		return name;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#exit()
+	 */
+	@Override
+	public void exit() {
+		PlayerFactory.shutdown(this);
+		
+	}
+
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -224,10 +270,67 @@ public class LocalImagePlayer implements Player {
 	 */
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
+		cancleNotification();
 		
 	}
-
 	
+	/**
+	 * Displays the notification.
+	 * @param uris 
+	 */
+	private void showNotification(ArrayList<Uri> uris){	
+		
+	    NotificationCompat.Builder mBuilder =
+	            new NotificationCompat.Builder(context)
+	    		.setOngoing(true)
+	            .setSmallIcon(R.drawable.ic_launcher)
+	            .setContentTitle("Yaacc player " + (getName() == null ? "" : getName()));
+	            //.setContentText("Current Title");
+	    PendingIntent contentIntent = getNotificationIntent(uris);
+	    if(contentIntent != null){        
+	      mBuilder.setContentIntent(contentIntent);
+	    }
+	    NotificationManager mNotificationManager =
+	    	    (NotificationManager) context.getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.notify(getNotificationId(), mBuilder.build());
+	}
+
+
+	/**
+	 *  Cancels the notification.  
+	 */
+	private void cancleNotification() {
+		NotificationManager mNotificationManager =
+	    	    (NotificationManager) context.getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.cancel(getNotificationId());
+		
+	}
+	
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+	 */	
+	private PendingIntent getNotificationIntent(ArrayList<Uri> uris){
+		Intent notificationIntent = new Intent(context,
+			    ImageViewerActivity.class);
+		  	notificationIntent.putExtra(ImageViewerActivity.URIS, uris);
+			PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+			    notificationIntent, 0);
+			return contentIntent;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
+	 */
+	private int getNotificationId() {
+		 
+		return NotificationId.LOCAL_IMAGE_PLAYER.getId();
+	}
 
 }
