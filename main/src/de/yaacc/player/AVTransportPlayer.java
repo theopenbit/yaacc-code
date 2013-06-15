@@ -23,6 +23,7 @@ import java.util.TimerTask;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.support.avtransport.callback.Pause;
 import org.teleal.cling.support.avtransport.callback.Play;
 import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.avtransport.callback.Stop;
@@ -30,6 +31,7 @@ import org.teleal.cling.support.avtransport.callback.Stop;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
+import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 
@@ -256,5 +258,48 @@ public class AVTransportPlayer extends AbstractPlayer {
 	protected int getNotificationId() {
 		 
 		return NotificationId.AVTRANSPORT_PLAYER.getId();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#pause()
+	 */
+	@Override
+	public void pause() {		
+		super.pause();
+		Service<?, ?> service = getUpnpClient().getAVTransportService(getUpnpClient().getReceiverDevice());
+		if (service == null) {
+			Log.d(getClass().getName(),
+					"No AVTransport-Service found on Device: "
+							+ getUpnpClient().getReceiverDevice().getDisplayString());
+			return;
+		}
+		Log.d(getClass().getName(), "Action Pause ");
+		final ActionState actionState = new ActionState();
+		actionState.actionFinished = false;
+		Pause actionCallback = new Pause(service) {
+
+			@Override
+			public void failure(ActionInvocation actioninvocation,
+					UpnpResponse upnpresponse, String s) {
+				Log.d(getClass().getName(), "Failure UpnpResponse: "
+						+ upnpresponse);
+				Log.d(getClass().getName(),
+						upnpresponse != null ? "UpnpResponse: "
+								+ upnpresponse.getResponseDetails() : "");
+				Log.d(getClass().getName(), "s: " + s);
+				actionState.actionFinished = true;
+
+			}
+
+			@Override
+			public void success(ActionInvocation actioninvocation) {
+				super.success(actioninvocation);
+				actionState.actionFinished = true;
+
+			}
+
+		};
+		getUpnpClient().getControlPoint().execute(actionCallback);
+
 	}
 }

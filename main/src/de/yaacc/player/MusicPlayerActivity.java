@@ -33,10 +33,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+
 /**
  * A music player activity based on a background music service.
- * @author Tobias Schoene (openbit)  
- *
+ * 
+ * @author Tobias Schoene (openbit)
+ * 
  */
 public class MusicPlayerActivity extends Activity {
 
@@ -48,34 +50,34 @@ public class MusicPlayerActivity extends Activity {
 		setContentView(R.layout.activity_music_player);
 		// initialize buttons
 		Player player = getPlayer();
-	    ImageButton btnPrev = (ImageButton) findViewById(R.id.musicActivityControlPrev);
-	    ImageButton btnNext = (ImageButton) findViewById(R.id.musicActivityControlNext);
-	    ImageButton btnStop = (ImageButton) findViewById(R.id.musicActivityControlStop);
-	    ImageButton btnPlay = (ImageButton) findViewById(R.id.musicActivityControlPlay);
-	    ImageButton btnPause = (ImageButton) findViewById(R.id.musicActivityControlPause);
-	    ImageButton btnExit = (ImageButton) findViewById(R.id.musicActivityControlExit);
-	    if(player == null){
-	    	btnPrev.setActivated(false);
-	    	btnNext.setActivated(false); 
-	    	btnStop.setActivated(false); 
-	    	btnPlay.setActivated(false); 
-	    	btnPause.setActivated(false);
-	    	btnExit.setActivated(false);
-	    }else{
-	    	btnPrev.setActivated(true);
-	    	btnNext.setActivated(true); 
-	    	btnStop.setActivated(true); 
-	    	btnPlay.setActivated(true); 
-	    	btnPause.setActivated(true);
-	    	btnExit.setActivated(true);
-	    }
+		ImageButton btnPrev = (ImageButton) findViewById(R.id.musicActivityControlPrev);
+		ImageButton btnNext = (ImageButton) findViewById(R.id.musicActivityControlNext);
+		ImageButton btnStop = (ImageButton) findViewById(R.id.musicActivityControlStop);
+		ImageButton btnPlay = (ImageButton) findViewById(R.id.musicActivityControlPlay);
+		ImageButton btnPause = (ImageButton) findViewById(R.id.musicActivityControlPause);
+		ImageButton btnExit = (ImageButton) findViewById(R.id.musicActivityControlExit);
+		if (player == null) {
+			btnPrev.setActivated(false);
+			btnNext.setActivated(false);
+			btnStop.setActivated(false);
+			btnPlay.setActivated(false);
+			btnPause.setActivated(false);
+			btnExit.setActivated(false);
+		} else {
+			btnPrev.setActivated(true);
+			btnNext.setActivated(true);
+			btnStop.setActivated(true);
+			btnPlay.setActivated(true);
+			btnPause.setActivated(true);
+			btnExit.setActivated(true);
+		}
 		btnPrev.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.previous();
+					player.previous();
 				}
 
 			}
@@ -86,18 +88,18 @@ public class MusicPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.next();
+					player.next();
 				}
 
 			}
-		});	    
+		});
 		btnPlay.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.play();
+					player.play();
 				}
 
 			}
@@ -108,7 +110,7 @@ public class MusicPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.pause();
+					player.pause();
 				}
 
 			}
@@ -119,7 +121,7 @@ public class MusicPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.stop();
+					player.stop();
 				}
 
 			}
@@ -130,7 +132,8 @@ public class MusicPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.exit();
+					player.exit();
+					finish();
 				}
 
 			}
@@ -150,7 +153,7 @@ public class MusicPlayerActivity extends Activity {
 		}
 		return player;
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -168,7 +171,7 @@ public class MusicPlayerActivity extends Activity {
 			return true;
 		case R.id.yaacc_about:
 			AboutActivity.showAbout(this);
-			return true;				
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

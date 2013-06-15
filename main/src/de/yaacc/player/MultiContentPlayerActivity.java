@@ -133,6 +133,7 @@ public class MultiContentPlayerActivity extends Activity {
 				Player player = getPlayer();
 				if (player != null) {
 					player.exit();
+					finish();
 				}
 
 			}

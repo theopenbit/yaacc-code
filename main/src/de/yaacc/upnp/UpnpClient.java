@@ -72,6 +72,7 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.player.AVTransportPlayer;
 import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
@@ -717,7 +718,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	
 	/**
-	 * Returns a player instance initialized with the given didl object
+	 * Returns a player instance initialized with the given transport object
 	 * 
 	 * @param didlObject
 	 *            the object which describes the content to be played
@@ -747,6 +748,37 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(),
 				"MimeType: " + playableItem.getMimeType());					
 		return PlayerFactory.createPlayer(this, items);
+	}
+	
+	/**
+	 * Returns the current player instance for the given transport object
+	 * 
+	 * @param didlObject
+	 *            the object which describes the content to be played
+	 * @return the player
+	 */
+	public Player getCurrentPlayer(AVTransport transport) {
+		PlayableItem playableItem = new PlayableItem();
+		List<PlayableItem>items = new ArrayList<PlayableItem>();
+		if (transport == null)
+			return PlayerFactory.createPlayer(this, items); 
+		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
+		PositionInfo positionInfo = transport.getPositionInfo();
+		if (positionInfo == null)
+			return PlayerFactory.createPlayer(this, items);
+
+		playableItem.setTitle(positionInfo.getTrackMetaData());
+		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
+		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
+		String mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);		
+		Log.d(getClass().getName(),
+				"MimeType: " + playableItem.getMimeType());					
+		List<Player> players = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
+		Player result=null;
+		if(players != null && players.size() > 0){
+			result = players.get(0);
+		}
+		return result;
 	}
 	
 	/**
