@@ -95,6 +95,6 @@
     <string name="yaacc_about">Über</string>
     <string name="app_descrip">Yet Another Android Client Controller\nVerbindet ihre UPnP-Geräte im lokalen Netzwerk mit ihrem Android Gerät!\n<a href="www.yaacc.de">www.yaacc.de</a></string>
     <string name="app_credits">YAACC steht unter der Lizenz GPLv3. Die dürfen die Software frei nutzen und weitergeben. Für die Software wird keinerlei Grantie gewährleistet. Lizenzdetails sind hier nachzulesen  <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a></string>
-    <string name="app_credits_third_partie">Weitere Lizenen:\nDie UPNP implementierung basiert auf <a href="http://4thline.org/projects/cling">Cling</a>\nIn der Anwendung verwendete Bilder stammen von  <a href="http://www.carpicon.com">black + white icons 2.0</a> und <a href="http://developer.android.com/about/index.html">Android</a>  itself. Android is a trademark of Google Inc</string>    
+    <string name="app_credits_third_partie">Weitere Lizenen:\nDie UPNP Implementierung basiert auf <a href="http://4thline.org/projects/cling">Cling</a>\nIn der Anwendung verwendete Bilder stammen von  <a href="http://www.carpicon.com">black + white icons 2.0</a> und <a href="http://developer.android.com/about/index.html">Android</a> . Android is a trademark of Google Inc</string>    
 
 </resources>
