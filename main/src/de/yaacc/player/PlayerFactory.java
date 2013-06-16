@@ -56,7 +56,7 @@ public class PlayerFactory {
 		boolean music = false;
 		if (!upnpClient.getReceiverDeviceId().equals(UpnpClient.LOCAL_UID)) {
 			result = new AVTransportPlayer(upnpClient,upnpClient.getContext().getString(R.string.playerNameAvTransport));
-		} else {
+		} else {			 
 			for (PlayableItem playableItem : items) {
 				image = image || playableItem.getMimeType().startsWith("image");
 				video = video || playableItem.getMimeType().startsWith("video");
@@ -93,7 +93,7 @@ public class PlayerFactory {
 		boolean background = PreferenceManager.getDefaultSharedPreferences(
 				upnpClient.getContext()).getBoolean(
 				upnpClient.getContext().getString(R.string.settings_audio_app),
-				false);
+				true);
 		if (background) {
 			return new LocalBackgoundMusicPlayer(upnpClient, upnpClient.getContext().getString(R.string.playerNameMusic));
 		}
@@ -157,6 +157,16 @@ public class PlayerFactory {
 		assert(player != null);
 		currentPlayers.remove(player);
 		player.onDestroy();
+	}
+
+	/**
+	 * Kill all Players
+	 */
+	public static void shutdown() {
+		for (Player player : currentPlayers) {
+			shutdown(player);
+		}
+		
 	}
 	
 }

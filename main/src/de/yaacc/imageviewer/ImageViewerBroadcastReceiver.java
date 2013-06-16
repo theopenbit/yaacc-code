@@ -34,6 +34,7 @@ public class ImageViewerBroadcastReceiver extends BroadcastReceiver {
 	public static String ACTION_PAUSE = "de.yaacc.imageviewer.ActionPause";
 	public static String ACTION_NEXT = "de.yaacc.imageviewer.ActionNext";
 	public static String ACTION_PREVIOUS = "de.yaacc.imageviewer.ActionPrevious";
+	public static String ACTION_EXIT = "de.yaacc.imageviewer.ActionExit";
 	
 	
 	private ImageViewerActivity imageViewer;
@@ -66,6 +67,8 @@ public class ImageViewerBroadcastReceiver extends BroadcastReceiver {
 			imageViewer.previous();
 		}else if(ACTION_NEXT.equals(intent.getAction())){
 			imageViewer.next();
+		}else if(ACTION_EXIT.equals(intent.getAction())){
+			imageViewer.finish();
 		}
 		
 			

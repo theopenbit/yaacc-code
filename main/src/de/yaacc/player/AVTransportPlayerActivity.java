@@ -19,21 +19,17 @@ package de.yaacc.player;
 
 import java.util.List;
 
-import de.yaacc.R;
-import de.yaacc.R.layout;
-import de.yaacc.R.menu;
-import de.yaacc.musicplayer.BackgroundMusicService;
-import de.yaacc.settings.SettingsActivity;
-import de.yaacc.util.AboutActivity;
-import android.os.Bundle;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import de.yaacc.R;
+import de.yaacc.settings.SettingsActivity;
+import de.yaacc.util.AboutActivity;
 
 /**
  * A avtransport player activity controlling the {@link AVTransportPlayer}.
@@ -135,8 +131,8 @@ public class AVTransportPlayerActivity extends Activity {
 				Player player = getPlayer();
 				if (player != null) {
 					player.exit();
-					finish();
 				}
+				finish();
 
 			}
 		});

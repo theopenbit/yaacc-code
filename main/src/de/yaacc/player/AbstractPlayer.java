@@ -411,7 +411,9 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	@Override
 	public void onDestroy() {
+		cancleTimer();
 		cancleNotification();
+		items.clear();
 		
 	}
 

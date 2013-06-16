@@ -243,6 +243,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		if ("0".equals(this.uClient.getCurrentObjectId())) {
 			populateItemList();
 		} else if ("-1".equals(this.uClient.getCurrentObjectId())){
+			uClient.shutdown();
 			super.finish();
 		} else {
 

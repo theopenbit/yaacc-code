@@ -49,14 +49,15 @@ public class LocalImagePlayer implements Player {
 
 	/**
 	 * @param context
-	 * @param name playerName
+	 * @param name
+	 *            playerName
 	 * 
 	 */
-	public LocalImagePlayer(UpnpClient upnpClient, String name) {		
+	public LocalImagePlayer(UpnpClient upnpClient, String name) {
 		this(upnpClient);
 		setName(name);
 	}
-	
+
 	/**
 	 * @param context
 	 */
@@ -225,35 +226,39 @@ public class LocalImagePlayer implements Player {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#setName(java.lang.String)
 	 */
 	@Override
 	public void setName(String name) {
-		this.name=name;
-		
+		this.name = name;
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#getName()
 	 */
 	@Override
 	public String getName() {
-		
+
 		return name;
 	}
-	
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#exit()
 	 */
 	@Override
 	public void exit() {
 		PlayerFactory.shutdown(this);
-		
+
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -265,71 +270,89 @@ public class LocalImagePlayer implements Player {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.Player#onDestroy()
 	 */
 	@Override
 	public void onDestroy() {
 		cancleNotification();
-		
+		// Communicating with the activity is only possible after the activity
+		// is started
+		// if we send an broadcast event to early the activity won't be up
+		// in order there is no known way to query the activity state
+		// we are sending the command delayed
+		commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				Intent intent = new Intent();
+				intent.setAction(ImageViewerBroadcastReceiver.ACTION_EXIT);
+				context.sendBroadcast(intent);
+
+			}
+		}, 500L);
+
 	}
-	
+
 	/**
 	 * Displays the notification.
-	 * @param uris 
+	 * 
+	 * @param uris
 	 */
-	private void showNotification(ArrayList<Uri> uris){	
-		
-	    NotificationCompat.Builder mBuilder =
-	            new NotificationCompat.Builder(context)
-	    		.setOngoing(true)
-	            .setSmallIcon(R.drawable.ic_launcher)
-	            .setContentTitle("Yaacc player " + (getName() == null ? "" : getName()));
-	            //.setContentText("Current Title");
-	    PendingIntent contentIntent = getNotificationIntent(uris);
-	    if(contentIntent != null){        
-	      mBuilder.setContentIntent(contentIntent);
-	    }
-	    NotificationManager mNotificationManager =
-	    	    (NotificationManager) context.getSystemService(Context
-	    	    		.NOTIFICATION_SERVICE);
-	    	// mId allows you to update the notification later on.
-	    	mNotificationManager.notify(getNotificationId(), mBuilder.build());
-	}
+	private void showNotification(ArrayList<Uri> uris) {
 
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				context)
+				.setOngoing(true)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(
+						"Yaacc player " + (getName() == null ? "" : getName()));
+		// .setContentText("Current Title");
+		PendingIntent contentIntent = getNotificationIntent(uris);
+		if (contentIntent != null) {
+			mBuilder.setContentIntent(contentIntent);
+		}
+		NotificationManager mNotificationManager = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		// mId allows you to update the notification later on.
+		mNotificationManager.notify(getNotificationId(), mBuilder.build());
+	}
 
 	/**
-	 *  Cancels the notification.  
+	 * Cancels the notification.
 	 */
 	private void cancleNotification() {
-		NotificationManager mNotificationManager =
-	    	    (NotificationManager) context.getSystemService(Context
-	    	    		.NOTIFICATION_SERVICE);
-	    	// mId allows you to update the notification later on.
-	    	mNotificationManager.cancel(getNotificationId());
-		
+		NotificationManager mNotificationManager = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		// mId allows you to update the notification later on.
+		mNotificationManager.cancel(getNotificationId());
+
 	}
-	
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
-	 */	
-	private PendingIntent getNotificationIntent(ArrayList<Uri> uris){
+	 */
+	private PendingIntent getNotificationIntent(ArrayList<Uri> uris) {
 		Intent notificationIntent = new Intent(context,
-			    ImageViewerActivity.class);
-		  	notificationIntent.putExtra(ImageViewerActivity.URIS, uris);
-			PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-			    notificationIntent, 0);
-			return contentIntent;
+				ImageViewerActivity.class);
+		notificationIntent.putExtra(ImageViewerActivity.URIS, uris);
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+				notificationIntent, 0);
+		return contentIntent;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
 	 */
 	private int getNotificationId() {
-		 
+
 		return NotificationId.LOCAL_IMAGE_PLAYER.getId();
 	}
 

@@ -76,6 +76,7 @@ import de.yaacc.player.AVTransportPlayer;
 import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
+import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
  * A client facade to the upnp lookup and access framework. This class provides
@@ -788,6 +789,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	private List<PlayableItem> toPlayableItems(List<Item> items){
 		List<PlayableItem> playableItems = new ArrayList<PlayableItem>();
+		//FIXME: filter cover.jpg for testing purpose
+		List<PlayableItem> coverImageItems = new ArrayList<PlayableItem>();
+		int audioItemsCount=0;
 		for (Item item : items) {
 			PlayableItem playableItem = new PlayableItem();
 			playableItem.setTitle(item.getTitle());
@@ -795,6 +799,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			if(resource  != null) { 
 				playableItem.setUri(Uri.parse(resource.getValue()));
 				playableItem.setMimeType(resource.getProtocolInfo().getContentFormat());
+				//FIXME: filter cover.jpg for testing purpose
+				if(playableItem.getMimeType().startsWith("audio")){
+					audioItemsCount++;
+				}
+				if(playableItem.getMimeType().startsWith("image")){
+					coverImageItems.add(playableItem);
+				}
 				// calculate duration
 				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
 				long millis = 10000; // 10 sec. default
@@ -812,6 +823,12 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				playableItem.setDuration(millis);
 			}
 			playableItems.add(playableItem);
+		}
+		//FIXME: filter cover.jpg for testing purpose
+		//here comes the magic
+		if(audioItemsCount > 1 && coverImageItems.size() == 1){
+			//hope there is only one cover image
+			playableItems.removeAll(coverImageItems);
 		}
 		return playableItems;
 	}
@@ -945,6 +962,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public Boolean isLocalPlaybackEnabled() {
 		return (LOCAL_UID.equals(getReceiverDeviceId()));
+	}
+
+	/**
+	 * Shutdown the upnp client and all players
+	 */
+	public void shutdown() {
+		//shutdown UpnpRegistry
+		boolean result = getContext().stopService(new Intent(context,
+				UpnpRegistryService.class));
+		Log.d(getClass().getName(), "Stopping UpnpRegistryService succsessful= " + result);
+		//shutdown yaacc server service 
+		result = getContext().stopService(new Intent(context,
+				YaaccUpnpServerService.class));
+		Log.d(getClass().getName(), "Stopping YaaccUpnpServerService succsessful= " + result);
+		//stop all players
+		PlayerFactory.shutdown();
 	}
 
 }
