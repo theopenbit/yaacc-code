@@ -20,6 +20,7 @@ package de.yaacc.upnp.server;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -68,6 +69,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -128,6 +130,7 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@Override
 	public void onStart(Intent intent, int startid) {
+		
 		// when the service starts, the preferences are initialized
 		preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -182,7 +185,9 @@ public class YaaccUpnpServerService extends Service {
 			}
 		}
 		if (upnpClient.isInitialized()) {
-			localServer = createDevice();
+			if (localServer == null){
+				localServer = createDevice();
+			}
 			upnpClient.getRegistry().addDevice(localServer);
 		} else {
 			throw new IllegalStateException("UpnpClient is not initialized!");
@@ -191,11 +196,12 @@ public class YaaccUpnpServerService extends Service {
 		// Create a HttpService for providing content in the network.
 		try {
 			new RequestListenerThread(getApplicationContext()).start();
+		} catch (BindException e){
+			Log.w(this.getClass().getName(), "Server already running");
 		} catch (IOException e) {		
 			//FIXME Ignored right error handling on rebind needed 
 			Log.w(this.getClass().getName(), "ContentProvider can not be initialized!", e);
-				//throw new IllegalStateException("ContentProvider can not be initialized!", e);
-			
+				//throw new IllegalStateException("ContentProvider can not be initialized!", e);		
 		}
 
 	}
@@ -207,6 +213,15 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	private LocalDevice createDevice() {
 		LocalDevice device;
+		String versionName;
+		try {
+			 versionName = getApplicationContext().getPackageManager()
+				    .getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			versionName = "0.1";
+		}
 		try {
 			device = new LocalDevice(
 					new DeviceIdentity(new UDN(UDN_ID)),
@@ -215,7 +230,7 @@ public class YaaccUpnpServerService extends Service {
 					new DeviceDetails("YAACC - MediaServer", new ManufacturerDetails(
 							"yaacc.de", "www.yaacc.de"), new ModelDetails(
 									preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "MediaServer"),
-							"Free Android UPnP AV MediaServer, GNU GPL", "0.1")),
+							"Free Android UPnP AV MediaServer, GNU GPL", versionName)),
 					createServices());
 
 			return device;
@@ -385,7 +400,7 @@ public class YaaccUpnpServerService extends Service {
 		private BasicHttpParams params;
 		private HttpService httpService;
 
-		public RequestListenerThread(Context context) throws IOException {
+		public RequestListenerThread(Context context) throws IOException, BindException {
 			serversocket = new ServerSocket(PORT);
 			params = new BasicHttpParams();
 			params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000)
