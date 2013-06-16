@@ -17,8 +17,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 import de.yaacc.R;
 
-public class BrowseItemClickListener implements OnItemClickListener
-		 {
+public class BrowseItemClickListener implements OnItemClickListener{
+		//FIXME: just for easter egg to play all items on prev button
+		public static DIDLObject currentObject;
+		 
 
 	@Override
 	public void onItemClick(AdapterView<?> listView, View arg1, int position,
@@ -27,8 +29,9 @@ public class BrowseItemClickListener implements OnItemClickListener
 		ListView a = (ListView) listView.findViewById(R.id.itemList);
 		BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
 
-		DIDLObject currentObject = adapter.getFolder(position);
-
+		currentObject = adapter.getFolder(position);
+ 
+		
 		if (currentObject instanceof Container) {
 			// if the current id is null, go back to the top level
 			String newObjectId = currentObject.getId() == null ? "0" : adapter

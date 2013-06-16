@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 
+/*
  *
  * Copyright (C) 2013 www.yaacc.de 
  *
@@ -16,18 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+ */
+package de.yaacc.util;
 
-    <item
-        android:id="@+id/menu_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/menu_settings"/>
-    <item
-        android:id="@+id/yaacc_about"
-        android:orderInCategory="120"
-        android:showAsAction="never"
-        android:title="@string/yaacc_about"/>
 
-</menu>
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import de.yaacc.R;
+
+/**
+ * An about dialog for yaacc
+ * @author Tobias Schoene (openbit)  
+ *
+ */
+public class AboutActivity extends Activity {
+	 public static void showAbout(Activity activity) {
+		 activity.startActivity(new Intent(activity,AboutActivity.class));
+	 }
+
+	 @Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+        
+			setContentView(R.layout.about);
+
+	    }
+}

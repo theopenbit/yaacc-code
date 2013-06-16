@@ -23,16 +23,23 @@ import de.yaacc.R;
 import de.yaacc.R.layout;
 import de.yaacc.R.menu;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.settings.SettingsActivity;
+import de.yaacc.util.AboutActivity;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Intent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+
 /**
  * A avtransport player activity controlling the {@link AVTransportPlayer}.
- * @author Tobias Schoene (openbit)  
- *
+ * 
+ * @author Tobias Schoene (openbit)
+ * 
  */
 public class AVTransportPlayerActivity extends Activity {
 
@@ -43,36 +50,36 @@ public class AVTransportPlayerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_avtransport_player);
 		// initialize buttons
-		
+
 		Player player = getPlayer();
-	    ImageButton btnPrev = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPrev);
-	    ImageButton btnNext = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlNext);
-	    ImageButton btnStop = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlStop);
-	    ImageButton btnPlay = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPlay);
-	    ImageButton btnPause = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPause);
-	    ImageButton btnExit = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlExit);
-	    if(player == null){
-	    	btnPrev.setActivated(false);
-	    	btnNext.setActivated(false); 
-	    	btnStop.setActivated(false); 
-	    	btnPlay.setActivated(false); 
-	    	btnPause.setActivated(false);
-	    	btnExit.setActivated(false);
-	    }else{
-	    	btnPrev.setActivated(true);
-	    	btnNext.setActivated(true); 
-	    	btnStop.setActivated(true); 
-	    	btnPlay.setActivated(true); 
-	    	btnPause.setActivated(true);
-	    	btnExit.setActivated(true);
-	    }
+		ImageButton btnPrev = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPrev);
+		ImageButton btnNext = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlNext);
+		ImageButton btnStop = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlStop);
+		ImageButton btnPlay = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPlay);
+		ImageButton btnPause = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPause);
+		ImageButton btnExit = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlExit);
+		if (player == null) {
+			btnPrev.setActivated(false);
+			btnNext.setActivated(false);
+			btnStop.setActivated(false);
+			btnPlay.setActivated(false);
+			btnPause.setActivated(false);
+			btnExit.setActivated(false);
+		} else {
+			btnPrev.setActivated(true);
+			btnNext.setActivated(true);
+			btnStop.setActivated(true);
+			btnPlay.setActivated(true);
+			btnPause.setActivated(true);
+			btnExit.setActivated(true);
+		}
 		btnPrev.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.previous();
+					player.previous();
 				}
 
 			}
@@ -83,18 +90,18 @@ public class AVTransportPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.next();
+					player.next();
 				}
 
 			}
-		});	    
+		});
 		btnPlay.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.play();
+					player.play();
 				}
 
 			}
@@ -105,7 +112,7 @@ public class AVTransportPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.pause();
+					player.pause();
 				}
 
 			}
@@ -116,7 +123,7 @@ public class AVTransportPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.stop();
+					player.stop();
 				}
 
 			}
@@ -127,13 +134,14 @@ public class AVTransportPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-				player.exit();
+					player.exit();
+					finish();
 				}
 
 			}
 		});
 	}
-	
+
 	private Player getPlayer() {
 		Player player = null;
 		List<Player> players = PlayerFactory
@@ -154,6 +162,21 @@ public class AVTransportPlayerActivity extends Activity {
 		getMenuInflater().inflate(R.menu.activity_avtransport_player, menu);
 
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_settings:
+			Intent i = new Intent(this, SettingsActivity.class);
+			startActivity(i);
+			return true;
+		case R.id.yaacc_about:
+			AboutActivity.showAbout(this);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 }

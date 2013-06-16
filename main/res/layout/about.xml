@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<!--
  *
  * Copyright (C) 2013 www.yaacc.de 
  *
@@ -16,16 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- -->
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="20dip" >
 
-    <ProgressBar
-        android:id="@+id/dialogProgressBar"
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:text="@string/app_descrip"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/about_credits"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:paddingTop="20dip"
+        android:text="@string/app_credits"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/about_credits_third_partie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:paddingTop="20dip"
+        android:text="@string/app_credits_third_partie"
+        android:textSize="16sp" />
 
 </LinearLayout>

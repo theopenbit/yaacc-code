@@ -112,7 +112,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 	@Override
 	public Class<? extends AbstractState> pause() {
 		Log.d(this.getClass().getName(), "pause");
-		return null;
+		return AvTransportMediaRendererPaused.class;
 	}
 
 	/*

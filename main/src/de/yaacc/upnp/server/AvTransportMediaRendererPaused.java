@@ -22,27 +22,24 @@ import java.net.URI;
 import java.util.List;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
-import org.teleal.cling.support.avtransport.impl.state.Stopped;
+import org.teleal.cling.support.avtransport.impl.state.PausedPlay;
 import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.PositionInfo;
-import org.teleal.cling.support.model.SeekMode;
 
+import android.app.ActivityManager;
 import android.util.Log;
+
 import de.yaacc.player.AVTransportPlayer;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
 import de.yaacc.upnp.UpnpClient;
 
-/**
- * @author Tobias Schöne (openbit)
- * 
- */
-public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
+public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
 
 	private UpnpClient upnpClient;
-
+	
 	/**
 	 * Constructor.
 	 * 
@@ -51,37 +48,27 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 	 * @param upnpClient
 	 *            the upnpclient to use
 	 */
-	public AvTransportMediaRendererStopped(AVTransport transport,
+	public AvTransportMediaRendererPaused(AVTransport transport,
 			UpnpClient upnpClient) {
 		super(transport);
 		this.upnpClient = upnpClient;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#onEntry()
+	/* (non-Javadoc)
+	 * @see org.teleal.cling.support.avtransport.impl.state.PausedPlay#play(java.lang.String)
 	 */
 	@Override
-	public void onEntry() {
-		Log.d(this.getClass().getName(), "On Entry");
-		super.onEntry();
-		Player player = upnpClient.getCurrentPlayer(getTransport());
-		if(player != null ){
-			player.stop();
-		}
+	public Class<? extends AbstractState> play(String arg0) {
+		Log.d(this.getClass().getName(), "play");
+		return AvTransportMediaRendererPlaying.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.teleal.cling.support.avtransport.impl.state.Stopped#setTransportURI
-	 * (java.net.URI, java.lang.String)
+	/* (non-Javadoc)
+	 * @see org.teleal.cling.support.avtransport.impl.state.PausedPlay#setTransportURI(java.net.URI, java.lang.String)
 	 */
 	@Override
-	public Class<? extends AbstractState> setTransportURI(URI uri,
-			String metaData) {
+	public Class<? extends AbstractState> setTransportURI(URI uri, String metaData) {
+		Log.d(this.getClass().getName(), "setTransportURI");
 		Log.d(this.getClass().getName(), "setTransportURI");
 		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));
 		// If you can, you should find and set the duration of the track here!
@@ -104,67 +91,27 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 		return AvTransportMediaRendererStopped.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#stop()
+	/* (non-Javadoc)
+	 * @see org.teleal.cling.support.avtransport.impl.state.PausedPlay#stop()
 	 */
 	@Override
 	public Class<? extends AbstractState> stop() {
 		Log.d(this.getClass().getName(), "stop");
-		// / Same here, if you are stopped already and someone calls STOP,
-		// well...
 		return AvTransportMediaRendererStopped.class;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.teleal.cling.support.avtransport.impl.state.Stopped#play(java.lang
-	 * .String)
+	 * @see org.teleal.cling.support.avtransport.impl.state.Playing#onEntry()
 	 */
 	@Override
-	public Class<? extends AbstractState> play(String speed) {
-		Log.d(this.getClass().getName(), "play");
-		// It's easier to let this classes' onEntry() method do the work
-		return AvTransportMediaRendererPlaying.class;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#next()
-	 */
-	@Override
-	public Class<? extends AbstractState> next() {
-		Log.d(this.getClass().getName(), "next");
-		return AvTransportMediaRendererStopped.class;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.teleal.cling.support.avtransport.impl.state.Stopped#previous()
-	 */
-	@Override
-	public Class<? extends AbstractState> previous() {
-		Log.d(this.getClass().getName(), "previous");
-		return AvTransportMediaRendererStopped.class;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.teleal.cling.support.avtransport.impl.state.Stopped#seek(org.teleal
-	 * .cling.support.model.SeekMode, java.lang.String)
-	 */
-	@Override
-	public Class<? extends AbstractState> seek(SeekMode unit, String target) {
-		Log.d(this.getClass().getName(), "seek");
-		// Implement seeking with the stream in stopped state!
-		return AvTransportMediaRendererStopped.class;
+	public void onEntry() {
+		Log.d(this.getClass().getName(), "On Entry");
+		super.onEntry();		
+		Player player = upnpClient.getCurrentPlayer(getTransport());
+		if(player != null ){
+			player.pause();
+		}
 	}
 
 	

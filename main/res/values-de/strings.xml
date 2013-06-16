@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ *
+ * Copyright (C) 2013 www.yaacc.de 
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ -->
 <resources>
 
     <string name="app_name">YAACC</string>
+    <string name="menu_settings">Einstellungen</string>
     <string name="browse_main_folder">Zeige Hauptverzeichnis</string>
     <string name="browse_context_title">Mögliche Aktionen</string>
     <string name="browse_context_play">Spiele Eintrag ab</string>
     <string name="browse_context_download">Lade Eintrag herunter</string>
     <string name="browse_context_add_to_playplist">Füge Eintrag zu Wiedergabeliste hinzu</string>
 	<string name="browse_no_content_found">Keine anzeigbaren Daten gefunden</string>
+	<string name="browse_button_prev">vorheriges</string>
+    <string name="browse_button_stop">stoppe </string>
+    <string name="browse_button_next">nächstes</string>
     <string name="title_activity_main">YAACC</string>
     <string name="title_activity_upnp_browser">Verzeichnisdienst</string>
     <string name="title_activity_image_viewer">Bildbetrachter</string>
@@ -20,6 +42,7 @@
     <string name="settings_change_provider">Druecken sie hier um den Sender zu wechseln</string>
     <string name="settings_selected_receiver_title">Aktueller Medien-Empfaenger</string>
     <string name="settings_change_receiver">Druecken sie hier um den Empfaenger zu wechseln</string>
+    <string name="settings_no_content_found">Kein Inhalt zum Anzeiden gefunden</string>
     <string name="settings_audio_app">Audio Wiedergabe</string> 
     <string name="settings_video_app">Video Wiedergabe</string>
     <string name="settings_image_app">Bilder Wiedergabe</string>  
@@ -43,8 +66,11 @@
     <string name="settings_local_server_stopped">Lokaler server ist gestoppt</string>
     <string name="settings_local_server_chkbx">local_server_chkbx</string>
     <string name="settings_local_server_testcontent">Lokaler Server verwendet Testinhalte</string>
-    <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>
-    <string name="settings_local_server_testcontent_chkbx">local_server_testcontent_chkbx</string>
+    <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>    
+    <string name="settings_local_server_name">Netzwerkname für lokalen Server</string>
+    <string name="settings_local_server_name_key">Name des localen servers</string>
+    <string name="error_upnp_generic">An unknown error happened while browsing</string>
+    <string name="error_upnp_specific">The following error occurred:</string>
     <string name="error_no_activity_found">Keine Aktivität zum Abspielen vom Typ \'%1$s\' gefunden</string>
     <string name="image_viewer_settings_duration">Dauer der Bildanzeige</string>    
     <string name="no_valid_uri_data_found_to_display">Keine gültigen Uri-Informationen zum Anzeigen gefunden</string>
@@ -61,8 +87,14 @@
     <string name="playerNameMultiContent">Multi</string>
     <string name="playerNameAvTransport">Entfernd</string>
     <string name="multiContentPlayerActivityImageView">variabler Inhalt</string>
-    <string name="title_activity_avtransport_player">Yaacc Netwerk player</string>
-    <string name="title_activity_multi_content_player">Yaacc Standard player</string>
+    <string name="title_activity_avtransport_player">Yaacc Netwerk Spieler</string>
+    <string name="title_activity_multi_content_player">Yaacc Standard Spieler</string>
     <string name="can_not_start_activity">"Die App kann nicht gestartet werden! Grund: "</string>
+    <string name="title_activity_music_player">Yaacc Musik Spieler </string>       
+    <string name="yaacc_menu_settings">YAACC eigenschaften</string>
+    <string name="yaacc_about">Über</string>
+    <string name="app_descrip">Yet Another Android Client Controller\nVerbindet ihre UPnP-Geräte im lokalen Netzwerk mit ihrem Android Gerät!\n<a href="www.yaacc.de">www.yaacc.de</a></string>
+    <string name="app_credits">YAACC steht unter der Lizenz GPLv3. Die dürfen die Software frei nutzen und weitergeben. Für die Software wird keinerlei Grantie gewährleistet. Lizenzdetails sind hier nachzulesen  <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a></string>
+    <string name="app_credits_third_partie">Weitere Lizenen:\nDie UPNP Implementierung basiert auf <a href="http://4thline.org/projects/cling">Cling</a>\nIn der Anwendung verwendete Bilder stammen von  <a href="http://www.carpicon.com">black + white icons 2.0</a> und <a href="http://developer.android.com/about/index.html">Android</a> . Android is a trademark of Google Inc</string>    
 
 </resources>

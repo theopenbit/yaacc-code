@@ -83,7 +83,7 @@ public class PlayerFactory {
 		}
 		return result;
 	}
-
+	
 	private static Player createImagePlayer(UpnpClient upnpClient) {
 
 		return new LocalImagePlayer(upnpClient,upnpClient.getContext().getString(R.string.playerNameImage));
@@ -125,6 +125,29 @@ public class PlayerFactory {
 		return Collections.unmodifiableList(players);
 	}
 	
+	/**
+	 * Returns the class of a player for the given mime type.
+	 * @param mimeType the mime type
+	 * @return the player class
+	 */
+	public static Class getPlayerClassForMimeType(String mimeType){
+		//FIXME don't implement business logic twice
+		boolean image = mimeType.startsWith("image");
+		boolean video = mimeType.startsWith("video");
+		boolean music = mimeType.startsWith("audio");
+		Class result  =MultiContentPlayer.class;
+		if (video && !image && !music) {
+			// use videoplayer
+			result = MultiContentPlayer.class;
+		} else if (!video && image && !music) {
+			// use imageplayer
+			result = LocalImagePlayer.class;
+		} else if (!video && !image && music) {
+			// use musicplayer
+			result = LocalBackgoundMusicPlayer.class;
+		} 	
+		return result;
+	}
 	
 	/**
 	 * Kills the given Player

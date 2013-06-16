@@ -45,6 +45,7 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.settings.ImageViewerSettingsActivity;
 import de.yaacc.settings.SettingsActivity;
+import de.yaacc.util.AboutActivity;
 import de.yaacc.util.ActivitySwipeDetector;
 import de.yaacc.util.SwipeReceiver;
 
@@ -200,6 +201,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		case R.id.menu_stop:
 			stop();
 			return true;
+		case R.id.yaacc_about:
+			AboutActivity.showAbout(this);
+			return true;	
 		default:
 			return super.onOptionsItemSelected(item);
 		}

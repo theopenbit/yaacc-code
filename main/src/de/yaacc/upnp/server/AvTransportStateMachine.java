@@ -28,7 +28,8 @@ import org.teleal.common.statemachine.States;
 @States({
 	AvTransportMediaRendererNoMediaPresent.class,
 	AvTransportMediaRendererStopped.class,
-	AvTransportMediaRendererPlaying.class
+	AvTransportMediaRendererPlaying.class,
+	AvTransportMediaRendererPaused.class,
 })
 public interface AvTransportStateMachine extends AVTransportStateMachine {
 	
