@@ -38,7 +38,7 @@
         android:contentDescription="@string/browse_button_prev"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:src="@drawable/player_start"
+        android:src="@drawable/player_play"
         android:layout_toLeftOf="@+id/controlStop"/>
         
         <ImageButton android:id="@+id/controlStop"
@@ -52,7 +52,7 @@
         android:contentDescription="@string/browse_button_next"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:src="@drawable/player_end"
+        android:src="@drawable/refresh"
         android:layout_toRightOf="@+id/controlStop"/>
     </RelativeLayout>
     
