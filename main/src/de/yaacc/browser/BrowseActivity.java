@@ -35,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -49,7 +50,7 @@ import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.util.AboutActivity;
 
-public class BrowseActivity extends Activity implements OnClickListener,
+public class BrowseActivity extends Activity implements OnClickListener, OnLongClickListener,
 		UpnpClientListener {
 
 	private boolean displayingSomething = false;
@@ -67,6 +68,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	private SharedPreferences preferences = null;
 	
 	private Intent serverService = null;
+
+	protected ListView contentList;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,10 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		// initialize click listener
 		bDeviceClickListener = new BrowseDeviceClickListener();
 
+
+		// Define where to show the folder contents for media
+		contentList = (ListView) findViewById(R.id.itemList);
+		registerForContextMenu(contentList);
 
 		// remove the buttons if local playback is enabled and background
 		// playback is not enabled
@@ -145,6 +152,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
 			populateItemList();
 
 		}
+		
+		
 	}
 	
 	@Override
@@ -261,6 +270,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
+		
 
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		if (v instanceof ListView) {
@@ -314,19 +324,20 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	 */
 	private void populateItemList(Device providerDevice) {
 
+
 		this.runOnUiThread(new Runnable() {
 			public void run() {
-				// Define where to show the folder contents
-				ListView deviceList = (ListView) findViewById(R.id.itemList);
-
+				
 				// Load adapter if selected device is configured and found
 				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
 						"0");
-				deviceList.setAdapter(bItemAdapter);
+				contentList.setAdapter(bItemAdapter);
 
-				deviceList.setOnItemClickListener(bItemClickListener);
+				contentList.setOnItemClickListener(bItemClickListener);
+				
+				
+				
 
-				registerForContextMenu(deviceList);
 			}
 		});
 
@@ -397,6 +408,13 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	public void deviceUpdated(Device<?, ?, ?> device) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		Toast toast = Toast.makeText(getApplicationContext(), "Long click", Toast.LENGTH_SHORT);
+		toast.show();
+		return true;
 	}
 
 }
