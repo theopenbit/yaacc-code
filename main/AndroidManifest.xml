@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<!--
  *
  * Copyright (C) 2013 www.yaacc.de 
  *
@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- -->
- 
+-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.yaacc"
     android:versionCode="1"
@@ -96,38 +96,47 @@
         <activity
             android:name="de.yaacc.player.MusicPlayerActivity"
             android:label="@string/title_activity_music_player" >
-             <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-         <activity
+        <activity
             android:name="de.yaacc.player.AVTransportPlayerActivity"
             android:label="@string/title_activity_avtransport_player" >
-             <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-         <activity
+        <activity
             android:name="de.yaacc.player.MultiContentPlayerActivity"
             android:label="@string/title_activity_multi_content_player" >
-             <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> 
+        </activity>
         <activity
             android:name="de.yaacc.util.AboutActivity"
             android:label="@string/yaacc_about" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="de.yaacc.upnp.server.YaaccUpnpServerControlActivity"
+            android:label="@string/title_activity_yaacc_upnp_server_control" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

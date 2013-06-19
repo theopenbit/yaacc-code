@@ -64,6 +64,8 @@ import org.teleal.cling.support.model.ProtocolInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
 
 import android.app.ActivityManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Service;
 import android.content.Context;
@@ -73,10 +75,13 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseActivity;
+import de.yaacc.player.AVTransportPlayerActivity;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * A simple local upnpserver implementation. This class encapsulate the creation
@@ -88,7 +93,7 @@ import de.yaacc.upnp.UpnpClient;
 public class YaaccUpnpServerService extends Service {
 
 	public static int PORT = 4711;
-	
+
 	private LocalDevice localServer;
 
 	// make preferences available for the whole service, since there might be
@@ -130,7 +135,7 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@Override
 	public void onStart(Intent intent, int startid) {
-		
+
 		// when the service starts, the preferences are initialized
 		preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -151,24 +156,60 @@ public class YaaccUpnpServerService extends Service {
 			}
 		});
 		initializationThread.start();
+		showNotification();
 		Log.d(this.getClass().getName(), "End On Start");
+		
 	}
-	
+
 	@Override
-	public void onDestroy(){
+	public void onDestroy() {
 		Log.d(this.getClass().getName(), "Destroying the service");
-		BrowseActivity.uClient.localDeviceRemoved(BrowseActivity.uClient.getRegistry(), localServer);
+		BrowseActivity.uClient.localDeviceRemoved(
+				BrowseActivity.uClient.getRegistry(), localServer);
 		localServer = null;
+		cancleNotification();
 		super.onDestroy();
 	}
-	
 
+	/**
+	 * Displays the notification.
+	 */
+	private void showNotification(){	
+		Intent notificationIntent = new Intent(this,
+				YaaccUpnpServerControlActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+			    notificationIntent, 0); 
+	    NotificationCompat.Builder mBuilder =
+	            new NotificationCompat.Builder(this)
+	    		.setOngoing(true)
+	            .setSmallIcon(R.drawable.ic_launcher)
+	            .setContentTitle("Yaacc Upnp Server" )
+	            .setContentText(preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key),""));	   
+	    mBuilder.setContentIntent(contentIntent);
+	    NotificationManager mNotificationManager =
+	    	    (NotificationManager) getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.notify(NotificationId.UPNP_SERVER.getId(), mBuilder.build());
+	}
+	
+	/**
+	 *  Cancels the notification.  
+	 */
+	private void cancleNotification() {
+		NotificationManager mNotificationManager =
+	    	    (NotificationManager) getSystemService(Context
+	    	    		.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.cancel(NotificationId.UPNP_SERVER.getId());
+		
+	}
+	
 	/**
 	 * 
 	 */
 	private void initialize() {
-		
-			
+
 		if (!upnpClient.isInitialized()) {
 			upnpClient.initialize(getApplicationContext());
 			watchdog = false;
@@ -185,7 +226,7 @@ public class YaaccUpnpServerService extends Service {
 			}
 		}
 		if (upnpClient.isInitialized()) {
-			if (localServer == null){
+			if (localServer == null) {
 				localServer = createDevice();
 			}
 			upnpClient.getRegistry().addDevice(localServer);
@@ -196,12 +237,15 @@ public class YaaccUpnpServerService extends Service {
 		// Create a HttpService for providing content in the network.
 		try {
 			new RequestListenerThread(getApplicationContext()).start();
-		} catch (BindException e){
+		} catch (BindException e) {
 			Log.w(this.getClass().getName(), "Server already running");
-		} catch (IOException e) {		
-			//FIXME Ignored right error handling on rebind needed 
-			Log.w(this.getClass().getName(), "ContentProvider can not be initialized!", e);
-				//throw new IllegalStateException("ContentProvider can not be initialized!", e);		
+		} catch (IOException e) {
+			// FIXME Ignored right error handling on rebind needed
+			Log.w(this.getClass().getName(),
+					"ContentProvider can not be initialized!", e);
+			// throw new
+			// IllegalStateException("ContentProvider can not be initialized!",
+			// e);
 		}
 
 	}
@@ -215,23 +259,31 @@ public class YaaccUpnpServerService extends Service {
 		LocalDevice device;
 		String versionName;
 		try {
-			 versionName = getApplicationContext().getPackageManager()
-				    .getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+			versionName = getApplicationContext()
+					.getPackageManager()
+					.getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			versionName = "0.1";
 		}
 		try {
-			device = new LocalDevice(
-					new DeviceIdentity(new UDN(UDN_ID)),
+			device = new LocalDevice(new DeviceIdentity(new UDN(UDN_ID)),
 					new UDADeviceType("MediaServer"),
-					// Used for shown name: first part of ManufactDet, first part of ModelDet and version number
-					new DeviceDetails("YAACC - MediaServer", new ManufacturerDetails(
-							"yaacc.de", "www.yaacc.de"), new ModelDetails(
-									preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "MediaServer"),
-							"Free Android UPnP AV MediaServer, GNU GPL", versionName)),
-					createServices());
+					// Used for shown name: first part of ManufactDet, first
+					// part of ModelDet and version number
+					new DeviceDetails(
+							"YAACC - MediaServer",
+							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
+							new ModelDetails(
+									preferences
+											.getString(
+													getApplicationContext()
+															.getString(
+																	R.string.settings_local_server_name_key),
+													"MediaServer"),
+									"Free Android UPnP AV MediaServer, GNU GPL",
+									versionName)), createServices());
 
 			return device;
 		} catch (ValidationException e) {
@@ -248,8 +300,16 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	private LocalService<?>[] createServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
-		services.add(createAVTransportService());
-		services.add(createContentDirectoryService());
+		if (preferences.getBoolean(
+				getApplicationContext().getString(
+						R.string.settings_local_server_receiver_chkbx), false)) {
+			services.add(createAVTransportService());
+		}
+		if (preferences.getBoolean(
+				getApplicationContext().getString(
+						R.string.settings_local_server_provider_chkbx), false)) {
+			services.add(createContentDirectoryService());
+		}
 		services.add(createConnectionManagerService());
 		return services.toArray(new LocalService[] {});
 	}
@@ -400,7 +460,8 @@ public class YaaccUpnpServerService extends Service {
 		private BasicHttpParams params;
 		private HttpService httpService;
 
-		public RequestListenerThread(Context context) throws IOException, BindException {
+		public RequestListenerThread(Context context) throws IOException,
+				BindException {
 			serversocket = new ServerSocket(PORT);
 			params = new BasicHttpParams();
 			params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000)
@@ -472,8 +533,9 @@ public class YaaccUpnpServerService extends Service {
 			Log.d(getClass().getName(), "New connection thread");
 			try {
 				Log.d(getClass().getName(), "conn.isOpen(): " + conn.isOpen());
-				Log.d(getClass().getName(), "!Thread.interrupted(): " + !Thread.interrupted());
-				while (!Thread.interrupted() && conn.isOpen()) {					
+				Log.d(getClass().getName(),
+						"!Thread.interrupted(): " + !Thread.interrupted());
+				while (!Thread.interrupted() && conn.isOpen()) {
 					HttpContext context = new BasicHttpContext();
 					httpservice.handleRequest(conn, context);
 				}
@@ -490,21 +552,28 @@ public class YaaccUpnpServerService extends Service {
 					conn.shutdown();
 				} catch (IOException ignore) {
 					// ignore it
-					Log.d(getClass().getName(), "Error closing connection: ", ignore);
+					Log.d(getClass().getName(), "Error closing connection: ",
+							ignore);
 				}
 
 			}
 		}
 
 	}
-	
+
 	private boolean isYaaccUpnpServerServiceRunning() {
-	    ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-	        if (this.getClass().getName().equals(service.service.getClassName())) {
-	            return true;
-	        }
-	    }
-	    return false;
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager
+				.getRunningServices(Integer.MAX_VALUE)) {
+			if (this.getClass().getName()
+					.equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
+	
+	
+
+
 }
