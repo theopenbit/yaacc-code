@@ -53,8 +53,6 @@ import de.yaacc.util.AboutActivity;
 public class BrowseActivity extends Activity implements OnClickListener, OnLongClickListener,
 		UpnpClientListener {
 
-	private boolean displayingSomething = false;
-
 	public static UpnpClient uClient = null;
 
 	private BrowseItemAdapter bItemAdapter;
@@ -147,7 +145,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		// add ourself as listener
 		uClient.addUpnpClientListener(this);
 
-		if (!displayingSomething) {
+		if (currentlyShowingDevices()) {
 			//showMainFolder();
 			populateItemList();
 
@@ -196,8 +194,6 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 		if (providerDevice != null) {
 			populateItemList(providerDevice);
-
-			displayingSomething = true;
 
 		} else {
 
@@ -388,7 +384,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 	@Override
 	public void deviceAdded(Device<?, ?, ?> device) {
-		if (!displayingSomething) {
+		if (currentlyShowingDevices()) {
 			// showMainFolder();
 			populateItemList();
 		}
@@ -398,7 +394,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	@Override
 	public void deviceRemoved(Device<?, ?, ?> device) {
 		Log.d(this.getClass().toString(), "device removal called");
-		if (!displayingSomething) {
+		if (currentlyShowingDevices()) {
 			// showMainFolder();
 			populateItemList();
 		}
@@ -416,6 +412,13 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		Toast toast = Toast.makeText(getApplicationContext(), "Long click", Toast.LENGTH_SHORT);
 		toast.show();
 		return true;
+	}
+	
+	public boolean currentlyShowingDevices(){
+		if ("-1".equals(this.uClient.getCurrentObjectId()) || null == this.uClient.getCurrentObjectId())	{
+			return true;
+		}
+		return false;
 	}
 
 }
