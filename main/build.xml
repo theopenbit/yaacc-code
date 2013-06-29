@@ -46,6 +46,9 @@
          -->
     <property file="ant.properties" />
 
+    <!-- Added for storing keystore information -->
+    <property file="signing.properties" />
+
     <!-- The project.properties file is created and updated by the 'android'
          tool, as well as ADT.
 
