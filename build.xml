@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <project name="yaacc" default="all" basedir=".">
-  <target name="all">
+  <target name="AppRelease">
     <ant dir="main" target="release"/>
   </target>
+ <target name="AppDebug">
+    <ant dir="main" target="debug"/>
+ </target>
+
 </project>
