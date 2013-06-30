@@ -347,7 +347,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				// Define where to show the folder contents
 				ListView deviceList = (ListView) findViewById(R.id.itemList);
 
-				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(uClient.getDevices()));
+				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(uClient.getDevicesProvidingContentDirectoryService()));
 				
 				deviceList.setAdapter(bDeviceAdapter);
 
