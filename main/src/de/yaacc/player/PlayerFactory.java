@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import android.preference.PreferenceManager;
@@ -163,7 +164,9 @@ public class PlayerFactory {
 	 * Kill all Players
 	 */
 	public static void shutdown() {
-		for (Player player : currentPlayers) {
+		HashSet<Player> players = new HashSet<Player>();
+		players.addAll(currentPlayers);
+		for (Player player : players) {
 			shutdown(player);
 		}
 		
