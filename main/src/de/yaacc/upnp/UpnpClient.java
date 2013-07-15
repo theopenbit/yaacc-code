@@ -275,9 +275,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
 		Log.d(getClass().getName(),
 				"localDeviceRemoved: " + localdevice.getDisplayString());
-		if (localdevice != null){
-			this.getRegistry().removeDevice(localdevice);
+		Registry currentRegistry = this.getRegistry();
+		if (localdevice != null && currentRegistry != null){
 			this.deviceRemoved(localdevice);
+			this.getRegistry().removeDevice(localdevice);
 		}
 
 	}
