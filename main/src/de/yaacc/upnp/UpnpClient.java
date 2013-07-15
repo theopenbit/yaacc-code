@@ -36,7 +36,6 @@ import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.types.DeviceType;
 import org.teleal.cling.model.types.ServiceId;
 import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDAServiceType;
@@ -53,7 +52,6 @@ import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.SortCriterion;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
-import org.teleal.common.util.MimeType;
 
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -72,7 +70,6 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
-import de.yaacc.player.AVTransportPlayer;
 import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
@@ -278,8 +275,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
 		Log.d(getClass().getName(),
 				"localDeviceRemoved: " + localdevice.getDisplayString());
-		this.getRegistry().removeDevice(localdevice);
-		this.deviceRemoved(localdevice);
+		if (localdevice != null){
+			this.getRegistry().removeDevice(localdevice);
+			this.deviceRemoved(localdevice);
+		}
 
 	}
 
