@@ -24,8 +24,6 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 
 	public BrowseDeviceAdapter(Context ctx, LinkedList <Device> devices) {
 		super();
-
-		BrowseActivity.uClient.storeNewVisitedObjectId("-1");
 		
 		this.devices = devices;
 

@@ -68,6 +68,8 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.browser.Navigator;
+import de.yaacc.browser.Position;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.player.PlayableItem;
@@ -92,7 +94,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private Set<Device> knownDevices = new HashSet<Device>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
-	private LinkedList<String> visitedObjectIds;
+	private Navigator navigator;
+	// private LinkedList<String> visitedObjectIds;
 	SharedPreferences preferences;
 
 	public UpnpClient() {
@@ -110,13 +113,17 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		this.context = context;
 		this.preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		this.visitedObjectIds = new LinkedList<String>();
+		this.navigator = new Navigator();
 
 		// FIXME check if this is right: Context.BIND_AUTO_CREATE kills the
 		// service after closing the activity
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
 
+	}
+	
+	public Navigator getNavigator(){
+		return this.navigator;
 	}
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
@@ -595,6 +602,19 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return browseSync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*",
 				0L, null, new SortCriterion[0]);
 	}
+	
+	/**
+	 * Browse ContenDirctory synchronous
+	 * 
+	 * @param Position
+	 *            the device and object to be browsed
+	 * @return the browsing result
+	 */
+	public ContentDirectoryBrowseResult browseSync(Position pos) {
+		
+		return browseSync(pos.getCurrentDevice(), pos.getCurrentObjectId(), BrowseFlag.DIRECT_CHILDREN, "*",
+				0L, null, new SortCriterion[0]);
+	}
 
 	/**
 	 * Browse ContenDirctory synchronous
@@ -618,6 +638,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
 			String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
+		navigator.addNewPosition(device,objectID);
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		if (device == null) {
 			return result;
@@ -930,28 +951,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return this.getDevice(getProviderDeviceId());
 
 	}
-
-	public String getLastVisitedObjectId() {
-		if (visitedObjectIds != null && !visitedObjectIds.isEmpty()) {
-			this.visitedObjectIds.removeLast();
-		}
-		if (visitedObjectIds == null || visitedObjectIds.isEmpty()) {
-			return "-1";
-		}
-		return this.visitedObjectIds.pollLast();
-	}
-
-
-	
-	public void storeNewVisitedObjectId(String newVisitedObjectId) {
-
-		this.visitedObjectIds.addLast(newVisitedObjectId);
-	}
-
-	public String getCurrentObjectId() {
-		return this.visitedObjectIds.peekLast();
-	}
-
 
 
 	

@@ -78,11 +78,11 @@ public class BrowseItemClickListener implements OnItemClickListener{
 		if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
 			    		BrowseActivity.uClient.initializePlayer(selectedDIDLObject).play();
     	} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
-			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemted)", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);
     		toast.show();
 			
 		} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))){
-			Toast toast2 = Toast.makeText(applicationContext, "download pressed (Not yet implemted)", Toast.LENGTH_SHORT);
+			Toast toast2 = Toast.makeText(applicationContext, "download pressed (Not yet implemented)", Toast.LENGTH_SHORT);
     		toast2.show();
 			
 		} else {

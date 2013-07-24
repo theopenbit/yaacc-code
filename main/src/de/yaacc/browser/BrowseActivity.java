@@ -145,6 +145,8 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		// add ourself as listener
 		uClient.addUpnpClientListener(this);
 
+		
+		
 		if (currentlyShowingDevices()) {
 			//showMainFolder();
 			populateItemList();
@@ -244,10 +246,10 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	@Override
 	public void onBackPressed() {
 
-		// FIXME: Since there are now some magic values in here, they should be removed...
-		if ("0".equals(this.uClient.getCurrentObjectId())) {
+		Navigator nav = this.uClient.getNavigator();
+		if (nav.isLevelDeviceRoot()) {
 			populateItemList();
-		} else if ("-1".equals(this.uClient.getCurrentObjectId())){
+		} else if (nav.isLevelDeviceOverview()){
 			uClient.shutdown();
 			super.finish();
 		} else {
@@ -255,7 +257,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 			final ListView itemList = (ListView) findViewById(R.id.itemList);
 	
 			bItemAdapter = new BrowseItemAdapter(this,
-					this.uClient.getLastVisitedObjectId());
+					this.uClient.getNavigator().getLastPosition());
 			itemList.setAdapter(bItemAdapter);
 	
 			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
@@ -415,10 +417,14 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 	
 	public boolean currentlyShowingDevices(){
-		if ("-1".equals(this.uClient.getCurrentObjectId()) || null == this.uClient.getCurrentObjectId())	{
+		if (this.uClient.getNavigator().isLevelDeviceOverview())	{
 			return true;
 		}
 		return false;
 	}
+	
+	
+	
+	
 
 }
