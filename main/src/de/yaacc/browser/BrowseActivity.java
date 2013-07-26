@@ -115,15 +115,25 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 			}
 		});
+		
+		ImageButton btnDev = (ImageButton) findViewById(R.id.controlDevices);
+		btnDev.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				populateItemList();				
+			}
+		});
 
 		ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
 		btnStop.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+				populateItemList();
 				if(PlayerFactory.getCurrentPlayers().size() > 0){
-				    Player player = PlayerFactory.getCurrentPlayers().get(0);
-				    player.stop();
+				   Player player = PlayerFactory.getCurrentPlayers().get(0);
+				  player.stop();
 				}
 				// FIXME: uClient.playbackStop();
 				// FIXME: ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);

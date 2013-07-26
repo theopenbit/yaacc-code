@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<!--
  *
  * Copyright (C) 2013 www.yaacc.de 
  *
@@ -16,45 +16,56 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- -->
+-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-	<ListView
+    <ListView
         android:id="@+id/itemList"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/controls"/>
-    
-    <RelativeLayout android:id="@+id/controls" 
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/controls" />
+
+    <RelativeLayout
+        android:id="@+id/controls"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        
-        <ImageButton android:id="@+id/controlPrev"
-        android:contentDescription="@string/browse_button_prev"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:src="@drawable/player_play"
-        android:layout_toLeftOf="@+id/controlStop"/>
-        
-        <ImageButton android:id="@+id/controlStop"
-        android:contentDescription="@string/browse_button_stop"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:src="@drawable/player_stop"
-        android:layout_centerHorizontal="true"/>
-        
-        <ImageButton android:id="@+id/controlNext"
-        android:contentDescription="@string/browse_button_next"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:src="@drawable/refresh"
-        android:layout_toRightOf="@+id/controlStop"/>
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/controlDevices"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/controlPrev"
+            android:contentDescription="@string/browse_button_devices"
+            android:src="@drawable/device_48_48" />
+
+        <ImageButton
+            android:id="@+id/controlPrev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/controlStop"
+            android:contentDescription="@string/browse_button_prev"
+            android:src="@drawable/player_play" />
+
+        <ImageButton
+            android:id="@+id/controlStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/browse_button_stop"
+            android:src="@drawable/player_stop" />
+
+        <ImageButton
+            android:id="@+id/controlNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/controlStop"
+            android:contentDescription="@string/browse_button_next"
+            android:src="@drawable/refresh" />
     </RelativeLayout>
-    
 
 </RelativeLayout>
