@@ -23,7 +23,7 @@
         android:id="@+id/menu_previous"
         android:icon="@drawable/player_start"
         android:orderInCategory="110"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/previous"/>
     <item
         android:id="@+id/menu_play"
