@@ -161,14 +161,24 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		uClient.addUpnpClientListener(this);
 
 		
-		
 		if (currentlyShowingDevices()) {
 			//showMainFolder();
 			populateItemList();
 
+		} else {
+			
+			showMainFolder();
 		}
 		
 		
+	}
+	
+	private SharedPreferences getPrefereces(){
+		if (preferences == null){
+			preferences = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext());
+		}
+		return preferences;
 	}
 	
 	@Override
@@ -401,8 +411,22 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	@Override
 	public void deviceAdded(Device<?, ?, ?> device) {
 		if (currentlyShowingDevices()) {
-			// showMainFolder();
-			populateItemList();
+			preferences = getPrefereces();
+			Device formerDevice = null;
+			if (preferences.getString(
+					getString(R.string.settings_selected_provider_title), null) != null) {
+				formerDevice = uClient
+						.getDevice(preferences
+								.getString(
+										getString(R.string.settings_selected_provider_title),
+										null));
+			}
+			
+			if(formerDevice != null && device.equals(formerDevice)){
+				showMainFolder();
+			} else {
+				populateItemList();
+			}
 		}
 
 	}
