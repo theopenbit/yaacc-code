@@ -55,8 +55,13 @@ public class Navigator {
 		Position last = navigationPath.get(listSize - POS_JUMP_TWO);
 		this.moveTo(last.getCurrentDevice(), last.getCurrentObjectId());
 	}
-	
+
 	public void addNewPosition(Position pos){
+		navigationPath.add(pos);
+	}
+	
+	public void addNewPositionOnSameDevice(String objectId){
+		Position pos = new Position(objectId, navigationPath.peekLast().getCurrentDevice());
 		navigationPath.add(pos);
 	}
 	

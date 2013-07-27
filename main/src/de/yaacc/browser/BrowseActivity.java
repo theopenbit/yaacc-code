@@ -69,9 +69,14 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 	protected ListView contentList;
 	
+	private static Navigator navigator = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		navigator = new Navigator();
+		
 		setContentView(R.layout.activity_browse);
 
 		// local server startup
@@ -256,10 +261,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	@Override
 	public void onBackPressed() {
 
-		Navigator nav = this.uClient.getNavigator();
-		if (nav.isLevelDeviceRoot()) {
+		if (navigator.isLevelDeviceRoot()) {
 			populateItemList();
-		} else if (nav.isLevelDeviceOverview()){
+		} else if (navigator.isLevelDeviceOverview()){
 			uClient.shutdown();
 			super.finish();
 		} else {
@@ -267,7 +271,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 			final ListView itemList = (ListView) findViewById(R.id.itemList);
 	
 			bItemAdapter = new BrowseItemAdapter(this,
-					this.uClient.getNavigator().getLastPosition());
+					navigator.getLastPosition());
 			itemList.setAdapter(bItemAdapter);
 	
 			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
@@ -427,12 +431,15 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 	
 	public boolean currentlyShowingDevices(){
-		if (this.uClient.getNavigator().isLevelDeviceOverview())	{
+		if (navigator.isLevelDeviceOverview())	{
 			return true;
 		}
 		return false;
 	}
 	
+	public static Navigator getNavigator(){
+		return navigator;
+	}
 	
 	
 	

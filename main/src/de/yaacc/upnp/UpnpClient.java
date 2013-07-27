@@ -93,8 +93,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private Set<Device> knownDevices = new HashSet<Device>();
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
-	private Navigator navigator;
-	// private LinkedList<String> visitedObjectIds;
 	SharedPreferences preferences;
 
 	public UpnpClient() {
@@ -112,8 +110,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		this.context = context;
 		this.preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		this.navigator = new Navigator();
-
+		
 		// FIXME check if this is right: Context.BIND_AUTO_CREATE kills the
 		// service after closing the activity
 		return context.bindService(new Intent(context,
@@ -121,10 +118,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	}
 	
-	public Navigator getNavigator(){
-		return this.navigator;
-	}
-
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
 		fireDeviceAdded(device);
 	}
@@ -637,7 +630,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
 			String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
-		navigator.addNewPosition(device,objectID);
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		if (device == null) {
 			return result;

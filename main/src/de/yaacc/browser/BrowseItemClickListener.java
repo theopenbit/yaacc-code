@@ -2,6 +2,7 @@ package de.yaacc.browser;
 
 import java.util.ArrayList;
 
+import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 
@@ -37,6 +38,8 @@ public class BrowseItemClickListener implements OnItemClickListener{
 			String newObjectId = currentObject.getId() == null ? "0" : adapter
 					.getFolder(position).getId();
 
+			BrowseActivity.getNavigator().addNewPositionOnSameDevice(newObjectId);
+			
 			BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
 					listView.getContext(), newObjectId);
 			a.setAdapter(bItemAdapter);
