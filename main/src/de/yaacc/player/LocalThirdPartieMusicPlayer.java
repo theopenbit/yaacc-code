@@ -33,6 +33,7 @@ import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.NotificationId;
 
 /**
  * A Player for local music playing
@@ -152,6 +153,27 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 		}
 	}	
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+	 */
+	@Override
+	protected PendingIntent getNotificationIntent(){
+		Intent notificationIntent = new Intent(getContext(),
+			    ThirdPartieMusicPlayerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+			    notificationIntent, 0);
+			return contentIntent;
+	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
+	 */
+	@Override
+	protected int getNotificationId() {
+		 
+		return NotificationId.LOCAL_THIRD_PARTIE_MUSIC_PLAYER.getId();
+	}
 
 }

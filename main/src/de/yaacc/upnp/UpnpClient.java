@@ -789,6 +789,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
 		Player result=null;
 		if(avTransportPlayers != null && avTransportPlayers.size() > 0){
+		
 			result = avTransportPlayers.get(0);
 		}
 		return result;

@@ -88,13 +88,13 @@
 
      <ImageView
          android:id="@+id/thirdPratieMusicActivityImageView"
-         android:contentDescription="@string/musicActivityImageView"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_above="@+id/thirdPratieMusicActivityControls"
+         android:layout_above="@+id/thirdPartieMusicActivityControls"
          android:layout_alignParentLeft="true"
          android:layout_alignParentRight="true"
          android:layout_alignParentTop="true"
+         android:contentDescription="@string/musicActivityImageView"
          android:src="@drawable/cdtrack" />
 
 </RelativeLayout>

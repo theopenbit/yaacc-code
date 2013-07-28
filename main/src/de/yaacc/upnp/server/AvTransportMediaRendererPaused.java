@@ -69,7 +69,6 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
 	@Override
 	public Class<? extends AbstractState> setTransportURI(URI uri, String metaData) {
 		Log.d(this.getClass().getName(), "setTransportURI");
-		Log.d(this.getClass().getName(), "setTransportURI");
 		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));
 		// If you can, you should find and set the duration of the track here!
 		getTransport().setPositionInfo(
