@@ -32,27 +32,27 @@ import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
 
 /**
- * A multi content player activity based on the multi content player.
+ * A music player activity based on a background music service.
  * 
  * @author Tobias Schoene (openbit)
  * 
  */
-public class MultiContentPlayerActivity extends Activity {
+public class ThirdPartieMusicPlayerActivity extends Activity {
+
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_multi_content_player);
+		setContentView(R.layout.activity_third_partie_music_player);
 		// initialize buttons
-
 		Player player = getPlayer();
-
-		ImageButton btnPrev = (ImageButton) findViewById(R.id.multiContentPlayerActivityControlPrev);
-		ImageButton btnNext = (ImageButton) findViewById(R.id.multiContentPlayerActivityControlNext);
-		ImageButton btnStop = (ImageButton) findViewById(R.id.multiContentPlayerActivityControlStop);
-		ImageButton btnPlay = (ImageButton) findViewById(R.id.multiContentPlayerActivityControlPlay);
-		ImageButton btnPause = (ImageButton) findViewById(R.id.multiContentPlayerActivityControlPause);
-		ImageButton btnExit = (ImageButton) findViewById(R.id.multiContentPlayerActivityControlExit);
+		ImageButton btnPrev = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPrev);
+		ImageButton btnNext = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlNext);
+		ImageButton btnStop = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlStop);
+		ImageButton btnPlay = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPlay);
+		ImageButton btnPause = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPause);
+		ImageButton btnExit = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlExit);
 		if (player == null) {
 			btnPrev.setActivated(false);
 			btnNext.setActivated(false);
@@ -129,23 +129,22 @@ public class MultiContentPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-					player.exit();
+					player.exit();					
 				}
 				finish();
-
 			}
 		});
 	}
 
-	private Player getPlayer() {
+	private Player getPlayer() {		
 		return PlayerFactory
-				.getFirstCurrentPlayerOfType(MultiContentPlayer.class);		
+				.getFirstCurrentPlayerOfType(LocalThirdPartieMusicPlayer.class);		
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_multi_content_player, menu);
+		getMenuInflater().inflate(R.menu.activity_third_partie_music_player, menu);
 
 		return true;
 	}
@@ -159,10 +158,9 @@ public class MultiContentPlayerActivity extends Activity {
 			return true;
 		case R.id.yaacc_about:
 			AboutActivity.showAbout(this);
-			return true;				
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
 }

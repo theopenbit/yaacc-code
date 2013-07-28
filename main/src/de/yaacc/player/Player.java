@@ -87,6 +87,12 @@ public interface Player {
 	 * Exit the player.
 	 */
 	void exit();
+	
+	/**
+	 * Returns the id of the Player.
+	 * @return the id
+	 */
+	int getId();
 
 	
 }

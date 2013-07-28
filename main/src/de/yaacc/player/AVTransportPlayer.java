@@ -43,6 +43,9 @@ import de.yaacc.util.NotificationId;
 public class AVTransportPlayer extends AbstractPlayer {
 
 	
+	public static final String PLAYER_ID = "PlayerId";
+	
+
 	/**
 	 * @param context
 	 * @param name playerName
@@ -245,9 +248,10 @@ public class AVTransportPlayer extends AbstractPlayer {
 	protected PendingIntent getNotificationIntent(){
 		Intent notificationIntent = new Intent(getContext(),
 			    AVTransportPlayerActivity.class);
-			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
-			    notificationIntent, 0);
-			return contentIntent;
+		notificationIntent.putExtra(PLAYER_ID, getNotificationId());
+		PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+		    notificationIntent, 0);
+		return contentIntent;
 	}
 	
 	/*
@@ -257,7 +261,7 @@ public class AVTransportPlayer extends AbstractPlayer {
 	@Override
 	protected int getNotificationId() {
 		 
-		return NotificationId.AVTRANSPORT_PLAYER.getId();
+		return NotificationId.AVTRANSPORT_PLAYER.getId() + getName().hashCode();
 	}
 	
 	/* (non-Javadoc)

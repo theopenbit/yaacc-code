@@ -40,13 +40,15 @@ import de.yaacc.util.AboutActivity;
 public class AVTransportPlayerActivity extends Activity {
 
 	private Player player;
+	private int playerId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_avtransport_player);
 		// initialize buttons
-
+		playerId = getIntent().getIntExtra(AVTransportPlayer.PLAYER_ID, -1);
+		
 		Player player = getPlayer();
 		ImageButton btnPrev = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPrev);
 		ImageButton btnNext = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlNext);
@@ -138,18 +140,23 @@ public class AVTransportPlayerActivity extends Activity {
 		});
 	}
 
+	
+
+
+
 	private Player getPlayer() {
-		Player player = null;
+		Player result = null;
 		List<Player> players = PlayerFactory
 				.getCurrentPlayersOfType(AVTransportPlayer.class);
-		if (players != null && players.size() == 1) { // assume that there
-														// is only one
-														// background music
-														// player on this
-														// device
-			player = players.get(0);
+		if (players != null) { // assume that there
+			for (Player player : players) {
+				if(player.getId() == playerId){
+					result = player;
+					break;
+				}
+			}			
 		}
-		return player;
+		return result;
 	}
 
 	@Override

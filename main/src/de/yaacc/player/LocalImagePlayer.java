@@ -306,7 +306,7 @@ public class LocalImagePlayer implements Player {
 
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				context)
-				.setOngoing(true)
+				.setOngoing(false)
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle(
 						"Yaacc player " + (getName() == null ? "" : getName()));
@@ -355,5 +355,15 @@ public class LocalImagePlayer implements Player {
 
 		return NotificationId.LOCAL_IMAGE_PLAYER.getId();
 	}
+
+	/* (non-Javadoc)
+	 * @see de.yaacc.player.Player#getId()
+	 */
+	@Override
+	public int getId() {		
+		return getNotificationId();
+	}
+	
+	
 
 }

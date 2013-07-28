@@ -136,18 +136,9 @@ public class MusicPlayerActivity extends Activity {
 		});
 	}
 
-	private Player getPlayer() {
-		Player player = null;
-		List<Player> players = PlayerFactory
-				.getCurrentPlayersOfType(LocalBackgoundMusicPlayer.class);
-		if (players != null && players.size() == 1) { // assume that there
-														// is only one
-														// background music
-														// player on this
-														// device
-			player = players.get(0);
-		}
-		return player;
+	private Player getPlayer() {		
+		return PlayerFactory
+				.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);		
 	}
 
 	@Override
