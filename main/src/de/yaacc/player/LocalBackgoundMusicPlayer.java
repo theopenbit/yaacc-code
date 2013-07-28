@@ -118,7 +118,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 				getContext().sendBroadcast(intent);
 
 			}
-		}, 1000L);
+		}, 300L);
 
 	}
 

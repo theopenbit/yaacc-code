@@ -19,7 +19,6 @@
 package de.yaacc.upnp.server;
 
 import java.net.URI;
-import java.util.List;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.avtransport.impl.state.Stopped;
@@ -30,9 +29,7 @@ import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.SeekMode;
 
 import android.util.Log;
-import de.yaacc.player.AVTransportPlayer;
 import de.yaacc.player.Player;
-import de.yaacc.player.PlayerFactory;
 import de.yaacc.upnp.UpnpClient;
 
 /**

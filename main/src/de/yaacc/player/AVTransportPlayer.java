@@ -22,6 +22,7 @@ import java.util.TimerTask;
 
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.support.avtransport.callback.Pause;
 import org.teleal.cling.support.avtransport.callback.Play;
@@ -31,7 +32,6 @@ import org.teleal.cling.support.avtransport.callback.Stop;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
-import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 
@@ -44,6 +44,7 @@ public class AVTransportPlayer extends AbstractPlayer {
 
 	
 	public static final String PLAYER_ID = "PlayerId";
+	private String deviceId="";
 	
 
 	/**
@@ -53,7 +54,12 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 */
 	public AVTransportPlayer(UpnpClient upnpClient, String name) {		
 		this(upnpClient);
+		deviceId = upnpClient.getReceiverDeviceId();
 		setName(name);
+	}
+	
+	private Device<?, ?, ?> getDevice(){
+		return getUpnpClient().getDevice(deviceId);
 	}
 	
 	/**
@@ -69,11 +75,17 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected void stopItem(PlayableItem playableItem) {
-		Service<?, ?> service = getUpnpClient().getAVTransportService(getUpnpClient().getReceiverDevice());
+		if(getDevice() == null) {
+			Log.d(getClass().getName(),
+					"No receiver device found: "
+							+ deviceId);
+			return;
+		}
+		Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
 		if (service == null) {
 			Log.d(getClass().getName(),
 					"No AVTransport-Service found on Device: "
-							+ getUpnpClient().getReceiverDevice().getDisplayString());
+							+ getDevice().getDisplayString());
 			return;
 		}
 		Log.d(getClass().getName(), "Action SetAVTransportURI ");
@@ -121,7 +133,7 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected void startItem(PlayableItem playableItem, Object loadedItem) {
-		if (playableItem == null || getUpnpClient().getReceiverDevice() == null)
+		if (playableItem == null || getDevice() == null)
 			return;
 				
 		Log.d(getClass().getName(), "Uri: " + playableItem.getUri());
@@ -130,11 +142,11 @@ public class AVTransportPlayer extends AbstractPlayer {
 				"MimeType: " + playableItem.getMimeType());
 		
 		Log.d(getClass().getName(), "Title: " + playableItem.getTitle());
-		Service<?, ?> service = getUpnpClient().getAVTransportService(getUpnpClient().getReceiverDevice());
+		Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
 		if (service == null) {
 			Log.d(getClass().getName(),
 					"No AVTransport-Service found on Device: "
-							+ getUpnpClient().getReceiverDevice().getDisplayString());
+							+ getDevice().getDisplayString());
 			return;
 		}
 		Log.d(getClass().getName(), "Action SetAVTransportURI ");
@@ -270,11 +282,17 @@ public class AVTransportPlayer extends AbstractPlayer {
 	@Override
 	public void pause() {		
 		super.pause();
-		Service<?, ?> service = getUpnpClient().getAVTransportService(getUpnpClient().getReceiverDevice());
+		if(getDevice() == null) {
+			Log.d(getClass().getName(),
+					"No receiver device found: "
+							+ deviceId);
+			return;
+		}
+		Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
 		if (service == null) {
 			Log.d(getClass().getName(),
 					"No AVTransport-Service found on Device: "
-							+ getUpnpClient().getReceiverDevice().getDisplayString());
+							+getDevice().getDisplayString());
 			return;
 		}
 		Log.d(getClass().getName(), "Action Pause ");

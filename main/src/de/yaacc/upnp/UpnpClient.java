@@ -67,7 +67,6 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 import de.yaacc.R;
-import de.yaacc.browser.Navigator;
 import de.yaacc.browser.Position;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
@@ -110,14 +109,14 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		this.context = context;
 		this.preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		
+
 		// FIXME check if this is right: Context.BIND_AUTO_CREATE kills the
 		// service after closing the activity
 		return context.bindService(new Intent(context,
 				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
 
 	}
-	
+
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
 		fireDeviceAdded(device);
 	}
@@ -275,7 +274,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(),
 				"localDeviceRemoved: " + localdevice.getDisplayString());
 		Registry currentRegistry = this.getRegistry();
-		if (localdevice != null && currentRegistry != null){
+		if (localdevice != null && currentRegistry != null) {
 			this.deviceRemoved(localdevice);
 			this.getRegistry().removeDevice(localdevice);
 		}
@@ -328,8 +327,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return service;
 	}
-
-	
 
 	/**
 	 * Start an intent with Action.View;
@@ -594,7 +591,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return browseSync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*",
 				0L, null, new SortCriterion[0]);
 	}
-	
+
 	/**
 	 * Browse ContenDirctory synchronous
 	 * 
@@ -603,9 +600,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the browsing result
 	 */
 	public ContentDirectoryBrowseResult browseSync(Position pos) {
-		
-		return browseSync(pos.getCurrentDevice(), pos.getCurrentObjectId(), BrowseFlag.DIRECT_CHILDREN, "*",
-				0L, null, new SortCriterion[0]);
+
+		return browseSync(pos.getCurrentDevice(), pos.getCurrentObjectId(),
+				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
 	}
 
 	/**
@@ -715,8 +712,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 	}
 
-	
-	
 	/**
 	 * Returns a player instance initialized with the given didl object
 	 * 
@@ -724,12 +719,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
-	public Player initializePlayer(DIDLObject didlObject) {		
-		List<PlayableItem> playableItems = toPlayableItems(toItemList(didlObject));		
+	public Player initializePlayer(DIDLObject didlObject) {
+		List<PlayableItem> playableItems = toPlayableItems(toItemList(didlObject));
 		return PlayerFactory.createPlayer(this, playableItems);
 	}
 
-	
 	/**
 	 * Returns a player instance initialized with the given transport object
 	 * 
@@ -739,18 +733,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public Player initializePlayer(AVTransport transport) {
 		PlayableItem playableItem = new PlayableItem();
-		List<PlayableItem>items = new ArrayList<PlayableItem>();
-		if (transport == null)
-			return PlayerFactory.createPlayer(this, items); 
+		List<PlayableItem> items = new ArrayList<PlayableItem>();
+		if (transport == null) {
+			return PlayerFactory.createPlayer(this, items);
+		}
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
-		if (positionInfo == null)
+		if (positionInfo == null) {
 			return PlayerFactory.createPlayer(this, items);
+		}
 
 		playableItem.setTitle(positionInfo.getTrackMetaData());
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
-		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
-		playableItem.setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension));
+		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo
+				.getTrackURI());
+		playableItem.setMimeType(MimeTypeMap.getSingleton()
+				.getMimeTypeFromExtension(fileExtension));
 		items.add(playableItem);
 		Log.d(getClass().getName(),
 				"TransportUri: " + positionInfo.getTrackURI());
@@ -758,11 +756,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				"Current duration: " + positionInfo.getTrackDuration());
 		Log.d(getClass().getName(),
 				"TrackMetaData: " + positionInfo.getTrackMetaData());
-		Log.d(getClass().getName(),
-				"MimeType: " + playableItem.getMimeType());					
+		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
 		return PlayerFactory.createPlayer(this, items);
 	}
-	
+
 	/**
 	 * Returns the current player instance for the given transport object
 	 * 
@@ -772,9 +769,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public Player getCurrentPlayer(AVTransport transport) {
 		PlayableItem playableItem = new PlayableItem();
-		List<PlayableItem>items = new ArrayList<PlayableItem>();
+		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null)
-			return PlayerFactory.createPlayer(this, items); 
+			return PlayerFactory.createPlayer(this, items);
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
 		if (positionInfo == null)
@@ -782,41 +779,47 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 		playableItem.setTitle(positionInfo.getTrackMetaData());
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
-		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
-		String mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);		
-		Log.d(getClass().getName(),
-				"MimeType: " + playableItem.getMimeType());					
-		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
-		Player result=null;
-		if(avTransportPlayers != null && avTransportPlayers.size() > 0){
-		
+		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo
+				.getTrackURI());
+		String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+				fileExtension);
+		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
+		List<Player> avTransportPlayers = PlayerFactory
+				.getCurrentPlayersOfType(PlayerFactory
+						.getPlayerClassForMimeType(mimeType));
+		Player result = null;
+		if (avTransportPlayers != null && avTransportPlayers.size() > 0) {
+
 			result = avTransportPlayers.get(0);
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Convert cling items into playable items 
-	 * @param items the cling items
-	 * @return  the playable items
+	 * Convert cling items into playable items
+	 * 
+	 * @param items
+	 *            the cling items
+	 * @return the playable items
 	 */
-	private List<PlayableItem> toPlayableItems(List<Item> items){
+	private List<PlayableItem> toPlayableItems(List<Item> items) {
 		List<PlayableItem> playableItems = new ArrayList<PlayableItem>();
-		//FIXME: filter cover.jpg for testing purpose
+		// FIXME: filter cover.jpg for testing purpose
 		List<PlayableItem> coverImageItems = new ArrayList<PlayableItem>();
-		int audioItemsCount=0;
+		int audioItemsCount = 0;
 		for (Item item : items) {
 			PlayableItem playableItem = new PlayableItem();
 			playableItem.setTitle(item.getTitle());
 			Res resource = item.getFirstResource();
-			if(resource  != null) { 
+			if (resource != null) {
 				playableItem.setUri(Uri.parse(resource.getValue()));
-				playableItem.setMimeType(resource.getProtocolInfo().getContentFormat());
-				//FIXME: filter cover.jpg for testing purpose
-				if(playableItem.getMimeType().startsWith("audio")){
+				playableItem.setMimeType(resource.getProtocolInfo()
+						.getContentFormat());
+				// FIXME: filter cover.jpg for testing purpose
+				if (playableItem.getMimeType().startsWith("audio")) {
 					audioItemsCount++;
 				}
-				if(playableItem.getMimeType().startsWith("image")){
+				if (playableItem.getMimeType().startsWith("image")) {
 					coverImageItems.add(playableItem);
 				}
 				// calculate duration
@@ -824,9 +827,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				long millis = 10000; // 10 sec. default
 				if (resource.getDuration() != null) {
 					try {
-						Date date = dateFormat.parse(resource.getDuration());						
-						millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date
-								.getSeconds()) * 1000;
+						Date date = dateFormat.parse(resource.getDuration());
+						millis = (date.getHours() * 3600 + date.getMinutes()
+								* 60 + date.getSeconds()) * 1000;
 
 					} catch (ParseException e) {
 						Log.d(getClass().getName(), "bad duration format", e);
@@ -837,15 +840,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			}
 			playableItems.add(playableItem);
 		}
-		//FIXME: filter cover.jpg for testing purpose
-		//here comes the magic
-		if(audioItemsCount > 1 && coverImageItems.size() == 1){
-			//hope there is only one cover image
+		// FIXME: filter cover.jpg for testing purpose
+		// here comes the magic
+		if (audioItemsCount > 1 && coverImageItems.size() == 1) {
+			// hope there is only one cover image
 			playableItems.removeAll(coverImageItems);
 		}
 		return playableItems;
 	}
-	
+
 	/**
 	 * Converts the content of a didlObject into a list of cling items.
 	 * 
@@ -863,14 +866,16 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			}
 
 		} else if (didlObject instanceof Item) {
-			items.add((Item)didlObject);
+			items.add((Item) didlObject);
 		}
 		return items;
 	}
 
 	/**
 	 * load the content of the container.
-	 * @param container the container to be loaded
+	 * 
+	 * @param container
+	 *            the container to be loaded
 	 * @return the loaded content
 	 */
 	private DIDLContent loadContainer(Container container) {
@@ -885,16 +890,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return result.getResult();
 	}
 
-
-
-
 	/**
 	 * Gets the receiver ID, if none is defined the local device will be
 	 * returned
 	 * 
 	 * @return the receiverDeviceId
 	 */
-	public String getReceiverDeviceId() {		
+	public String getReceiverDeviceId() {
 		String receiver = preferences.getString(
 				context.getString(R.string.settings_selected_receiver_title),
 				null);
@@ -903,8 +905,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return receiver;
 	}
-	
-	
+
 	/**
 	 * @return the receiverDevice
 	 */
@@ -923,15 +924,16 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				context.getString(R.string.settings_selected_provider_title),
 				null);
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param provider
 	 */
-	public void setProviderDevice(Device provider){
+	public void setProviderDevice(Device provider) {
 		Editor prefEdit = preferences.edit();
-		prefEdit.putString(context.getString(R.string.settings_selected_provider_title), provider.getIdentity().getUdn().getIdentifierString());
+		prefEdit.putString(
+				context.getString(R.string.settings_selected_provider_title),
+				provider.getIdentity().getUdn().getIdentifierString());
 		prefEdit.apply();
 	}
 
@@ -944,8 +946,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	}
 
-
-	
 	/**
 	 * Check's whether local or remote playback is enabled
 	 * 
@@ -959,17 +959,18 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * Shutdown the upnp client and all players
 	 */
 	public void shutdown() {
-		//shutdown UpnpRegistry
-		boolean result = getContext().stopService(new Intent(context,
-				UpnpRegistryService.class));
-		Log.d(getClass().getName(), "Stopping UpnpRegistryService succsessful= " + result);
-		//shutdown yaacc server service 
-		result = getContext().stopService(new Intent(context,
-				YaaccUpnpServerService.class));
-		Log.d(getClass().getName(), "Stopping YaaccUpnpServerService succsessful= " + result);
-		//stop all players
+		// shutdown UpnpRegistry
+		boolean result = getContext().stopService(
+				new Intent(context, UpnpRegistryService.class));
+		Log.d(getClass().getName(),
+				"Stopping UpnpRegistryService succsessful= " + result);
+		// shutdown yaacc server service
+		result = getContext().stopService(
+				new Intent(context, YaaccUpnpServerService.class));
+		Log.d(getClass().getName(),
+				"Stopping YaaccUpnpServerService succsessful= " + result);
+		// stop all players
 		PlayerFactory.shutdown();
 	}
-
 
 }
