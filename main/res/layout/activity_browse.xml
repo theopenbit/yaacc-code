@@ -66,6 +66,16 @@
             android:layout_toRightOf="@+id/controlStop"
             android:contentDescription="@string/browse_button_next"
             android:src="@drawable/refresh" />
+
+        <ImageButton
+            android:id="@+id/controlReceiverDevices"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/controlNext"
+            android:contentDescription="@string/browse_button_devices"
+            android:src="@drawable/laptop_48_48" />
+
     </RelativeLayout>
 
 </RelativeLayout>

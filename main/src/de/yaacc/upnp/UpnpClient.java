@@ -18,6 +18,7 @@
  */
 package de.yaacc.upnp;
 
+import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,11 +32,22 @@ import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceConfiguration;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.controlpoint.ControlPoint;
+import org.teleal.cling.model.Namespace;
+import org.teleal.cling.model.ValidationException;
+import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.Device;
+import org.teleal.cling.model.meta.DeviceDetails;
+import org.teleal.cling.model.meta.DeviceIdentity;
+import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.meta.StateVariable;
+import org.teleal.cling.model.meta.UDAVersion;
+import org.teleal.cling.model.resource.Resource;
+import org.teleal.cling.model.types.DeviceType;
 import org.teleal.cling.model.types.ServiceId;
+import org.teleal.cling.model.types.ServiceType;
 import org.teleal.cling.model.types.UDAServiceId;
 import org.teleal.cling.model.types.UDAServiceType;
 import org.teleal.cling.model.types.UDN;
@@ -914,6 +926,18 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return this.getDevice(getReceiverDeviceId());
 
 	}
+	
+	/**
+	 * 
+	 * @param receiver
+	 */
+	public void setReceiverDevice(Device receiver) {
+		Editor prefEdit = preferences.edit();
+		prefEdit.putString(
+				context.getString(R.string.settings_selected_receiver_title),
+				receiver.getIdentity().getUdn().getIdentifierString());
+		prefEdit.apply();
+	}
 
 	/**
 	 * 
@@ -972,5 +996,99 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		// stop all players
 		PlayerFactory.shutdown();
 	}
+	
+	public Device<?, ?, ?> getLocalDummyDevice(){
+		Device result = null;
+		try {
+			result =  new LocalDummyDevice();
+		} catch (ValidationException e) {
+			// TODO Auto-generated catch block
+			//Ignore
+			Log.d(this.getClass().getName(), "Something wrong with the LocalDummyDevice...", e );
+		}
+		return result;
+	}
 
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private class LocalDummyDevice extends Device{
+		public LocalDummyDevice() throws ValidationException {
+			super(new DeviceIdentity(new UDN(LOCAL_UID)));
+		}
+
+		@Override
+		public Service[] getServices() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Device[] getEmbeddedDevices() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Device getRoot() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Device findDevice(UDN udn) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Resource[] discoverResources(Namespace namespace) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Device newInstance(UDN arg0, UDAVersion arg1, DeviceType arg2,
+				DeviceDetails arg3, Icon[] arg4, Service[] arg5, List arg6)
+				throws ValidationException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Service newInstance(ServiceType servicetype,
+				ServiceId serviceid, URI uri, URI uri1, URI uri2,
+				Action[] aaction, StateVariable[] astatevariable)
+				throws ValidationException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Device[] toDeviceArray(Collection collection) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Service[] newServiceArray(int i) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Service[] toServiceArray(Collection collection) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.teleal.cling.model.meta.Device#getDisplayString()
+		 */
+		@Override
+		public String getDisplayString() { 
+			return android.os.Build.MODEL;
+		}
+		
+		
+	}
 }

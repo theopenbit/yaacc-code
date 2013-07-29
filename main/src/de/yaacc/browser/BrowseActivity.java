@@ -17,10 +17,27 @@
  */
 package de.yaacc.browser;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
+import org.teleal.cling.model.Namespace;
+import org.teleal.cling.model.ValidationException;
+import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.Device;
+import org.teleal.cling.model.meta.DeviceDetails;
+import org.teleal.cling.model.meta.DeviceIdentity;
+import org.teleal.cling.model.meta.Icon;
+import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.meta.StateVariable;
+import org.teleal.cling.model.meta.UDAVersion;
+import org.teleal.cling.model.resource.Resource;
+import org.teleal.cling.model.types.DeviceType;
+import org.teleal.cling.model.types.ServiceId;
+import org.teleal.cling.model.types.ServiceType;
+import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.model.DIDLObject;
 
 import android.app.Activity;
@@ -60,6 +77,8 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	BrowseItemClickListener bItemClickListener = null;
 	
 	BrowseDeviceClickListener bDeviceClickListener = null;
+	
+	BrowseReceiverDeviceClickListener bReceiverDeviceClickListener = null;
 
 	private DIDLObject selectedDIDLObject;
 
@@ -93,6 +112,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		// initialize click listener
 		bDeviceClickListener = new BrowseDeviceClickListener();
 
+		
+		// initialize click listener
+		bReceiverDeviceClickListener = new BrowseReceiverDeviceClickListener(this);
 
 		// Define where to show the folder contents for media
 		contentList = (ListView) findViewById(R.id.itemList);
@@ -130,6 +152,15 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 			}
 		});
 
+		ImageButton btnRecDev = (ImageButton) findViewById(R.id.controlReceiverDevices);
+		btnRecDev.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				populateReceiverDeviceList();				
+			}
+		});
+		
 		ImageButton btnStop = (ImageButton) findViewById(R.id.controlStop);
 		btnStop.setOnClickListener(new OnClickListener() {
 
@@ -383,6 +414,28 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		});
 	}
 
+	
+	private void populateReceiverDeviceList(){
+		this.runOnUiThread(new Runnable() {
+			public void run() {
+				
+				// Define where to show the folder contents
+				ListView deviceList = (ListView) findViewById(R.id.itemList);
+				
+				
+				
+				LinkedList<Device> receiverDevices = new LinkedList<Device>(uClient.getDevicesProvidingAvTransportService());
+				receiverDevices.add(uClient.getLocalDummyDevice());
+				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), receiverDevices);
+				
+				deviceList.setAdapter(bDeviceAdapter);
+
+				deviceList.setOnItemClickListener(bReceiverDeviceClickListener);
+
+			}
+		});
+	}
+	
 	/**
 	 * Loads the device providing media files, as it is configured in the
 	 * settings
