@@ -18,32 +18,59 @@
  */
 package de.yaacc.upnp;
 
+import org.teleal.cling.android.AndroidUpnpServiceConfiguration;
 import org.teleal.cling.android.AndroidUpnpServiceImpl;
+import org.teleal.cling.transport.impl.apache.StreamClientConfigurationImpl;
+import org.teleal.cling.transport.impl.apache.StreamClientImpl;
+import org.teleal.cling.transport.spi.StreamClient;
 
+import android.net.wifi.WifiManager;
 
 /**
- * This is an android service to provide access to an upnp registry. 
- * @author Tobias Schöne (openbit)  
+ * This is an android service to provide access to an upnp registry.
+ * 
+ * @author Tobias Schöne (openbit)
  * 
  */
-public class UpnpRegistryService extends AndroidUpnpServiceImpl{
+public class UpnpRegistryService extends AndroidUpnpServiceImpl {
 
-	
-	
-	
-//FIXME Example for further use
-//	@Override
-//    protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) {
-//        return new AndroidUpnpServiceConfiguration(wifiManager) {
-//
-//            @Override
-//            public int getRegistryMaintenanceIntervalMillis() {
-//            	
-//                return 7000;
-//            }
-//
-//        };
-//    }
+	@Override
+	protected AndroidUpnpServiceConfiguration createConfiguration(
+			WifiManager wifiManager) {
+		return new AndroidUpnpServiceConfiguration(wifiManager) {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.teleal.cling.android.AndroidUpnpServiceConfiguration#
+			 * createStreamClient()
+			 */
+			@Override
+			public StreamClient<?> createStreamClient() {
+				return new StreamClientImpl(
+						new StreamClientConfigurationImpl() {
+							public int getConnectionTimeoutSeconds() {
+								return 20;
+							}
+
+							public int getDataReadTimeoutSeconds() {
+								return 20;
+							}
+
+							public boolean getStaleCheckingEnabled() {
+
+								return false;
+							}
+
+							public int getRequestRetryCount() {
+
+								return 1;
+							}
+
+						});
+			}
+
+		};
+	}
 
 }

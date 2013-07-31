@@ -872,9 +872,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		List<Item> items = new ArrayList<Item>();
 		if (didlObject instanceof Container) {
 			DIDLContent content = loadContainer((Container) didlObject);
-			items.addAll(content.getItems());
-			for (Container includedContainer : content.getContainers()) {
-				items.addAll(toItemList(includedContainer));
+			if (content != null) {
+				items.addAll(content.getItems());
+				for (Container includedContainer : content.getContainers()) {
+					items.addAll(toItemList(includedContainer));
+				}
 			}
 
 		} else if (didlObject instanceof Item) {
@@ -926,7 +928,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return this.getDevice(getReceiverDeviceId());
 
 	}
-	
+
 	/**
 	 * 
 	 * @param receiver
@@ -996,22 +998,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		// stop all players
 		PlayerFactory.shutdown();
 	}
-	
-	public Device<?, ?, ?> getLocalDummyDevice(){
+
+	public Device<?, ?, ?> getLocalDummyDevice() {
 		Device result = null;
 		try {
-			result =  new LocalDummyDevice();
+			result = new LocalDummyDevice();
 		} catch (ValidationException e) {
 			// TODO Auto-generated catch block
-			//Ignore
-			Log.d(this.getClass().getName(), "Something wrong with the LocalDummyDevice...", e );
+			// Ignore
+			Log.d(this.getClass().getName(),
+					"Something wrong with the LocalDummyDevice...", e);
 		}
 		return result;
 	}
 
-	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private class LocalDummyDevice extends Device{
+	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
 			super(new DeviceIdentity(new UDN(LOCAL_UID)));
 		}
@@ -1080,15 +1082,16 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			// TODO Auto-generated method stub
 			return null;
 		}
-		
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.teleal.cling.model.meta.Device#getDisplayString()
 		 */
 		@Override
-		public String getDisplayString() { 
+		public String getDisplayString() {
 			return android.os.Build.MODEL;
 		}
-		
-		
+
 	}
 }
