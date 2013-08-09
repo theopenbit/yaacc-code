@@ -171,7 +171,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 			@Override
 			public void onClick(View v) {
-				populateDeviceList();
+				//populateDeviceList();
 				if(PlayerFactory.getCurrentPlayers().size() > 0){
 				   Player player = PlayerFactory.getCurrentPlayers().get(0);
 				  player.stop();
