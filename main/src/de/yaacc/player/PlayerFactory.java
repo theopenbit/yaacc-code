@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 
@@ -59,6 +60,11 @@ public class PlayerFactory {
 			music = music || playableItem.getMimeType().startsWith("audio");
 		}
 		if (!upnpClient.getReceiverDeviceId().equals(UpnpClient.LOCAL_UID)) {
+			if( upnpClient.getReceiverDevice() == null){
+				Toast toast = Toast.makeText(upnpClient.getContext(), upnpClient.getContext().getString(R.string.error_no_receiver_device_found), Toast.LENGTH_SHORT);
+				toast.show();
+				return null;
+			}
 			String deviceName = upnpClient.getReceiverDevice()
 					.getDisplayString();
 			if (deviceName.length() > 13) {

@@ -283,10 +283,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
-		Log.d(getClass().getName(),
-				"localDeviceRemoved: " + localdevice.getDisplayString());
+		
 		Registry currentRegistry = this.getRegistry();
 		if (localdevice != null && currentRegistry != null) {
+			Log.d(getClass().getName(),
+					"localDeviceRemoved: " + localdevice.getDisplayString());
 			this.deviceRemoved(localdevice);
 			this.getRegistry().removeDevice(localdevice);
 		}
@@ -612,8 +613,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the browsing result
 	 */
 	public ContentDirectoryBrowseResult browseSync(Position pos) {
-
-		return browseSync(pos.getCurrentDevice(), pos.getCurrentObjectId(),
+		if(pos == null || pos.getDevice() == null){
+			return null;
+		}
+		
+		return browseSync(pos.getDevice(), pos.getObjectId(),
 				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
 	}
 

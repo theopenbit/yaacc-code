@@ -137,7 +137,10 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				//FIXME: Until context menu isn't working using the prev-button for playAll
 				//a little easter egg	
 				if(BrowseItemClickListener.currentObject != null){
-					uClient.initializePlayer(BrowseItemClickListener.currentObject).play();
+					Player player = uClient.initializePlayer(BrowseItemClickListener.currentObject);
+					if(player != null){
+						player.play();
+					}
 				}
 
 			}
@@ -148,7 +151,8 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 			@Override
 			public void onClick(View v) {
-				populateItemList();				
+				navigator.pushPosition(new Position(Navigator.PROVIDER_DEVICE_SELECT_LIST_OBJECT_ID, uClient.getProviderDevice()));
+				populateDeviceList();				
 			}
 		});
 
@@ -157,6 +161,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 			@Override
 			public void onClick(View v) {
+				navigator.pushPosition(new Position(Navigator.RECEIVER_DEVICE_SELECT_LIST_OBJECT_ID, uClient.getProviderDevice()));
 				populateReceiverDeviceList();				
 			}
 		});
@@ -166,7 +171,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 			@Override
 			public void onClick(View v) {
-				populateItemList();
+				populateDeviceList();
 				if(PlayerFactory.getCurrentPlayers().size() > 0){
 				   Player player = PlayerFactory.getCurrentPlayers().get(0);
 				  player.stop();
@@ -192,13 +197,14 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		uClient.addUpnpClientListener(this);
 
 		
-		if (currentlyShowingDevices()) {
-			//showMainFolder();
-			populateItemList();
+		if (uClient.getProviderDevice() !=null) {
+			showMainFolder();
 
 		} else {
 			
-			showMainFolder();
+			populateDeviceList();
+
+		
 		}
 		
 		
@@ -301,18 +307,21 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 	@Override
 	public void onBackPressed() {
-
-		if (navigator.isLevelDeviceRoot()) {
-			populateItemList();
-		} else if (navigator.isLevelDeviceOverview()){
+		Log.d(BrowseActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
+		String currentObjectId = navigator.getCurrentPosition().getObjectId();
+		if (Navigator.ITEM_ROOT_OBJECT_ID.equals(currentObjectId)) {
+			populateDeviceList();
+		} else if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(currentObjectId)){
 			uClient.shutdown();
 			super.finish();
-		} else {
-
+		}  else {
 			final ListView itemList = (ListView) findViewById(R.id.itemList);
-	
+			
+			
+			Position pos = navigator.popPosition(); // First pop is our
+													// currentPosition
 			bItemAdapter = new BrowseItemAdapter(this,
-					navigator.getLastPosition());
+					navigator.getCurrentPosition());
 			itemList.setAdapter(bItemAdapter);
 	
 			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
@@ -384,7 +393,8 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				
 				// Load adapter if selected device is configured and found
 				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
-						"0");
+						Navigator.ITEM_ROOT_OBJECT_ID);
+				
 				contentList.setAdapter(bItemAdapter);
 
 				contentList.setOnItemClickListener(bItemClickListener);
@@ -397,7 +407,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 	}
 	
-	private void populateItemList(){
+	private void populateDeviceList(){
 		this.runOnUiThread(new Runnable() {
 			public void run() {
 				
@@ -409,7 +419,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				deviceList.setAdapter(bDeviceAdapter);
 
 				deviceList.setOnItemClickListener(bDeviceClickListener);
-
+				
 			}
 		});
 	}
@@ -478,7 +488,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 			if(formerDevice != null && device.equals(formerDevice)){
 				showMainFolder();
 			} else {
-				populateItemList();
+				populateDeviceList();
 			}
 		}
 
@@ -489,7 +499,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		Log.d(this.getClass().toString(), "device removal called");
 		if (currentlyShowingDevices()) {
 			// showMainFolder();
-			populateItemList();
+			populateDeviceList();
 		}
 
 	}
@@ -508,7 +518,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 	
 	public boolean currentlyShowingDevices(){
-		if (navigator.isLevelDeviceOverview())	{
+		if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(navigator.getCurrentPosition().getObjectId()))	{
 			return true;
 		}
 		return false;

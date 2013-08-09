@@ -17,10 +17,10 @@ public class BrowseDeviceClickListener implements OnItemClickListener {
 		
 		BrowseActivity.uClient.setProviderDevice((Device)adapter.getItem(position));
 		
-		BrowseActivity.getNavigator().addNewPosition(new Position("0", (Device)adapter.getItem(position)));
+		BrowseActivity.getNavigator().pushPosition(new Position(Navigator.ITEM_ROOT_OBJECT_ID, BrowseActivity.uClient.getProviderDevice()));
 		
 		BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
-				listView.getContext(), "0");
+				listView.getContext(), Navigator.ITEM_ROOT_OBJECT_ID);
 		a.setAdapter(bItemAdapter);
 		
 		BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();

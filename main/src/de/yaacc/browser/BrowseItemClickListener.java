@@ -17,6 +17,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.player.Player;
 
 public class BrowseItemClickListener implements OnItemClickListener{
 		//FIXME: just for easter egg to play all items on prev button
@@ -35,10 +36,10 @@ public class BrowseItemClickListener implements OnItemClickListener{
 		
 		if (currentObject instanceof Container) {
 			// if the current id is null, go back to the top level
-			String newObjectId = currentObject.getId() == null ? "0" : adapter
+			String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID: adapter
 					.getFolder(position).getId();
 
-			BrowseActivity.getNavigator().addNewPositionOnSameDevice(newObjectId);
+			BrowseActivity.getNavigator().pushPosition(new Position(newObjectId, BrowseActivity.uClient.getProviderDevice()));
 			
 			BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
 					listView.getContext(), newObjectId);
@@ -48,7 +49,10 @@ public class BrowseItemClickListener implements OnItemClickListener{
 			a.setOnItemClickListener(bItemClickListener);
 
 		} else {
-			BrowseActivity.uClient.initializePlayer(currentObject).play();
+			Player player = BrowseActivity.uClient.initializePlayer(currentObject);
+			if(player != null){
+				player.play();
+			}
 		}
 	}
 
@@ -79,7 +83,10 @@ public class BrowseItemClickListener implements OnItemClickListener{
 	 */
 	public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
 		if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
-			    		BrowseActivity.uClient.initializePlayer(selectedDIDLObject).play();
+			    		Player player = BrowseActivity.uClient.initializePlayer(selectedDIDLObject);
+						if(player != null){
+							player.play();
+						}
     	} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
 			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);
     		toast.show();

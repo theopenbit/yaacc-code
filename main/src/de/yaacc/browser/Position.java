@@ -4,27 +4,33 @@ import org.teleal.cling.model.meta.Device;
 
 public class Position {
 
-	private String currentObjectId;
-	private Device currentDevice;
+	private String objectId;
+	private Device device;
 	
 	public Position(String objectId, Device device){
 			
-		this.currentDevice = device;
-		this.currentObjectId = objectId;
+		this.device = device;
+		this.objectId = objectId; 
 	}
 	
-	public String getCurrentObjectId() {
-		return currentObjectId;
-	}
-	public void setCurrentObjectId(String currentObjectId) {
-		this.currentObjectId = currentObjectId;
-	}
-	public Device getCurrentDevice() {
-		return currentDevice;
-	}
-	public void setCurrentDevice(Device currentDevice) {
-		this.currentDevice = currentDevice;
+	
+	public String getObjectId() {
+		return objectId;
 	}
 	
+	public Device getDevice() {
+		return device;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Position ["
+				+ (objectId != null ? "objectId=" + objectId + ", " : "")
+				+ (device != null ? "device=" + device : "") + "]";
+	}
+
 	
 }

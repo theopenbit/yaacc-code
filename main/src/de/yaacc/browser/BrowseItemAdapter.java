@@ -43,6 +43,7 @@ public class BrowseItemAdapter extends BaseAdapter{
 		inflator = LayoutInflater.from(ctx);
 		
 		ContentDirectoryBrowseResult result = BrowseActivity.uClient.browseSync(pos);
+    	if(result == null) return; 
     	
 		DIDLContent a = result.getResult();
 		
@@ -63,7 +64,7 @@ public class BrowseItemAdapter extends BaseAdapter{
 				text = ctx.getString(R.string.error_upnp_specific)+" "+result.getUpnpFailure();
 			}
 			
-			Log.e("ResoveError",text);
+			Log.e("ResolveError",text + "("+ pos.getObjectId() +")");
 			
     		Toast toast = Toast.makeText(ctx, text, duration);
     		toast.show();
