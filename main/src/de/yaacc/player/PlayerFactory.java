@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
@@ -59,6 +60,7 @@ public class PlayerFactory {
 			video = video || playableItem.getMimeType().startsWith("video");
 			music = music || playableItem.getMimeType().startsWith("audio");
 		}
+		Log.d(PlayerFactory.class.getName(), "video:" + video + " image: " + image +  "audio:" + music );
 		if (!upnpClient.getReceiverDeviceId().equals(UpnpClient.LOCAL_UID)) {
 			if( upnpClient.getReceiverDevice() == null){
 				Toast toast = Toast.makeText(upnpClient.getContext(), upnpClient.getContext().getString(R.string.error_no_receiver_device_found), Toast.LENGTH_SHORT);
@@ -79,6 +81,7 @@ public class PlayerFactory {
 			} else if (!video && !image && music) {
 				contentType ="music";
 			}	
+			
 			result = new AVTransportPlayer(upnpClient, upnpClient.getContext()
 					.getString(R.string.playerNameAvTransport)
 					+ "-" + contentType + "@"  
@@ -89,8 +92,8 @@ public class PlayerFactory {
 				result = getFirstCurrentPlayerOfType(MultiContentPlayer.class);
 				if (result != null) {
 					shutdown(result);
-				}
-				return new MultiContentPlayer(upnpClient, upnpClient
+				}				
+				result =  new MultiContentPlayer(upnpClient, upnpClient
 							.getContext().getString(
 									R.string.playerNameMultiContent));
 				

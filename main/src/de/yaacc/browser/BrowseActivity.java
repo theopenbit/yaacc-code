@@ -310,6 +310,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		Log.d(BrowseActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
 		String currentObjectId = navigator.getCurrentPosition().getObjectId();
 		if (Navigator.ITEM_ROOT_OBJECT_ID.equals(currentObjectId)) {
+			navigator.pushPosition(Navigator.DEVICE_LIST_POSIOTION);
 			populateDeviceList();
 		} else if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(currentObjectId)){
 			uClient.shutdown();
@@ -392,8 +393,10 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 			public void run() {
 				
 				// Load adapter if selected device is configured and found
+				Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, BrowseActivity.uClient.getProviderDevice());
+				navigator.pushPosition(pos);				
 				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
-						Navigator.ITEM_ROOT_OBJECT_ID);
+						pos);
 				
 				contentList.setAdapter(bItemAdapter);
 

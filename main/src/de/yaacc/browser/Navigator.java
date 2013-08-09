@@ -12,7 +12,7 @@ public class Navigator {
 	public final static String PROVIDER_DEVICE_SELECT_LIST_OBJECT_ID = "-2";
 	public final static String RECEIVER_DEVICE_SELECT_LIST_OBJECT_ID = "-3";
 	public final static String ITEM_ROOT_OBJECT_ID = "0";
-	private final static Position DEVICE_LIST_POSIOTION = new Position(DEVICE_OVERVIEW_OBJECT_ID, null);
+	public final static Position DEVICE_LIST_POSIOTION = new Position(DEVICE_OVERVIEW_OBJECT_ID, null);
 	
 	
 	public Navigator(){		
