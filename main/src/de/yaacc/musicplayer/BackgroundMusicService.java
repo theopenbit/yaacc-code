@@ -106,7 +106,7 @@ public class BackgroundMusicService extends Service {
 			player.stop();
 		}
 		try {
-			if (intent.getData() != null) {
+			if (intent != null && intent.getData() != null) {
 				player.setDataSource(this, intent.getData());
 			}
 		} catch (Exception e) {

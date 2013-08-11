@@ -76,8 +76,8 @@
     <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>    
     <string name="settings_local_server_name">Netzwerkname für lokalen Server</string>
     <string name="settings_local_server_name_key">Name des localen servers</string>
-    <string name="error_upnp_generic">An unknown error happened while browsing</string>
-    <string name="error_upnp_specific">The following error occurred:</string>
+    <string name="error_upnp_generic">Während des Überfliegens ist ein Fehler aufgetreten </string>
+    <string name="error_upnp_specific">Es ist folgender Fehler aufgetreten:</string>
     <string name="error_no_receiver_device_found">Kein Empfänger gefunden</string>
     <string name="error_no_activity_found">Keine Aktivität zum Abspielen vom Typ \'%1$s\' gefunden</string>
     <string name="image_viewer_settings_duration">Dauer der Bildanzeige</string>    
@@ -95,11 +95,11 @@
     <string name="playerNameMultiContent">Multi</string>
     <string name="playerNameAvTransport">Entfernd</string>
     <string name="multiContentPlayerActivityImageView">variabler Inhalt</string>
-    <string name="title_activity_avtransport_player">Yaacc Netwerk Spieler</string>
-    <string name="title_activity_multi_content_player">Yaacc Standard Spieler</string>
+    <string name="title_activity_avtransport_player">Yaacc Netzwerkspieler</string>
+    <string name="title_activity_multi_content_player">Yaacc Standardspieler</string>
     <string name="can_not_start_activity">"Die App kann nicht gestartet werden! Grund: "</string>
-    <string name="title_activity_music_player">Yaacc Musik Spieler </string>       
-    <string name="yaacc_menu_settings">YAACC eigenschaften</string>
+    <string name="title_activity_music_player">Yaacc Musikspieler </string>       
+    <string name="yaacc_menu_settings">YAACC Eigenschaften</string>
     <string name="yaacc_about">Über</string>
     <string name="app_descrip">Yet Another Android Client Controller\nVerbindet ihre UPnP-Geräte im lokalen Netzwerk mit ihrem Android Gerät!\n<a href="www.yaacc.de">www.yaacc.de</a></string>
     <string name="app_credits">YAACC steht unter der Lizenz GPLv3. Die dürfen die Software frei nutzen und weitergeben. Für die Software wird keinerlei Grantie gewährleistet. Lizenzdetails sind hier nachzulesen  <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a></string>
