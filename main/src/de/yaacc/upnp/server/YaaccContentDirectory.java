@@ -48,16 +48,12 @@ import org.teleal.cling.support.model.item.Photo;
 import org.teleal.cling.support.model.item.VideoItem;
 import org.teleal.common.util.MimeType;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 import de.yaacc.R;
 
 /**

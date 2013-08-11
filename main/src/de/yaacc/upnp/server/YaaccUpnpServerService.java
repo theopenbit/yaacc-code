@@ -64,9 +64,9 @@ import org.teleal.cling.support.model.ProtocolInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
 
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -79,7 +79,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseActivity;
-import de.yaacc.player.AVTransportPlayerActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 

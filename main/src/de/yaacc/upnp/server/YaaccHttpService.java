@@ -36,13 +36,11 @@ import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpService;
 import org.teleal.common.util.MimeType;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 /**
  * A http service to retrieve media content by an id.

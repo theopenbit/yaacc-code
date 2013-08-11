@@ -17,27 +17,10 @@
  */
 package de.yaacc.browser;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
-import org.teleal.cling.model.Namespace;
-import org.teleal.cling.model.ValidationException;
-import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.DeviceDetails;
-import org.teleal.cling.model.meta.DeviceIdentity;
-import org.teleal.cling.model.meta.Icon;
-import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.meta.StateVariable;
-import org.teleal.cling.model.meta.UDAVersion;
-import org.teleal.cling.model.resource.Resource;
-import org.teleal.cling.model.types.DeviceType;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.ServiceType;
-import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.model.DIDLObject;
 
 import android.app.Activity;
