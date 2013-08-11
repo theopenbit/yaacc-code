@@ -20,7 +20,6 @@ package de.yaacc.upnp.server;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
@@ -33,7 +32,6 @@ import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
-import org.teleal.cling.support.avtransport.AbstractAVTransportService;
 import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
 
 import android.content.ComponentName;

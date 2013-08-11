@@ -17,7 +17,6 @@
  */
 package de.yaacc.upnp;
 
-import java.net.URI;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,20 +39,14 @@ import org.teleal.cling.support.avtransport.callback.SetAVTransportURI;
 import org.teleal.cling.support.avtransport.callback.Stop;
 import org.teleal.cling.support.connectionmanager.callback.GetProtocolInfo;
 import org.teleal.cling.support.contentdirectory.DIDLParser;
-import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
-import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
 import org.teleal.cling.support.model.TransportInfo;
-import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.renderingcontrol.callback.GetMute;
 import org.teleal.cling.support.renderingcontrol.callback.GetVolume;
 import org.teleal.cling.support.renderingcontrol.callback.SetMute;
 import org.teleal.cling.support.renderingcontrol.callback.SetVolume;
-
-import de.yaacc.upnp.server.LocalUpnpServer;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 import android.util.Log;
 

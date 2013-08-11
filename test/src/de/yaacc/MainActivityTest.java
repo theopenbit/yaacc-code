@@ -17,9 +17,9 @@
  */
 package de.yaacc;
 
-import de.yaacc.browser.BrowseActivity;
 import android.annotation.TargetApi;
 import android.test.ActivityInstrumentationTestCase2;
+import de.yaacc.browser.BrowseActivity;
 
 /**
  * This is a simple framework for a test of an Application.  See

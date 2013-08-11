@@ -42,8 +42,6 @@ import org.teleal.cling.support.model.item.MusicTrack;
 import org.teleal.cling.support.model.item.Photo;
 import org.teleal.common.util.MimeType;
 
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-
 /**
  * a simple local content directory for test purpose.
  * 
