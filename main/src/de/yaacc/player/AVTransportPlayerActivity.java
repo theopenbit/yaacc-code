@@ -22,6 +22,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +49,7 @@ public class AVTransportPlayerActivity extends Activity {
 		setContentView(R.layout.activity_avtransport_player);
 		// initialize buttons
 		playerId = getIntent().getIntExtra(AVTransportPlayer.PLAYER_ID, -1);
-		
+		Log.d(getClass().getName(), "Got id from intent: " + playerId);
 		Player player = getPlayer();
 		ImageButton btnPrev = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlPrev);
 		ImageButton btnNext = (ImageButton) findViewById(R.id.avtransportPlayerActivityControlNext);
@@ -150,6 +151,7 @@ public class AVTransportPlayerActivity extends Activity {
 				.getCurrentPlayersOfType(AVTransportPlayer.class);
 		if (players != null) { // assume that there
 			for (Player player : players) {
+				Log.d(getClass().getName(), "Found networkplayer: " + player.getId() + " Searched  for id: " + playerId);
 				if(player.getId() == playerId){
 					result = player;
 					break;

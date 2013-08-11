@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
@@ -31,9 +32,9 @@ import org.teleal.cling.support.avtransport.callback.Stop;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import de.yaacc.upnp.UpnpClient;
-import de.yaacc.util.NotificationId;
 
 /**
  * A Player for playing on a remote avtransport device 
@@ -45,6 +46,7 @@ public class AVTransportPlayer extends AbstractPlayer {
 	
 	public static final String PLAYER_ID = "PlayerId";
 	private String deviceId="";
+	private int id; 
 	
 
 	/**
@@ -55,7 +57,8 @@ public class AVTransportPlayer extends AbstractPlayer {
 	public AVTransportPlayer(UpnpClient upnpClient, String name) {		
 		this(upnpClient);
 		deviceId = upnpClient.getReceiverDeviceId();
-		setName(name);
+		setName(name);		
+		id = UUID.randomUUID().hashCode();
 	}
 	
 	private Device<?, ?, ?> getDevice(){
@@ -260,9 +263,11 @@ public class AVTransportPlayer extends AbstractPlayer {
 	protected PendingIntent getNotificationIntent(){
 		Intent notificationIntent = new Intent(getContext(),
 			    AVTransportPlayerActivity.class);
-		notificationIntent.putExtra(PLAYER_ID, getNotificationId());
-		PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
-		    notificationIntent, 0);
+		Log.d(getClass().getName(), "Put id into intent: " + getId());
+		notificationIntent.setData(Uri.parse("http://0.0.0.0/"+getId()+"")); //just for making the intents different http://stackoverflow.com/questions/10561419/scheduling-more-than-one-pendingintent-to-same-activity-using-alarmmanager
+		notificationIntent.putExtra(PLAYER_ID, getId());
+		PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0 ,
+		    notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		return contentIntent;
 	}
 	
@@ -272,8 +277,8 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected int getNotificationId() {
-		 
-		return NotificationId.AVTRANSPORT_PLAYER.getId() + getName().hashCode();
+		
+		return id;
 	}
 	
 	/* (non-Javadoc)
