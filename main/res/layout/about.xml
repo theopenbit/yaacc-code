@@ -25,6 +25,7 @@
     android:padding="20dip" >
 
     <TextView
+        android:id="@+id/about_descrip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_descrip"
