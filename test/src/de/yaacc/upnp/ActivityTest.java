@@ -63,7 +63,7 @@ public class ActivityTest extends AndroidTestCase {
 	}
 	
 	
-	public void testImageViewerActivityBigImageFile() throws Exception{
+	public void testImageViewerActivityBigImageFile() throws Exception{		
 		String filesDir = getContext().getFilesDir().toString();
 		String fileName = "CIMG5019.JPG";
 		copyAssetsToSdCard(fileName, filesDir);
