@@ -101,9 +101,7 @@
     <string name="title_activity_music_player">Yaacc Musikspieler </string>       
     <string name="yaacc_menu_settings">YAACC Eigenschaften</string>
     <string name="yaacc_about">Über</string>
-    <string name="app_descrip">Verbindet ihre UPnP-Geräte im lokalen Netzwerk mit ihrem Android Gerät!\n<a href="www.yaacc.de">www.yaacc.de</a></string>
-    <string name="app_credits">YAACC steht unter der Lizenz GPLv3. Die dürfen die Software frei nutzen und weitergeben. Für die Software wird keinerlei Grantie gewährleistet. Lizenzdetails sind hier nachzulesen  <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a></string>
-    <string name="app_credits_third_partie">Weitere Lizenen:\nDie UPNP Implementierung basiert auf <a href="http://4thline.org/projects/cling">Cling</a>\nIn der Anwendung verwendete Bilder stammen von  <a href="http://www.carpicon.com">black + white icons 2.0</a> und <a href="http://developer.android.com/about/index.html">Android</a> . Android is a trademark of Google Inc</string>
+    <string name="app_descrip">Verbindet ihre UPnP-Geräte im lokalen Netzwerk mit ihrem Android Gerät!\n<a href="http://www.yaacc.de">www.yaacc.de</a>\n\nYAACC steht unter der Lizenz GPLv3. Die dürfen die Software frei nutzen und weitergeben. Für die Software wird keinerlei Grantie gewährleistet. Lizenzdetails sind hier nachzulesen  <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a> (www.gnu.org/licenses/gpl-3.0)\n\nWeitere Lizenen:\nDie UPNP Implementierung basiert auf <a href="http://4thline.org/projects/cling">Cling</a> (4thline.org/projects/cling )\nIn der Anwendung verwendete Bilder stammen von  <a href="http://www.carpicon.com">black + white icons 2.0</a> (www.carpicon.com ) und <a href="http://developer.android.com/about/index.html">Android</a> . Android is a trademark of Google Inc (developer.android.com/about/index.html )</string>
     <string name="title_activity_yaacc_upnp_server_control">Yaacc Upnp Server Einstellung</string>    
     <string name="yaacc_upnp_server_stop_server">stop server</string>
     <string name="yaacc_upnp_server_start_server">start server</string>
