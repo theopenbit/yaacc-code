@@ -17,8 +17,9 @@
  */
 package de.yaacc;
 
-import android.annotation.TargetApi;
-import android.test.ActivityInstrumentationTestCase2;
+import android.content.Intent;
+import android.test.ActivityUnitTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 import de.yaacc.browser.BrowseActivity;
 
 /**
@@ -31,11 +32,36 @@ import de.yaacc.browser.BrowseActivity;
  * -e class de.yaacc.MainActivityTest \
  * de.yaacc.tests/android.test.InstrumentationTestRunner
  */
-@TargetApi(3)
-public class MainActivityTest extends ActivityInstrumentationTestCase2<BrowseActivity> {
 
+public class MainActivityTest extends ActivityUnitTestCase<BrowseActivity> {
+
+	private BrowseActivity activity;
+	
     public MainActivityTest() {
-        super("de.yaacc", BrowseActivity.class);
+        super(BrowseActivity.class);
     }
 
+    @Override
+    protected void setUp() throws Exception {
+      super.setUp();
+      Intent intent = new Intent(getInstrumentation().getTargetContext(),
+    		  BrowseActivity.class);
+      startActivity(intent, null, null);
+      activity = getActivity();
+    }
+    
+    @SmallTest
+    public void testStartSettingsMenu() {
+      getInstrumentation().invokeMenuActionSync(activity, 0, 0);
+     
+    }
+
+    
+    @Override
+    protected void tearDown() throws Exception {
+      
+      super.tearDown();
+    }
+
+    
 }
