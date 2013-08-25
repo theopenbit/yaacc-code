@@ -19,6 +19,7 @@
 package de.yaacc.upnp.server;
 
 import java.net.URI;
+import java.util.List;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.avtransport.impl.state.Playing;
@@ -29,6 +30,7 @@ import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.SeekMode;
 
 import android.util.Log;
+import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 
 public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
@@ -58,7 +60,10 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 		Log.d(this.getClass().getName(), "On Entry");
 		super.onEntry();
 		// Start playing now!		
-		upnpClient.initializePlayer(getTransport()).play();
+		List<Player> players = upnpClient.initializePlayers(getTransport());
+		for (Player player : players) {
+			player.play();			
+		}
 	}
 
 	/*

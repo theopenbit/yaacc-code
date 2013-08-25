@@ -67,6 +67,7 @@ import android.webkit.MimeTypeMap;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.player.Player;
 import de.yaacc.upnp.server.LocalUpnpServer;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -794,7 +795,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		for (Player player : players) {
+			player.play();			
+		}
 		
 	}
 	
@@ -812,7 +816,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				YaaccUpnpServerService.UDN_ID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		for (Player player : players) {
+			player.play();			
+		}
 		myWait(120000L);
 	}
 	
@@ -831,9 +838,13 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		for (Player player : players) {
+			player.play();			
+		}
 		myWait(120000L);
 	}
+	
 	
 	public void testUseCasePlayLocalImage() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
@@ -849,7 +860,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));		
+		for (Player player : players) {
+			player.play();			
+		}
 		myWait();
 	}
 
@@ -867,7 +881,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getContainers().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getContainers().get(0));
+		for (Player player : players) {
+			player.play();			
+		}
 		
 	}
 	
@@ -885,7 +902,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getContainers().get(1)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getContainers().get(1));		
+		for (Player player : players) {
+			player.play();			
+		}
 		
 	}
 // TODO must be implemented in another way	

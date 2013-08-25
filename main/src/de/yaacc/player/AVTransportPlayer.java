@@ -54,9 +54,9 @@ public class AVTransportPlayer extends AbstractPlayer {
 	 * @param name playerName
 	 * 
 	 */
-	public AVTransportPlayer(UpnpClient upnpClient, String name) {		
+	public AVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name) {		
 		this(upnpClient);
-		deviceId = upnpClient.getReceiverDeviceId();
+		deviceId = receiverDevice.getIdentity().getUdn().getIdentifierString();
 		setName(name);		
 		id = UUID.randomUUID().hashCode();
 	}

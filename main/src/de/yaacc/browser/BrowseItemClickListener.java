@@ -18,6 +18,7 @@
 package de.yaacc.browser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
@@ -65,9 +66,11 @@ public class BrowseItemClickListener implements OnItemClickListener{
 			a.setOnItemClickListener(bItemClickListener);
 
 		} else {
-			Player player = BrowseActivity.uClient.initializePlayer(currentObject);
-			if(player != null){
-				player.play();
+			List<Player> players = BrowseActivity.uClient.initializePlayers(currentObject);
+			for (Player player : players) {
+				if(player != null){
+					player.play();
+				}				
 			}
 		}
 	}
@@ -99,9 +102,11 @@ public class BrowseItemClickListener implements OnItemClickListener{
 	 */
 	public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
 		if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
-			    		Player player = BrowseActivity.uClient.initializePlayer(selectedDIDLObject);
-						if(player != null){
-							player.play();
+			    		List<Player> players = BrowseActivity.uClient.initializePlayers(selectedDIDLObject);
+						for (Player player : players) {
+							if(player != null){
+								player.play();
+							}							
 						}
     	} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
 			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);

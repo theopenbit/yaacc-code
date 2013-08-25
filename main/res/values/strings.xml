@@ -42,6 +42,7 @@
     <string name="settings_selected_provider_title">Current media provider</string>
     <string name="settings_change_provider">Tab to change current provider</string>
     <string name="settings_selected_receiver_title">Current media receiver</string>
+    <string name="settings_selected_receivers_title">Current media receivers</string>
     <string name="settings_change_receiver">Tab to change current receiver</string>
     <string name="settings_audio_app">Audio Playback</string>
     <string name="settings_video_app">Image Playback</string>

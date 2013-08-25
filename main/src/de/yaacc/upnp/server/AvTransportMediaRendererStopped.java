@@ -19,6 +19,7 @@
 package de.yaacc.upnp.server;
 
 import java.net.URI;
+import java.util.List;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.avtransport.impl.state.Stopped;
@@ -63,9 +64,12 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
 	public void onEntry() {
 		Log.d(this.getClass().getName(), "On Entry");
 		super.onEntry();
-		Player player = upnpClient.getCurrentPlayer(getTransport());
-		if(player != null ){
-			player.stop();
+		List<Player> players = upnpClient.getCurrentPlayers(getTransport());
+		for (Player player : players) {
+			if(player != null ){
+				player.stop();
+			}
+			
 		}
 	}
 

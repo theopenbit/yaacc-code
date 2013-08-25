@@ -19,6 +19,7 @@ package de.yaacc.browser;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLObject;
@@ -120,9 +121,12 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				//FIXME: Until context menu isn't working using the prev-button for playAll
 				//a little easter egg	
 				if(BrowseItemClickListener.currentObject != null){
-					Player player = uClient.initializePlayer(BrowseItemClickListener.currentObject);
-					if(player != null){
-						player.play();
+					List<Player> players = uClient.initializePlayers(BrowseItemClickListener.currentObject);
+					for (Player player : players) {
+						if(player != null){
+							player.play();
+						}
+						
 					}
 				}
 
@@ -380,7 +384,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				navigator.pushPosition(pos);				
 				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
 						pos);
-				
+				contentList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 				contentList.setAdapter(bItemAdapter);
 
 				contentList.setOnItemClickListener(bItemClickListener);
@@ -399,7 +403,7 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				
 				// Define where to show the folder contents
 				ListView deviceList = (ListView) findViewById(R.id.itemList);
-
+				deviceList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(uClient.getDevicesProvidingContentDirectoryService()));
 				
 				deviceList.setAdapter(bDeviceAdapter);
@@ -417,17 +421,19 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 				
 				// Define where to show the folder contents
 				ListView deviceList = (ListView) findViewById(R.id.itemList);
-				
+				deviceList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 				
 				
 				LinkedList<Device> receiverDevices = new LinkedList<Device>(uClient.getDevicesProvidingAvTransportService());
-				receiverDevices.add(uClient.getLocalDummyDevice());
-				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), receiverDevices);
+				
+				
+				BrowseReceiverDeviceAdapter bDeviceAdapter = new BrowseReceiverDeviceAdapter(getApplicationContext(), receiverDevices, uClient.getReceiverDevices());
 				
 				deviceList.setAdapter(bDeviceAdapter);
 
 				deviceList.setOnItemClickListener(bReceiverDeviceClickListener);
 
+	
 			}
 		});
 	}

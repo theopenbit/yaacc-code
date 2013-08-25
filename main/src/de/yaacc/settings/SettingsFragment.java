@@ -24,6 +24,7 @@ import org.teleal.cling.model.meta.Device;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.preference.PreferenceFragment;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseActivity;
@@ -79,6 +80,7 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 
 			// One entry per found device for receiving media data
 			ListPreference receiverLp = (ListPreference) findPreference(getString(R.string.settings_selected_receiver_title));
+			MultiSelectListPreference receiverMsLp = (MultiSelectListPreference) findPreference(getString(R.string.settings_selected_receivers_title));
 			ArrayList<CharSequence> receiverEntries = new ArrayList<CharSequence>();
 			ArrayList<CharSequence> receiverEntryValues = new ArrayList<CharSequence>();
 			for (Device currentDevice : devices) {
@@ -87,13 +89,16 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 						.getIdentifierString());
 			}
 
-			// Add a default entry for the local device
-			receiverEntries.add(android.os.Build.MODEL);
-			receiverEntryValues.add(UpnpClient.LOCAL_UID);
+			
 
 			receiverLp.setEntries(receiverEntries
 					.toArray(new CharSequence[receiverEntries.size()]));
 			receiverLp.setEntryValues(receiverEntryValues
+					.toArray(new CharSequence[receiverEntries.size()]));
+			
+			receiverMsLp.setEntries(receiverEntries
+					.toArray(new CharSequence[receiverEntries.size()]));
+			receiverMsLp.setEntryValues(receiverEntryValues
 					.toArray(new CharSequence[receiverEntries.size()]));
 		}
 	}
