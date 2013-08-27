@@ -762,7 +762,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
-		if (positionInfo == null) {
+		if (positionInfo == null) {			
 			return PlayerFactory.createPlayer(this, items);
 		}
 
@@ -772,6 +772,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				.getTrackURI());
 		playableItem.setMimeType(MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(fileExtension));
+		//FIXME Duration not supported in receiver yet playableItem.setDuration(duration)
 		items.add(playableItem);
 		Log.d(getClass().getName(),
 				"TransportUri: " + positionInfo.getTrackURI());
@@ -842,7 +843,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				}
 				// calculate duration
 				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-				long millis = 10000; // 10 sec. default
+				long millis = getDefaultDuration();
 				if (resource.getDuration() != null) {
 					try {
 						Date date = dateFormat.parse(resource.getDuration());
@@ -1037,6 +1038,32 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		PlayerFactory.shutdown();
 	}
 
+	/**
+	 * Return the configured default duration
+	 * @return the duration
+	 */
+	public  int getDefaultDuration() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
+		return Integer
+				.parseInt(preferences.getString(
+						getContext().getString(R.string.settings_default_duration_key),
+						"0"));
+	}
+	
+	/**
+	 * Return the configured silence duration
+	 * @return the duration
+	 */
+	public  int getSilenceDuration() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
+		return Integer
+				.parseInt(preferences.getString(
+						getContext().getString(R.string.settings_silence_duration_key),
+						"2000"));
+	}
+	
 	public Device<?, ?, ?> getLocalDummyDevice() {
 		Device result = null;
 		try {
@@ -1049,7 +1076,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return result;
 	}
+	
 
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
@@ -1130,6 +1159,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		public String getDisplayString() {
 			return android.os.Build.MODEL;
 		}
+
 
 	}
 }

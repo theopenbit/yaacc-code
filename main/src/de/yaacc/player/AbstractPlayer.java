@@ -285,7 +285,7 @@ public abstract class AbstractPlayer implements Player {
 	 * @return dureaton in millis
 	 */
 	protected long getSilenceDuration() {
-		return 2000L; // Default 2 sec.
+		return upnpClient.getSilenceDuration();
 	}
 
 	/**
