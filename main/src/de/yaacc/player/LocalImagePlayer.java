@@ -209,7 +209,7 @@ public class LocalImagePlayer implements Player {
 		for (int i = 0; i < items.length; i++) {
 			uris.add(items[i].getUri());
 		}
-		intent.putExtra(ImageViewerActivity.URIS, uris);
+		intent.putExtra(ImageViewerActivity.URIS, uris);				
 		context.startActivity(intent);
 		showNotification(uris);
 	}
