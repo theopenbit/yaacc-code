@@ -62,6 +62,10 @@
     <string name="settings_audio_chkbx">audio_chkbx</string>
     <string name="settings_video_chkbx">video_chkbx</string>
     <string name="settings_image_chkbx">image_chkbx</string>
+    <string name="settings_default_duration">Standardanzeigedauer</string>
+    <string name="settings_default_duration_key">Standardanzeigedauer</string>
+    <string name="settings_silence_duration">Pausendauer</string>    
+    <string name="settings_silence_duration_key">Pausendauer</string>
     <string name="settings_local_server_title">Lokale Serverkonfiguration</string>
     <string name="settings_local_server_started">Lokaler server ist gestartet</string>
     <string name="settings_local_server_stopped">Lokaler server ist gestoppt</string>
@@ -75,7 +79,7 @@
     <string name="settings_local_server_testcontent">Lokaler Server verwendet Testinhalte</string>
     <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>    
     <string name="settings_local_server_name">Netzwerkname für lokalen Server</string>
-    <string name="settings_local_server_name_key">Name des localen servers</string>
+    <string name="settings_local_server_name_key">Name des lokalen Servers</string>
     <string name="error_upnp_generic">Während des Überfliegens ist ein Fehler aufgetreten </string>
     <string name="error_upnp_specific">Es ist folgender Fehler aufgetreten:</string>
     <string name="error_no_receiver_device_found">Kein Empfänger gefunden</string>

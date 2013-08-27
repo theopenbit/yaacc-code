@@ -25,6 +25,8 @@
       <CheckBoxPreference android:summaryOff="@string/settings_image_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_image_app_on" android:key="@string/settings_image_app"/>
       <CheckBoxPreference android:summaryOff="@string/settings_video_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_video_app_on" android:key="@string/settings_video_app"/>
       <CheckBoxPreference android:summaryOff="@string/settings_audio_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_audio_app_on" android:key="@string/settings_audio_app"/>
+       <ListPreference android:title="@string/settings_default_duration"    android:key="@string/settings_default_duration_key"       android:entries="@array/image_viewer_slide_stay_duration_entries"   android:entryValues="@array/image_viewer_slide_stay_duration_values" />
+       <ListPreference android:title="@string/settings_silence_duration"    android:key="@string/settings_default_duration_key"       android:entries="@array/image_viewer_slide_stay_duration_entries"   android:entryValues="@array/image_viewer_slide_stay_duration_values" />
       </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_browsing">
         <CheckBoxPreference android:summaryOn="@string/settings_browse_audio_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_audio_off" android:key="@string/settings_audio_chkbx"/>
