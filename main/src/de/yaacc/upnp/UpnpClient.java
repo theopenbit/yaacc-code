@@ -926,23 +926,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 
-//	/**
-//	 * Gets the receiver ID, if none is defined the local device will be
-//	 * returned
-//	 * 
-//	 * @return the receiverDeviceId
-//	 */
-//	public String getReceiverDeviceId() {
-//		String receiver = preferences.getString(
-//				context.getString(R.string.settings_selected_receiver_title),
-//				null);
-//		if (receiver == null) {
-//			receiver = UpnpClient.LOCAL_UID;
-//		}
-//		return receiver;
-//	}
-
-
 	/**
 	 * @return the receiverDevices
 	 */
@@ -956,28 +939,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	}
 
-	
-	
-//	/**
-//	 * @return the receiverDevice
-//	 */
-//	public Device<?, ?, ?> getReceiverDevice() {
-//
-//		return this.getDevice(getReceiverDeviceId());
-//
-//	}
-//
-//	/**
-//	 * 
-//	 * @param receiver
-//	 */
-//	public void setReceiverDevice(Device receiver) {
-//		Editor prefEdit = preferences.edit();
-//		prefEdit.putString(
-//				context.getString(R.string.settings_selected_receiver_title),
-//				receiver.getIdentity().getUdn().getIdentifierString());
-//		prefEdit.apply();
-//	}
 
 	/**
 	 * add a receiver device

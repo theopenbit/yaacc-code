@@ -20,9 +20,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="@string/settings_category_send_rec">
-      <ListPreference android:title="@string/settings_selected_provider_title" android:key="@string/settings_selected_provider_title"/>  
-      <ListPreference android:title="@string/settings_selected_receiver_title" android:key="@string/settings_selected_receiver_title"/>
-      <MultiSelectListPreference android:title="@string/settings_selected_receiver_title" android:key="@string/settings_selected_receivers_title"/>      
+      <ListPreference android:title="@string/settings_selected_provider_title" android:key="@string/settings_selected_provider_title"/>        
+      <MultiSelectListPreference android:title="@string/settings_selected_receivers_title" android:key="@string/settings_selected_receivers_title"/>      
       <CheckBoxPreference android:summaryOff="@string/settings_image_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_image_app_on" android:key="@string/settings_image_app"/>
       <CheckBoxPreference android:summaryOff="@string/settings_video_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_video_app_on" android:key="@string/settings_video_app"/>
       <CheckBoxPreference android:summaryOff="@string/settings_audio_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_audio_app_on" android:key="@string/settings_audio_app"/>
