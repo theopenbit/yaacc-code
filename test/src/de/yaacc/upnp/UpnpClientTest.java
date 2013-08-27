@@ -813,7 +813,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				YaaccUpnpServerService.UDN_ID);
 		editor.commit();
 		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
@@ -835,7 +835,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
 		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
@@ -857,7 +857,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
 		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));		
@@ -878,7 +878,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getContainers().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
 		List<Player> players = upnpClient.initializePlayers(result.getResult().getContainers().get(0));
@@ -899,7 +899,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getContainers().get(1));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
 		List<Player> players = upnpClient.initializePlayers(result.getResult().getContainers().get(1));		
