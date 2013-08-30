@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -362,7 +363,44 @@ public class LocalImagePlayer implements Player {
 	public int getId() {		
 		return getNotificationId();
 	}
+
+	@Override
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		throw new UnsupportedOperationException();
+		
+	}
+
+	@Override
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		throw new UnsupportedOperationException();
+		
+	}
 	
+
+	/**
+	 * returns the current item position in the playlist 
+	 * @return the position string
+	 */
+	public String getPositionString() {
+		return "";
+	}
+
+	/**
+	 * returns the title of the current item 
+	 * @return the title
+	 */
+	public String getCurrentItemTitle() {		
+		return "";
+	}
+
 	
+	/**
+	 * returns the title of the next current item 
+	 * @return the title
+	 */
+	public String getNextItemTitle() {		
+		return "";
+	}
+
 
 }

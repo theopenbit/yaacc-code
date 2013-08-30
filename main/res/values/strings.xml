@@ -111,5 +111,9 @@
     <string name="title_activity_yaacc_upnp_server_control">Yaacc Upnp server control</string>
     <string name="yaacc_upnp_server_stop_server">stop server</string>
     <string name="yaacc_upnp_server_start_server">start server</string>
+    <string name="playerCurrentItem">currentItem</string>
+    <string name="musicActivityNextLabel">"Next:  "</string>
+    <string name="playerNextIem">nextItem</string>
+    <string name="playerPosition">Position</string>
 
 </resources>

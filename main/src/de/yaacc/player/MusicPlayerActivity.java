@@ -17,6 +17,9 @@
  */
 package de.yaacc.player;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
@@ -36,8 +40,6 @@ import de.yaacc.util.AboutActivity;
  * 
  */
 public class MusicPlayerActivity extends Activity {
-
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,23 @@ public class MusicPlayerActivity extends Activity {
 			btnPause.setActivated(false);
 			btnExit.setActivated(false);
 		} else {
+			player.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent event) {
+					if (LocalBackgoundMusicPlayer.PROPERTY_ITEM.equals(event
+							.getPropertyName())) {
+						runOnUiThread(new Runnable() {
+							public void run() {
+								setTrackInfo();
+							}
+						});
+
+					}
+
+				}
+			});
+			setTrackInfo();
 			btnPrev.setActivated(true);
 			btnNext.setActivated(true);
 			btnStop.setActivated(true);
@@ -127,16 +146,16 @@ public class MusicPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-					player.exit();					
+					player.exit();
 				}
 				finish();
 			}
 		});
 	}
 
-	private Player getPlayer() {		
+	private Player getPlayer() {
 		return PlayerFactory
-				.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);		
+				.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);
 	}
 
 	@Override
@@ -160,5 +179,14 @@ public class MusicPlayerActivity extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void setTrackInfo() {
+		TextView current = (TextView) findViewById(R.id.musicActivityCurrentItem);
+		current.setText(getPlayer().getCurrentItemTitle());
+		TextView position = (TextView) findViewById(R.id.musicActivityPosition);
+		position.setText(getPlayer().getPositionString());
+		TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
+		next.setText(getPlayer().getNextItemTitle());
 	}
 }

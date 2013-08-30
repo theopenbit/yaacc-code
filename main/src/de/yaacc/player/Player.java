@@ -17,6 +17,8 @@
  */
 package de.yaacc.player;
 
+import java.beans.PropertyChangeListener;
+
 
 /**
  * A Player is able to play stop a couple of MediaObjects  
@@ -95,4 +97,35 @@ public interface Player {
 	int getId();
 
 	
+	/**
+	 * add a property change listener
+	 * @param listener
+	 */
+	void addPropertyChangeListener(PropertyChangeListener listener);
+
+	/**
+	 * remove a property change listener
+	 * @param listener
+	 */
+    void removePropertyChangeListener(PropertyChangeListener listener);
+    
+    /**
+	 * returns the current item position in the playlist 
+	 * @return the position string
+	 */
+	public String getPositionString();
+
+	/**
+	 * returns the title of the current item 
+	 * @return the title
+	 */
+	public String getCurrentItemTitle();
+
+	
+	/**
+	 * returns the title of the next current item 
+	 * @return the title
+	 */
+	public String getNextItemTitle();
+
 }

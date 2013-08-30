@@ -84,17 +84,57 @@
              android:layout_toRightOf="@+id/musicActivityControlNext"
              android:contentDescription="@string/exit"
              android:src="@drawable/button_cancel" />
+
      </RelativeLayout>
 
      <ImageView
          android:id="@+id/musicActivityImageView"
-         android:contentDescription="@string/musicActivityImageView"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_above="@+id/musicActivityControls"
+         android:layout_above="@+id/musicActivityPosition"
          android:layout_alignParentLeft="true"
          android:layout_alignParentRight="true"
          android:layout_alignParentTop="true"
+         android:contentDescription="@string/musicActivityImageView"
          android:src="@drawable/cdtrack" />
+
+     <TextView
+         android:id="@+id/musicActivityPosition"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@+id/musicActivityControls"        
+         android:layout_alignParentRight="true"
+         android:layout_marginBottom="20dp"
+         android:text="@string/playerPosition" />
+
+     <TextView
+         android:id="@+id/musicActivityCurrentItem"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignBaseline="@+id/musicActivityPosition"
+         android:layout_alignBottom="@+id/musicActivityPosition"
+         android:layout_below="@+id/musicActivityImageView"
+         android:layout_alignParentLeft="true"
+         android:layout_toLeftOf="@+id/musicActivityPosition"
+         android:text="@string/playerCurrentItem" />
+
+     <TextView
+         android:id="@+id/musicActivityNextLabel"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignBaseline="@+id/musicActivityNextItem"
+         android:layout_alignBottom="@+id/musicActivityNextItem"
+         android:layout_alignParentLeft="true"
+         android:text="@string/musicActivityNextLabel" />
+
+     <TextView
+         android:id="@+id/musicActivityNextItem"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@+id/musicActivityControls"
+         android:layout_alignParentRight="true"
+         android:layout_below="@+id/musicActivityCurrentItem"
+         android:layout_toRightOf="@+id/musicActivityNextLabel"
+         android:text="@string/playerNextIem" />
 
 </RelativeLayout>

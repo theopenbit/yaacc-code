@@ -146,7 +146,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 				intent.putExtra(BackgroundMusicBroadcastReceiver.ACTION_SET_DATA_URI_PARAM, uri);
 				getContext().sendBroadcast(intent);				
 			}
-		}, 500L);				
+		}, 500L);						
 		return uri;
 	}
 
