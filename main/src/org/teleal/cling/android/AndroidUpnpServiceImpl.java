@@ -24,6 +24,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
+import android.util.Log;
+
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceConfiguration;
 import org.teleal.cling.UpnpServiceImpl;
@@ -57,7 +59,7 @@ public class AndroidUpnpServiceImpl extends Service {
         final Object wifiManager = getSystemService(Context.WIFI_SERVICE);
         final Object ethernetManager = getSystemService("ethernet");
         
-        final Object manager = (ethernetManager != null)?ethernetManager:wifiManager;
+        final Object manager = (wifiManager != null)?wifiManager:ethernetManager;        
         final ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
