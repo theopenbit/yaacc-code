@@ -97,11 +97,11 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 		// Let's not wait for the first "wifi switched on" broadcast (which
 		// might be late on
 		// some real devices and will never occur on the emulator)
-		NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(
+		NetworkInfo netInfo = getConnectivityManager().getNetworkInfo(
 				ConnectivityManager.TYPE_WIFI);
-		if (wifiInfo.isConnected() || ModelUtil.ANDROID_EMULATOR) {
+		if (netInfo != null && (netInfo.isConnected() || ModelUtil.ANDROID_EMULATOR)) {
 			log.info("WiFi is enabled (or running on Android emulator), starting router immediately");
-			enable();
+			enable();		
 		}
 	}
 

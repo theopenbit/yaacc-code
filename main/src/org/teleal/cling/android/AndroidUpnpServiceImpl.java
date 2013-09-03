@@ -17,6 +17,11 @@
 
 package org.teleal.cling.android;
 
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -36,100 +41,127 @@ import org.teleal.cling.registry.Registry;
 import org.teleal.cling.transport.Router;
 
 /**
- * Provides a UPnP stack with Android configuration (WiFi network only) as an application service component.
+ * Provides a UPnP stack with Android configuration (WiFi network only) as an
+ * application service component.
  * <p>
- * Sends a search for all UPnP devices on instantiation. See the {@link org.teleal.cling.android.AndroidUpnpService}
- * interface for a usage example.
+ * Sends a search for all UPnP devices on instantiation. See the
+ * {@link org.teleal.cling.android.AndroidUpnpService} interface for a usage
+ * example.
  * </p>
  * <p/>
- * Override the {@link #createRouter(org.teleal.cling.UpnpServiceConfiguration, org.teleal.cling.protocol.ProtocolFactory, android.net.wifi.WifiManager, android.net.ConnectivityManager)}
- * and {@link #createConfiguration(android.net.wifi.WifiManager)} methods to customize the service.
- *
+ * Override the
+ * {@link #createRouter(org.teleal.cling.UpnpServiceConfiguration, org.teleal.cling.protocol.ProtocolFactory, android.net.wifi.WifiManager, android.net.ConnectivityManager)}
+ * and {@link #createConfiguration(android.net.wifi.WifiManager)} methods to
+ * customize the service.
+ * 
  * @author Christian Bauer
  */
 public class AndroidUpnpServiceImpl extends Service {
 
-    protected UpnpService upnpService;
-    protected Binder binder = new Binder();
+	protected UpnpService upnpService;
+	protected Binder binder = new Binder();
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+	@Override
+	public void onCreate() {
+		super.onCreate();
 
-        final Object wifiManager = getSystemService(Context.WIFI_SERVICE);
-        final Object ethernetManager = getSystemService("ethernet");
-        
-        final Object manager = (wifiManager != null)?wifiManager:ethernetManager;        
-        final ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInterface ethernet = null;
+		List<NetworkInterface> interfaces;
+		Object manager_ = null;
+		try {
+			interfaces = Collections.list(NetworkInterface
+					.getNetworkInterfaces());
 
-        upnpService = new UpnpServiceImpl(createConfiguration(manager)) {
-            @Override
-            protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
-                AndroidWifiSwitchableRouter router =
-                        AndroidUpnpServiceImpl.this.createRouter(
-                                getConfiguration(),
-                                protocolFactory,
-                                manager,
-                                connectivityManager
-                        );
-                if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges()) {
-                    // Only register for network connectivity changes if we are not running on emulator
-                    registerReceiver(
-                            router.getBroadcastReceiver(),
-                            new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
-                    );
-                }
-                return router;
-            }
-        };
+			for (NetworkInterface iface : interfaces) {
+				if (iface.getDisplayName().equals("eth0")) {
+					ethernet = iface;
+					break;
+				}
+			}		
+		
+		if(ethernet != null && ethernet.isUp()){
+			manager_ = getSystemService("ethernet");
+		} else {
+			manager_ = getSystemService(Context.WIFI_SERVICE);
+		}	
+		
+		} catch (SocketException e) {
+			Log.d(getClass().getName(),
+					"Exception while lookup Networkinterfaces", e);
+			manager_ = getSystemService(Context.WIFI_SERVICE);
+		}
+		final Object manager = manager_;
+		Log.d(getClass().getName(), "NetworkManager: " + manager);
+		final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		upnpService = new UpnpServiceImpl(createConfiguration(manager)) {
+			@Override
+			protected Router createRouter(ProtocolFactory protocolFactory,
+					Registry registry) {
+				AndroidWifiSwitchableRouter router = AndroidUpnpServiceImpl.this
+						.createRouter(getConfiguration(), protocolFactory,
+								manager, connectivityManager);
+				if (!ModelUtil.ANDROID_EMULATOR
+						&& isListeningForConnectivityChanges()) {
+					// Only register for network connectivity changes if we are
+					// not running on emulator
+					registerReceiver(router.getBroadcastReceiver(),
+							new IntentFilter(
+									"android.net.conn.CONNECTIVITY_CHANGE"));
+				}
+				return router;
+			}
+		};
 
-    }
+	}
 
-    protected AndroidUpnpServiceConfiguration createConfiguration(Object wifiManager) {
-        return new AndroidUpnpServiceConfiguration(wifiManager);
-    }
+	protected AndroidUpnpServiceConfiguration createConfiguration(
+			Object wifiManager) {
+		return new AndroidUpnpServiceConfiguration(wifiManager);
+	}
 
-    protected AndroidWifiSwitchableRouter createRouter(UpnpServiceConfiguration configuration,
-                                                      ProtocolFactory protocolFactory,
-                                                      Object manager,
-                                                      ConnectivityManager connectivityManager) {
-    	return new AndroidWifiSwitchableRouter(configuration, protocolFactory, manager, connectivityManager);
-    }
+	protected AndroidWifiSwitchableRouter createRouter(
+			UpnpServiceConfiguration configuration,
+			ProtocolFactory protocolFactory, Object manager,
+			ConnectivityManager connectivityManager) {
+		return new AndroidWifiSwitchableRouter(configuration, protocolFactory,
+				manager, connectivityManager);
+	}
 
-    @Override
-    public void onDestroy() {
-        if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges())
-            unregisterReceiver(((AndroidWifiSwitchableRouter) upnpService.getRouter()).getBroadcastReceiver());
-        upnpService.shutdown();
-    }
+	@Override
+	public void onDestroy() {
+		if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges())
+			unregisterReceiver(((AndroidWifiSwitchableRouter) upnpService
+					.getRouter()).getBroadcastReceiver());
+		upnpService.shutdown();
+	}
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
+	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
 
-    protected boolean isListeningForConnectivityChanges() {
-        return true;
-    }
+	protected boolean isListeningForConnectivityChanges() {
+		return true;
+	}
 
-    protected class Binder extends android.os.Binder implements AndroidUpnpService {
+	protected class Binder extends android.os.Binder implements
+			AndroidUpnpService {
 
-        public UpnpService get() {
-            return upnpService;
-        }
+		public UpnpService get() {
+			return upnpService;
+		}
 
-        public UpnpServiceConfiguration getConfiguration() {
-            return upnpService.getConfiguration();
-        }
+		public UpnpServiceConfiguration getConfiguration() {
+			return upnpService.getConfiguration();
+		}
 
-        public Registry getRegistry() {
-            return upnpService.getRegistry();
-        }
+		public Registry getRegistry() {
+			return upnpService.getRegistry();
+		}
 
-        public ControlPoint getControlPoint() {
-            return upnpService.getControlPoint();
-        }
-    }
+		public ControlPoint getControlPoint() {
+			return upnpService.getControlPoint();
+		}
+	}
 
 }
