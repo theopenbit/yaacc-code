@@ -107,7 +107,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 		// Define where to show the folder contents for media
 		contentList = (ListView) findViewById(R.id.itemList);
+		
 		registerForContextMenu(contentList);
+		
 
 		// remove the buttons if local playback is enabled and background
 		// playback is not enabled
@@ -340,7 +342,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 		// TODO: I think there might be some item dependent actions in the
 		// future, so this is designed as a dynamic list
-		menuItems.add(v.getContext().getString(R.string.browse_context_play));
+		if (!navigator.getCurrentPosition().equals(Navigator.DEVICE_LIST_POSIOTION)){
+			menuItems.add(v.getContext().getString(R.string.browse_context_play));
+		}
 		menuItems.add(v.getContext().getString(
 				R.string.browse_context_add_to_playplist));
 		menuItems.add(v.getContext()
@@ -501,13 +505,6 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		// TODO Auto-generated method stub
 
 	}
-
-	@Override
-	public boolean onLongClick(View v) {
-		Toast toast = Toast.makeText(getApplicationContext(), "Long click", Toast.LENGTH_SHORT);
-		toast.show();
-		return true;
-	}
 	
 	public boolean currentlyShowingDevices(){
 		if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(navigator.getCurrentPosition().getObjectId()))	{
@@ -518,6 +515,12 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	
 	public static Navigator getNavigator(){
 		return navigator;
+	}
+
+	@Override
+	public boolean onLongClick(View arg0) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	
