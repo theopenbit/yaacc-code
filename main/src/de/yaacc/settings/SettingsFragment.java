@@ -30,6 +30,12 @@ import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 
+/**
+ * Main settings menu. Defines an entry point for all settings of the application.
+ * 
+ * @author Christoph Hähnel (eyeless)
+ *
+ */
 public class SettingsFragment extends PreferenceFragment implements UpnpClientListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

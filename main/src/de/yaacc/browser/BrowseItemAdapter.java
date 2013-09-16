@@ -41,6 +41,12 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
+/**
+ * Adapter for holding item information in the browse list.
+ * 
+ * @author Christoph Hähnel (eyeless)
+ *
+ */
 public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;

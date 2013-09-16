@@ -25,6 +25,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import de.yaacc.R;
 
+/**
+ * Reacts on click on a certain device in the device list.
+ * 
+ * @author Christoph Hähnel (eyeless)
+ *
+ */
 public class BrowseDeviceClickListener implements OnItemClickListener {
 
 	@Override

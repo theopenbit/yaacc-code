@@ -35,6 +35,12 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.player.Player;
 
+/**
+ * Reacts on click on a certain device in the item list.
+ * 
+ * @author Christoph Hähnel (eyeless)
+ *
+ */
 public class BrowseItemClickListener implements OnItemClickListener{
 		//FIXME: just for easter egg to play all items on prev button
 		public static DIDLObject currentObject;
