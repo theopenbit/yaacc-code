@@ -34,6 +34,7 @@ import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 
 /**
+ * State stopped
  * @author Tobias Schöne (openbit)
  * 
  */

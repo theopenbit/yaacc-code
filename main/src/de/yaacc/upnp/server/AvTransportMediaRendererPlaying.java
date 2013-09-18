@@ -33,6 +33,11 @@ import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 
+/**
+ * State Playing.
+ * @author Tobias Schoene (openbit)  
+ *
+ */
 public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
 
 	private UpnpClient upnpClient;

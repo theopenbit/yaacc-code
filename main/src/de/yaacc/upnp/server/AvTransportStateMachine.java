@@ -21,6 +21,7 @@ package de.yaacc.upnp.server;
 import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
 import org.teleal.common.statemachine.States;
 /**
+ * Statemachine...
  * @author Tobias Schöne (openbit)  
  *
  */

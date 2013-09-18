@@ -32,6 +32,11 @@ import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 
+/**
+ * State Paused.
+ * @author Tobias Schoene (openbit)  
+ *
+ */
 public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
 
 	private UpnpClient upnpClient;

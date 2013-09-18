@@ -91,7 +91,6 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * A client facade to the upnp lookup and access framework. This class provides
  * all services to manage devices.
  * 
- * TODO play methods must be refactored
  * 
  * @author Tobias Schöne (openbit)
  * 

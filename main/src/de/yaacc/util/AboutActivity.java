@@ -28,7 +28,7 @@ import android.widget.TextView;
 import de.yaacc.R;
 
 /**
- * An about dialog for yaacc
+ * An about dialog for yaacc.
  * 
  * @author Tobias Schoene (openbit)
  * 

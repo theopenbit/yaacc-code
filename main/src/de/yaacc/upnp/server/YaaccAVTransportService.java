@@ -28,6 +28,7 @@ import de.yaacc.upnp.UpnpClient;
 
 
 /**
+ * Implementation of the AVTransportService.
  * @author Tobias Schöne (openbit)
  * 
  */
