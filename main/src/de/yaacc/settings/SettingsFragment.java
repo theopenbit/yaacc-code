@@ -51,6 +51,9 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 		
 	}
 
+	/**
+	 * Loads devices and shows them to the user.
+	 */
 	private void populateDeviceLists() {
 		LinkedList<Device> devices = new LinkedList<Device>();
 		// TODO: populate with found devices
@@ -98,6 +101,9 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 	}
 
 	@Override
+	/**
+	 * Refresh device list if device is removed.
+	 */
 	public void deviceAdded(Device<?, ?, ?> device) {
 		if (this.isVisible()){
 			populateDeviceLists();
@@ -105,6 +111,9 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 	}
 
 	@Override
+	/**
+	 * Refresh device list if device is added.
+	 */
 	public void deviceRemoved(Device<?, ?, ?> device) {
 		if(this.isVisible()){
 			populateDeviceLists();

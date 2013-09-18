@@ -56,7 +56,7 @@ import de.yaacc.util.AboutActivity;
  * 
  * @author Christoph Hähnel (eyeless)
  */
-public class BrowseActivity extends Activity implements OnClickListener, OnLongClickListener,
+public class BrowseActivity extends Activity implements OnClickListener,
 		UpnpClientListener {
 
 	public static UpnpClient uClient = null;
@@ -202,6 +202,10 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		
 	}
 	
+	/**
+	 * load app preferences
+	 * @return app preferences
+	 */
 	private SharedPreferences getPrefereces(){
 		if (preferences == null){
 			preferences = PreferenceManager
@@ -271,6 +275,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 
 	@Override
+	/**
+	 * Navigation in option menu
+	 */
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
@@ -298,11 +305,14 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 
 	@Override
+	/**
+	 * Stepps 'up' in the folder hierarchy or closes App if on device level.
+	 */
 	public void onBackPressed() {
 		Log.d(BrowseActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
 		String currentObjectId = navigator.getCurrentPosition().getObjectId();
 		if (Navigator.ITEM_ROOT_OBJECT_ID.equals(currentObjectId)) {
-			navigator.pushPosition(Navigator.DEVICE_LIST_POSIOTION);
+			navigator.pushPosition(Navigator.DEVICE_LIST_POSITION);
 			populateDeviceList();
 		} else if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(currentObjectId)){
 			uClient.shutdown();
@@ -324,6 +334,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 
 	@Override
+	/**
+	 * Creates context menu for certain actions on a specific item.
+	 */
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		
@@ -343,11 +356,13 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 		// TODO: I think there might be some item dependent actions in the
 		// future, so this is designed as a dynamic list
-		if (!navigator.getCurrentPosition().equals(Navigator.DEVICE_LIST_POSIOTION)){
+		if (!currentlyShowingDevices()){
 			menuItems.add(v.getContext().getString(R.string.browse_context_play));
 		}
 		menuItems.add(v.getContext().getString(
 				R.string.browse_context_add_to_playplist));
+		
+		
 		menuItems.add(v.getContext()
 				.getString(R.string.browse_context_download));
 
@@ -404,6 +419,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 	}
 	
+	/**
+	 * Shows all available devices in the main device list.
+	 */
 	private void populateDeviceList(){
 		this.runOnUiThread(new Runnable() {
 			public void run() {
@@ -421,7 +439,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		});
 	}
 
-	
+	/**
+	 * Shows all available devices in the receiver device list.
+	 */
 	private void populateReceiverDeviceList(){
 		this.runOnUiThread(new Runnable() {
 			public void run() {
@@ -471,6 +491,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 
 	@Override
+	/**
+	 * Refreshes the shown devices when device is added.
+	 */
 	public void deviceAdded(Device<?, ?, ?> device) {
 		if (currentlyShowingDevices()) {
 			preferences = getPrefereces();
@@ -494,10 +517,12 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 	}
 
 	@Override
+	/**
+	 * Refreshes the shown devices when device is removed.
+	 */
 	public void deviceRemoved(Device<?, ?, ?> device) {
 		Log.d(this.getClass().toString(), "device removal called");
 		if (currentlyShowingDevices()) {
-			// showMainFolder();
 			populateDeviceList();
 		}
 
@@ -509,13 +534,10 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 	}
 
-	@Override
-	public boolean onLongClick(View v) {
-		Toast toast = Toast.makeText(getApplicationContext(), "Long click", Toast.LENGTH_SHORT);
-		toast.show();
-		return true;
-	}
-	
+	/**
+	 * Checks whether currently showing devices or folders inside a certain device
+	 * @return true if showing devices, false otherwise
+	 */
 	public boolean currentlyShowingDevices(){
 		if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(navigator.getCurrentPosition().getObjectId()))	{
 			return true;
@@ -523,6 +545,10 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 		return false;
 	}
 	
+	/**
+	 * Returns Object containing about the current navigation way
+	 * @return information about current navigation 
+	 */
 	public static Navigator getNavigator(){
 		return navigator;
 	}
