@@ -343,7 +343,9 @@ public class BrowseActivity extends Activity implements OnClickListener, OnLongC
 
 		// TODO: I think there might be some item dependent actions in the
 		// future, so this is designed as a dynamic list
-		menuItems.add(v.getContext().getString(R.string.browse_context_play));
+		if (!navigator.getCurrentPosition().equals(Navigator.DEVICE_LIST_POSIOTION)){
+			menuItems.add(v.getContext().getString(R.string.browse_context_play));
+		}
 		menuItems.add(v.getContext().getString(
 				R.string.browse_context_add_to_playplist));
 		menuItems.add(v.getContext()
