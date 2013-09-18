@@ -19,6 +19,10 @@ package de.yaacc.browser;
 
 import org.teleal.cling.model.meta.Device;
 
+/**
+ * Reference point for a certain object on a certain device.
+ * @author Christoph Hähnel (eyeless)
+ */
 public class Position {
 
 	private String objectId;

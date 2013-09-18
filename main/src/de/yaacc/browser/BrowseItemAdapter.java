@@ -41,6 +41,10 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
 
+/**
+ * Adapter for browsing devices.
+ * @author Christoph Hähnel (eyeless)
+ */
 public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;

@@ -21,6 +21,10 @@ import java.util.LinkedList;
 
 import android.util.Log;
 
+/**
+ * Manages navigation path inside device and folder hierarchy.
+ * @author Christoph Hähnel (eyeless)
+ */
 public class Navigator {
 	
 	public final static String DEVICE_OVERVIEW_OBJECT_ID = "-1";

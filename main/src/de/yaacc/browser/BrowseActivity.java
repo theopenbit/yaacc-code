@@ -51,6 +51,11 @@ import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.util.AboutActivity;
 
+/**
+ * Activity for browsing devices and folders. Represents the entrypoint for the whole application.
+ * 
+ * @author Christoph Hähnel (eyeless)
+ */
 public class BrowseActivity extends Activity implements OnClickListener, OnLongClickListener,
 		UpnpClientListener {
 

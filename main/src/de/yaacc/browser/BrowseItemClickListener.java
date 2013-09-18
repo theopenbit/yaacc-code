@@ -36,6 +36,10 @@ import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.player.Player;
 
+/**
+ * Clicklistener when browsing folders.
+ * @author Christoph Hähnel (eyeless)
+ */
 public class BrowseItemClickListener implements OnItemClickListener{
 		//FIXME: just for easter egg to play all items on prev button
 		public static DIDLObject currentObject;
