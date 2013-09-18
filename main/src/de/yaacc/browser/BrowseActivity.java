@@ -50,12 +50,6 @@ import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.util.AboutActivity;
 
-/**
- * Activity providing the browsing functionality for devices, folders and files.
- * 
- * @author Christoph Hähnel (eyeless)
- *
- */
 public class BrowseActivity extends Activity implements OnClickListener, OnLongClickListener,
 		UpnpClientListener {
 

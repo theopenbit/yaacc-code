@@ -21,12 +21,6 @@ import java.util.LinkedList;
 
 import android.util.Log;
 
-/**
- * Provides easy accessible methods to retrieve information where on the browsing path the current user is residing.
- * 
- * @author Christoph Hähnel (eyeless)
- *
- */
 public class Navigator {
 	
 	public final static String DEVICE_OVERVIEW_OBJECT_ID = "-1";
