@@ -91,14 +91,14 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		init(savedInstanceState, getIntent());
 
 	}
-	
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onNewIntent(android.content.Intent)
 	 */
 	@Override
-	protected void onNewIntent(Intent intent) {	
+	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		init(null, intent);
 	}
@@ -123,7 +123,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			imageUris = (List<Uri>) savedInstanceState
 					.getSerializable("imageUris");
 		}
-		
+
 		Log.d(this.getClass().getName(),
 				"Received Action View! now setting items ");
 		Serializable urisData = intent.getSerializableExtra(URIS);
@@ -282,8 +282,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			});
 			// Start the pictureShow
 			pictureShowActive = true;
-			loadImage();
-			startMenuHideTimer();
+			loadImage();			
 			isProcessingCommand = false;
 
 		}
@@ -324,8 +323,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		});
 		showDefaultImage();
 
-		pictureShowActive = false;
-		startMenuHideTimer();
+		pictureShowActive = false;		
 		isProcessingCommand = false;
 	}
 
@@ -363,8 +361,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 			}
 		});
-		pictureShowActive = false;
-		startMenuHideTimer();
+		pictureShowActive = false;		
 		isProcessingCommand = false;
 	}
 
@@ -392,13 +389,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				toast.show();
 			}
 		});
-		loadImage();
-		runOnUiThread(new Runnable() {
-			public void run() {
-				menuBarsHide();
-			}
-
-		});
+		loadImage();		
 		isProcessingCommand = false;
 	}
 
@@ -425,8 +416,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			}
 
 		});
-		loadImage();
-		startMenuHideTimer();
+		loadImage();		
 		isProcessingCommand = false;
 	}
 
@@ -521,12 +511,12 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			@Override
 			public void run() {
 				runOnUiThread(new Runnable() {
-					public void run() {
-						menuBarsHide();
+					public void run() {						
+							menuBarsHide();						
 					}
 				});
 			}
-		}, 4000);
+		}, 5000);
 	}
 
 	public boolean isPictureShowActive() {
