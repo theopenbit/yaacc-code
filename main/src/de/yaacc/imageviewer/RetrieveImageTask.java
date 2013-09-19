@@ -46,6 +46,14 @@ import de.yaacc.R;
  */
 public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 
+	private ImageViewerActivity imageViewerActivity;
+	private Dialog pd;
+	
+
+	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
+		this.imageViewerActivity = imageViewerActivity;
+	}
+
 	static class FlushedInputStream extends FilterInputStream {
 		public FlushedInputStream(InputStream inputStream) {
 			super(inputStream);
@@ -68,13 +76,6 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 			}
 			return totalBytesSkipped;
 		}
-	}
-
-	private ImageViewerActivity imageViewerActivity;
-	private Dialog pd;
-
-	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
-		this.imageViewerActivity = imageViewerActivity;
 	}
 
 	@Override
