@@ -343,8 +343,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Start an intent with Action.View;
 	 * 
-	 * @param mime
-	 *            the Mimetype to start
 	 * @param uris
 	 *            the uri to start
 	 * @param backround
