@@ -574,5 +574,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		actionBar.show();
 
 	}
+	
+	
 
 }
