@@ -17,11 +17,6 @@
  */
 package de.yaacc.browser;
 
-import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,12 +31,10 @@ import org.teleal.cling.support.model.item.PlaylistItem;
 import org.teleal.cling.support.model.item.TextItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.DisplayMetrics;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +45,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
+import de.yaacc.util.image.IconDownloadTask;
+import de.yaacc.util.image.ImageDownloader;
 
 /**
  * Adapter for browsing devices.
@@ -130,7 +125,7 @@ public class BrowseItemAdapter extends BaseAdapter{
 	@Override
 	public View getView(int position, View arg1, ViewGroup parent) {
 		ViewHolder holder;
-		
+        IconDownloadTask iconDownloadTask = new IconDownloadTask();
 		
 		
 		if(arg1 == null){
@@ -149,11 +144,28 @@ public class BrowseItemAdapter extends BaseAdapter{
 		holder.name.setText(currentObject.getTitle());
 		
 		if(currentObject instanceof Container){
-			holder.icon.setImageResource(R.drawable.folder);
+            holder.icon.setImageResource(R.drawable.folder);
+            Bitmap cover = containedCoverImage((Container) currentObject);
+            if (cover != null){
+                holder.icon.setImageBitmap(cover);
+            }
 		} else if(currentObject instanceof AudioItem){			
 			holder.icon.setImageResource(R.drawable.cdtrack);
 		} else if(currentObject instanceof ImageItem){
-			holder.icon.setImageResource(R.drawable.image);
+            holder.icon.setImageResource(R.drawable.image);
+            iconDownloadTask.execute((ImageItem) currentObject);
+
+            //FIXME: The icons must be loaded afterwards, right now breaking after 0.2 seconds
+            long starttime = System.currentTimeMillis();
+
+            while(iconDownloadTask.getStatus() == AsyncTask.Status.RUNNING
+                    && (System.currentTimeMillis()-starttime < 200)){
+
+            }
+            Bitmap result = iconDownloadTask.getResult();
+            if (result != null){
+                holder.icon.setImageBitmap(result);
+            }
 		} else if(currentObject instanceof VideoItem){
 			holder.icon.setImageResource(R.drawable.video);
 		} else if(currentObject instanceof PlaylistItem){
@@ -179,79 +191,33 @@ public class BrowseItemAdapter extends BaseAdapter{
 		}
 		return objects.get(position);
 	}
+
+    private Bitmap getThumbnail(ImageItem image){
+        ImageDownloader downloader = new ImageDownloader();
+        return downloader.retrieveIcon(Uri.parse(image.getFirstResource().getValue()));
+    }
 	
 	private Bitmap containedCoverImage(Container currentObject){
 		List<Item> a = currentObject.getItems();
-		while(!a.isEmpty()){
+        ImageDownloader downloader = new ImageDownloader();
+
+        while(!a.isEmpty()){
 			Item toTest = a.remove(0);
-			if (toTest instanceof ImageItem && ((ImageItem)toTest).getTitle().equals("cover.jpg")){
-				Uri a = new Uri();
-				URI b = ((ImageItem)toTest).getFirstResource().getImportUri();
-				Bitmap bitmap = null; //decodeSampledBitmapFromStream(((ImageItem)toTest).getFirstResource().getImportUri(),	48, 48);
-				return bitmap;
+			if (toTest instanceof ImageItem){
+                return downloader.retrieveIcon(Uri.parse(((ImageItem)toTest).getFirstResource().getValue()));
 			}
 		}
 		return null;
 	}
 
-	private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
-			int reqHeight) throws IOException {
-		InputStream is = getUriAsStream(imageUri);
+    private boolean isCoverImage(ImageItem toTest){
+        String title = ((ImageItem)toTest).getTitle();
+        if (title.equalsIgnoreCase("cover.jpg")){
+            return true;
+        }
+        return false;
+    }
 
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = false;
-		options.outHeight = reqHeight;
-		options.outWidth = reqWidth;
-		options.inPreferQualityOverSpeed = false;
-		options.inDensity = DisplayMetrics.DENSITY_LOW;
-		options.inTempStorage = new byte[7680016];
-		Log.d(this.getClass().getName(),
-				"displaying image size width, height, inSampleSize "
-						+ options.outWidth + "," + options.outHeight + ","
-						+ options.inSampleSize);
-		Log.d(this.getClass().getName(), "free meomory before image load: "
-				+ Runtime.getRuntime().freeMemory());
-		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
-				null, options);
-		Log.d(this.getClass().getName(), "free meomory after image load: "
-				+ Runtime.getRuntime().freeMemory());
-		return bitmap;
-	}
-	
-	private InputStream getUriAsStream(Uri imageUri)
-			throws FileNotFoundException, IOException, MalformedURLException {
-		InputStream is = null;
-		Log.d(getClass().getName(), "Start load: " + System.currentTimeMillis());
-		
-			is = (InputStream) new java.net.URL(imageUri.toString())
-					.getContent();
-		Log.d(getClass().getName(), "Stop load: " + System.currentTimeMillis());
-		Log.d(getClass().getName(), "InputStream: " + is);
-		return is;
-	}
 
-	static class FlushedInputStream extends FilterInputStream {
-		public FlushedInputStream(InputStream inputStream) {
-			super(inputStream);
-		}
-
-		@Override
-		public long skip(long n) throws IOException {
-			long totalBytesSkipped = 0L;
-			while (totalBytesSkipped < n) {
-				long bytesSkipped = in.skip(n - totalBytesSkipped);
-				if (bytesSkipped == 0L) {
-					int byte_ = read();
-					if (byte_ < 0) {
-						break; // we reached EOF
-					} else {
-						bytesSkipped = 1; // we read one byte
-					}
-				}
-				totalBytesSkipped += bytesSkipped;
-			}
-			return totalBytesSkipped;
-		}
-	}
 
 }
