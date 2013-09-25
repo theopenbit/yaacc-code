@@ -17,7 +17,6 @@
  */
 package de.yaacc.browser;
 
-import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,11 +40,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
-import de.yaacc.util.image.IconDownloadTask;
 import de.yaacc.util.image.ImageDownloader;
 
 /**
@@ -125,20 +124,20 @@ public class BrowseItemAdapter extends BaseAdapter{
 	@Override
 	public View getView(int position, View arg1, ViewGroup parent) {
 		ViewHolder holder;
-        IconDownloadTask iconDownloadTask = new IconDownloadTask();
-		
-		
-		if(arg1 == null){
-			arg1 = inflator.inflate(R.layout.browse_item,parent,false);
-			
-			holder = new ViewHolder();
-			holder.icon = (ImageView) arg1.findViewById(R.id.browseItemIcon);
-			holder.name = (TextView) arg1.findViewById(R.id.browseItemName);
-			arg1.setTag(holder);
-		} else {
-			holder = (ViewHolder) arg1.getTag();
-		}
-				
+
+
+        if(arg1 == null){
+            arg1 = inflator.inflate(R.layout.browse_item,parent,false);
+
+            holder = new ViewHolder();
+            holder.icon = (ImageView) arg1.findViewById(R.id.browseItemIcon);
+            holder.name = (TextView) arg1.findViewById(R.id.browseItemName);
+            arg1.setTag(holder);
+        } else {
+            holder = (ViewHolder) arg1.getTag();
+        }
+        IconDownloadTask iconDownloadTask = new IconDownloadTask((ListView)parent, position);
+
 		DIDLObject currentObject = (DIDLObject)getItem(position);
 
 		holder.name.setText(currentObject.getTitle());
@@ -154,18 +153,6 @@ public class BrowseItemAdapter extends BaseAdapter{
 		} else if(currentObject instanceof ImageItem){
             holder.icon.setImageResource(R.drawable.image);
             iconDownloadTask.execute((ImageItem) currentObject);
-
-            //FIXME: The icons must be loaded afterwards, right now breaking after 0.2 seconds
-            long starttime = System.currentTimeMillis();
-
-            while(iconDownloadTask.getStatus() == AsyncTask.Status.RUNNING
-                    && (System.currentTimeMillis()-starttime < 200)){
-
-            }
-            Bitmap result = iconDownloadTask.getResult();
-            if (result != null){
-                holder.icon.setImageBitmap(result);
-            }
 		} else if(currentObject instanceof VideoItem){
 			holder.icon.setImageResource(R.drawable.video);
 		} else if(currentObject instanceof PlaylistItem){
