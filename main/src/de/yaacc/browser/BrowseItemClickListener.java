@@ -69,6 +69,8 @@ public class BrowseItemClickListener implements OnItemClickListener{
 			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
 			a.setOnItemClickListener(bItemClickListener);
 
+            IconDownloadCacheHandler.getInstance().resetCache();
+
 		} else {
 			List<Player> players = BrowseActivity.uClient.initializePlayers(currentObject);
 			for (Player player : players) {

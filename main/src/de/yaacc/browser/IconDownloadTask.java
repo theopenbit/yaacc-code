@@ -3,6 +3,7 @@ package de.yaacc.browser;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.LruCache;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,16 +25,21 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
     private Bitmap result;
     private ListView a;
     private int position;
-
+    private IconDownloadCacheHandler cache;
 
     public IconDownloadTask(ListView a,int position){
         this.a = a;
         this.position = position;
+        this.cache = IconDownloadCacheHandler.getInstance();
     }
 
     @Override
     protected Bitmap doInBackground(ImageItem... images) {
-        result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
+        result = cache.getBitmap(position);
+        if (result == null){
+            result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
+            cache.addBitmap(position,result);
+        }
         return result;
     }
 
