@@ -33,7 +33,6 @@ import org.teleal.cling.support.model.item.VideoItem;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
+import de.yaacc.util.image.IconDownloadTask;
 import de.yaacc.util.image.ImageDownloader;
 
 /**

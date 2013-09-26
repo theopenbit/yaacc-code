@@ -1,38 +1,44 @@
-package de.yaacc.browser;
+package de.yaacc.util.image;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.LruCache;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import org.teleal.cling.support.model.item.ImageItem;
 
-import java.net.URL;
-
 import de.yaacc.R;
-import de.yaacc.browser.BrowseItemAdapter;
-import de.yaacc.util.image.ImageDownloader;
 
 /**
+ * AsyncTask fpr retrieving icons while browsing.
+ *
  * @author: Christoph Hähnel (eyeless)
  */
 public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
 
     private Bitmap result;
-    private ListView a;
+    private ListView listView;
     private int position;
     private IconDownloadCacheHandler cache;
 
-    public IconDownloadTask(ListView a,int position){
-        this.a = a;
+    /**
+     * Initialize a new download by handing over the the list and the position with the icon to download
+     * @param list contains all item
+     * @param position position in list
+     */
+    public IconDownloadTask(ListView list,int position){
+        this.listView = list;
         this.position = position;
         this.cache = IconDownloadCacheHandler.getInstance();
     }
 
+    /**
+     * Download image and convert it to icon
+     * @param images DIDLObject containing the ressource URL
+     * @return icon
+     */
     @Override
     protected Bitmap doInBackground(ImageItem... images) {
         result = cache.getBitmap(position);
@@ -43,10 +49,14 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
         return result;
     }
 
+    /**
+     * Replaces the icon in the list with the freshly loaded icon
+     * @param result downloaded icon
+     */
     @Override
     protected void onPostExecute(Bitmap result) {
-        int visiblePosition = a.getFirstVisiblePosition();
-        View v = a.getChildAt(position - visiblePosition);
+        int visiblePosition = listView.getFirstVisiblePosition();
+        View v = listView.getChildAt(position - visiblePosition);
         if (v != null){
             ImageView c = (ImageView) v.findViewById(R.id.browseItemIcon);
             c.setImageBitmap(result);

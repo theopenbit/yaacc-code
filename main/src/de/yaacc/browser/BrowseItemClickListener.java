@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.player.Player;
+import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
  * Clicklistener when browsing folders.
@@ -69,6 +70,7 @@ public class BrowseItemClickListener implements OnItemClickListener{
 			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
 			a.setOnItemClickListener(bItemClickListener);
 
+            // when entering a new folder the cache must be emptied
             IconDownloadCacheHandler.getInstance().resetCache();
 
 		} else {

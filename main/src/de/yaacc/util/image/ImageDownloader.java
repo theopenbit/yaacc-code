@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 
 /**
- * Created by eyeless on 21.09.13.
+ * @author Christoph Hähnel (eyeless)
  */
 public class ImageDownloader {
 
