@@ -62,7 +62,6 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
         if (v != null){
             ImageView c = (ImageView) v.findViewById(R.id.browseItemIcon);
             c.setImageBitmap(result);
-            Log.d("Scaling","*********** HEIGHT: "+result.getHeight() + " WIDTH: "+ result.getWidth() +" *********");
         }
     }
 }

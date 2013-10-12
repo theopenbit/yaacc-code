@@ -13,12 +13,19 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 
 /**
+ * Manages downloading of images from various sources and some refactoring to these images.
+ *
  * @author Christoph Hähnel (eyeless)
  */
 public class ImageDownloader {
 
     public ImageDownloader(){}
 
+    /**
+     * Loads an iconised version of the handed image location
+     * @param imageUri image location
+     * @return
+     */
     public Bitmap retrieveIcon(Uri imageUri){
         Bitmap result = null;
         try{
@@ -29,14 +36,20 @@ public class ImageDownloader {
         return result;
     }
 
+    /**
+     * Loads an image from the given URI and return a Bitmap that matchs the requested size
+     * @param imageUri image location
+     * @param reqWidth width of result image
+     * @param reqHeight height of result image
+     * @return requested image
+     * @throws IOException problem while loading image from stream
+     */
     private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
                                                  int reqHeight) throws IOException {
         InputStream is = getUriAsStream(imageUri);
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = false;
-        //options.outHeight = reqHeight;
-        //options.outWidth = reqWidth;
         options.inPreferQualityOverSpeed = false;
         options.inDensity = DisplayMetrics.DENSITY_LOW;
         options.inTempStorage = new byte[7680016];
@@ -52,12 +65,21 @@ public class ImageDownloader {
         bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
         Log.d(this.getClass().getName(), "free memory after image load: "
                 + Runtime.getRuntime().freeMemory());
+
         if(bitmap.getHeight() != reqHeight){
-            Log.w("scaling", "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
+            Log.w(this.getClass().getName(), "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
         }
         return bitmap;
     }
 
+    /**
+     * Converts URI to InputStream.
+     * @param imageUri
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws MalformedURLException
+     */
     private InputStream getUriAsStream(Uri imageUri)
             throws FileNotFoundException, IOException, MalformedURLException {
         InputStream is = null;
