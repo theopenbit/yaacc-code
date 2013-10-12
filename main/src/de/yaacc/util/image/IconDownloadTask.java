@@ -1,8 +1,10 @@
 package de.yaacc.util.image;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -60,7 +62,7 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
         if (v != null){
             ImageView c = (ImageView) v.findViewById(R.id.browseItemIcon);
             c.setImageBitmap(result);
-            c.setMaxHeight(70);
+            Log.d("Scaling","*********** HEIGHT: "+result.getHeight() + " WIDTH: "+ result.getWidth() +" *********");
         }
     }
 }

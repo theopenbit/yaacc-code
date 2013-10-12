@@ -35,8 +35,8 @@ public class ImageDownloader {
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = false;
-        options.outHeight = reqHeight;
-        options.outWidth = reqWidth;
+        //options.outHeight = reqHeight;
+        //options.outWidth = reqWidth;
         options.inPreferQualityOverSpeed = false;
         options.inDensity = DisplayMetrics.DENSITY_LOW;
         options.inTempStorage = new byte[7680016];
@@ -48,8 +48,13 @@ public class ImageDownloader {
                 + Runtime.getRuntime().freeMemory());
         Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
                 null, options);
+
+        bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
         Log.d(this.getClass().getName(), "free memory after image load: "
                 + Runtime.getRuntime().freeMemory());
+        if(bitmap.getHeight() != reqHeight){
+            Log.w("scaling", "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
+        }
         return bitmap;
     }
 
