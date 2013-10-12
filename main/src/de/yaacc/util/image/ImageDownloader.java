@@ -26,18 +26,22 @@ public class ImageDownloader {
      * @param imageUri image location
      * @return
      */
-    public Bitmap retrieveIcon(Uri imageUri){
-        Bitmap result = null;
-        try{
-            result = decodeSampledBitmapFromStream(imageUri, 48, 48);
-        } catch (IOException e){
-            Log.d(this.getClass().getName(),"while decoding image: "+e.getMessage());
-        }
-        return result;
+    public Bitmap retrieveIcon(Uri imageUri) throws  IOException {
+        return decodeSampledBitmapFromStream(imageUri, 48, 48, true);
+    }
+
+
+    /**
+     * Loads the handed image location with the given size
+     * @param imageUri image location
+     * @return
+     */
+    public Bitmap retrieveImageWithCertainSize(Uri imageUri,int imageWidth, int imageHeight) throws IOException{
+        return decodeSampledBitmapFromStream(imageUri, imageWidth, imageHeight, false);
     }
 
     /**
-     * Loads an image from the given URI and return a Bitmap that matchs the requested size
+     * Loads an image from the given URI and return a Bitmap that matches the requested size
      * @param imageUri image location
      * @param reqWidth width of result image
      * @param reqHeight height of result image
@@ -45,11 +49,14 @@ public class ImageDownloader {
      * @throws IOException problem while loading image from stream
      */
     private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
-                                                 int reqHeight) throws IOException {
+                                                 int reqHeight, boolean rescaleImage) throws IOException {
+
         InputStream is = getUriAsStream(imageUri);
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = false;
+        options.outWidth = reqWidth;
+        options.outHeight = reqHeight;
         options.inPreferQualityOverSpeed = false;
         options.inDensity = DisplayMetrics.DENSITY_LOW;
         options.inTempStorage = new byte[7680016];
@@ -62,13 +69,16 @@ public class ImageDownloader {
         Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
                 null, options);
 
-        bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
+        if (rescaleImage){
+            bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
+        }
         Log.d(this.getClass().getName(), "free memory after image load: "
                 + Runtime.getRuntime().freeMemory());
 
         if(bitmap.getHeight() != reqHeight){
             Log.w(this.getClass().getName(), "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
         }
+
         return bitmap;
     }
 

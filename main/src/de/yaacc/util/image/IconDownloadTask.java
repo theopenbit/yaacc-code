@@ -11,6 +11,8 @@ import android.widget.ListView;
 
 import org.teleal.cling.support.model.item.ImageItem;
 
+import java.io.IOException;
+
 import de.yaacc.R;
 
 /**
@@ -45,7 +47,11 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
     protected Bitmap doInBackground(ImageItem... images) {
         result = cache.getBitmap(position);
         if (result == null){
-            result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
+            try {
+                result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
+            } catch (IOException e){
+
+            }
             cache.addBitmap(position,result);
         }
         return result;

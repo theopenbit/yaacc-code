@@ -37,6 +37,7 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.util.image.ImageDownloader;
 
 /**
  * Background task for retrieving network images.
@@ -151,7 +152,7 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 							"Decode image: " + System.currentTimeMillis());
 					Log.d(getClass().getName(), "Size width,height: "
 							+ widthPixels + "," + heightPixels);
-					Bitmap bitmap = decodeSampledBitmapFromStream(imageUri,
+					Bitmap bitmap = new ImageDownloader().retrieveImageWithCertainSize(imageUri,
 							widthPixels, heightPixels);
 					image = new BitmapDrawable(
 							imageViewerActivity.getResources(), bitmap);
@@ -187,51 +188,6 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 		}
 	}
 
-	/**
-	 * @param imageUri
-	 * @return
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws MalformedURLException
-	 */
-	private InputStream getUriAsStream(Uri imageUri)
-			throws FileNotFoundException, IOException, MalformedURLException {
-		InputStream is = null;
-		Log.d(getClass().getName(), "Start load: " + System.currentTimeMillis());
-		if (ContentResolver.SCHEME_CONTENT.equals(imageUri.getScheme())) {
-			is = imageViewerActivity.getContentResolver().openInputStream(
-					imageUri);
-		} else {
-			is = (InputStream) new java.net.URL(imageUri.toString())
-					.getContent();
-		}
-		Log.d(getClass().getName(), "Stop load: " + System.currentTimeMillis());
-		Log.d(getClass().getName(), "InputStream: " + is);
-		return is;
-	}
 
-	private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
-			int reqHeight) throws IOException {
-		InputStream is = getUriAsStream(imageUri);
-
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = false;
-		options.outHeight = reqHeight;
-		options.outWidth = reqWidth;
-		options.inPreferQualityOverSpeed = false;
-		options.inDensity = DisplayMetrics.DENSITY_LOW;
-		options.inTempStorage = new byte[7680016];
-		Log.d(this.getClass().getName(),
-				"displaying image size width, height, inSampleSize "
-						+ options.outWidth + "," + options.outHeight + ","
-						+ options.inSampleSize);
-		Log.d(this.getClass().getName(), "free meomory before image load: "
-				+ Runtime.getRuntime().freeMemory());
-		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
-				null, options);
-		Log.d(this.getClass().getName(), "free meomory after image load: "
-				+ Runtime.getRuntime().freeMemory());
-		return bitmap;
-	}
 
 }
