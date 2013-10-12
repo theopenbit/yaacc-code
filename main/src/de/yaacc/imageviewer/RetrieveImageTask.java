@@ -141,38 +141,28 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 			Log.d(getClass().getName(), "Load imageUri: " + imageUri);
 			Drawable image = null;
 
-			try {
-				if (imageUri != null) {
+            if (imageUri != null) {
 
-					int heightPixels = imageViewerActivity.getResources()
-							.getDisplayMetrics().heightPixels;
-					int widthPixels = imageViewerActivity.getResources()
-							.getDisplayMetrics().widthPixels;
-					Log.d(getClass().getName(),
-							"Decode image: " + System.currentTimeMillis());
-					Log.d(getClass().getName(), "Size width,height: "
-							+ widthPixels + "," + heightPixels);
-					Bitmap bitmap = new ImageDownloader().retrieveImageWithCertainSize(imageUri,
-							widthPixels, heightPixels);
-					image = new BitmapDrawable(
-							imageViewerActivity.getResources(), bitmap);
-					Log.d(getClass().getName(),
-							"Got image: " + System.currentTimeMillis());
-					Log.d(getClass().getName(), "image: " + image);
-				}
-			} catch (final Exception e) {
-				image = Drawable.createFromPath("@drawable/ic_launcher");
-				Log.d(getClass().getName(), "Error while processing image", e);
-				imageViewerActivity.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast toast = Toast.makeText(imageViewerActivity,
-								"Exception:" + e.getMessage(),
-								Toast.LENGTH_LONG);
-						toast.show();
-					}
-				});
-
-			}
+                int heightPixels = imageViewerActivity.getResources()
+                        .getDisplayMetrics().heightPixels;
+                int widthPixels = imageViewerActivity.getResources()
+                        .getDisplayMetrics().widthPixels;
+                Log.d(getClass().getName(),
+                        "Decode image: " + System.currentTimeMillis());
+                Log.d(getClass().getName(), "Size width,height: "
+                        + widthPixels + "," + heightPixels);
+                Bitmap bitmap = new ImageDownloader().retrieveImageWithCertainSize(imageUri,
+                        widthPixels, heightPixels);
+                if (bitmap != null){
+                    image = new BitmapDrawable(
+                            imageViewerActivity.getResources(), bitmap);
+                } else {
+                    image = Drawable.createFromPath("@drawable/ic_launcher");
+                }
+                Log.d(getClass().getName(),
+                        "Got image: " + System.currentTimeMillis());
+                Log.d(getClass().getName(), "image: " + image);
+            }
 
 			final Drawable finalImage = image;
 			imageViewerActivity.runOnUiThread(new Runnable() {

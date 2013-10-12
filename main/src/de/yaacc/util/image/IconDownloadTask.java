@@ -14,6 +14,7 @@ import org.teleal.cling.support.model.item.ImageItem;
 import java.io.IOException;
 
 import de.yaacc.R;
+import de.yaacc.browser.BrowseActivity;
 
 /**
  * AsyncTask fpr retrieving icons while browsing.
@@ -47,12 +48,8 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
     protected Bitmap doInBackground(ImageItem... images) {
         result = cache.getBitmap(position);
         if (result == null){
-            try {
-                result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
-            } catch (IOException e){
-
-            }
-            cache.addBitmap(position,result);
+             result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
+             cache.addBitmap(position,result);
         }
         return result;
     }

@@ -26,7 +26,7 @@ public class ImageDownloader {
      * @param imageUri image location
      * @return
      */
-    public Bitmap retrieveIcon(Uri imageUri) throws  IOException {
+    public Bitmap retrieveIcon(Uri imageUri){
         return decodeSampledBitmapFromStream(imageUri, 48, 48, true);
     }
 
@@ -36,8 +36,9 @@ public class ImageDownloader {
      * @param imageUri image location
      * @return
      */
-    public Bitmap retrieveImageWithCertainSize(Uri imageUri,int imageWidth, int imageHeight) throws IOException{
-        return decodeSampledBitmapFromStream(imageUri, imageWidth, imageHeight, false);
+    public Bitmap retrieveImageWithCertainSize(Uri imageUri,int imageWidth, int imageHeight){
+           Bitmap result =  decodeSampledBitmapFromStream(imageUri, imageWidth, imageHeight, false);
+        return result;
     }
 
     /**
@@ -49,34 +50,43 @@ public class ImageDownloader {
      * @throws IOException problem while loading image from stream
      */
     private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
-                                                 int reqHeight, boolean rescaleImage) throws IOException {
+                                                 int reqHeight, boolean rescaleImage) {
 
-        InputStream is = getUriAsStream(imageUri);
+        Bitmap bitmap = null;
 
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = false;
-        options.outWidth = reqWidth;
-        options.outHeight = reqHeight;
-        options.inPreferQualityOverSpeed = false;
-        options.inDensity = DisplayMetrics.DENSITY_LOW;
-        options.inTempStorage = new byte[7680016];
-        Log.d(this.getClass().getName(),
-                "displaying image size width, height, inSampleSize "
-                        + options.outWidth + "," + options.outHeight + ","
-                        + options.inSampleSize);
-        Log.d(this.getClass().getName(), "free memory before image load: "
-                + Runtime.getRuntime().freeMemory());
-        Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
-                null, options);
+        try {
+            InputStream is = getUriAsStream(imageUri);
 
-        if (rescaleImage){
-            bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
-        }
-        Log.d(this.getClass().getName(), "free memory after image load: "
-                + Runtime.getRuntime().freeMemory());
 
-        if(bitmap.getHeight() != reqHeight){
-            Log.w(this.getClass().getName(), "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = false;
+            options.outWidth = reqWidth;
+            options.outHeight = reqHeight;
+            options.inPreferQualityOverSpeed = false;
+            options.inDensity = DisplayMetrics.DENSITY_LOW;
+            options.inTempStorage = new byte[7680016];
+            Log.d(this.getClass().getName(),
+                    "displaying image size width, height, inSampleSize "
+                            + options.outWidth + "," + options.outHeight + ","
+                            + options.inSampleSize);
+            Log.d(this.getClass().getName(), "free memory before image load: "
+                    + Runtime.getRuntime().freeMemory());
+
+            bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
+                    null, options);
+
+            if (rescaleImage){
+                bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
+            }
+            Log.d(this.getClass().getName(), "free memory after image load: "
+                    + Runtime.getRuntime().freeMemory());
+
+            if(bitmap.getHeight() != reqHeight){
+                Log.w(this.getClass().getName(), "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
+            }
+
+        } catch (IOException e){
+            Log.d(this.getClass().getName(),"while decoding image: "+e.getMessage());
         }
 
         return bitmap;
