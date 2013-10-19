@@ -18,24 +18,19 @@
  */
 package de.yaacc.imageviewer;
 
-import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Window;
-import android.widget.Toast;
+
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import de.yaacc.R;
 import de.yaacc.util.image.ImageDownloader;
 
