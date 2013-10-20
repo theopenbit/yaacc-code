@@ -925,14 +925,25 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 
 	/**
+	 * Returns the receiverIds stored in the preferences. 
+	 * If an receiver id is unknown it will be removed.   
 	 * @return the receiverDevices
 	 */
 	public Collection<Device> getReceiverDevices() {
 		ArrayList<Device> result = new ArrayList<Device>();
-		for (String id : getReceiverDeviceIds()) {
-			result.add(this.getDevice(id));
+		ArrayList<String> unknowsIds = new ArrayList<String>(); //Maybe the the receiverDevice in the preferences isn't available any more 
+		Set<String> receiverDeviceIds = getReceiverDeviceIds();
+		for (String id : receiverDeviceIds) {
+			Device receiver = this.getDevice(id);
+			if(receiver != null){
+				result.add(this.getDevice(id));
+			} else {
+				unknowsIds.add(id);
+			}
 		}
-		
+		//remove all unknown ids 
+		receiverDeviceIds.removeAll(unknowsIds);
+		setReceiverDeviceIds(receiverDeviceIds);
 		return result;
 
 	}
@@ -964,19 +975,29 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @param receiver
 	 */
 	public void setReceiverDevices(Collection<Device> receiverDevices) {
-		assert(receiverDevices != null);
-		Editor prefEdit = preferences.edit();
+		assert(receiverDevices != null);		
 		HashSet<String> receiverIds = new HashSet<String>();
 		for (Device receiver : receiverDevices) {
+			Log.d(this.getClass().getName(), "Receiver: " + receiver);		
 			receiverIds.add(receiver.getIdentity().getUdn().getIdentifierString());
 			
 		}
-		prefEdit.putStringSet(
-				context.getString(R.string.settings_selected_receivers_title),
-				receiverIds);
-		prefEdit.apply();
+		setReceiverDeviceIds(receiverIds);
 	}
 	
+	
+	/**
+	 * Set the list of receiver device ids.
+	 * @param receiverDeviceIds the device ids. 
+	 */
+	protected void setReceiverDeviceIds(Set<String> receiverDeviceIds) {
+		assert(receiverDeviceIds != null);
+		Editor prefEdit = preferences.edit();				
+		prefEdit.putStringSet(
+				context.getString(R.string.settings_selected_receivers_title),
+				receiverDeviceIds);
+		prefEdit.apply();
+	}
 	/**
 	 * 
 	 * @return the providerDeviceId
