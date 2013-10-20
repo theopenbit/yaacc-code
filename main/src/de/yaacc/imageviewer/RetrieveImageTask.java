@@ -18,21 +18,25 @@
  */
 package de.yaacc.imageviewer;
 
+import java.io.FileNotFoundException;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Window;
-
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
+import android.widget.Toast;
 import de.yaacc.R;
-import de.yaacc.util.image.ImageDownloader;
 
 /**
  * Background task for retrieving network images.
@@ -41,14 +45,6 @@ import de.yaacc.util.image.ImageDownloader;
  * 
  */
 public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
-
-	private ImageViewerActivity imageViewerActivity;
-	private Dialog pd;
-	
-
-	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
-		this.imageViewerActivity = imageViewerActivity;
-	}
 
 	static class FlushedInputStream extends FilterInputStream {
 		public FlushedInputStream(InputStream inputStream) {
@@ -72,6 +68,13 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 			}
 			return totalBytesSkipped;
 		}
+	}
+
+	private ImageViewerActivity imageViewerActivity;
+	private Dialog pd;
+
+	public RetrieveImageTask(ImageViewerActivity imageViewerActivity) {
+		this.imageViewerActivity = imageViewerActivity;
 	}
 
 	@Override
@@ -136,28 +139,38 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 			Log.d(getClass().getName(), "Load imageUri: " + imageUri);
 			Drawable image = null;
 
-            if (imageUri != null) {
+			try {
+				if (imageUri != null) {
 
-                int heightPixels = imageViewerActivity.getResources()
-                        .getDisplayMetrics().heightPixels;
-                int widthPixels = imageViewerActivity.getResources()
-                        .getDisplayMetrics().widthPixels;
-                Log.d(getClass().getName(),
-                        "Decode image: " + System.currentTimeMillis());
-                Log.d(getClass().getName(), "Size width,height: "
-                        + widthPixels + "," + heightPixels);
-                Bitmap bitmap = new ImageDownloader().retrieveImageWithCertainSize(imageUri,
-                        widthPixels, heightPixels);
-                if (bitmap != null){
-                    image = new BitmapDrawable(
-                            imageViewerActivity.getResources(), bitmap);
-                } else {
-                    image = Drawable.createFromPath("@drawable/ic_launcher");
-                }
-                Log.d(getClass().getName(),
-                        "Got image: " + System.currentTimeMillis());
-                Log.d(getClass().getName(), "image: " + image);
-            }
+					int heightPixels = imageViewerActivity.getResources()
+							.getDisplayMetrics().heightPixels;
+					int widthPixels = imageViewerActivity.getResources()
+							.getDisplayMetrics().widthPixels;
+					Log.d(getClass().getName(),
+							"Decode image: " + System.currentTimeMillis());
+					Log.d(getClass().getName(), "Size width,height: "
+							+ widthPixels + "," + heightPixels);
+					Bitmap bitmap = decodeSampledBitmapFromStream(imageUri,
+							widthPixels, heightPixels);
+					image = new BitmapDrawable(
+							imageViewerActivity.getResources(), bitmap);
+					Log.d(getClass().getName(),
+							"Got image: " + System.currentTimeMillis());
+					Log.d(getClass().getName(), "image: " + image);
+				}
+			} catch (final Exception e) {
+				image = Drawable.createFromPath("@drawable/ic_launcher");
+				Log.d(getClass().getName(), "Error while processing image", e);
+				imageViewerActivity.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast toast = Toast.makeText(imageViewerActivity,
+								"Exception:" + e.getMessage(),
+								Toast.LENGTH_LONG);
+						toast.show();
+					}
+				});
+
+			}
 
 			final Drawable finalImage = image;
 			imageViewerActivity.runOnUiThread(new Runnable() {
@@ -173,6 +186,51 @@ public class RetrieveImageTask extends AsyncTask<Uri, Void, Void> {
 		}
 	}
 
+	/**
+	 * @param imageUri
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws MalformedURLException
+	 */
+	private InputStream getUriAsStream(Uri imageUri)
+			throws FileNotFoundException, IOException, MalformedURLException {
+		InputStream is = null;
+		Log.d(getClass().getName(), "Start load: " + System.currentTimeMillis());
+		if (ContentResolver.SCHEME_CONTENT.equals(imageUri.getScheme())) {
+			is = imageViewerActivity.getContentResolver().openInputStream(
+					imageUri);
+		} else {
+			is = (InputStream) new java.net.URL(imageUri.toString())
+					.getContent();
+		}
+		Log.d(getClass().getName(), "Stop load: " + System.currentTimeMillis());
+		Log.d(getClass().getName(), "InputStream: " + is);
+		return is;
+	}
 
+	private Bitmap decodeSampledBitmapFromStream(Uri imageUri, int reqWidth,
+			int reqHeight) throws IOException {
+		InputStream is = getUriAsStream(imageUri);
+
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = false;
+		options.outHeight = reqHeight;
+		options.outWidth = reqWidth;
+		options.inPreferQualityOverSpeed = false;
+		options.inDensity = DisplayMetrics.DENSITY_LOW;
+		options.inTempStorage = new byte[7680016];
+		Log.d(this.getClass().getName(),
+				"displaying image size width, height, inSampleSize "
+						+ options.outWidth + "," + options.outHeight + ","
+						+ options.inSampleSize);
+		Log.d(this.getClass().getName(), "free meomory before image load: "
+				+ Runtime.getRuntime().freeMemory());
+		Bitmap bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
+				null, options);
+		Log.d(this.getClass().getName(), "free meomory after image load: "
+				+ Runtime.getRuntime().freeMemory());
+		return bitmap;
+	}
 
 }

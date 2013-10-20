@@ -22,13 +22,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.widget.TextView;
 import de.yaacc.R;
 
 /**
- * An about dialog for yaacc.
+ * An about dialog for yaacc
  * 
  * @author Tobias Schoene (openbit)
  * 
@@ -52,13 +51,6 @@ public class AboutActivity extends Activity {
 			aboutTextBuilder.append("Yet Another Android Client Controller\nVersion: ").append(app_ver).append("\n\n")
 					.append(aboutText);
 			textView.setText(aboutTextBuilder.toString());
-			//Make links clickable
-			textView = (TextView) findViewById(R.id.about_descrip);
-			textView.setMovementMethod(LinkMovementMethod.getInstance());
-//			textView = (TextView) findViewById(R.id.about_credits_third_partie);
-//			textView.setMovementMethod(LinkMovementMethod.getInstance());
-//			textView = (TextView) findViewById(R.id.about_credits);
-//			textView.setMovementMethod(LinkMovementMethod.getInstance());
 		} catch (NameNotFoundException e) {
 			Log.d(getClass().getName(), "Can't find version", e);
 		}

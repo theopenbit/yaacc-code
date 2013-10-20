@@ -21,6 +21,6 @@
       <ListPreference
       	android:title="@string/image_viewer_settings_duration"
       	android:key="@string/image_viewer_settings_duration_key"
-      	android:entries="@array/duration_entries"
-      	android:entryValues="@array/duration_values" />
+      	android:entries="@array/image_viewer_slide_stay_duration_entries"
+      	android:entryValues="@array/image_viewer_slide_stay_duration_values" />
 </PreferenceScreen>

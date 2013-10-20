@@ -83,27 +83,12 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	private Timer pictureShowTimer;
 	private ImageViewerBroadcastReceiver imageViewerBroadcastReceiver;
 
+
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(this.getClass().getName(), "OnCreate");
 		super.onCreate(savedInstanceState);
-		init(savedInstanceState, getIntent());
-
-	}
-	
-	
-	
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onNewIntent(android.content.Intent)
-	 */
-	@Override
-	protected void onNewIntent(Intent intent) {	
-		super.onNewIntent(intent);
-		init(null, intent);
-	}
-
-	private void init(Bundle savedInstanceState, Intent intent) {
 		menuBarsHide();
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		getWindow().clearFlags(
@@ -123,27 +108,22 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			imageUris = (List<Uri>) savedInstanceState
 					.getSerializable("imageUris");
 		}
-		
+
+		Intent i = getIntent();
 		Log.d(this.getClass().getName(),
 				"Received Action View! now setting items ");
-		Serializable urisData = intent.getSerializableExtra(URIS);
+		Serializable urisData = i.getSerializableExtra(URIS);
 		if (urisData != null) {
 			if (urisData instanceof List) {
-				currentImageIndex = 0;
 				imageUris = (List<Uri>) urisData;
-				Log.d(this.getClass().getName(),
-						"imageUris" + imageUris.toString());
 			}
 
 		} else {
-			if (intent.getData() != null) {
-				currentImageIndex = 0;
-				imageUris.add(intent.getData());
-				Log.d(this.getClass().getName(), "imageUris.add(i.getData)"
-						+ imageUris.toString());
+			if (i.getData() != null) {
+				imageUris.add(i.getData());
 			}
 		}
-		pictureShowActive = intent.getBooleanExtra(AUTO_START_SHOW, false);
+		pictureShowActive = i.getBooleanExtra(AUTO_START_SHOW, false);
 		if (imageUris.size() > 0) {
 			loadImage();
 		} else {
@@ -157,20 +137,22 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				}
 			});
 		}
+		
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	
+	/* (non-Javadoc)
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
 	protected void onResume() {
-
-		imageViewerBroadcastReceiver = new ImageViewerBroadcastReceiver(this);
+		
+		imageViewerBroadcastReceiver = new ImageViewerBroadcastReceiver(this);		
 		imageViewerBroadcastReceiver.registerReceiver();
 		super.onResume();
 	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -181,7 +163,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	protected void onPause() {
 		cancleTimer();
 		unregisterReceiver(imageViewerBroadcastReceiver);
-		imageViewerBroadcastReceiver = null;
+		imageViewerBroadcastReceiver=null;
 		super.onPause();
 	}
 
@@ -221,7 +203,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			return true;
 		case R.id.yaacc_about:
 			AboutActivity.showAbout(this);
-			return true;
+			return true;	
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -298,8 +280,6 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			return;
 		}
 		retrieveImageTask = new RetrieveImageTask(this);
-		Log.d(getClass().getName(),
-				"showImage(" + imageUris.get(currentImageIndex) + ")");
 		retrieveImageTask.execute(imageUris.get(currentImageIndex));
 
 	}
@@ -574,7 +554,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		actionBar.show();
 
 	}
-	
-	
 
+
+
+
+	
 }

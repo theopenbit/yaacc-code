@@ -24,17 +24,12 @@ import org.teleal.cling.model.meta.Device;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
 import android.preference.PreferenceFragment;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 
-/**
- * Entry point for main settings and second level setting menus.
- * @author Christoph Hähnel (eyeless)
- */
 public class SettingsFragment extends PreferenceFragment implements UpnpClientListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,9 +46,6 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 		
 	}
 
-	/**
-	 * Loads devices and shows them to the user.
-	 */
 	private void populateDeviceLists() {
 		LinkedList<Device> devices = new LinkedList<Device>();
 		// TODO: populate with found devices
@@ -84,8 +76,9 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 
 			devices = new LinkedList<Device>();
 			devices.addAll(upnpClient.getDevicesProvidingAvTransportService());
-			
-			MultiSelectListPreference receiverMsLp = (MultiSelectListPreference) findPreference(getString(R.string.settings_selected_receivers_title));
+
+			// One entry per found device for receiving media data
+			ListPreference receiverLp = (ListPreference) findPreference(getString(R.string.settings_selected_receiver_title));
 			ArrayList<CharSequence> receiverEntries = new ArrayList<CharSequence>();
 			ArrayList<CharSequence> receiverEntryValues = new ArrayList<CharSequence>();
 			for (Device currentDevice : devices) {
@@ -93,17 +86,19 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 				receiverEntryValues.add(currentDevice.getIdentity().getUdn()
 						.getIdentifierString());
 			}
-			receiverMsLp.setEntries(receiverEntries
+
+			// Add a default entry for the local device
+			receiverEntries.add(android.os.Build.MODEL);
+			receiverEntryValues.add(UpnpClient.LOCAL_UID);
+
+			receiverLp.setEntries(receiverEntries
 					.toArray(new CharSequence[receiverEntries.size()]));
-			receiverMsLp.setEntryValues(receiverEntryValues
+			receiverLp.setEntryValues(receiverEntryValues
 					.toArray(new CharSequence[receiverEntries.size()]));
 		}
 	}
 
 	@Override
-	/**
-	 * Refresh device list if device is removed.
-	 */
 	public void deviceAdded(Device<?, ?, ?> device) {
 		if (this.isVisible()){
 			populateDeviceLists();
@@ -111,9 +106,6 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 	}
 
 	@Override
-	/**
-	 * Refresh device list if device is added.
-	 */
 	public void deviceRemoved(Device<?, ?, ?> device) {
 		if(this.isVisible()){
 			populateDeviceLists();

@@ -36,7 +36,7 @@ public class UpnpRegistryService extends AndroidUpnpServiceImpl {
 
 	@Override
 	protected AndroidUpnpServiceConfiguration createConfiguration(
-			Object wifiManager) {
+			WifiManager wifiManager) {
 		return new AndroidUpnpServiceConfiguration(wifiManager) {
 
 			/*

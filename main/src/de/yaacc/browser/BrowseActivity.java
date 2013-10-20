@@ -19,7 +19,6 @@ package de.yaacc.browser;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.support.model.DIDLObject;
@@ -51,12 +50,7 @@ import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.util.AboutActivity;
 
-/**
- * Activity for browsing devices and folders. Represents the entrypoint for the whole application.
- * 
- * @author Christoph Hähnel (eyeless)
- */
-public class BrowseActivity extends Activity implements OnClickListener,
+public class BrowseActivity extends Activity implements OnClickListener, OnLongClickListener,
 		UpnpClientListener {
 
 	public static UpnpClient uClient = null;
@@ -126,12 +120,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
 				//FIXME: Until context menu isn't working using the prev-button for playAll
 				//a little easter egg	
 				if(BrowseItemClickListener.currentObject != null){
-					List<Player> players = uClient.initializePlayers(BrowseItemClickListener.currentObject);
-					for (Player player : players) {
-						if(player != null){
-							player.play();
-						}
-						
+					Player player = uClient.initializePlayer(BrowseItemClickListener.currentObject);
+					if(player != null){
+						player.play();
 					}
 				}
 
@@ -202,10 +193,6 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		
 	}
 	
-	/**
-	 * load app preferences
-	 * @return app preferences
-	 */
 	private SharedPreferences getPrefereces(){
 		if (preferences == null){
 			preferences = PreferenceManager
@@ -275,9 +262,6 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	/**
-	 * Navigation in option menu
-	 */
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
@@ -305,14 +289,11 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	/**
-	 * Stepps 'up' in the folder hierarchy or closes App if on device level.
-	 */
 	public void onBackPressed() {
 		Log.d(BrowseActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
 		String currentObjectId = navigator.getCurrentPosition().getObjectId();
 		if (Navigator.ITEM_ROOT_OBJECT_ID.equals(currentObjectId)) {
-			navigator.pushPosition(Navigator.DEVICE_LIST_POSITION);
+			navigator.pushPosition(Navigator.DEVICE_LIST_POSIOTION);
 			populateDeviceList();
 		} else if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(currentObjectId)){
 			uClient.shutdown();
@@ -334,9 +315,6 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	/**
-	 * Creates context menu for certain actions on a specific item.
-	 */
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		
@@ -356,13 +334,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 		// TODO: I think there might be some item dependent actions in the
 		// future, so this is designed as a dynamic list
-		if (!currentlyShowingDevices()){
-			menuItems.add(v.getContext().getString(R.string.browse_context_play));
-		}
+		menuItems.add(v.getContext().getString(R.string.browse_context_play));
 		menuItems.add(v.getContext().getString(
 				R.string.browse_context_add_to_playplist));
-		
-		
 		menuItems.add(v.getContext()
 				.getString(R.string.browse_context_download));
 
@@ -406,7 +380,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
 				navigator.pushPosition(pos);				
 				bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
 						pos);
-				contentList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+				
 				contentList.setAdapter(bItemAdapter);
 
 				contentList.setOnItemClickListener(bItemClickListener);
@@ -419,16 +393,13 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 	}
 	
-	/**
-	 * Shows all available devices in the main device list.
-	 */
 	private void populateDeviceList(){
 		this.runOnUiThread(new Runnable() {
 			public void run() {
 				
 				// Define where to show the folder contents
 				ListView deviceList = (ListView) findViewById(R.id.itemList);
-				deviceList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
 				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(uClient.getDevicesProvidingContentDirectoryService()));
 				
 				deviceList.setAdapter(bDeviceAdapter);
@@ -439,28 +410,24 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		});
 	}
 
-	/**
-	 * Shows all available devices in the receiver device list.
-	 */
+	
 	private void populateReceiverDeviceList(){
 		this.runOnUiThread(new Runnable() {
 			public void run() {
 				
 				// Define where to show the folder contents
 				ListView deviceList = (ListView) findViewById(R.id.itemList);
-				deviceList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+				
 				
 				
 				LinkedList<Device> receiverDevices = new LinkedList<Device>(uClient.getDevicesProvidingAvTransportService());
-				
-				
-				BrowseReceiverDeviceAdapter bDeviceAdapter = new BrowseReceiverDeviceAdapter(getApplicationContext(), receiverDevices, uClient.getReceiverDevices());
+				receiverDevices.add(uClient.getLocalDummyDevice());
+				BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), receiverDevices);
 				
 				deviceList.setAdapter(bDeviceAdapter);
 
 				deviceList.setOnItemClickListener(bReceiverDeviceClickListener);
 
-	
 			}
 		});
 	}
@@ -491,9 +458,6 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	/**
-	 * Refreshes the shown devices when device is added.
-	 */
 	public void deviceAdded(Device<?, ?, ?> device) {
 		if (currentlyShowingDevices()) {
 			preferences = getPrefereces();
@@ -517,12 +481,10 @@ public class BrowseActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	/**
-	 * Refreshes the shown devices when device is removed.
-	 */
 	public void deviceRemoved(Device<?, ?, ?> device) {
 		Log.d(this.getClass().toString(), "device removal called");
 		if (currentlyShowingDevices()) {
+			// showMainFolder();
 			populateDeviceList();
 		}
 
@@ -534,10 +496,13 @@ public class BrowseActivity extends Activity implements OnClickListener,
 
 	}
 
-	/**
-	 * Checks whether currently showing devices or folders inside a certain device
-	 * @return true if showing devices, false otherwise
-	 */
+	@Override
+	public boolean onLongClick(View v) {
+		Toast toast = Toast.makeText(getApplicationContext(), "Long click", Toast.LENGTH_SHORT);
+		toast.show();
+		return true;
+	}
+	
 	public boolean currentlyShowingDevices(){
 		if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(navigator.getCurrentPosition().getObjectId()))	{
 			return true;
@@ -545,10 +510,6 @@ public class BrowseActivity extends Activity implements OnClickListener,
 		return false;
 	}
 	
-	/**
-	 * Returns Object containing about the current navigation way
-	 * @return information about current navigation 
-	 */
 	public static Navigator getNavigator(){
 		return navigator;
 	}

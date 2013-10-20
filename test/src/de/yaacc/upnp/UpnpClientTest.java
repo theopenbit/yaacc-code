@@ -67,7 +67,6 @@ import android.webkit.MimeTypeMap;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
-import de.yaacc.player.Player;
 import de.yaacc.upnp.server.LocalUpnpServer;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -268,36 +267,27 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 
 	}
 
-//	this testcase never stop why? public void testRetrieveContentDirectoryContent() throws Exception {
-//		UpnpClient upnpClient = new UpnpClient();
-//		final List<Device<?, ?, ?>> devices = searchDevices(upnpClient);
-//		ContentDirectoryBrowser browse = null;
-//		for (Device<?, ?, ?> device : devices) {
-//			Log.d(getClass().getName(),
-//					"#####Device: " + device.getDisplayString());
-//			Service service = device.findService(new UDAServiceId(
-//					"ContentDirectory"));
-//			if (service != null) {
-//				browse = new ContentDirectoryBrowser(service, "0",
-//						BrowseFlag.DIRECT_CHILDREN);
-//				upnpClient.getUpnpService().getControlPoint().execute(browse);
-//				flag = false;
-//				new Timer().schedule(new TimerTask() {
-//
-//					@Override
-//					public void run() {
-//						flag = true;
-//					}
-//				}, 120000l); // 120sec. Watchdog				
-//				while (browse != null && browse.getStatus() != Status.OK && !flag)
-//					;
-//				assertFalse("Watchdog timeout" , flag);
-//				browseContainer(upnpClient, browse.getContainers(), service, 0);
-//			}
-//
-//		}
-//
-//	}
+	public void testRetrieveContentDirectoryContent() throws Exception {
+		UpnpClient upnpClient = new UpnpClient();
+		final List<Device<?, ?, ?>> devices = searchDevices(upnpClient);
+		ContentDirectoryBrowser browse = null;
+		for (Device<?, ?, ?> device : devices) {
+			Log.d(getClass().getName(),
+					"#####Device: " + device.getDisplayString());
+			Service service = device.findService(new UDAServiceId(
+					"ContentDirectory"));
+			if (service != null) {
+				browse = new ContentDirectoryBrowser(service, "0",
+						BrowseFlag.DIRECT_CHILDREN);
+				upnpClient.getUpnpService().getControlPoint().execute(browse);
+				while (browse != null && browse.getStatus() != Status.OK)
+					;
+				browseContainer(upnpClient, browse.getContainers(), service, 0);
+			}
+
+		}
+
+	}
 
 	protected void browseContainer(UpnpClient upnpClient,
 			List<Container> containers, Service service, int depth) {
@@ -309,17 +299,8 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 			ContentDirectoryBrowser dirBrowser = new ContentDirectoryBrowser(
 					service, container.getId(), BrowseFlag.DIRECT_CHILDREN);
 			upnpClient.getUpnpService().getControlPoint().execute(dirBrowser);
-			flag = false;
-			new Timer().schedule(new TimerTask() {
-
-				@Override
-				public void run() {
-					flag = true;
-				}
-			}, 120000l); // 120sec. Watchdog
 			while (dirBrowser != null && dirBrowser.getStatus() != Status.OK)
 				;
-			assertFalse(flag);
 			browseContainer(upnpClient, dirBrowser.getContainers(), service,
 					depth + 1);
 		}
@@ -729,17 +710,8 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 						+ device.getIdentity().getUdn().getIdentifierString());
 			}
 		});
-		flag = false;
-		new Timer().schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				flag = true;
-			}
-		}, 120000l); // 120sec. Watchdog			
-		while (!upnpClient.isInitialized() && !flag)
+		while (!upnpClient.isInitialized())
 			;
-		assertFalse("Watchdog timeout" , flag);
 		upnpClient.searchDevices();
 		myWait();
 
@@ -747,7 +719,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	}
 
 	protected void myWait() {
-		myWait(10000l);
+		myWait(30000l);
 	}
 
 	protected void myWait(final long millis) {
@@ -795,10 +767,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
-		for (Player player : players) {
-			player.play();			
-		}
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		
 	}
 	
@@ -813,13 +782,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				YaaccUpnpServerService.UDN_ID);
 		editor.commit();
-		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
-		for (Player player : players) {
-			player.play();			
-		}
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		myWait(120000L);
 	}
 	
@@ -835,16 +801,12 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
-		for (Player player : players) {
-			player.play();			
-		}
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		myWait(120000L);
 	}
-	
 	
 	public void testUseCasePlayLocalImage() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithLocalServer();
@@ -857,13 +819,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));		
-		for (Player player : players) {
-			player.play();			
-		}
+		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
 		myWait();
 	}
 
@@ -878,13 +837,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getContainers().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		List<Player> players = upnpClient.initializePlayers(result.getResult().getContainers().get(0));
-		for (Player player : players) {
-			player.play();			
-		}
+		upnpClient.initializePlayer(result.getResult().getContainers().get(0)).play();
 		
 	}
 	
@@ -899,13 +855,10 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getContainers().get(1));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		List<Player> players = upnpClient.initializePlayers(result.getResult().getContainers().get(1));		
-		for (Player player : players) {
-			player.play();			
-		}
+		upnpClient.initializePlayer(result.getResult().getContainers().get(1)).play();
 		
 	}
 // TODO must be implemented in another way	

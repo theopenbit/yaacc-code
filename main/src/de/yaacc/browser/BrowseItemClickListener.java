@@ -18,7 +18,6 @@
 package de.yaacc.browser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
@@ -35,12 +34,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.player.Player;
-import de.yaacc.util.image.IconDownloadCacheHandler;
 
-/**
- * Clicklistener when browsing folders.
- * @author Christoph Hähnel (eyeless)
- */
 public class BrowseItemClickListener implements OnItemClickListener{
 		//FIXME: just for easter egg to play all items on prev button
 		public static DIDLObject currentObject;
@@ -70,15 +64,10 @@ public class BrowseItemClickListener implements OnItemClickListener{
 			BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
 			a.setOnItemClickListener(bItemClickListener);
 
-            // when entering a new folder the cache must be emptied
-            IconDownloadCacheHandler.getInstance().resetCache();
-
 		} else {
-			List<Player> players = BrowseActivity.uClient.initializePlayers(currentObject);
-			for (Player player : players) {
-				if(player != null){
-					player.play();
-				}				
+			Player player = BrowseActivity.uClient.initializePlayer(currentObject);
+			if(player != null){
+				player.play();
 			}
 		}
 	}
@@ -110,11 +99,9 @@ public class BrowseItemClickListener implements OnItemClickListener{
 	 */
 	public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
 		if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
-			    		List<Player> players = BrowseActivity.uClient.initializePlayers(selectedDIDLObject);
-						for (Player player : players) {
-							if(player != null){
-								player.play();
-							}							
+			    		Player player = BrowseActivity.uClient.initializePlayer(selectedDIDLObject);
+						if(player != null){
+							player.play();
 						}
     	} else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
 			Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);

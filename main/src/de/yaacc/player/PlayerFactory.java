@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.teleal.cling.model.meta.Device;
-
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -51,9 +49,8 @@ public class PlayerFactory {
 	 *            the items to be played
 	 * @return the player
 	 */
-	public static List<Player> createPlayer(UpnpClient upnpClient,
+	public static Player createPlayer(UpnpClient upnpClient,
 			List<PlayableItem> items) {
-		List<Player> resultList = new ArrayList<Player>();
 		Player result = null;
 		boolean video = false;
 		boolean image = false;
@@ -64,37 +61,14 @@ public class PlayerFactory {
 			music = music || playableItem.getMimeType().startsWith("audio");
 		}
 		Log.d(PlayerFactory.class.getName(), "video:" + video + " image: " + image +  "audio:" + music );
-		for (Device device : upnpClient.getReceiverDevices()) {
-			result = createPlayer(upnpClient,device, video, image, music);			
-			if (result != null) {
-				currentPlayers.add(result);
-				result.setItems(items.toArray(new PlayableItem[items.size()]));
-				resultList.add(result);
+		if (!upnpClient.getReceiverDeviceId().equals(UpnpClient.LOCAL_UID)) {
+			if( upnpClient.getReceiverDevice() == null){
+				Toast toast = Toast.makeText(upnpClient.getContext(), upnpClient.getContext().getString(R.string.error_no_receiver_device_found), Toast.LENGTH_SHORT);
+				toast.show();
+				return null;
 			}
-			
-		}
-		return resultList;
-	}
-
-	/**
-	 * creates a player for the given device
-	 * @param upnpClient  the upnpClient
-	 * @param receiverDevice the receiverDevice 
-	 * @param video true if video items
-	 * @param image true if image items
-	 * @param music true if music items
-	 * @return the player or null if no device is present
-	 */
-	private static Player createPlayer(UpnpClient upnpClient,Device receiverDevice,
-			boolean video, boolean image, boolean music) {
-		if( receiverDevice == null){
-			Toast toast = Toast.makeText(upnpClient.getContext(), upnpClient.getContext().getString(R.string.error_no_receiver_device_found), Toast.LENGTH_SHORT);
-			toast.show();
-			return null;
-		}
-		Player result;
-		if (!receiverDevice.getIdentity().getUdn().getIdentifierString().equals(UpnpClient.LOCAL_UID)) {
-			String deviceName = receiverDevice.getDisplayString();
+			String deviceName = upnpClient.getReceiverDevice()
+					.getDisplayString();
 			if (deviceName.length() > 13) {
 				deviceName = deviceName.substring(0, 10) + "...";
 			}
@@ -108,7 +82,7 @@ public class PlayerFactory {
 				contentType ="music";
 			}	
 			
-			result = new AVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
+			result = new AVTransportPlayer(upnpClient, upnpClient.getContext()
 					.getString(R.string.playerNameAvTransport)
 					+ "-" + contentType + "@"  
 					+ deviceName);
@@ -135,6 +109,10 @@ public class PlayerFactory {
 						.getContext()
 						.getString(R.string.playerNameMultiContent));
 			}
+		}
+		if (result != null) {
+			currentPlayers.add(result);
+			result.setItems(items.toArray(new PlayableItem[items.size()]));
 		}
 		return result;
 	}

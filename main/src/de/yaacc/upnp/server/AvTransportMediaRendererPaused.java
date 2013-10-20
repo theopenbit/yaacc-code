@@ -19,7 +19,6 @@
 package de.yaacc.upnp.server;
 
 import java.net.URI;
-import java.util.List;
 
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.avtransport.impl.state.PausedPlay;
@@ -32,11 +31,6 @@ import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 
-/**
- * State Paused.
- * @author Tobias Schoene (openbit)  
- *
- */
 public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
 
 	private UpnpClient upnpClient;
@@ -108,12 +102,9 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
 	public void onEntry() {
 		Log.d(this.getClass().getName(), "On Entry");
 		super.onEntry();		
-		List<Player> players = upnpClient.getCurrentPlayers(getTransport());
-		for (Player player : players) {
-			if(player != null ){
-				player.pause();
-			}
-			
+		Player player = upnpClient.getCurrentPlayer(getTransport());
+		if(player != null ){
+			player.pause();
 		}
 	}
 

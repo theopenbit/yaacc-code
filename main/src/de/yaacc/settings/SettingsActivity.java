@@ -20,10 +20,6 @@ package de.yaacc.settings;
 import android.app.Activity;
 import android.os.Bundle;
 
-/**
- * Container for SettingsFragment.
- * @author Christoph Hähnel (eyeless)
- */
 public class SettingsActivity extends Activity {
 
 	@Override

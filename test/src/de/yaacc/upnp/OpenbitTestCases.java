@@ -59,7 +59,7 @@ import android.util.Log;
  */
 public class OpenbitTestCases extends UpnpClientTest {
 	private static final String OPENBIT_MEDIA_SERVER = "c8236ca5-1995-4ad5-a682-edce874c81eb";
-	private static final String OPENBIT_AVTRANSPORT_DEVICE = "00-30-8D-20-20-8C";//"00-30-8D-20-20-83";
+	private static final String OPENBIT_AVTRANSPORT_DEVICE = "00-30-8D-20-20-83";//"00-30-8D-20-20-8C";
 	private static final String OPENBIT_AVTRANSPORT_DEVICE2 = "F00DBABE-SA5E-BABA-DADA00903EF555CB";
 	private static final String OPENBIT_AVTRANSPORT_DEVICE3 = "00-30-8D-20-20-83";
 	private static final String OPENBIT_TABLET = "357718866788936";
@@ -907,15 +907,32 @@ public class OpenbitTestCases extends UpnpClientTest {
 		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0"); 
 		assertNotNull(result);
 		assertNotNull(result.getResult());
-		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));	
-		result = upnpClient.browseSync(device,"1029740"); 	
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		//
+		result = upnpClient.browseSync(device,"1455"); 	
 		assertNotNull(result);
 		assertNotNull(result.getResult());
 		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
-		result = upnpClient.browseSync(device,"1029788"); 	
+		result = upnpClient.browseSync(device,"1458"); 	
 		assertNotNull(result);
 		assertNotNull(result.getResult());
-		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));			
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"380082"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"10"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));		
+		result = upnpClient.browseSync(device,"22"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));
+		result = upnpClient.browseSync(device,"339532"); 	
+		assertNotNull(result);
+		assertNotNull(result.getResult());
+		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));		
 //		assertNotNull(result.getResult().getItems());
 //		assertNotNull(result.getResult().getItems().get(0));
 //		upnpClient.playLocal(result.getResult().getItems().get(0));

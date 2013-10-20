@@ -19,7 +19,7 @@
  -->
 <resources>
     <string-array
-        name="duration_entries">
+        name="image_viewer_slide_stay_duration_entries">
         <item>"1 sec"</item>
         <item>"2 sec"</item>
         <item>"3 sec"</item>
@@ -27,13 +27,8 @@
         <item>"5 sec"</item>
         <item>"8 sec"</item>
         <item>"10 sec"</item>
-        <item>"15 sec"</item>
-        <item>"20 sec"</item>
-        <item>"30 sec"</item>
-        <item>"45 sec"</item>
-        <item>"60 sec"</item>
     </string-array>
-    <string-array name="duration_values" translatable="false">
+    <string-array name="image_viewer_slide_stay_duration_values" translatable="false">
         <item>"1000"</item>
         <item>"2000"</item>
         <item>"3000"</item>
@@ -41,10 +36,5 @@
         <item>"5000"</item>
         <item>"8000"</item>
         <item>"10000"</item>
-        <item>"15000"</item>
-        <item>"20000"</item>
-        <item>"30000"</item>
-        <item>"45000"</item>
-        <item>"60000"</item>
      </string-array>   
 </resources>

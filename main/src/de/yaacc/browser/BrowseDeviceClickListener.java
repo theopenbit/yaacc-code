@@ -25,11 +25,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import de.yaacc.R;
 
-/**
- * Clicklistener when browsing devices.
- * 
- * @author Christoph Hähnel (eyeless)
- */
 public class BrowseDeviceClickListener implements OnItemClickListener {
 
 	@Override

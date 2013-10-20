@@ -25,32 +25,22 @@ import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.ImageItem;
-import org.teleal.cling.support.model.item.Item;
 import org.teleal.cling.support.model.item.PlaylistItem;
 import org.teleal.cling.support.model.item.TextItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
 import de.yaacc.upnp.ContentDirectoryBrowseResult;
-import de.yaacc.util.image.IconDownloadTask;
-import de.yaacc.util.image.ImageDownloader;
 
-/**
- * Adapter for browsing devices.
- * @author Christoph Hähnel (eyeless)
- */
 public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;
@@ -124,35 +114,28 @@ public class BrowseItemAdapter extends BaseAdapter{
 	@Override
 	public View getView(int position, View arg1, ViewGroup parent) {
 		ViewHolder holder;
-
-
-        if(arg1 == null){
-            arg1 = inflator.inflate(R.layout.browse_item,parent,false);
-
-            holder = new ViewHolder();
-            holder.icon = (ImageView) arg1.findViewById(R.id.browseItemIcon);
-            holder.name = (TextView) arg1.findViewById(R.id.browseItemName);
-            arg1.setTag(holder);
-        } else {
-            holder = (ViewHolder) arg1.getTag();
-        }
-        IconDownloadTask iconDownloadTask = new IconDownloadTask((ListView)parent, position);
-
+		
+		if(arg1 == null){
+			arg1 = inflator.inflate(R.layout.browse_item,parent,false);
+			
+			holder = new ViewHolder();
+			holder.icon = (ImageView) arg1.findViewById(R.id.browseItemIcon);
+			holder.name = (TextView) arg1.findViewById(R.id.browseItemName);
+			arg1.setTag(holder);
+		} else {
+			holder = (ViewHolder) arg1.getTag();
+		}
+				
 		DIDLObject currentObject = (DIDLObject)getItem(position);
 
 		holder.name.setText(currentObject.getTitle());
 		
 		if(currentObject instanceof Container){
-            holder.icon.setImageResource(R.drawable.folder);
-            Bitmap cover = containedCoverImage((Container) currentObject);
-            if (cover != null){
-                holder.icon.setImageBitmap(cover);
-            }
-		} else if(currentObject instanceof AudioItem){			
+			holder.icon.setImageResource(R.drawable.folder);
+		} else if(currentObject instanceof AudioItem){
 			holder.icon.setImageResource(R.drawable.cdtrack);
 		} else if(currentObject instanceof ImageItem){
-            holder.icon.setImageResource(R.drawable.image);
-            iconDownloadTask.execute((ImageItem) currentObject);
+			holder.icon.setImageResource(R.drawable.image);
 		} else if(currentObject instanceof VideoItem){
 			holder.icon.setImageResource(R.drawable.video);
 		} else if(currentObject instanceof PlaylistItem){
@@ -178,32 +161,6 @@ public class BrowseItemAdapter extends BaseAdapter{
 		}
 		return objects.get(position);
 	}
-
-    private Bitmap getThumbnail(ImageItem image){
-        ImageDownloader downloader = new ImageDownloader();
-        return downloader.retrieveIcon(Uri.parse(image.getFirstResource().getValue()));
-    }
-	
-	private Bitmap containedCoverImage(Container currentObject){
-		List<Item> a = currentObject.getItems();
-        ImageDownloader downloader = new ImageDownloader();
-
-        while(!a.isEmpty()){
-			Item toTest = a.remove(0);
-			if (toTest instanceof ImageItem){
-                return downloader.retrieveIcon(Uri.parse(((ImageItem)toTest).getFirstResource().getValue()));
-			}
-		}
-		return null;
-	}
-
-    private boolean isCoverImage(ImageItem toTest){
-        String title = ((ImageItem)toTest).getTitle();
-        if (title.equalsIgnoreCase("cover.jpg")){
-            return true;
-        }
-        return false;
-    }
 
 
 

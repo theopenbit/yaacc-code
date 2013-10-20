@@ -22,11 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-/**
- * Swipe gesture implementation.
- * @author Tobias Schoene (openbit)  
- *
- */
 public class ActivitySwipeDetector implements OnTouchListener {
 
 	static final String logTag = "ActivitySwipeDetector";

@@ -17,8 +17,6 @@
  */
 package de.yaacc.player;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +39,6 @@ import de.yaacc.upnp.UpnpClient;
  */
 public abstract class AbstractPlayer implements Player {
 
-	public static final String PROPERTY_ITEM = "item";
 	private List<PlayableItem> items = new ArrayList<PlayableItem>();
 	private int currentIndex = 0;
 	private Timer playerTimer;
@@ -50,8 +47,6 @@ public abstract class AbstractPlayer implements Player {
 
 	private UpnpClient upnpClient;
 	private String name;
-
-	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	/**
 	 * @param context
@@ -82,7 +77,6 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	@Override
 	public void next() {
-		int previousIndex = currentIndex;
 		if (isProcessingCommand)
 			return;
 		isProcessingCommand = true;
@@ -103,7 +97,7 @@ public abstract class AbstractPlayer implements Player {
 				}
 			});
 		}
-		loadItem(previousIndex, currentIndex);
+		loadItem();
 		isProcessingCommand = false;
 	}
 
@@ -116,7 +110,6 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	@Override
 	public void previous() {
-		int previousIndex = currentIndex;
 		if (isProcessingCommand)
 			return;
 		isProcessingCommand = true;
@@ -140,7 +133,7 @@ public abstract class AbstractPlayer implements Player {
 				}
 			});
 		}
-		loadItem(previousIndex, currentIndex);
+		loadItem();
 		isProcessingCommand = false;
 
 	}
@@ -195,7 +188,7 @@ public abstract class AbstractPlayer implements Player {
 			}
 			// Start the pictureShow
 			isPlaying = true;
-			loadItem(currentIndex, currentIndex);
+			loadItem();
 			isProcessingCommand = false;
 
 		}
@@ -271,49 +264,14 @@ public abstract class AbstractPlayer implements Player {
 		return isPlaying;
 	}
 
-	/**
-	 * returns the current item position in the playlist
-	 * 
-	 * @return the position string
-	 */
-	public String getPositionString() {
+	private String getPositionString() {
 		return " (" + (currentIndex + 1) + "/" + items.size() + ")";
 	}
 
-	/**
-	 * returns the title of the current item
-	 * 
-	 * @return the title
-	 */
-	public String getCurrentItemTitle() {
-		String result = "";
-		if (currentIndex < items.size()) {
-
-			result = items.get(currentIndex).getTitle();
-		}
-		return result;
-	}
-
-	/**
-	 * returns the title of the next current item
-	 * 
-	 * @return the title
-	 */
-	public String getNextItemTitle() {
-		String result = "";
-		if (currentIndex + 1 < items.size()) {
-
-			result = items.get(currentIndex + 1).getTitle();
-		}
-		return result;
-	}
-
-	private void loadItem(int previousIndex, int nextIndex) {
+	private void loadItem() {
 		if (items == null)
 			return;
-		firePropertyChange(PROPERTY_ITEM, items.get(previousIndex),
-				items.get(nextIndex));
-		PlayableItem playableItem = items.get(nextIndex);
+		PlayableItem playableItem = items.get(currentIndex);
 		Object loadedItem = loadItem(playableItem);
 		startItem(playableItem, loadedItem);
 		if (isPlaying() && items.size() > 1) {
@@ -327,7 +285,7 @@ public abstract class AbstractPlayer implements Player {
 	 * @return dureaton in millis
 	 */
 	protected long getSilenceDuration() {
-		return upnpClient.getSilenceDuration();
+		return 2000L; // Default 2 sec.
 	}
 
 	/**
@@ -455,27 +413,14 @@ public abstract class AbstractPlayer implements Player {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.yaacc.player.Player#getId()
 	 */
 	@Override
-	public int getId() {
+	public int getId() { 
 		return getNotificationId();
 	}
-
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		this.pcs.addPropertyChangeListener(listener);
-	}
-
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		this.pcs.removePropertyChangeListener(listener);
-	}
-
-	protected void firePropertyChange(String property, Object oldValue,
-			Object newValue) {
-		this.pcs.firePropertyChange(property, oldValue, newValue);
-	}
+	
+	
 
 }

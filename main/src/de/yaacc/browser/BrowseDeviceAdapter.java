@@ -32,10 +32,6 @@ import android.widget.TextView;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseItemAdapter.ViewHolder;
 
-/**
- * Adapter for browsing devices.
- * @author Christoph Hähnel (eyeless)
- */
 public class BrowseDeviceAdapter extends BaseAdapter {
 	
 	LinkedList<Device> devices;

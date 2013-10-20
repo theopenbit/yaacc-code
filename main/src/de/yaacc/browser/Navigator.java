@@ -21,35 +21,26 @@ import java.util.LinkedList;
 
 import android.util.Log;
 
-/**
- * Manages navigation path inside device and folder hierarchy.
- * 
- * @author Christoph Hähnel (eyeless)
- */
 public class Navigator {
 	
 	public final static String DEVICE_OVERVIEW_OBJECT_ID = "-1";
 	public final static String PROVIDER_DEVICE_SELECT_LIST_OBJECT_ID = "-2";
 	public final static String RECEIVER_DEVICE_SELECT_LIST_OBJECT_ID = "-3";
 	public final static String ITEM_ROOT_OBJECT_ID = "0";
-	public final static Position DEVICE_LIST_POSITION = new Position(DEVICE_OVERVIEW_OBJECT_ID, null);
+	public final static Position DEVICE_LIST_POSIOTION = new Position(DEVICE_OVERVIEW_OBJECT_ID, null);
 	
 	
 	public Navigator(){		
 		navigationPath = new LinkedList<Position>();
-		Log.d(getClass().getName(), "pushNavigation: " + DEVICE_LIST_POSITION.getObjectId());
-		navigationPath.add(DEVICE_LIST_POSITION);
+		Log.d(getClass().getName(), "pushNavigation: " + DEVICE_LIST_POSIOTION.getObjectId());
+		navigationPath.add(DEVICE_LIST_POSIOTION);
 	}
 
 	private LinkedList<Position> navigationPath;
 	
-	/**
-	 * Provides information about the current position.
-	 * @return current position or DEVICE_LIST_POSITION if on device level
-	 */
 	public Position getCurrentPosition(){
 		if (navigationPath.isEmpty()){
-			return DEVICE_LIST_POSITION;
+			return DEVICE_LIST_POSIOTION;
 		}
 		return navigationPath.peekLast();
 	}
@@ -59,14 +50,10 @@ public class Navigator {
 		navigationPath.add(pos);
 	}
 	
-	/**
-	 * Provides information about the current position and removes it from the navigation path.
-	 * @return current position or DEVICE_LIST_POSITION if on device level
-	 */
 	public Position popPosition(){
 		Position result = null;
 		if (navigationPath.isEmpty()){
-			result = DEVICE_LIST_POSITION;
+			result = DEVICE_LIST_POSIOTION;
 		}else{
 			result = navigationPath.removeLast();
 		}
