@@ -81,6 +81,10 @@
     <string name="settings_local_server_testcontent_chkbx" translatable="false">local_server_testcontent_chkbx</string>
     <string name="settings_local_server_name">network name for local server</string>
     <string name="settings_local_server_name_key">Local server name</string>
+    <string name="settings_category_playing">Media playing behavior</string>
+    <string name="settings_replay_playlist_chkbx">settings_replay_playlist_chkbx</string>
+    <string name="settings_replay_playlist_on">Replay playlist</string>
+    <string name="settings_replay_playlist_off">Don\'t replay playlist</string>
     <string name="error_upnp_generic">An unknown error happened while browsing</string>
     <string name="error_upnp_specific">The following error occurred:</string>
     <string name="error_no_receiver_device_found">No receiver device found</string>

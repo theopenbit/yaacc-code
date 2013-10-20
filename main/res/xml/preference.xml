@@ -33,6 +33,9 @@
         <CheckBoxPreference android:summaryOn="@string/settings_browse_video_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_video_off" android:key="@string/settings_video_chkbx"/>
         <CheckBoxPreference android:summaryOn="@string/settings_browse_image_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_image_off" android:key="@string/settings_image_chkbx"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_playing">
+        <CheckBoxPreference android:defaultValue="true"  android:summaryOn="@string/settings_replay_playlist_on" android:disableDependentsState="true" android:summaryOff="@string/settings_replay_playlist_off" android:key="@string/settings_replay_playlist_chkbx"/>
+    </PreferenceCategory>    
     <PreferenceCategory android:title="@string/settings_local_server_title">
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_stopped" android:summaryOn="@string/settings_local_server_started" android:key="@string/settings_local_server_chkbx"/>
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_receiver_off" android:summaryOn="@string/settings_local_server_receiver_on" android:key="@string/settings_local_server_receiver_chkbx"/>

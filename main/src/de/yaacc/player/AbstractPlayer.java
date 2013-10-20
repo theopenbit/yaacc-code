@@ -29,6 +29,8 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -90,6 +92,16 @@ public abstract class AbstractPlayer implements Player {
 		currentIndex++;
 		if (currentIndex > items.size() - 1) {
 			currentIndex = 0;
+			SharedPreferences preferences = PreferenceManager
+					.getDefaultSharedPreferences(getContext());
+			boolean replay = preferences.getBoolean(
+					getContext().getString(
+							R.string.settings_replay_playlist_chkbx), true);
+			if (!replay) {
+				stop();
+				return;
+			}
+
 		}
 		Context context = getUpnpClient().getContext();
 		if (context instanceof Activity) {

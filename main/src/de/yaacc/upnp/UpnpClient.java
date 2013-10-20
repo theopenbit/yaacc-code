@@ -858,7 +858,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		// FIXME: filter cover.jpg for testing purpose
 		// here comes the magic
-		if (audioItemsCount > 1 && coverImageItems.size() == 1) {
+		if (audioItemsCount > 0 && coverImageItems.size() == 1) {
 			// hope there is only one cover image
 			playableItems.removeAll(coverImageItems);
 		}
