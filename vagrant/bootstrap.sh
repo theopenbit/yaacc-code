@@ -17,10 +17,11 @@ then
   apt-get install python-software-properties -y
   add-apt-repository ppa:webupd8team/java
   apt-get update
+  echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
   apt-get install oracle-java7-installer -y
-  sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-  sudo update-java-alternatives -s java-7-oracle
-  sudo apt-get install oracle-java7-set-default -y
+  update-java-alternatives -s java-7-oracle
+  apt-get install oracle-java7-set-default -y
+
 fi
 #############################################
 ## Install android
@@ -125,6 +126,7 @@ then
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t build-tools-18.1.1)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t tool)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t platform-tool)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t android-15)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t android-17)
 else
 echo "Android Debug Bridge already detected."
