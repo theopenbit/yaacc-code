@@ -1,0 +1,10 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant::Config.run do |config|
+#Vagrant.configure("2") do |config|
+ config.vm.box = "yaacc-dev"
+ #config.vm.boot_mode = :gui
+ config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+ config.vm.share_folder "yaacc-keystore", "/mnt/yaacc-keystore","/mnt/yaacc-keystore/", :create => false
+ config.vm.provision :shell, :path => "bootstrap.sh"
+end
