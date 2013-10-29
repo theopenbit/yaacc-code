@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -340,6 +341,7 @@ public class LocalImagePlayer implements Player {
 	private PendingIntent getNotificationIntent(ArrayList<Uri> uris) {
 		Intent notificationIntent = new Intent(context,
 				ImageViewerActivity.class);
+		notificationIntent.setData(Uri.parse("http://0.0.0.0/"+Arrays.hashCode(uris.toArray())+"")); //just for making the intents different http://stackoverflow.com/questions/10561419/scheduling-more-than-one-pendingintent-to-same-activity-using-alarmmanager
 		notificationIntent.putExtra(ImageViewerActivity.URIS, uris);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
 				notificationIntent, 0);
