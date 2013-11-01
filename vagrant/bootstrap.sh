@@ -10,6 +10,11 @@ echo -e "vagrant\nvagrant" | (passwd  $USER)
 apt-get update
 
 ##############################################
+##Install common unix tools
+##############################################
+apt-get install vim -y
+  
+##############################################
 ##Install java
 ##############################################
 if [ ! -d "/usr/lib/jvm/java-7-oracle" ];
