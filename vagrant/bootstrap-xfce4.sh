@@ -10,6 +10,12 @@ echo -e "vagrant\nvagrant" | (passwd  $USER)
 apt-get update
 
 ##############################################
+##Install common unix tools
+##############################################
+apt-get install vim -y
+ 
+
+##############################################
 ## Install xfce
 ##############################################
 apt-get install xfce4 -y
@@ -128,12 +134,12 @@ fi
 
 if [ ! -f "/usr/local/android-sdk/platform-tools/adb" ];
 then
-  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t build-tools-18.1.1)
-  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t tool)
-  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t platform-tool)
-  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t android-15)
-  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u -t android-17)
-  echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u -t system-image)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t build-tools-18.1.1)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t tool)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t platform-tool)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-15)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-17)
+  echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u --all -t system-image)
 else
 echo "Android Debug Bridge already detected."
 fi
