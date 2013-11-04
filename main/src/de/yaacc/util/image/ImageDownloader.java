@@ -65,6 +65,7 @@ public class ImageDownloader {
             options.inPreferQualityOverSpeed = false;
             options.inDensity = DisplayMetrics.DENSITY_LOW;
             options.inTempStorage = new byte[7680016];
+
             Log.d(this.getClass().getName(),
                     "displaying image size width, height, inSampleSize "
                             + options.outWidth + "," + options.outHeight + ","
@@ -72,11 +73,24 @@ public class ImageDownloader {
             Log.d(this.getClass().getName(), "free memory before image load: "
                     + Runtime.getRuntime().freeMemory());
 
+
             bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is),
                     null, options);
 
+            // if the image must be rescaled its ratio must be recalculated
             if (rescaleImage){
-                bitmap = Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,false);
+                int outWidth;
+                int outHeight;
+                int inWidth = bitmap.getWidth();
+                int inHeight = bitmap.getHeight();
+                if(inWidth > inHeight){
+                    outWidth = reqWidth;
+                    outHeight = (inHeight * reqWidth) / inWidth;
+                } else {
+                    outWidth = (inWidth * reqHeight) / inHeight;
+                    outHeight = reqHeight;
+                }
+                bitmap = Bitmap.createScaledBitmap(bitmap,outWidth,outHeight,false);
             }
             Log.d(this.getClass().getName(), "free memory after image load: "
                     + Runtime.getRuntime().freeMemory());
