@@ -287,11 +287,11 @@ if [ ! -d "/home/$developerName/.android" ]
 then 
    mkdir /home/$developerName/.android
    chmod 755 /home/$developerName/.android
-   chown $developername:$developerName /home/$developerName/.android
+   chown $developerName:$developerName /home/$developerName/.android
 fi
 cp /mnt/yaacc-secret/debug.keystore /home/$developerName/.android/
 chmod 644 /home/$developerName/.android/debug.keystore
-chown $developername:$developerName /home/$developerName/.android/debug.keystore
+chown $developerName:$developerName /home/$developerName/.android/debug.keystore
 
 
 
