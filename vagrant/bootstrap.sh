@@ -1,19 +1,29 @@
 ###############################
-# setup a dev-box for yaacc development
-#!/usr/bin/env bash
-#  
+# setup a dev-box for yaacc development !/usr/bin/env bash
 ################################
-#TODO: must be a normal user
-pwd="/root"
+#Setup root password
 echo -e "vagrant\nvagrant" | (passwd  $USER)
-
+#Setup hostname
+echo -e "yaacc-dev"  > /etc/hostname
+if [ -z "$(cat /etc/hosts | grep 'yaacc-dev')" ]
+then
+ echo -e "127.0.1.1       yaacc-dev" >> /etc/hosts
+fi
 apt-get update
+
 
 ##############################################
 ##Install common unix tools
 ##############################################
 apt-get install vim -y
-  
+
+##############################################
+## Install xterm and roxterm in order to
+## enable an ssh access using an  X tunnel
+##############################################
+apt-get install xterm -y
+apt-get install roxterm -y
+
 ##############################################
 ##Install java
 ##############################################
@@ -133,25 +143,65 @@ then
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t platform-tool)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-15)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-17)
+  echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u --all -t system-image)
 else
 echo "Android Debug Bridge already detected."
 fi
+############################################################
+## 
+## Read config file
+##
+############################################################
+source /mnt/yaacc-secret/config
 
+############################################################
+##
+## create developer
+##
+############################################################
+if id -u $developerName >/dev/null 2>&1; then
+        echo "user already exists"
+else
+        echo "create user"
+        useradd  $developerName -m -s /bin/bash
+        echo -e "vagrant\nvagrant" | (passwd  $developerName)
+fi
+if [ ! -d "/home/$developerName/.ssh" ];
+then
+   mkdir /home/$developerName/.ssh
+fi
+cp /mnt/yaacc-secret/$developerPrivateRSAKeyName /home/$developerName/.ssh/id_rsa
+cp /mnt/yaacc-secret/$developerPublicRSAKeyName /home/$developerName/.ssh/id_rsa.pub
+chown -R  $developerName:$developerName /home/$developerName/.ssh
+chmod 600 /home/$developerName/.ssh/id_rsa
+chmod 600 /home/$developerName/.ssh/id_rsa.pub
 #############################################################
 ##  clone yaacc
-##  TODO: What about credentials?
 ############################################################
+# setup ssh with  sf.net server
+if [ ! -f "/home/$developerName/.ssh/known_hosts" ] 
+then 
+  touch /home/$developerName/.ssh/known_hosts
+  chown -R  $developerName:$developerName /home/$developerName/.ssh/known_hosts
+fi
+sudo -u $developerName ssh-keygen -R git.code.sf.net
+sudo -u $developerName ssh-keyscan -H git.code.sf.net >>  /home/$developerName/.ssh/known_hosts
+
+#install git
 apt-get install git  -y
-cd ~
+
+#clone git repo
+
+cd /home/$developerName
 if [ ! -d "yaacc-code" ];
 then
-   git clone git://git.code.sf.net/p/yaacc/code yaacc-code
+   sudo -n -u $developerName git clone $yaaccRepo yaacc-code
 else
    cd  yaacc-code
-   git pull
+   sudo -n -u $developerName git pull
 fi
 
-cd $pwd
+cd /home/$developerName
 
 if [ ! -f "yaacc-code/main/local.properties" ];
 then
@@ -163,41 +213,37 @@ then
   echo "target=android-15" > yaacc-code/main/project.properties
 fi
 
-cd  yaacc-code/main
-ant debug
 
 #############################################################
 ## Setup F-droid server tools
-##  TODO: What about credentials?
 #############################################################
-cd $pwd
+cd /home/$developerName
 
 apt-get install python -y
 apt-get install python-magic -y
 
 if [ ! -d "fdroidserver.git" ];
 then
-   git clone git://gitorious.org/f-droid/fdroidserver.git fdroidserver.git
-   echo "export PATH=\$PATH:/root/fdroidserver.git" >> $pwd/.bashrc   
+   sudo -n -u $developerName git clone $fdroidServerRepo fdroidserver.git
+   echo "export PATH=\$PATH:/root/fdroidserver.git" >> /home/$developerName/.bashrc   
 else
    cd fdroidserver.git
-   git pull
+   sudo -n -u $developerName git pull
 fi
 
 
 #############################################################
 ## Setup F-droid repo
-##  TODO: What about credentials?
 #############################################################
-cd $pwd
+cd /home/$developerName
 if [ ! -d "fdroiddata.git" ];
 then
-  git clone git://gitorious.org/f-droid/fdroiddata.git  fdroiddata.git
+  sudo -n -u $developerName git clone $fdroidDataRepo  fdroiddata.git
 else
   cd fdroiddata.git
-  git pull
+  sudo -n -u $developerName git pull
 fi
-cd $pwd
+cd  /home/$developerName
 if [ ! -f "fdroiddata.git/config.py" ];
 then
    echo "sdk_path = \"/usr/local/android-sdk/\"" >> fdroiddata.git/config.py
@@ -220,18 +266,61 @@ then
    echo "archive_icon = \"fdroid-icon.png\"" >> fdroiddata.git/config.py
    echo "archive_description = \"\"\"" >> fdroiddata.git/config.py
    echo "build_server_always = False" >>fdroiddata.git/config.py
-   echo "repo_keyalias = \"$(< /mnt/yaacc-keystore/repo_keyalias.txt)\"" >> fdroiddata.git/config.py
-   echo "keystore = \"/mnt/yaacc-keystore/yaacc.de-release-key.keystore\"" >> fdroiddata.git/config.py
-   echo "keystorepass = \"$(< /mnt/yaacc-keystore/keystorepass.txt)\"" >> fdroiddata.git/config.py
-   echo "keypass = \"$(< /mnt/yaacc-keystore/keypass.txt)\"" >> fdroiddata.git/config.py
-
+   echo "repo_keyalias = \"$repo_keyalias\"" >> fdroiddata.git/config.py
+   echo "keystore = \"/mnt/yaacc-secret/$keystoreName\"" >> fdroiddata.git/config.py
+   echo "keystorepass = \"$keystorepass\"" >> fdroiddata.git/config.py
+   echo "keypass = \"$keypass\"" >> fdroiddata.git/config.py
+   chmod 0600 fdroiddata.git/config.py
+   chown $developerName:$developerName fdroiddata.git/config.py 
  
 fi
+#####################################################################
+## Setup Path
+#####################################################################
+cd /home/$developerName
+echo -e "PATH=\$PATH:/home/$developerName/fdroidserver.git:/usr/local/android-sdk/platform-tools:/usr/local/android-sdk/tools" >> /home/$developerName/.bashrc
 
-cd $pwd
-PATH=$PATH:$pwd/fdroidserver.git
-cd fdroiddata.git
+#####################################################################
+## Setup debug keystore 
+#####################################################################
+if [ ! -d "/home/$developerName/.android" ] 
+then 
+   mkdir /home/$developerName/.android
+   chmod 755 /home/$developerName/.android
+   chown $developername:$developerName /home/$developerName/.android
+fi
+cp /mnt/yaacc-secret/debug.keystore /home/$developerName/.android/
+chmod 644 /home/$developerName/.android/debug.keystore
+chown $developername:$developerName /home/$developerName/.android/debug.keystore
+
+
+
+############################################
+# build yaacc
+############################################
+cd  /home/$developerName/yaacc-code/main
+ant debug
+
+cd /home/$developerName/fdroiddata.git
 echo test build yaacc with fdroid
-fdroid build -p de.yaacc
+sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p de.yaaccRepo
+
+
+###############################################
+# create  AVD
+##############################################
+if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ];
+then
+ sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
+fi
+
+############################################
+# start avd and install yaacc on it
+###########################################
+# /usr/local/android-sdk/tools/emulator -avd yaacc-emu
+# /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
+#
+
+
 
 echo ready enjoy developing!
