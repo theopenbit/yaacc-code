@@ -184,8 +184,8 @@ then
   touch /home/$developerName/.ssh/known_hosts
   chown -R  $developerName:$developerName /home/$developerName/.ssh/known_hosts
 fi
-sudo -u $developerName ssh-keygen -R git.code.sf.net
-sudo -u $developerName ssh-keyscan -H git.code.sf.net >>  /home/$developerName/.ssh/known_hosts
+sudo -n -u $developerName ssh-keygen -R git.code.sf.net
+sudo -n -u $developerName ssh-keyscan -H git.code.sf.net >>  /home/$developerName/.ssh/known_hosts
 
 #install git
 apt-get install git  -y
@@ -205,12 +205,12 @@ cd /home/$developerName
 
 if [ ! -f "yaacc-code/main/local.properties" ];
 then
-   echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
+   sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
 fi
 
 if [ ! -f "yaacc-code/main/project.properties" ];
 then
-  echo "target=android-15" > yaacc-code/main/project.properties
+  sudo -n -u $developerName echo "target=android-15" > yaacc-code/main/project.properties
 fi
 
 
@@ -225,7 +225,7 @@ apt-get install python-magic -y
 if [ ! -d "fdroidserver.git" ];
 then
    sudo -n -u $developerName git clone $fdroidServerRepo fdroidserver.git
-   echo "export PATH=\$PATH:/root/fdroidserver.git" >> /home/$developerName/.bashrc   
+   sudo -n -u $developerName echo "export PATH=\$PATH:/root/fdroidserver.git" >> /home/$developerName/.bashrc   
 else
    cd fdroidserver.git
    sudo -n -u $developerName git pull
