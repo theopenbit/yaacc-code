@@ -299,7 +299,7 @@ chown $developerName:$developerName /home/$developerName/.android/debug.keystore
 # build yaacc
 ############################################
 cd  /home/$developerName/yaacc-code/main
-ant debug
+sudo -n -u $developerName ant debug
 
 cd /home/$developerName/fdroiddata.git
 echo test build yaacc with fdroid
@@ -309,10 +309,10 @@ sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p 
 ###############################################
 # create  AVD
 ##############################################
-if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ];
-then
- sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
-fi
+#if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ]
+#then
+# sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
+#fi
 
 ############################################
 # start avd and install yaacc on it
@@ -320,7 +320,15 @@ fi
 # /usr/local/android-sdk/tools/emulator -avd yaacc-emu
 # /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
 #
-
-
+############################################
+# install eclipse
+############################################
+#apt-get install eclipse -y
+#if [  -d "/home/$developerName/.swt/lib/linux" ]
+#then
+#  cd /home/$developerName/.swt/lib/linux
+#  sudo -n -u $developerName  rm -rf x86
+#  sudo -n -u $developerName  ln -s /usr/lib/jni x86  
+#fi
 
 echo ready enjoy developing!
