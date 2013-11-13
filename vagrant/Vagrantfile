@@ -68,7 +68,7 @@ if ! File.exist?(yaaccSecretPath)
   Dir::mkdir(yaaccSecretPath)
   puts "Create sample config file in secret folder: '" + yaaccSecretPath + "/config'\n"
   f = File.new(yaaccSecretPath + "/config", "w")
-  configTemplate.each{ 
+  configTemplate.each_line{
     |line|
     f.write line
   }
