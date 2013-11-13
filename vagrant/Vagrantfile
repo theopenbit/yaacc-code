@@ -26,7 +26,7 @@ def configTemplate
         configTemplate=configTemplate+"######################################################\n"
         configTemplate=configTemplate+"##             Developer setup                      ##\n"
         configTemplate=configTemplate+"######################################################\n"
-        configTemplate=configTemplate+"developerName=\"YOURNAME\"\n"
+        configTemplate=configTemplate+"developerName=\""+$YOURNAME+"\"\n"
         configTemplate=configTemplate+"developerPrivateRSAKeyName=\"id_rsa\"\n"
         configTemplate=configTemplate+"developerPublicRSAKeyName=\"id_rsa.pub\"\n"
         configTemplate=configTemplate+"######################################################\n"
@@ -39,60 +39,98 @@ def configTemplate
         configTemplate=configTemplate+"###################################################\n"
         configTemplate=configTemplate+"##            Yaacc - GitRepo                    ##\n"
         configTemplate=configTemplate+"###################################################\n"
-        configTemplate=configTemplate+"yaaccRepo=\"ssh://YOURNAME@git.code.sf.net/p/yaacc/code\"\n"
+        configTemplate=configTemplate+"yaaccRepo=\"ssh://"+$YOURNAME+"@git.code.sf.net/p/yaacc/code\"\n"
         configTemplate=configTemplate+"###################################################\n"
         configTemplate=configTemplate+"##            Froid                              ##\n"
         configTemplate=configTemplate+"###################################################\n"
         configTemplate=configTemplate+"fdroidServerRepo=\"git://gitorious.org/f-droid/fdroidserver.git\"\n"
-        configTemplate=configTemplate+"fdroidDataRepo=\"git://gitorious.org/f-droid/YOURNAME-fdroiddata.git\"\n"
+        configTemplate=configTemplate+"fdroidDataRepo=\"git://gitorious.org/f-droid/"+$YOURNAME+"-fdroiddata.git\"\n"
 	return configTemplate
 end
 
 
-yaaccSecretPath="/home/" +ENV['USER']+ "/yaacc-secret"
 
-if ! File.exist?("bootstrap.sh") || ! File.exist?(yaaccSecretPath) 
+def instructions
+	instructions=		  "Before restart vagrant setup your secrets:\n"       
+        instructions=instructions+"1) copy the yaacc debug keystore file into the secret folder\n"
+        instructions=instructions+"2) copy the yaacc release keystore file into the secret folder.\n"       
+        instructions=instructions+"3) copy your private and public rsa key used for the authentication at fdroid repo  and yaacc repo into the secret folder\n"
+        instructions=instructions+"4) modifiy the config file '" + $yaaccSecretPath + "/config'\n"
+        instructions=instructions+"5) Restart vagrant..."
+	return instructions
+end
+
+
+$yaaccSecretPath = "/home/" +ENV['USER']+ "/yaacc-secret"
+
+
+
+if ! File.exist?("bootstrap.sh") || ! File.exist?($yaaccSecretPath) 
   puts "################################################################\n"
   puts "##  Y A A C C - D E V E L O P M E N T - B O X    S E T U P    ##\n"
   puts "################################################################\n"
 end 
+
+# TODO: Set username on demand - problem with the given vagrant command
+#
+#puts "Please enter your desired username"
+#$YOURNAME = gets
+#puts "Username set to" + $YOURNAME 
+$YOURNAME = "YOUR_USER_NAME"
 
 if ! File.exist?("bootstrap.sh")
   puts "Download box configuration file bootstrap.sh "
   system("wget https://sourceforge.net/p/yaacc/code/ci/release1.1/tree/vagrant/bootstrap.sh?format=raw -O bootstrap.sh")
 end
 
-if ! File.exist?(yaaccSecretPath)  
+if ! File.exist?($yaaccSecretPath)  
   puts "Yaacc secret folder not found seems to be the first start...\n"
-  puts "Create secret path at '" + yaaccSecretPath + "'\n"
-  Dir::mkdir(yaaccSecretPath)
-  puts "Create sample config file in secret folder: '" + yaaccSecretPath + "/config'\n"
-  f = File.new(yaaccSecretPath + "/config", "w")
+  puts "Creating secret path at '" + $yaaccSecretPath + "'\n"
+  Dir::mkdir($yaaccSecretPath)
+  puts "Creating sample config file in secret folder: '" + $yaaccSecretPath + "/config'\n"
+  f = File.new($yaaccSecretPath + "/config", "w")
   configTemplate.each_line{
     |line|
     f.write line
   }
   
-  puts "Before restart vagrant setup your secrets:\n"
-  puts "1) copy the yaacc debug keystore file into the secret folder"
-  puts "2) copy the yaacc release keystore file into the secret folder.\n"
-  puts "3) copy your private and public rsa key used for the authentication at fdroid repo  and yaacc repo into the secret folder\n"    
-  puts "4) modifiy the config file '" + yaaccSecretPath + "/config'"
-  puts "5) Restart vagrant..."
+  puts instructions
   exit
 else
-  puts "Found yaacc secret folder '" + yaaccSecretPath + "'. Now starting vagrant box ..."   
+  puts "Found yaacc secret folder '" + $yaaccSecretPath + "'."   
 end
 
+if ! File.exist?($yaaccSecretPath+"/id_rsa")  
 
+  puts "Your id_rsa is missing !!!\n\n"
+  puts instructions
+  exit
+
+elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
+
+  puts "Your id_rsa.pub is missing !!!"
+  puts instructions
+  exit
+
+# TODO: Checking the keystore is still needed
+#
+#elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
+#
+#  puts "Your id_rsa.pub is missing !!!"
+#  puts instructions
+#  exit
+
+else
+
+puts "Now starting vagrant box..."
 
 Vagrant::Config.run do |config|
  config.vm.box = "yaacc-dev" 
  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
- config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , yaaccSecretPath , :create => false
+ config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
  config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
  config.vm.provision :shell, :path => "bootstrap.sh"
 
 end
 
-
+end
