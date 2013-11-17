@@ -61,6 +61,15 @@ def instructions
 end
 
 
+def theBox()
+	Vagrant::Config.run do |config|
+	config.vm.box = "yaacc-dev" 
+	config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+	config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
+	config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
+	config.vm.provision :shell, :path => "bootstrap.sh"
+end
+
 $yaaccSecretPath = "/home/" +ENV['USER']+ "/yaacc-secret"
 $userSshPath = "/home/" +ENV['USER']+ "/.ssh"
 
@@ -164,26 +173,14 @@ if ARGV[0] == "up"
 
 	puts "Now starting vagrant box..."
 
-	Vagrant::Config.run do |config|
-	 config.vm.box = "yaacc-dev" 
-	 config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-	 config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
-	 config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
-	 config.vm.provision :shell, :path => "bootstrap.sh"
+	theBox()
 
 	end
 
 	end
 
-else 
-
-Vagrant::Config.run do |config|
- config.vm.box = "yaacc-dev" 
- config.vm.box_url = "http://files.vagrantup.com/precise32.box"
- config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
- config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
- config.vm.provision :shell, :path => "bootstrap.sh"
-
 end
 
-end
+theBox()
+
+
