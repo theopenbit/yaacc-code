@@ -62,67 +62,120 @@ end
 
 
 $yaaccSecretPath = "/home/" +ENV['USER']+ "/yaacc-secret"
+$userSshPath = "/home/" +ENV['USER']+ "/.ssh"
 
 
+if ARGV[0] == "up"
+	if ! File.exist?("bootstrap.sh") || ! File.exist?($yaaccSecretPath) 
+	  puts "################################################################\n"
+	  puts "##  Y A A C C - D E V E L O P M E N T - B O X    S E T U P    ##\n"
+	  puts "################################################################\n"
+	end 
 
-if ! File.exist?("bootstrap.sh") || ! File.exist?($yaaccSecretPath) 
-  puts "################################################################\n"
-  puts "##  Y A A C C - D E V E L O P M E N T - B O X    S E T U P    ##\n"
-  puts "################################################################\n"
-end 
+	# TODO: Set username on demand - problem with the given vagrant command
+	#
+	#puts "Please enter your desired username"
+	#$YOURNAME = gets
+	#puts "Username set to" + $YOURNAME 
+	$YOURNAME = "YOUR_USER_NAME"
 
-# TODO: Set username on demand - problem with the given vagrant command
-#
-#puts "Please enter your desired username"
-#$YOURNAME = gets
-#puts "Username set to" + $YOURNAME 
-$YOURNAME = "YOUR_USER_NAME"
+	if ! File.exist?("bootstrap.sh")
+	  puts "Download box configuration file bootstrap.sh "
+	  system("wget https://sourceforge.net/p/yaacc/code/ci/release1.1/tree/vagrant/bootstrap.sh?format=raw -O bootstrap.sh")
+	end
 
-if ! File.exist?("bootstrap.sh")
-  puts "Download box configuration file bootstrap.sh "
-  system("wget https://sourceforge.net/p/yaacc/code/ci/release1.1/tree/vagrant/bootstrap.sh?format=raw -O bootstrap.sh")
-end
+	if ! File.exist?($yaaccSecretPath)  
+	  puts "Yaacc secret folder not found seems to be the first start...\n"
+	  puts "Creating secret path at '" + $yaaccSecretPath + "'\n"
+	  Dir::mkdir($yaaccSecretPath)
+	  puts "Creating sample config file in secret folder: '" + $yaaccSecretPath + "/config'\n"
+	  f = File.new($yaaccSecretPath + "/config", "w")
+	  configTemplate.each_line{
+	    |line|
+	    f.write line
+	  }
+	  puts "Copying private key to secret folder\n"
+	  system("cp "+$userSshPath+"/id_rsa "+$yaaccSecretPath)
+	  puts "Copying public key to secret folder\n\n"
+	  system("cp "+$userSshPath+"/id_rsa.pub "+$yaaccSecretPath)
+	  
+	  
+	  puts instructions
+	  exit
+	else
+	  puts "Found yaacc secret folder '" + $yaaccSecretPath + "'."   
+	end
 
-if ! File.exist?($yaaccSecretPath)  
-  puts "Yaacc secret folder not found seems to be the first start...\n"
-  puts "Creating secret path at '" + $yaaccSecretPath + "'\n"
-  Dir::mkdir($yaaccSecretPath)
-  puts "Creating sample config file in secret folder: '" + $yaaccSecretPath + "/config'\n"
-  f = File.new($yaaccSecretPath + "/config", "w")
-  configTemplate.each_line{
-    |line|
-    f.write line
-  }
-  
-  puts instructions
-  exit
-else
-  puts "Found yaacc secret folder '" + $yaaccSecretPath + "'."   
-end
+	if ! File.exist?($yaaccSecretPath+"/id_rsa")  
 
-if ! File.exist?($yaaccSecretPath+"/id_rsa")  
+	  puts "Your id_rsa is missing !!!\n\n"
 
-  puts "Your id_rsa is missing !!!\n\n"
-  puts instructions
-  exit
+	  if File.exist?($userSshPath+"id_rsa")
 
-elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
+	  	puts "Trying to copy your private key to secret folder\n"
+	 	exec("cp "+$userSshPath+"/id_rsa "+$yaaccSecretPath)
+	
+		if File.exist?($yaaccSecretPath+"/id_rsa")
+			puts "Private key successfully copied !\n"
+		else
+			puts "Unable to copy found key, please check executing rights !\n"
+		end
+	  
+	  else
+	
+		puts "No private key found at all, did you create it ?\n"
+	  	puts instructions
+	  	exit
+	  
+	  end
 
-  puts "Your id_rsa.pub is missing !!!"
-  puts instructions
-  exit
+	elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
 
-# TODO: Checking the keystore is still needed
-#
-#elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
-#
-#  puts "Your id_rsa.pub is missing !!!"
-#  puts instructions
-#  exit
+	  puts "Your id_rsa.pub is missing !!!"
 
-else
+	  if File.exist?($userSshPath+"id_rsa.pub")
 
-puts "Now starting vagrant box..."
+	  	puts "Trying to copy your public key to secret folder\n"
+	 	exec("cp "+$userSshPath+"/id_rsa.pub "+$yaaccSecretPath)
+	
+		if File.exist?($yaaccSecretPath+"/id_rsa.pub")
+			puts "Public key successfully copied !\n"
+		else
+			puts "Unable to copy found key, please check executing rights !\n"
+		end
+	  
+	  else
+	
+		puts "No public key found at all, did you create it ?\n"
+	  	puts instructions
+	  	exit
+
+	  end
+
+	# TODO: Checking the keystore is still needed
+	#
+	#elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
+	#
+	#  puts "Your id_rsa.pub is missing !!!"
+	#  puts instructions
+	#  exit
+
+	else
+
+	puts "Now starting vagrant box..."
+
+	Vagrant::Config.run do |config|
+	 config.vm.box = "yaacc-dev" 
+	 config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+	 config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
+	 config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
+	 config.vm.provision :shell, :path => "bootstrap.sh"
+
+	end
+
+	end
+
+else 
 
 Vagrant::Config.run do |config|
  config.vm.box = "yaacc-dev" 
