@@ -21,6 +21,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -249,18 +250,22 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	@Override
 	public void setItems(PlayableItem... playableItems) {
-		items.addAll(Arrays.asList(playableItems));
+		List<PlayableItem> itemsList = Arrays.asList(playableItems);
+		if(isShufflePlay()){
+			Collections.shuffle(itemsList);
+		}
+		items.addAll(itemsList);
 		showNotification();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.yaacc.player.Player#addItem(de.yaacc.player.PlayableItem)
+
+
+	/**
+	 * is shuffle play enabled.
+	 * @return true, if shuffle play is enabled
 	 */
-	@Override
-	public void addItem(PlayableItem playableItems) {
-		items.add(playableItems);
+	protected boolean isShufflePlay() {		
+		return false;
 	}
 
 	/*

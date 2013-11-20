@@ -216,16 +216,7 @@ public class LocalImagePlayer implements Player {
 		showNotification(uris);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.yaacc.player.Player#addItem(de.yaacc.player.PlayableItem)
-	 */
-	@Override
-	public void addItem(PlayableItem item) {
-		// FIXME not yet implemented
 
-	}
 
 	/*
 	 * (non-Javadoc)

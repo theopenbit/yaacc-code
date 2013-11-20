@@ -85,6 +85,9 @@
     <string name="settings_replay_playlist_chkbx">settings_replay_playlist_chkbx</string>
     <string name="settings_replay_playlist_on">Replay playlist</string>
     <string name="settings_replay_playlist_off">Don\'t replay playlist</string>
+    <string name="settings_music_player_shuffle_chkbx">settings_music_player_chkbx</string>
+    <string name="settings_music_player_shuffle_on">Shuffled music play</string>
+    <string name="settings_music_player_shuffle_off">Ordered music play</string>
     <string name="error_upnp_generic">An unknown error happened while browsing</string>
     <string name="error_upnp_specific">The following error occurred:</string>
     <string name="error_no_receiver_device_found">No receiver device found</string>

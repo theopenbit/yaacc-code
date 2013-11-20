@@ -84,6 +84,9 @@
     <string name="settings_replay_playlist_chkbx">settings_replay_playlist_chkbx</string>
     <string name="settings_replay_playlist_on">Wiederhole Titelliste</string>
     <string name="settings_replay_playlist_off">Stoppe am Ende der Titelliste</string>
+    <string name="settings_music_player_shuffle_chkbx">settings_music_player_chkbx</string>
+    <string name="settings_music_player_shuffle_on">Musikabspielung gemischt</string>
+    <string name="settings_music_player_shuffle_off">Musikabspielung geordnet</string>
     <string name="error_upnp_generic">Während des Überfliegens ist ein Fehler aufgetreten </string>
     <string name="error_upnp_specific">Es ist folgender Fehler aufgetreten:</string>
     <string name="error_no_receiver_device_found">Kein Empfänger gefunden</string>
