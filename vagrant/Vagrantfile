@@ -115,14 +115,14 @@ if ARGV[0] == "up"
 	 	exec("cp "+$userSshPath+"/id_rsa "+$yaaccSecretPath)
 	
 		if File.exist?($yaaccSecretPath+"/id_rsa")
-			puts "Private key successfully copied !\n"
+			puts "Private key successfully copied !\n\n"
 		else
-			puts "Unable to copy found key, please check executing rights !\n"
+			puts "Unable to copy found key, please check executing rights !\n\n"
 		end
 	  
 	  else
 	
-		puts "No private key found at all, did you create it ?\n"
+		puts "No private key found at all, did you create it ?\n\n"
 	  	puts instructions
 	  	exit
 	  
@@ -138,14 +138,14 @@ if ARGV[0] == "up"
 	 	exec("cp "+$userSshPath+"/id_rsa.pub "+$yaaccSecretPath)
 	
 		if File.exist?($yaaccSecretPath+"/id_rsa.pub")
-			puts "Public key successfully copied !\n"
+			puts "Public key successfully copied !\n\n"
 		else
-			puts "Unable to copy found key, please check executing rights !\n"
+			puts "Unable to copy found key, please check executing rights !\n\n"
 		end
 	  
 	  else
 	
-		puts "No public key found at all, did you create it ?\n"
+		puts "No public key found at all, did you create it ?\n\n"
 	  	puts instructions
 	  	exit
 
@@ -161,18 +161,25 @@ if ARGV[0] == "up"
 	 	exec("cp "+$userSshPath+"/.android/debug.keystore "+$yaaccSecretPath)
 	
 		if File.exist?($yaaccSecretPath+"/debug.keystore")
-			puts "Debug keystore successfully copied !\n"
+			puts "Debug keystore successfully copied !\n\n"
 		else
-			puts "Unable to copy found keystore, please check executing rights !\n"
+			puts "Unable to copy found keystore, please check executing rights !\n\n"
 		end
 	  
 	  else
 	
-		puts "No debug keystore found at all, did you create it ?\n"
+		puts "No debug keystore found at all, did you create it ?\n\n"
 	  	puts instructions
 	  	exit
 
 	  end
+
+	elsif ! File.exist?($yaaccSecretPath+"/debug.keystore")
+
+	  puts "Your debug keystore is missing !!!\n\n"
+
+	  puts instructions
+	  exit
 
 	# TODO: Checking the keystore is still needed
 	#
