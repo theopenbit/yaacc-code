@@ -151,6 +151,29 @@ if ARGV[0] == "up"
 
 	  end
 
+	elsif ! File.exist?($yaaccSecretPath+"/debug.keystore")
+
+	  puts "Your debug keystore is missing !!!"
+
+	  if File.exist?($userSshPath+"/.android/debug.keystore")
+
+	  	puts "Trying to copy your debug keystore to secret folder\n"
+	 	exec("cp "+$userSshPath+"/.android/debug.keystore "+$yaaccSecretPath)
+	
+		if File.exist?($yaaccSecretPath+"/debug.keystore")
+			puts "Debug keystore successfully copied !\n"
+		else
+			puts "Unable to copy found keystore, please check executing rights !\n"
+		end
+	  
+	  else
+	
+		puts "No debug keystore found at all, did you create it ?\n"
+	  	puts instructions
+	  	exit
+
+	  end
+
 	# TODO: Checking the keystore is still needed
 	#
 	#elseif ! File.exist?($yaaccSecretPath+"/id_rsa.pub")
