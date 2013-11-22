@@ -174,9 +174,9 @@ if ARGV[0] == "up"
 
 	  end
 
-	elsif ! File.exist?($yaaccSecretPath+"/debug.keystore")
+	elsif ! File.exist?($yaaccSecretPath+"/yaacc.de-release-key.keystore")
 
-	  puts "Your debug keystore is missing !!!\n\n"
+	  puts "Your release key is missing !!!\n\n"
 
 	  puts instructions
 	  exit

@@ -303,7 +303,7 @@ sudo -n -u $developerName ant debug
 
 cd /home/$developerName/fdroiddata.git
 echo test build yaacc with fdroid
-sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p de.yaaccRepo
+sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p de.yaacc
 
 
 ###############################################
