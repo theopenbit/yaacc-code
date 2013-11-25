@@ -58,10 +58,6 @@ public interface Player {
 	 */
 	void setItems(PlayableItem... items);
 	
-	/**
-	 * Adds an Item at the end of the player items 
-	 */
-	void addItem(PlayableItem item);
 	
     /**
      * Drops all Items.
