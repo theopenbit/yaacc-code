@@ -23,8 +23,11 @@ import java.util.TimerTask;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.upnp.UpnpClient;
@@ -197,5 +200,19 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	protected int getNotificationId() {
 		 
 		return NotificationId.LOCAL_BACKGROUND_MUSIC_PLAYER.getId();
+	}
+	
+	/**
+	 * read the setting for music player shuffle play.
+	 * @return true, if shuffle play is enabled
+	 */
+	@Override
+	protected boolean isShufflePlay() {		
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
+		return preferences.getBoolean(
+				getContext().getString(
+						R.string.settings_music_player_shuffle_chkbx), false);
+		
 	}
 }

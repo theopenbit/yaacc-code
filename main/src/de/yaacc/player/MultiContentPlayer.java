@@ -20,6 +20,7 @@ package de.yaacc.player;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -103,10 +104,21 @@ public class MultiContentPlayer extends AbstractPlayer {
 		intent.setDataAndType(playableItem.getUri(), playableItem.getMimeType());
 		try {
 			getContext().startActivity(intent);
-		} catch (ActivityNotFoundException anfe) {
-			Toast.makeText(getContext(),
-					R.string.can_not_start_activity + anfe.getMessage(),
-					Toast.LENGTH_LONG).show();
+		} catch (final ActivityNotFoundException anfe) {
+			Context context = getUpnpClient().getContext();
+			if (context instanceof Activity) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								getContext(),
+								R.string.can_not_start_activity
+										+ anfe.getMessage(), Toast.LENGTH_LONG)
+								.show();
+					}
+				});
+			}
+			Log.e(getClass().getName(), R.string.can_not_start_activity
+										+ anfe.getMessage(), anfe);
 
 		}
 		discoverStartedActivityPid();

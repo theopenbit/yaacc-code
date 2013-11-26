@@ -27,10 +27,15 @@
       <CheckBoxPreference android:summaryOff="@string/settings_audio_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_audio_app_on" android:key="@string/settings_audio_app"/>
       </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_browsing">
+        <CheckBoxPreference android:summaryOn="@string/settings_browse_thumbnails_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_thumbnails_off" android:key="@string/settings_thumbnails_chkbx"/>
         <CheckBoxPreference android:summaryOn="@string/settings_browse_audio_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_audio_off" android:key="@string/settings_audio_chkbx"/>
         <CheckBoxPreference android:summaryOn="@string/settings_browse_video_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_video_off" android:key="@string/settings_video_chkbx"/>
         <CheckBoxPreference android:summaryOn="@string/settings_browse_image_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_image_off" android:key="@string/settings_image_chkbx"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_playing">
+        <CheckBoxPreference android:defaultValue="true"  android:summaryOn="@string/settings_replay_playlist_on" android:disableDependentsState="true" android:summaryOff="@string/settings_replay_playlist_off" android:key="@string/settings_replay_playlist_chkbx"/>
+        <CheckBoxPreference android:defaultValue="false"  android:summaryOn="@string/settings_music_player_shuffle_on" android:disableDependentsState="true" android:summaryOff="@string/settings_music_player_shuffle_off" android:key="@string/settings_music_player_shuffle_chkbx"/>        
+    </PreferenceCategory>    
     <PreferenceCategory android:title="@string/settings_local_server_title">
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_stopped" android:summaryOn="@string/settings_local_server_started" android:key="@string/settings_local_server_chkbx"/>
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_receiver_off" android:summaryOn="@string/settings_local_server_receiver_on" android:key="@string/settings_local_server_receiver_chkbx"/>

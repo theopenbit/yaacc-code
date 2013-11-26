@@ -30,6 +30,8 @@ import org.teleal.cling.support.model.item.TextItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,10 +47,12 @@ public class BrowseItemAdapter extends BaseAdapter{
 	
 	private LayoutInflater inflator;
 	private List<DIDLObject> objects;
+    private Context context;
 	
 	public BrowseItemAdapter(Context ctx, String objectId){
 		Position pos = new Position(objectId, BrowseActivity.uClient.getProviderDevice());
 		initialize(ctx, pos);
+        this.context = ctx;
 	}
 	
 	public BrowseItemAdapter(Context ctx, Position pos){
@@ -115,6 +119,8 @@ public class BrowseItemAdapter extends BaseAdapter{
 	public View getView(int position, View arg1, ViewGroup parent) {
 		ViewHolder holder;
 		
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(parent.getContext());
 		if(arg1 == null){
 			arg1 = inflator.inflate(R.layout.browse_item,parent,false);
 			
@@ -136,6 +142,8 @@ public class BrowseItemAdapter extends BaseAdapter{
 			holder.icon.setImageResource(R.drawable.cdtrack);
 		} else if(currentObject instanceof ImageItem){
 			holder.icon.setImageResource(R.drawable.image);
+            if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
+                iconDownloadTask.execute((ImageItem) currentObject);
 		} else if(currentObject instanceof VideoItem){
 			holder.icon.setImageResource(R.drawable.video);
 		} else if(currentObject instanceof PlaylistItem){
@@ -161,6 +169,32 @@ public class BrowseItemAdapter extends BaseAdapter{
 		}
 		return objects.get(position);
 	}
+
+    private Bitmap getThumbnail(ImageItem image){
+        ImageDownloader downloader = new ImageDownloader();
+        return downloader.retrieveIcon(Uri.parse(image.getFirstResource().getValue()));
+    }
+	
+	private Bitmap containedCoverImage(Container currentObject){
+		List<Item> a = currentObject.getItems();
+        ImageDownloader downloader = new ImageDownloader();
+
+        while(!a.isEmpty()){
+			Item toTest = a.remove(0);
+			if (toTest instanceof ImageItem){
+                return downloader.retrieveIcon(Uri.parse(((ImageItem)toTest).getFirstResource().getValue()));
+			}
+		}
+		return null;
+	}
+
+    private boolean isCoverImage(ImageItem toTest){
+        String title = ((ImageItem)toTest).getTitle();
+        if (title.equalsIgnoreCase("cover.jpg")){
+            return true;
+        }
+        return false;
+    }
 
 
 

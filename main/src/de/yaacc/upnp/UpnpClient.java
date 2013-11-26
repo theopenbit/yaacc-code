@@ -91,7 +91,6 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * A client facade to the upnp lookup and access framework. This class provides
  * all services to manage devices.
  * 
- * TODO play methods must be refactored
  * 
  * @author Tobias Schöne (openbit)
  * 
@@ -344,8 +343,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Start an intent with Action.View;
 	 * 
-	 * @param mime
-	 *            the Mimetype to start
 	 * @param uris
 	 *            the uri to start
 	 * @param backround
@@ -478,11 +475,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the upnpDevices
 	 */
 	public Collection<Device> getDevicesProvidingAvTransportService() {
+		ArrayList<Device> result = new ArrayList<Device>();
+		
+		result.add(getLocalDummyDevice());
 		if (isInitialized()) {
-			return getRegistry().getDevices(new UDAServiceType("AVTransport"));
+			result.addAll(getRegistry().getDevices(new UDAServiceType("AVTransport")));
 
 		}
-		return new ArrayList<Device>();
+		
+		return result;
 	}
 
 	/**
@@ -491,6 +492,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the upnpDevice null if not found
 	 */
 	public Device<?, ?, ?> getDevice(String identifier) {
+		if(LOCAL_UID.equals(identifier)){
+			return getLocalDummyDevice();
+		}
 		if (isInitialized()) {
 			return getRegistry().getDevice(new UDN(identifier), true);
 		}
@@ -729,25 +733,25 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Returns a player instance initialized with the given didl object
+	 * Returns all player instances initialized with the given didl object
 	 * 
 	 * @param didlObject
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
-	public Player initializePlayer(DIDLObject didlObject) {
+	public List<Player> initializePlayers(DIDLObject didlObject) {
 		List<PlayableItem> playableItems = toPlayableItems(toItemList(didlObject));
 		return PlayerFactory.createPlayer(this, playableItems);
 	}
 
 	/**
-	 * Returns a player instance initialized with the given transport object
+	 * Returns all player instances initialized with the given transport object
 	 * 
 	 * @param didlObject
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
-	public Player initializePlayer(AVTransport transport) {
+	public List<Player> initializePlayers(AVTransport transport) {
 		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null) {
@@ -755,7 +759,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
-		if (positionInfo == null) {
+		if (positionInfo == null) {			
 			return PlayerFactory.createPlayer(this, items);
 		}
 
@@ -765,6 +769,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				.getTrackURI());
 		playableItem.setMimeType(MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(fileExtension));
+		//FIXME Duration not supported in receiver yet playableItem.setDuration(duration)
 		items.add(playableItem);
 		Log.d(getClass().getName(),
 				"TransportUri: " + positionInfo.getTrackURI());
@@ -777,13 +782,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * Returns the current player instance for the given transport object
+	 * Returns all current player instances for the given transport object
 	 * 
 	 * @param didlObject
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
-	public Player getCurrentPlayer(AVTransport transport) {
+	public List<Player> getCurrentPlayers(AVTransport transport) {
 		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null)
@@ -803,12 +808,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		List<Player> avTransportPlayers = PlayerFactory
 				.getCurrentPlayersOfType(PlayerFactory
 						.getPlayerClassForMimeType(mimeType));
-		Player result = null;
-		if (avTransportPlayers != null && avTransportPlayers.size() > 0) {
-
-			result = avTransportPlayers.get(0);
-		}
-		return result;
+		return avTransportPlayers;
 	}
 
 	/**
@@ -840,7 +840,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				}
 				// calculate duration
 				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-				long millis = 10000; // 10 sec. default
+				long millis = getDefaultDuration();
 				if (resource.getDuration() != null) {
 					try {
 						Date date = dateFormat.parse(resource.getDuration());
@@ -858,7 +858,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		// FIXME: filter cover.jpg for testing purpose
 		// here comes the magic
-		if (audioItemsCount > 1 && coverImageItems.size() == 1) {
+		if (audioItemsCount > 0 && coverImageItems.size() == 1) {
 			// hope there is only one cover image
 			playableItems.removeAll(coverImageItems);
 		}
@@ -907,44 +907,98 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return result.getResult();
 	}
-
+	
 	/**
-	 * Gets the receiver ID, if none is defined the local device will be
+	 * Gets the receiver IDs, if none is defined the local device will be
 	 * returned
 	 * 
-	 * @return the receiverDeviceId
+	 * @return the receiverDeviceIds
 	 */
-	public String getReceiverDeviceId() {
-		String receiver = preferences.getString(
-				context.getString(R.string.settings_selected_receiver_title),
-				null);
-		if (receiver == null) {
-			receiver = UpnpClient.LOCAL_UID;
-		}
-		return receiver;
+	public Set<String> getReceiverDeviceIds() {
+		HashSet<String> defaultReceiverSet = new HashSet<String>();
+		defaultReceiverSet.add(UpnpClient.LOCAL_UID);
+		Set<String> receiverDeviceIds = preferences.getStringSet(
+				context.getString(R.string.settings_selected_receivers_title),
+				defaultReceiverSet);		
+		return receiverDeviceIds;
 	}
 
+
 	/**
-	 * @return the receiverDevice
+	 * Returns the receiverIds stored in the preferences. 
+	 * If an receiver id is unknown it will be removed.   
+	 * @return the receiverDevices
 	 */
-	public Device<?, ?, ?> getReceiverDevice() {
+	public Collection<Device> getReceiverDevices() {
+		ArrayList<Device> result = new ArrayList<Device>();
+		ArrayList<String> unknowsIds = new ArrayList<String>(); //Maybe the the receiverDevice in the preferences isn't available any more 
+		Set<String> receiverDeviceIds = getReceiverDeviceIds();
+		for (String id : receiverDeviceIds) {
+			Device receiver = this.getDevice(id);
+			if(receiver != null){
+				result.add(this.getDevice(id));
+			} else {
+				unknowsIds.add(id);
+			}
+		}
+		//remove all unknown ids 
+		receiverDeviceIds.removeAll(unknowsIds);
+		setReceiverDeviceIds(receiverDeviceIds);
+		return result;
+
+	}
 
 		return this.getDevice(getReceiverDeviceId());
 
+	/**
+	 * add a receiver device
+	 * @param receiverDevice
+	 */
+	public void addReceiverDevice(Device receiverDevice) {
+		assert(receiverDevice != null);
+		Collection<Device> receiverDevices = getReceiverDevices();		
+		receiverDevices.add(receiverDevice);		
+		setReceiverDevices(receiverDevices);
 	}
-
+	/**
+	 * remove a receiver device
+	 * @param receiverDevice
+	 */
+	public void removeReceiverDevice(Device receiverDevice) {
+		assert(receiverDevice != null);
+		Collection<Device> receiverDevices = getReceiverDevices();
+		receiverDevices.remove(receiverDevice);
+		setReceiverDevices(receiverDevices);
+	}
+	
 	/**
 	 * 
 	 * @param receiver
 	 */
 	public void setReceiverDevice(Device receiver) {
-		Editor prefEdit = preferences.edit();
+		assert(receiverDevices != null);		
 		prefEdit.putString(
 				context.getString(R.string.settings_selected_receiver_title),
-				receiver.getIdentity().getUdn().getIdentifierString());
+			Log.d(this.getClass().getName(), "Receiver: " + receiver);		
+			receiverIds.add(receiver.getIdentity().getUdn().getIdentifierString());
+			
+		}
+		setReceiverDeviceIds(receiverIds);
+	}
+	
+	
+	/**
+	 * Set the list of receiver device ids.
+	 * @param receiverDeviceIds the device ids. 
+	 */
+	protected void setReceiverDeviceIds(Set<String> receiverDeviceIds) {
+		assert(receiverDeviceIds != null);
+		Editor prefEdit = preferences.edit();				
+		prefEdit.putStringSet(
+				context.getString(R.string.settings_selected_receivers_title),
+				receiverDeviceIds);
 		prefEdit.apply();
 	}
-
 	/**
 	 * 
 	 * @return the providerDeviceId
@@ -1003,6 +1057,32 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		PlayerFactory.shutdown();
 	}
 
+	/**
+	 * Return the configured default duration
+	 * @return the duration
+	 */
+	public  int getDefaultDuration() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
+		return Integer
+				.parseInt(preferences.getString(
+						getContext().getString(R.string.settings_default_duration_key),
+						"0"));
+	}
+	
+	/**
+	 * Return the configured silence duration
+	 * @return the duration
+	 */
+	public  int getSilenceDuration() {
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
+		return Integer
+				.parseInt(preferences.getString(
+						getContext().getString(R.string.settings_silence_duration_key),
+						"2000"));
+	}
+	
 	public Device<?, ?, ?> getLocalDummyDevice() {
 		Device result = null;
 		try {
@@ -1015,7 +1095,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		return result;
 	}
+	
 
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
@@ -1096,6 +1178,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		public String getDisplayString() {
 			return android.os.Build.MODEL;
 		}
+
 
 	}
 }

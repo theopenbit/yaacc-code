@@ -88,7 +88,21 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.d(this.getClass().getName(), "OnCreate");
 		super.onCreate(savedInstanceState);
+		init(savedInstanceState, getIntent());
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		init(null, intent);
+	}
+
+	private void init(Bundle savedInstanceState, Intent intent) {
 		menuBarsHide();
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		getWindow().clearFlags(
@@ -115,12 +129,20 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		Serializable urisData = i.getSerializableExtra(URIS);
 		if (urisData != null) {
 			if (urisData instanceof List) {
+				currentImageIndex = 0;
 				imageUris = (List<Uri>) urisData;
+				Log.d(this.getClass().getName(),
+						"imageUris" + imageUris.toString());
 			}
 
 		} else {
 			if (i.getData() != null) {
 				imageUris.add(i.getData());
+			if (intent.getData() != null) {
+				currentImageIndex = 0;
+				imageUris.add(intent.getData());
+				Log.d(this.getClass().getName(), "imageUris.add(i.getData)"
+						+ imageUris.toString());
 			}
 		}
 		pictureShowActive = i.getBooleanExtra(AUTO_START_SHOW, false);
@@ -141,8 +163,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 	}
 
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
@@ -264,8 +287,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			});
 			// Start the pictureShow
 			pictureShowActive = true;
-			loadImage();
-			startMenuHideTimer();
+			loadImage();			
 			isProcessingCommand = false;
 
 		}
@@ -280,6 +302,8 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			return;
 		}
 		retrieveImageTask = new RetrieveImageTask(this);
+		Log.d(getClass().getName(),
+				"showImage(" + imageUris.get(currentImageIndex) + ")");
 		retrieveImageTask.execute(imageUris.get(currentImageIndex));
 
 	}
@@ -304,8 +328,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 		});
 		showDefaultImage();
 
-		pictureShowActive = false;
-		startMenuHideTimer();
+		pictureShowActive = false;		
 		isProcessingCommand = false;
 	}
 
@@ -343,8 +366,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 
 			}
 		});
-		pictureShowActive = false;
-		startMenuHideTimer();
+		pictureShowActive = false;		
 		isProcessingCommand = false;
 	}
 
@@ -372,13 +394,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 				toast.show();
 			}
 		});
-		loadImage();
-		runOnUiThread(new Runnable() {
-			public void run() {
-				menuBarsHide();
-			}
-
-		});
+		loadImage();		
 		isProcessingCommand = false;
 	}
 
@@ -405,8 +421,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			}
 
 		});
-		loadImage();
-		startMenuHideTimer();
+		loadImage();		
 		isProcessingCommand = false;
 	}
 
@@ -501,12 +516,12 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
 			@Override
 			public void run() {
 				runOnUiThread(new Runnable() {
-					public void run() {
-						menuBarsHide();
+					public void run() {						
+							menuBarsHide();						
 					}
 				});
 			}
-		}, 4000);
+		}, 5000);
 	}
 
 	public boolean isPictureShowActive() {

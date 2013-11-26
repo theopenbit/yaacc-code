@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +28,8 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -84,6 +87,16 @@ public abstract class AbstractPlayer implements Player {
 		currentIndex++;
 		if (currentIndex > items.size() - 1) {
 			currentIndex = 0;
+			SharedPreferences preferences = PreferenceManager
+					.getDefaultSharedPreferences(getContext());
+			boolean replay = preferences.getBoolean(
+					getContext().getString(
+							R.string.settings_replay_playlist_chkbx), true);
+			if (!replay) {
+				stop();
+				return;
+			}
+
 		}
 		Context context = getUpnpClient().getContext();
 		if (context instanceof Activity) {
@@ -230,18 +243,22 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	@Override
 	public void setItems(PlayableItem... playableItems) {
-		items.addAll(Arrays.asList(playableItems));
+		List<PlayableItem> itemsList = Arrays.asList(playableItems);
+		if(isShufflePlay()){
+			Collections.shuffle(itemsList);
+		}
+		items.addAll(itemsList);
 		showNotification();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.yaacc.player.Player#addItem(de.yaacc.player.PlayableItem)
+
+
+	/**
+	 * is shuffle play enabled.
+	 * @return true, if shuffle play is enabled
 	 */
-	@Override
-	public void addItem(PlayableItem playableItems) {
-		items.add(playableItems);
+	protected boolean isShufflePlay() {		
+		return false;
 	}
 
 	/*

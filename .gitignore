@@ -23,6 +23,7 @@ out
 .classpath
 .settings
 .externalToolBuilders
+.vagrant
 local.properties
 *.bak
 *.log
