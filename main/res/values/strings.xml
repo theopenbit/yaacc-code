@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- *
- * Copyright (C) 2013 www.yaacc.de 
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*
+* Copyright (C) 2013 www.yaacc.de
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 3
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -->
 <resources>
-
     <string name="app_name">YAACC</string>
     <string name="menu_settings">Settings</string>
     <string name="browse_main_folder">Browse main folder</string>
@@ -26,7 +25,7 @@
     <string name="browse_context_play">Play item</string>
     <string name="browse_context_download">Download item</string>
     <string name="browse_context_add_to_playplist">Add item to playlist</string>
-    <string name="browse_no_content_found">No data found</string>    
+    <string name="browse_no_content_found">No data found</string>
     <string name="browse_button_devices">Sender Devices</string>
     <string name="browse_button_prev">Previous Item</string>
     <string name="browse_button_stop">Stop Playback</string>
@@ -41,11 +40,15 @@
     <string name="settings_category_browsing">Media browsing behavior</string>
     <string name="settings_selected_provider_title">Current media provider</string>
     <string name="settings_change_provider">Tab to change current provider</string>
-    <string name="settings_selected_receiver_title">Current media receiver</string>
+    <string name="settings_selected_receivers_title">Current media receivers</string>
     <string name="settings_change_receiver">Tab to change current receiver</string>
     <string name="settings_audio_app">Audio Playback</string>
     <string name="settings_video_app">Image Playback</string>
     <string name="settings_image_app">Video Playback</string>
+    <string name="settings_default_duration">default item duration</string>
+    <string name="settings_default_duration_key">default item duration</string>
+    <string name="settings_silence_duration">silence duration</string>
+    <string name="settings_silence_duration_key">silence duration</string>
     <string name="settings_audio_app_on">Local audio playback directly in YAACC is enabled</string>
     <string name="settings_audio_app_off">Local audio playback opens a third party application</string>
     <string name="settings_image_app_on">Local image playback directly in YAACC is enabled</string>
@@ -113,11 +116,12 @@
     <string name="title_activity_avtransport_player">Yaacc Remote player</string>
     <string name="title_activity_multi_content_player">Yaacc Default player</string>
     <string name="can_not_start_activity">"Can not start app! Reason: "</string>
-    <string name="app_descrip">Bring your UPnP devices in your local network together with android!\n<a href="www.yaacc.de">www.yaacc.de</a></string>
-    <string name="app_credits">YAACC is developed under GPLv3. Feel free to use and share it without any warranty. Licence details are documented at <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a></string>
-    <string name="app_credits_third_partie">Further licences are:\nThe UPNP implementation is based on <a href="http://4thline.org/projects/cling">Cling</a>\nIcons are used came from <a href="http://www.carpicon.com">black + white icons 2.0</a> and <a href="http://developer.android.com/about/index.html">Android</a> itself. Android is a trademark of Google Inc</string>
+    <string name="app_descrip">Bring your UPnP devices in your local network together with android!\n <a href="http://www.yaacc.de">www.yaacc.de</a>\n\nYAACC is developed under GPLv3. Feel free to use and share it without any warranty. Licence details are documented at <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a> (www.gnu.org/licenses/gpl-3.0)\n\nFurther licences are:\nThe UPNP implementation is based on <a href="http://4thline.org/projects/cling">Cling</a> (4thline.org/projects/cling)\nIcons are used came from <a href="http://www.carpicon.com">black + white icons 2.0</a> (www.carpicon.com) and <a href="http://developer.android.com/about/index.html">Android</a> itself. Android is a trademark of Google Inc (developer.android.com/about/index.html )</string>
     <string name="title_activity_yaacc_upnp_server_control">Yaacc Upnp server control</string>
     <string name="yaacc_upnp_server_stop_server">stop server</string>
     <string name="yaacc_upnp_server_start_server">start server</string>
-
-</resources>
+    <string name="playerCurrentItem">currentItem</string>
+    <string name="musicActivityNextLabel">"Next: "</string>
+    <string name="playerNextIem">nextItem</string>
+    <string name="playerPosition">Position</string>
+</resources> 
