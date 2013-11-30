@@ -26,9 +26,9 @@
     <string name="browse_context_play">Spiele Eintrag ab</string>
     <string name="browse_context_download">Lade Eintrag herunter</string>
     <string name="browse_context_add_to_playplist">Füge Eintrag zu Wiedergabeliste hinzu</string>
-	<string name="browse_no_content_found">Keine anzeigbaren Daten gefunden</string>
-	<string name="browse_button_devices">Sender</string>
-	<string name="browse_button_prev">vorheriges</string>
+    <string name="browse_no_content_found">Keine anzeigbaren Daten gefunden</string>
+    <string name="browse_button_devices">Sender</string>
+    <string name="browse_button_prev">vorheriges</string>
     <string name="browse_button_stop">stoppe </string>
     <string name="browse_button_next">nächstes</string>
     <string name="title_activity_main">YAACC</string>
@@ -83,6 +83,9 @@
     <string name="settings_music_player_shuffle_chkbx">settings_music_player_chkbx</string>
     <string name="settings_music_player_shuffle_on">Musikabspielung gemischt</string>
     <string name="settings_music_player_shuffle_off">Musikabspielung geordnet</string>
+    <string name="settings_browse_thumbnails_on">Zeige Vorschaubilder</string>
+    <string name="settings_browse_thumbnails_off">Zeige keine Vorschaubilder</string>
+    <string name="settings_thumbnails_chkbx">thumbnails_chkbx</string>
     <string name="error_upnp_generic">Während des Überfliegens ist ein Fehler aufgetreten </string>
     <string name="error_upnp_specific">Es ist folgender Fehler aufgetreten:</string>
     <string name="error_no_receiver_device_found">Kein Empfänger gefunden</string>
