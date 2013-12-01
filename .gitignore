@@ -27,3 +27,4 @@ out
 local.properties
 *.bak
 *.log
+*.orig
