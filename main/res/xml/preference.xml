@@ -21,10 +21,12 @@
 
     <PreferenceCategory android:title="@string/settings_category_send_rec">
       <ListPreference android:title="@string/settings_selected_provider_title" android:key="@string/settings_selected_provider_title"/>  
-      <ListPreference android:title="@string/settings_selected_receiver_title" android:key="@string/settings_selected_receiver_title"/>
+      <MultiSelectListPreference android:title="@string/settings_selected_receivers_title" android:key="@string/settings_selected_receivers_title"/>      
       <CheckBoxPreference android:summaryOff="@string/settings_image_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_image_app_on" android:key="@string/settings_image_app"/>
       <CheckBoxPreference android:summaryOff="@string/settings_video_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_video_app_on" android:key="@string/settings_video_app"/>
       <CheckBoxPreference android:summaryOff="@string/settings_audio_app_off" android:disableDependentsState="true" android:summaryOn="@string/settings_audio_app_on" android:key="@string/settings_audio_app"/>
+       <ListPreference android:title="@string/settings_default_duration"    android:key="@string/settings_default_duration_key"       android:entries="@array/duration_entries"   android:entryValues="@array/duration_values" />
+       <ListPreference android:title="@string/settings_silence_duration"    android:key="@string/settings_default_duration_key"       android:entries="@array/duration_entries"   android:entryValues="@array/duration_values" />
       </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_browsing">
         <CheckBoxPreference android:summaryOn="@string/settings_browse_thumbnails_on" android:disableDependentsState="true" android:summaryOff="@string/settings_browse_thumbnails_off" android:key="@string/settings_thumbnails_chkbx"/>

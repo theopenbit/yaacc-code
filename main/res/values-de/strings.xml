@@ -62,6 +62,10 @@
     <string name="settings_audio_chkbx">audio_chkbx</string>
     <string name="settings_video_chkbx">video_chkbx</string>
     <string name="settings_image_chkbx">image_chkbx</string>
+    <string name="settings_default_duration">Standardanzeigedauer</string>
+    <string name="settings_default_duration_key">Standardanzeigedauer</string>
+    <string name="settings_silence_duration">Pausendauer</string>    
+    <string name="settings_silence_duration_key">Pausendauer</string>
     <string name="settings_local_server_title">Lokale Serverkonfiguration</string>
     <string name="settings_local_server_started">Lokaler server ist gestartet</string>
     <string name="settings_local_server_stopped">Lokaler server ist gestoppt</string>
@@ -117,5 +121,9 @@
     <string name="title_activity_yaacc_upnp_server_control">Yaacc Upnp Server Einstellung</string>    
     <string name="yaacc_upnp_server_stop_server">stop server</string>
     <string name="yaacc_upnp_server_start_server">start server</string>
+    <string name="playerCurrentItem">currentItem</string>
+    <string name="musicActivityNextLabel">"Nächstes:  "</string>
+    <string name="playerNextIem">nextItem</string>
+    <string name="playerPosition">Position</string>
     
 </resources>
