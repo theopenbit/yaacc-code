@@ -78,8 +78,7 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 			devices = new LinkedList<Device>();
 			devices.addAll(upnpClient.getDevicesProvidingAvTransportService());
 
-			// One entry per found device for receiving media data
-			ListPreference receiverLp = (ListPreference) findPreference(getString(R.string.settings_selected_receiver_title));
+			// One entry per found device for receiving media data			
 			MultiSelectListPreference receiverMsLp = (MultiSelectListPreference) findPreference(getString(R.string.settings_selected_receivers_title));
 			ArrayList<CharSequence> receiverEntries = new ArrayList<CharSequence>();
 			ArrayList<CharSequence> receiverEntryValues = new ArrayList<CharSequence>();

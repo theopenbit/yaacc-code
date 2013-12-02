@@ -41,7 +41,7 @@
     <string name="settings_category_browsing">Verhalten der Medienverwaltung</string>
     <string name="settings_selected_provider_title">Aktueller Medien-Sender</string>
     <string name="settings_change_provider">Druecken sie hier um den Sender zu wechseln</string>
-    <string name="settings_selected_receiver_title">Aktueller Medien-Empfaenger</string>
+    <string name="settings_selected_receivers_title">Aktuelle Medien-Empfaenger</string>
     <string name="settings_change_receiver">Druecken sie hier um den Empfaenger zu wechseln</string>
     <string name="settings_no_content_found">Kein Inhalt zum Anzeiden gefunden</string>
     <string name="settings_audio_app">Audio Wiedergabe</string> 
