@@ -311,11 +311,11 @@ public class YaaccUpnpServerService extends Service {
 		}
 		try {
 			device = new LocalDevice(new DeviceIdentity(new UDN(UDN_ID)),
-					new UDADeviceType("MediaServer"),
+					new UDADeviceType("MediaRenderer"),
 					// Used for shown name: first part of ManufactDet, first
 					// part of ModelDet and version number
 					new DeviceDetails(
-							"YAACC - MediaServer",
+							"YAACC - MediaRenderer",
 							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
 							new ModelDetails(
 									preferences
@@ -323,7 +323,7 @@ public class YaaccUpnpServerService extends Service {
 													getApplicationContext()
 															.getString(
 																	R.string.settings_local_server_name_key),
-													"MediaServer"),
+													"MediaRenderer"),
 									"Free Android UPnP AV MediaServer, GNU GPL",
 									versionName)), createServices());
 
@@ -335,6 +335,10 @@ public class YaaccUpnpServerService extends Service {
 
 	}
 
+	
+
+	
+	
 	/**
 	 * Create the services provided by this device
 	 * 
