@@ -19,7 +19,8 @@
  -->
 <resources>
     <string-array
-        name="image_viewer_slide_stay_duration_entries">
+        name="duration_entries_with_never">
+        <item>"Nie"</item>
         <item>"1 Sek"</item>
         <item>"2 Sek"</item>
         <item>"3 Sek"</item>
@@ -27,5 +28,10 @@
         <item>"5 Sek"</item>
         <item>"8 Sek"</item>
         <item>"10 Sek"</item>
+        <item>"15 Sek"</item>
+        <item>"20 Sek"</item>
+        <item>"30 Sek"</item>
+        <item>"45 Sek"</item>
+        <item>"60 Sek"</item>
     </string-array>   
 </resources>

@@ -56,6 +56,7 @@ import org.teleal.cling.model.meta.ManufacturerDetails;
 import org.teleal.cling.model.meta.ModelDetails;
 import org.teleal.cling.model.types.UDADeviceType;
 import org.teleal.cling.model.types.UDN;
+import org.teleal.cling.protocol.async.SendingNotificationAlive;
 import org.teleal.cling.support.avtransport.AbstractAVTransportService;
 import org.teleal.cling.support.connectionmanager.ConnectionManagerService;
 import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
@@ -157,14 +158,16 @@ public class YaaccUpnpServerService extends Service {
 		initializationThread.start();
 		showNotification();
 		Log.d(this.getClass().getName(), "End On Start");
-		
+
 	}
 
 	@Override
 	public void onDestroy() {
 		Log.d(this.getClass().getName(), "Destroying the service");
-		BrowseActivity.uClient.localDeviceRemoved(
-				BrowseActivity.uClient.getRegistry(), localServer);
+		if (upnpClient != null) {
+			upnpClient
+					.localDeviceRemoved(upnpClient.getRegistry(), localServer);
+		}
 		localServer = null;
 		cancleNotification();
 		super.onDestroy();
@@ -173,37 +176,40 @@ public class YaaccUpnpServerService extends Service {
 	/**
 	 * Displays the notification.
 	 */
-	private void showNotification(){	
+	private void showNotification() {
 		Intent notificationIntent = new Intent(this,
 				YaaccUpnpServerControlActivity.class);
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-			    notificationIntent, 0); 
-	    NotificationCompat.Builder mBuilder =
-	            new NotificationCompat.Builder(this)
-	    		.setOngoing(true)
-	            .setSmallIcon(R.drawable.ic_launcher)
-	            .setContentTitle("Yaacc Upnp Server" )
-	            .setContentText(preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key),""));	   
-	    mBuilder.setContentIntent(contentIntent);
-	    NotificationManager mNotificationManager =
-	    	    (NotificationManager) getSystemService(Context
-	    	    		.NOTIFICATION_SERVICE);
-	    	// mId allows you to update the notification later on.
-	    	mNotificationManager.notify(NotificationId.UPNP_SERVER.getId(), mBuilder.build());
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				notificationIntent, 0);
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				this)
+				.setOngoing(true)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("Yaacc Upnp Server")
+				.setContentText(
+						preferences
+								.getString(
+										getApplicationContext()
+												.getString(
+														R.string.settings_local_server_name_key),
+										""));
+		mBuilder.setContentIntent(contentIntent);
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		// mId allows you to update the notification later on.
+		mNotificationManager.notify(NotificationId.UPNP_SERVER.getId(),
+				mBuilder.build());
 	}
-	
+
 	/**
-	 *  Cancels the notification.  
+	 * Cancels the notification.
 	 */
 	private void cancleNotification() {
-		NotificationManager mNotificationManager =
-	    	    (NotificationManager) getSystemService(Context
-	    	    		.NOTIFICATION_SERVICE);
-	    	// mId allows you to update the notification later on.
-	    	mNotificationManager.cancel(NotificationId.UPNP_SERVER.getId());
-		
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		// mId allows you to update the notification later on.
+		mNotificationManager.cancel(NotificationId.UPNP_SERVER.getId());
+
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -233,6 +239,8 @@ public class YaaccUpnpServerService extends Service {
 			throw new IllegalStateException("UpnpClient is not initialized!");
 		}
 
+		startUpnpAliveNotifications();
+
 		// Create a HttpService for providing content in the network.
 		try {
 			new RequestListenerThread(getApplicationContext()).start();
@@ -250,6 +258,42 @@ public class YaaccUpnpServerService extends Service {
 	}
 
 	/**
+	 * start sending periodical upnp alive notifications.
+	 */
+	private void startUpnpAliveNotifications() {
+		int upnpNotificationFrequency = getUpnpNotificationFrequency();
+		if (upnpNotificationFrequency != -1
+				&& preferences.getBoolean(
+						getString(R.string.settings_local_server_chkbx), false)) {
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Log.d(YaaccUpnpServerService.this.getClass().getName(),
+							"Sending upnp alive notivication");
+					SendingNotificationAlive sendingNotificationAlive = new SendingNotificationAlive(
+							upnpClient.getRegistry().getUpnpService(),
+							localServer);
+					sendingNotificationAlive.run();
+					startUpnpAliveNotifications();
+				}
+			}, upnpNotificationFrequency);
+
+		}
+	}
+
+	/**
+	 * the time between two upnp alive notifications. -1 if never send a
+	 * notification
+	 * 
+	 * @return the time
+	 */
+	private int getUpnpNotificationFrequency() {
+		return Integer.parseInt(preferences.getString(upnpClient.getContext()
+				.getString(R.string.settings_sending_upnp_alive_interval_key),
+				"-1"));
+	}
+
+	/**
 	 * Create a local upnp device
 	 * 
 	 * @return the device
@@ -261,10 +305,9 @@ public class YaaccUpnpServerService extends Service {
 			versionName = getApplicationContext()
 					.getPackageManager()
 					.getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
-		} catch (NameNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			versionName = "0.1";
+		} catch (NameNotFoundException ex) {
+			Log.e(this.getClass().getName(), "Error while creating device", ex);
+			versionName = "??";
 		}
 		try {
 			device = new LocalDevice(new DeviceIdentity(new UDN(UDN_ID)),
@@ -571,8 +614,5 @@ public class YaaccUpnpServerService extends Service {
 		}
 		return false;
 	}
-	
-	
-
 
 }

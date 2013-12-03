@@ -79,10 +79,11 @@
     <string name="settings_local_server_testcontent">Lokaler Server verwendet Testinhalte</string>
     <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>    
     <string name="settings_local_server_name">Netzwerkname für lokalen Server</string>
-    <string name="settings_local_server_name_key">Name des localen servers</string>
-    <string name="settings_category_playing">Medien Abspielverhalten</string>
+    <string name="settings_local_server_name_key">Name des lokalen Servers</string>
+	<string name="settings_sending_upnp_alive_interval">Senden von UPNPAlive-Meldungen</string>
+	<string name="settings_category_playing">Medien Abspielverhalten</string>
     <string name="settings_replay_playlist_chkbx">settings_replay_playlist_chkbx</string>
-    <string name="settings_replay_playlist_on">Wiederhole Titelliste</string>
+    <string name="settings_replay_playlist_on">Wiederhole Titelliste</string>    
     <string name="settings_replay_playlist_off">Stoppe am Ende der Titelliste</string>
     <string name="settings_music_player_shuffle_chkbx">settings_music_player_chkbx</string>
     <string name="settings_music_player_shuffle_on">Musikabspielung gemischt</string>

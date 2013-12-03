@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ *
+ * Copyright (C) 2013 www.yaacc.de 
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ -->
+<resources>
+    <string-array
+        name="duration_entries_with_never">
+        <item>"NEVER"</item>
+        <item>"1 sec"</item>
+        <item>"2 sec"</item>
+        <item>"3 sec"</item>
+        <item>"4 sec"</item>
+        <item>"5 sec"</item>
+        <item>"8 sec"</item>
+        <item>"10 sec"</item>        
+        <item>"15 sec"</item>
+        <item>"20 sec"</item>
+        <item>"30 sec"</item>
+        <item>"45 sec"</item>
+        <item>"60 sec"</item>
+    </string-array>
+    <string-array name="duration_values_with_never" translatable="false">
+        <item>"-1"</item>
+        <item>"1000"</item>
+        <item>"2000"</item>
+        <item>"3000"</item>
+        <item>"4000"</item>
+        <item>"5000"</item>
+        <item>"8000"</item>
+        <item>"10000"</item>
+        <item>"15000"</item>
+        <item>"20000"</item>
+        <item>"30000"</item>
+        <item>"45000"</item>
+        <item>"60000"</item>
+     </string-array>   
+</resources>
