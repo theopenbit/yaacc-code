@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
@@ -92,17 +93,7 @@ import de.yaacc.util.NotificationId;
  */
 public class YaaccUpnpServerService extends Service {
 
-	public static int PORT = 4711;
-
-	private LocalDevice localServer;
-
-	// make preferences available for the whole service, since there might be
-	// more things to configure in the future
-	SharedPreferences preferences;
-
-	// Building a pseudo UUID for the device, which can't be null or a default
-	// value
-	public static final String UDN_ID = "35"
+	private static final String UDN_ID = "35"
 			+ // we make this look like a valid IMEI
 			Build.BOARD.length() % 10 + Build.BRAND.length() % 10
 			+ Build.CPU_ABI.length() % 10 + Build.DEVICE.length() % 10
@@ -110,11 +101,26 @@ public class YaaccUpnpServerService extends Service {
 			+ Build.ID.length() % 10 + Build.MANUFACTURER.length() % 10
 			+ Build.MODEL.length() % 10 + Build.PRODUCT.length() % 10
 			+ Build.TAGS.length() % 10 + Build.TYPE.length() % 10
-			+ Build.USER.length() % 10; // 13 digits;
+			+ Build.USER.length() % 10;
+
+	public static int PORT = 4711;
+
+	private LocalDevice localServer;
+	private LocalDevice localRenderer;
+
+	// make preferences available for the whole service, since there might be
+	// more things to configure in the future
+	SharedPreferences preferences;
+
+	public static final String MEDIA_SERVER_UDN_ID = UDN_ID; 
+
+	public static final String MEDIA_RENDERER_UDN_ID = UDN_ID + "-1"; 
 
 	private UpnpClient upnpClient;
 
 	private boolean watchdog;
+
+	private RequestListenerThread httpServer;
 
 	/*
 	 * (non-Javadoc)
@@ -140,7 +146,6 @@ public class YaaccUpnpServerService extends Service {
 		preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
-		Log.d(this.getClass().getName(), "On Start ID: " + UDN_ID);
 		if (upnpClient == null) {
 			upnpClient = new UpnpClient();
 		}
@@ -165,10 +170,26 @@ public class YaaccUpnpServerService extends Service {
 	public void onDestroy() {
 		Log.d(this.getClass().getName(), "Destroying the service");
 		if (upnpClient != null) {
-			upnpClient
-					.localDeviceRemoved(upnpClient.getRegistry(), localServer);
+			if (localServer != null) {
+				upnpClient.localDeviceRemoved(upnpClient.getRegistry(),
+						localServer);
+				localServer = null;
+			}
+			if (localRenderer != null) {
+				upnpClient.localDeviceRemoved(upnpClient.getRegistry(),
+						localRenderer);
+				localRenderer = null;
+			}
+
 		}
-		localServer = null;
+		if (httpServer != null) {
+			try {
+				httpServer.serversocket.close();
+			} catch (IOException e) {
+				Log.e(this.getClass().getName(),
+						"Error while closing http request thread", e);
+			}
+		}
 		cancleNotification();
 		super.onDestroy();
 	}
@@ -231,19 +252,45 @@ public class YaaccUpnpServerService extends Service {
 			}
 		}
 		if (upnpClient.isInitialized()) {
-			if (localServer == null) {
-				localServer = createDevice();
+			if (preferences.getBoolean(
+					getApplicationContext().getString(
+							R.string.settings_local_server_provider_chkbx),
+					false)) {
+				if (localServer == null) {
+					localServer = createMediaServerDevice();
+				}
+				upnpClient.getRegistry().addDevice(localServer);
+
+				createHttpServer();
 			}
-			upnpClient.getRegistry().addDevice(localServer);
+
+			if (preferences.getBoolean(
+					getApplicationContext().getString(
+							R.string.settings_local_server_receiver_chkbx),
+					false)) {
+				if (localRenderer == null) {
+					localRenderer = createMediaRendererDevice();
+				}
+				upnpClient.getRegistry().addDevice(localRenderer);
+			}
 		} else {
 			throw new IllegalStateException("UpnpClient is not initialized!");
 		}
 
 		startUpnpAliveNotifications();
 
+	}
+
+	/**
+	 * creates a http request thread
+	 */
+	private void createHttpServer() {
 		// Create a HttpService for providing content in the network.
 		try {
-			new RequestListenerThread(getApplicationContext()).start();
+
+			httpServer = new RequestListenerThread(getApplicationContext());
+			httpServer.start();
+
 		} catch (BindException e) {
 			Log.w(this.getClass().getName(), "Server already running");
 		} catch (IOException e) {
@@ -254,7 +301,6 @@ public class YaaccUpnpServerService extends Service {
 			// IllegalStateException("ContentProvider can not be initialized!",
 			// e);
 		}
-
 	}
 
 	/**
@@ -273,6 +319,10 @@ public class YaaccUpnpServerService extends Service {
 					SendingNotificationAlive sendingNotificationAlive = new SendingNotificationAlive(
 							upnpClient.getRegistry().getUpnpService(),
 							localServer);
+					sendingNotificationAlive.run();
+					sendingNotificationAlive = new SendingNotificationAlive(
+							upnpClient.getRegistry().getUpnpService(),
+							localRenderer);
 					sendingNotificationAlive.run();
 					startUpnpAliveNotifications();
 				}
@@ -294,13 +344,15 @@ public class YaaccUpnpServerService extends Service {
 	}
 
 	/**
-	 * Create a local upnp device
+	 * Create a local upnp renderer device
 	 * 
 	 * @return the device
 	 */
-	private LocalDevice createDevice() {
+	private LocalDevice createMediaRendererDevice() {
 		LocalDevice device;
 		String versionName;
+		Log.d(this.getClass().getName(), "Create MediaRenderer with ID: "
+				+ MEDIA_SERVER_UDN_ID);
 		try {
 			versionName = getApplicationContext()
 					.getPackageManager()
@@ -310,22 +362,19 @@ public class YaaccUpnpServerService extends Service {
 			versionName = "??";
 		}
 		try {
-			device = new LocalDevice(new DeviceIdentity(new UDN(UDN_ID)),
+			device = new LocalDevice(
+					new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)),
 					new UDADeviceType("MediaRenderer"),
 					// Used for shown name: first part of ManufactDet, first
 					// part of ModelDet and version number
 					new DeviceDetails(
-							"YAACC - MediaRenderer",
+							"YAACC - MediaRenderer (" + getLocalServerName() + ")",
 							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
 							new ModelDetails(
-									preferences
-											.getString(
-													getApplicationContext()
-															.getString(
-																	R.string.settings_local_server_name_key),
-													"MediaRenderer"),
-									"Free Android UPnP AV MediaServer, GNU GPL",
-									versionName)), createServices());
+									getLocalServerName() + "-Renderer",
+									"Free Android UPnP AV MediaRender, GNU GPL",
+									versionName)),
+					createMediaRendererServices());
 
 			return device;
 		} catch (ValidationException e) {
@@ -335,27 +384,71 @@ public class YaaccUpnpServerService extends Service {
 
 	}
 
-	
-
-	
-	
 	/**
-	 * Create the services provided by this device
+	 * Create a local upnp renderer device
+	 * 
+	 * @return the device
+	 */
+	private LocalDevice createMediaServerDevice() {
+		LocalDevice device;
+		String versionName;
+		Log.d(this.getClass().getName(), "Create MediaServer whith ID: "
+				+ MEDIA_SERVER_UDN_ID);
+		try {
+			versionName = getApplicationContext()
+					.getPackageManager()
+					.getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+		} catch (NameNotFoundException ex) {
+			Log.e(this.getClass().getName(), "Error while creating device", ex);
+			versionName = "??";
+		}
+		try {
+			device = new LocalDevice(new DeviceIdentity(new UDN(
+					MEDIA_SERVER_UDN_ID)), new UDADeviceType("MediaServer"),
+					// Used for shown name: first part of ManufactDet, first
+					// part of ModelDet and version number
+					new DeviceDetails(
+							"YAACC - MediaServer(" + getLocalServerName() + ")",
+							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
+							new ModelDetails(
+									getLocalServerName() + "-MediaServer",
+									"Free Android UPnP AV MediaServer, GNU GPL",
+									versionName)), createMediaServerServices());
+
+			return device;
+		} catch (ValidationException e) {
+			throw new IllegalStateException("Exception during device creation",
+					e);
+		}
+
+	}
+
+	private String getLocalServerName() {
+		return preferences.getString(
+				getApplicationContext().getString(
+						R.string.settings_local_server_name_key), "Yaacc");
+	}
+
+	/**
+	 * Create the services provided by the server device
 	 * 
 	 * @return the services
 	 */
-	private LocalService<?>[] createServices() {
+	private LocalService<?>[] createMediaServerServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
-		if (preferences.getBoolean(
-				getApplicationContext().getString(
-						R.string.settings_local_server_receiver_chkbx), false)) {
-			services.add(createAVTransportService());
-		}
-		if (preferences.getBoolean(
-				getApplicationContext().getString(
-						R.string.settings_local_server_provider_chkbx), false)) {
-			services.add(createContentDirectoryService());
-		}
+		services.add(createContentDirectoryService());
+		services.add(createConnectionManagerService());
+		return services.toArray(new LocalService[] {});
+	}
+
+	/**
+	 * Create the renderer services provided by the device
+	 * 
+	 * @return the services
+	 */
+	private LocalService<?>[] createMediaRendererServices() {
+		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
+		services.add(createAVTransportService());
 		services.add(createConnectionManagerService());
 		return services.toArray(new LocalService[] {});
 	}
@@ -535,8 +628,8 @@ public class YaaccUpnpServerService extends Service {
 
 		@Override
 		public void run() {
-			System.out.println("Listening on port "
-					+ serversocket.getLocalPort());
+			Log.d(getClass().getName(),
+					"Listening on port " + serversocket.getLocalPort());
 			while (!Thread.interrupted()) {
 				try {
 					// Set up HTTP connection
