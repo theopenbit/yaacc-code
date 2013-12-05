@@ -64,6 +64,8 @@ import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService
 import org.teleal.cling.support.model.Protocol;
 import org.teleal.cling.support.model.ProtocolInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
+import org.teleal.cling.support.renderingcontrol.AbstractAudioRenderingControl;
+import org.teleal.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarService;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -112,9 +114,9 @@ public class YaaccUpnpServerService extends Service {
 	// more things to configure in the future
 	SharedPreferences preferences;
 
-	public static final String MEDIA_SERVER_UDN_ID = UDN_ID; 
+	public static final String MEDIA_SERVER_UDN_ID = UDN_ID;
 
-	public static final String MEDIA_RENDERER_UDN_ID = UDN_ID + "-1"; 
+	public static final String MEDIA_RENDERER_UDN_ID = UDN_ID + "-1";
 
 	private UpnpClient upnpClient;
 
@@ -368,7 +370,8 @@ public class YaaccUpnpServerService extends Service {
 					// Used for shown name: first part of ManufactDet, first
 					// part of ModelDet and version number
 					new DeviceDetails(
-							"YAACC - MediaRenderer (" + getLocalServerName() + ")",
+							"YAACC - MediaRenderer (" + getLocalServerName()
+									+ ")",
 							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
 							new ModelDetails(
 									getLocalServerName() + "-Renderer",
@@ -438,6 +441,7 @@ public class YaaccUpnpServerService extends Service {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createContentDirectoryService());
 		services.add(createConnectionManagerService());
+		//services.add(createMediaReceiverRegistrarService());
 		return services.toArray(new LocalService[] {});
 	}
 
@@ -450,6 +454,7 @@ public class YaaccUpnpServerService extends Service {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createAVTransportService());
 		services.add(createConnectionManagerService());
+		services.add(createRenderingControl());
 		return services.toArray(new LocalService[] {});
 	}
 
@@ -496,6 +501,37 @@ public class YaaccUpnpServerService extends Service {
 				});
 		return avTransportService;
 	}
+
+	private LocalService<AbstractAudioRenderingControl> createRenderingControl() {
+		LocalService<AbstractAudioRenderingControl> renderingControlService = new AnnotationLocalServiceBinder()
+				.read(AbstractAudioRenderingControl.class);
+		renderingControlService
+				.setManager(new DefaultServiceManager<AbstractAudioRenderingControl>(
+						renderingControlService, null) {
+					@Override
+					protected AbstractAudioRenderingControl createServiceInstance()
+							throws Exception {
+						return new YaaccAudioRenderingControlService(upnpClient);
+					}
+				});
+		return renderingControlService;
+	}
+	
+	private LocalService<AbstractMediaReceiverRegistrarService> createMediaReceiverRegistrarService() {
+		LocalService<AbstractMediaReceiverRegistrarService> service = new AnnotationLocalServiceBinder()
+				.read(AbstractMediaReceiverRegistrarService.class);
+		service
+				.setManager(new DefaultServiceManager<AbstractMediaReceiverRegistrarService>(
+						service, null) {
+					@Override
+					protected AbstractMediaReceiverRegistrarService createServiceInstance()
+							throws Exception {
+						return new YaaccMediaReceiverRegistrarService(upnpClient);
+					}
+				});
+		return service;
+	}
+	
 
 	/**
 	 * creates a ConnectionManagerService.
