@@ -83,6 +83,9 @@
     <string name="settings_local_server_testcontent_chkbx" translatable="false">local_server_testcontent_chkbx</string>
     <string name="settings_local_server_name">network name for local server</string>
     <string name="settings_local_server_name_key">Local server name</string>
+    <string name="settings_local_server_autostart_deactivated">Server will not start after booting</string>
+    <string name="settings_local_server_autostart_activated">Server will start after booting</string>
+    <string name="settings_local_server_autostart_chkbx">settings_local_server_autostart_chkbx</string>
     <string name="settings_sending_upnp_alive_interval">Sending upnp alive notifications</string>
     <string name="settings_sending_upnp_alive_interval_key" translatable="false">settings_sending_upnp_alive_interval_key</string>
     <string name="settings_category_playing">Media playing behavior</string>
