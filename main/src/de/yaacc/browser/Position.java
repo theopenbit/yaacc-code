@@ -19,6 +19,9 @@ package de.yaacc.browser;
 
 import org.teleal.cling.model.meta.Device;
 
+/**
+ * @author Christoph Hähnel (eyeless)
+ */
 public class Position {
 
 	private String objectId;

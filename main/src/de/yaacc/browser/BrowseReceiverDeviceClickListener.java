@@ -25,6 +25,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import de.yaacc.R;
+
+/**
+ * @author Christoph Hähnel (eyeless)
+ */
 public class BrowseReceiverDeviceClickListener implements OnItemClickListener {
     private BrowseActivity activity;
     public BrowseReceiverDeviceClickListener(BrowseActivity activity) {

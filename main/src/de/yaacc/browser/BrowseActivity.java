@@ -50,7 +50,7 @@ import de.yaacc.util.AboutActivity;
 /**
  * Activity for browsing devices and folders. Represents the entrypoint for the whole application.
  *
- * @author Christoph H��hnel (eyeless)
+ * @author Christoph Hähnel (eyeless)
  */
 public class BrowseActivity extends Activity implements OnClickListener,
         UpnpClientListener {

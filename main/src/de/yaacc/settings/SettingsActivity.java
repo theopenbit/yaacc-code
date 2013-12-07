@@ -20,6 +20,9 @@ package de.yaacc.settings;
 import android.app.Activity;
 import android.os.Bundle;
 
+/**
+ * @author Christoph Hähnel (eyeless)
+ */
 public class SettingsActivity extends Activity {
 
 	@Override

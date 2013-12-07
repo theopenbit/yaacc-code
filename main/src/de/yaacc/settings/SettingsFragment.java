@@ -31,6 +31,9 @@ import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 
+/**
+ * @author Christoph Hähnel (eyeless)
+ */
 public class SettingsFragment extends PreferenceFragment implements UpnpClientListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

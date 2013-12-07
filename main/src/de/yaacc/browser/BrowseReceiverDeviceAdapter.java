@@ -29,6 +29,10 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import de.yaacc.R;
+
+/**
+ * @author Christoph Hähnel (eyeless)
+ */
 public class BrowseReceiverDeviceAdapter extends BaseAdapter {
     LinkedList<Device> devices;
     private LayoutInflater inflator;
