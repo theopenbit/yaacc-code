@@ -99,7 +99,7 @@
             android:name="de.yaacc.upnp.server.ServerAutostart"
             android:enabled="true"
             android:exported="true"
-            android:label="StartMyServiceAtBootReceiver">
+            android:label="YAACC ServerAutoStart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
