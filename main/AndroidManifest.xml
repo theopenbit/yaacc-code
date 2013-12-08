@@ -21,7 +21,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.yaacc"
     android:versionCode="5"
-    android:versionName="1.1.3" >
+    android:versionName="1.1.3-snapshot" >
 
     <uses-sdk
         android:minSdkVersion="15"
