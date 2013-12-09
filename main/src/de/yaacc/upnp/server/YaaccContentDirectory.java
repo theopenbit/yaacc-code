@@ -91,7 +91,7 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 	 * 
 	 */
 	private void createTestContentDirectory() {
-		StorageFolder rootContainer = new StorageFolder("0", "-1", "Root",
+		StorageFolder rootContainer = new StorageFolder("0", "-1", "root",
 				"yaacc", 2, 907000L);
 		rootContainer.setClazz(new DIDLObject.Class("object.container"));
 		rootContainer.setRestricted(true);
@@ -226,16 +226,36 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		return result;
 	}
 
+	/**
+	 * basic implementation of search. At the moment it will be currently
+	 * redirected to the browse method.
+	 */
+	@Override
+	public BrowseResult search(String containerId, String searchCriteria,
+			String filter, long firstResult, long maxResults,
+			SortCriterion[] orderBy) throws ContentDirectoryException {
+
+		return browse(containerId, BrowseFlag.DIRECT_CHILDREN, filter,
+				firstResult, maxResults, orderBy);
+
+	}
+
 	@Override
 	public BrowseResult browse(String objectID, BrowseFlag browseFlag,
 			String filter, long firstResult, long maxResults,
 			SortCriterion[] orderby) throws ContentDirectoryException {
 
+		Log.d(getClass().getName(), "Browse: objectId: " + objectID
+				+ " browseFlag: " + browseFlag + " filter: " + filter
+				+ " firstResult: " + firstResult + " maxResults: " + maxResults
+				+ " orderby: " + orderby);
 		int childCount = 0;
 		DIDLObject didlObject = content.get(objectID);
 		if (didlObject == null) {
-			throw new ContentDirectoryException(
-					ContentDirectoryErrorCode.NO_SUCH_OBJECT);
+			// throw new ContentDirectoryException(
+			// ContentDirectoryErrorCode.NO_SUCH_OBJECT);
+			// object not found return root
+			didlObject = content.get("0");
 		}
 
 		DIDLContent didl = new DIDLContent();
@@ -468,7 +488,7 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 							&& InetAddressUtils.isIPv4Address(inetAddress
 									.getHostAddress())) {
 
-						hostAddress = inetAddress.getHostAddress();												
+						hostAddress = inetAddress.getHostAddress();
 					}
 
 				}
@@ -477,7 +497,7 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 			Log.d(getClass().getName(),
 					"Error while retrieving network interfaces", se);
 		}
-		//maybe wifi is off we have to use the loopback device
+		// maybe wifi is off we have to use the loopback device
 		hostAddress = hostAddress == null ? "0.0.0.0" : hostAddress;
 		return hostAddress;
 	}
