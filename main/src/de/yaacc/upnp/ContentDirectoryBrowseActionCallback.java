@@ -18,14 +18,14 @@
  */
 package de.yaacc.upnp;
 
-import org.teleal.cling.model.action.ActionInvocation;
-import org.teleal.cling.model.message.UpnpResponse;
-import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.support.contentdirectory.callback.Browse;
-import org.teleal.cling.support.model.BrowseFlag;
-import org.teleal.cling.support.model.BrowseResult;
-import org.teleal.cling.support.model.DIDLContent;
-import org.teleal.cling.support.model.SortCriterion;
+import org.fourthline.cling.model.action.ActionInvocation;
+import org.fourthline.cling.model.message.UpnpResponse;
+import org.fourthline.cling.model.meta.Service;
+import org.fourthline.cling.support.contentdirectory.callback.Browse;
+import org.fourthline.cling.support.model.BrowseFlag;
+import org.fourthline.cling.support.model.BrowseResult;
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.SortCriterion;
 
 import android.util.Log;
 
@@ -53,7 +53,7 @@ public class ContentDirectoryBrowseActionCallback extends Browse {
 	
 
 	/* (non-Javadoc)
-	 * @see org.teleal.cling.support.contentdirectory.callback.Browse#receivedRaw(org.teleal.cling.model.action.ActionInvocation, org.teleal.cling.support.model.BrowseResult)
+	 * @see org.fourthline.cling.support.contentdirectory.callback.Browse#receivedRaw(org.fourthline.cling.model.action.ActionInvocation, org.fourthline.cling.support.model.BrowseResult)
 	 */
 	@Override
 	public boolean receivedRaw(ActionInvocation actionInvocation,

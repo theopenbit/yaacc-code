@@ -27,41 +27,41 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.teleal.cling.UpnpService;
-import org.teleal.cling.UpnpServiceConfiguration;
-import org.teleal.cling.android.AndroidUpnpService;
-import org.teleal.cling.controlpoint.ControlPoint;
-import org.teleal.cling.model.Namespace;
-import org.teleal.cling.model.ValidationException;
-import org.teleal.cling.model.meta.Action;
-import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.DeviceDetails;
-import org.teleal.cling.model.meta.DeviceIdentity;
-import org.teleal.cling.model.meta.Icon;
-import org.teleal.cling.model.meta.LocalDevice;
-import org.teleal.cling.model.meta.RemoteDevice;
-import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.meta.StateVariable;
-import org.teleal.cling.model.meta.UDAVersion;
-import org.teleal.cling.model.resource.Resource;
-import org.teleal.cling.model.types.DeviceType;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.ServiceType;
-import org.teleal.cling.model.types.UDAServiceId;
-import org.teleal.cling.model.types.UDAServiceType;
-import org.teleal.cling.model.types.UDN;
-import org.teleal.cling.registry.Registry;
-import org.teleal.cling.registry.RegistryListener;
-import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
-import org.teleal.cling.support.model.AVTransport;
-import org.teleal.cling.support.model.BrowseFlag;
-import org.teleal.cling.support.model.DIDLContent;
-import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.PositionInfo;
-import org.teleal.cling.support.model.Res;
-import org.teleal.cling.support.model.SortCriterion;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
+import org.fourthline.cling.UpnpService;
+import org.fourthline.cling.UpnpServiceConfiguration;
+import org.fourthline.cling.android.AndroidUpnpService;
+import org.fourthline.cling.controlpoint.ControlPoint;
+import org.fourthline.cling.model.Namespace;
+import org.fourthline.cling.model.ValidationException;
+import org.fourthline.cling.model.meta.Action;
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.DeviceDetails;
+import org.fourthline.cling.model.meta.DeviceIdentity;
+import org.fourthline.cling.model.meta.Icon;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.RemoteDevice;
+import org.fourthline.cling.model.meta.Service;
+import org.fourthline.cling.model.meta.StateVariable;
+import org.fourthline.cling.model.meta.UDAVersion;
+import org.fourthline.cling.model.resource.Resource;
+import org.fourthline.cling.model.types.DeviceType;
+import org.fourthline.cling.model.types.ServiceId;
+import org.fourthline.cling.model.types.ServiceType;
+import org.fourthline.cling.model.types.UDAServiceId;
+import org.fourthline.cling.model.types.UDAServiceType;
+import org.fourthline.cling.model.types.UDN;
+import org.fourthline.cling.registry.Registry;
+import org.fourthline.cling.registry.RegistryListener;
+import org.fourthline.cling.support.contentdirectory.callback.Browse.Status;
+import org.fourthline.cling.support.model.AVTransport;
+import org.fourthline.cling.support.model.BrowseFlag;
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.DIDLObject;
+import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.SortCriterion;
+import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.Item;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -189,9 +189,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#remoteDeviceDiscoveryFailed
-	 * (org.teleal.cling.registry.Registry,
-	 * org.teleal.cling.model.meta.RemoteDevice, java.lang.Exception)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceDiscoveryFailed
+	 * (org.fourthline.cling.registry.Registry,
+	 * org.fourthline.cling.model.meta.RemoteDevice, java.lang.Exception)
 	 */
 	@Override
 	public void remoteDeviceDiscoveryFailed(Registry registry,
@@ -204,8 +204,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#remoteDeviceAdded(org.teleal
-	 * .cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceAdded(org.fourthline
+	 * .cling.registry.Registry, org.fourthline.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceAdded(Registry registry, RemoteDevice remotedevice) {
@@ -218,8 +218,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#remoteDeviceUpdated(org.teleal
-	 * .cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceUpdated(org.fourthline
+	 * .cling.registry.Registry, org.fourthline.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceUpdated(Registry registry, RemoteDevice remotedevice) {
@@ -232,8 +232,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#remoteDeviceRemoved(org.teleal
-	 * .cling.registry.Registry, org.teleal.cling.model.meta.RemoteDevice)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceRemoved(org.fourthline
+	 * .cling.registry.Registry, org.fourthline.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceRemoved(Registry registry, RemoteDevice remotedevice) {
@@ -246,8 +246,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#localDeviceAdded(org.teleal
-	 * .cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)
+	 * org.fourthline.cling.registry.RegistryListener#localDeviceAdded(org.fourthline
+	 * .cling.registry.Registry, org.fourthline.cling.model.meta.LocalDevice)
 	 */
 	@Override
 	public void localDeviceAdded(Registry registry, LocalDevice localdevice) {
@@ -261,8 +261,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#localDeviceRemoved(org.teleal
-	 * .cling.registry.Registry, org.teleal.cling.model.meta.LocalDevice)
+	 * org.fourthline.cling.registry.RegistryListener#localDeviceRemoved(org.fourthline
+	 * .cling.registry.Registry, org.fourthline.cling.model.meta.LocalDevice)
 	 */
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
@@ -279,7 +279,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.teleal.cling.registry.RegistryListener#beforeShutdown(org.teleal.
+	 * org.fourthline.cling.registry.RegistryListener#beforeShutdown(org.fourthline.
 	 * cling.registry.Registry)
 	 */
 	@Override
@@ -290,7 +290,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.teleal.cling.registry.RegistryListener#afterShutdown()
+	 * @see org.fourthline.cling.registry.RegistryListener#afterShutdown()
 	 */
 	@Override
 	public void afterShutdown() {
@@ -1145,7 +1145,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.teleal.cling.model.meta.Device#getDisplayString()
+		 * @see org.fourthline.cling.model.meta.Device#getDisplayString()
 		 */
 		@Override
 		public String getDisplayString() {

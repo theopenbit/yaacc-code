@@ -18,8 +18,8 @@
  */
 package de.yaacc.upnp;
 
-import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
-import org.teleal.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.contentdirectory.callback.Browse.Status;
+import org.fourthline.cling.support.model.DIDLContent;
 
 /**
  * Result of a content directory browsing.

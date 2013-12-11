@@ -23,24 +23,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.teleal.cling.support.contentdirectory.AbstractContentDirectoryService;
-import org.teleal.cling.support.contentdirectory.ContentDirectoryException;
-import org.teleal.cling.support.contentdirectory.DIDLParser;
-import org.teleal.cling.support.model.BrowseFlag;
-import org.teleal.cling.support.model.BrowseResult;
-import org.teleal.cling.support.model.DIDLContent;
-import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.PersonWithRole;
-import org.teleal.cling.support.model.Res;
-import org.teleal.cling.support.model.SortCriterion;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.container.MusicAlbum;
-import org.teleal.cling.support.model.container.PhotoAlbum;
-import org.teleal.cling.support.model.container.StorageFolder;
-import org.teleal.cling.support.model.item.Item;
-import org.teleal.cling.support.model.item.MusicTrack;
-import org.teleal.cling.support.model.item.Photo;
-import org.teleal.common.util.MimeType;
+import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService;
+import org.fourthline.cling.support.contentdirectory.ContentDirectoryException;
+import org.fourthline.cling.support.contentdirectory.DIDLParser;
+import org.fourthline.cling.support.model.BrowseFlag;
+import org.fourthline.cling.support.model.BrowseResult;
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.DIDLObject;
+import org.fourthline.cling.support.model.PersonWithRole;
+import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.SortCriterion;
+import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.container.MusicAlbum;
+import org.fourthline.cling.support.model.container.PhotoAlbum;
+import org.fourthline.cling.support.model.container.StorageFolder;
+import org.fourthline.cling.support.model.item.Item;
+import org.fourthline.cling.support.model.item.MusicTrack;
+import org.fourthline.cling.support.model.item.Photo;
+import org.seamless.util.MimeType;
 
 /**
  * a simple local content directory for test purpose.

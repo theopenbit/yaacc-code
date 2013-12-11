@@ -18,13 +18,11 @@
  */
 package de.yaacc.upnp;
 
-import org.teleal.cling.android.AndroidUpnpServiceConfiguration;
-import org.teleal.cling.android.AndroidUpnpServiceImpl;
-import org.teleal.cling.transport.impl.apache.StreamClientConfigurationImpl;
-import org.teleal.cling.transport.impl.apache.StreamClientImpl;
-import org.teleal.cling.transport.spi.StreamClient;
-
-import android.net.wifi.WifiManager;
+import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
+import org.fourthline.cling.android.AndroidUpnpServiceImpl;
+import org.fourthline.cling.model.types.ServiceType;
+import org.fourthline.cling.model.types.UDADeviceType;
+import org.fourthline.cling.model.types.UDAServiceType;
 
 /**
  * This is an android service to provide access to an upnp registry.
@@ -35,39 +33,17 @@ import android.net.wifi.WifiManager;
 public class UpnpRegistryService extends AndroidUpnpServiceImpl {
 
 	@Override
-	protected AndroidUpnpServiceConfiguration createConfiguration(
-			Object wifiManager) {
-		return new AndroidUpnpServiceConfiguration(wifiManager) {
+	protected AndroidUpnpServiceConfiguration createConfiguration() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.teleal.cling.android.AndroidUpnpServiceConfiguration#
-			 * createStreamClient()
-			 */
+		return new AndroidUpnpServiceConfiguration() {
 			@Override
-			public StreamClient<?> createStreamClient() {
-				return new StreamClientImpl(
-						new StreamClientConfigurationImpl() {
-							public int getConnectionTimeoutSeconds() {
-								return 20;
-							}
+			public int getRegistryMaintenanceIntervalMillis() {
+				return 7000;
+			}
 
-							public int getDataReadTimeoutSeconds() {
-								return 20;
-							}
-
-							public boolean getStaleCheckingEnabled() {
-
-								return false;
-							}
-
-							public int getRequestRetryCount() {
-
-								return 1;
-							}
-
-						});
+			@Override
+			public ServiceType[] getExclusiveServiceTypes() {
+				return new ServiceType[] { new UDAServiceType("AVTransport"), new UDAServiceType("ContentDirectory"), new UDAServiceType("ConnectionManager"), new UDAServiceType("RenderingControl"), new UDAServiceType("X_MS_MediaReceiverRegistrar") };
 			}
 
 		};

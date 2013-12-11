@@ -20,12 +20,12 @@ package de.yaacc.upnp.server;
 
 import java.net.URI;
 
-import org.teleal.cling.support.avtransport.impl.state.AbstractState;
-import org.teleal.cling.support.avtransport.impl.state.NoMediaPresent;
-import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
-import org.teleal.cling.support.model.AVTransport;
-import org.teleal.cling.support.model.MediaInfo;
-import org.teleal.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
+import org.fourthline.cling.support.avtransport.impl.state.NoMediaPresent;
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
+import org.fourthline.cling.support.model.AVTransport;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
 
 import android.util.Log;
 import de.yaacc.upnp.UpnpClient;
@@ -55,7 +55,7 @@ public class AvTransportMediaRendererNoMediaPresent extends
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.teleal.cling.support.avtransport.impl.state.NoMediaPresent#setTransportURI(java.net.URI, java.lang.String)
+	 * @see org.fourthline.cling.support.avtransport.impl.state.NoMediaPresent#setTransportURI(java.net.URI, java.lang.String)
 	 */
 	@Override
 	public Class<? extends AbstractState> setTransportURI(URI uri,

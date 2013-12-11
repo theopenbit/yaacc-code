@@ -20,7 +20,7 @@ package de.yaacc.browser;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.teleal.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device;
 
 import android.content.Context;
 import android.view.LayoutInflater;

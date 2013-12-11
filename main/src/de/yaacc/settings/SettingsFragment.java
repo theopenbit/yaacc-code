@@ -20,7 +20,7 @@ package de.yaacc.settings;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.teleal.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device;
 
 import android.os.Bundle;
 import android.preference.ListPreference;

@@ -18,7 +18,7 @@
  */
 package de.yaacc.upnp.server;
 
-import org.teleal.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarService;
+import org.fourthline.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarService;
 
 import de.yaacc.upnp.UpnpClient;
 

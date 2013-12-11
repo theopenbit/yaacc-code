@@ -25,36 +25,36 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.teleal.cling.controlpoint.ActionCallback;
-import org.teleal.cling.model.action.ActionArgumentValue;
-import org.teleal.cling.model.action.ActionInvocation;
-import org.teleal.cling.model.message.UpnpResponse;
-import org.teleal.cling.model.meta.Action;
-import org.teleal.cling.model.meta.ActionArgument;
-import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.DeviceDetails;
-import org.teleal.cling.model.meta.DeviceIdentity;
-import org.teleal.cling.model.meta.LocalDevice;
-import org.teleal.cling.model.meta.LocalService;
-import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.meta.StateVariable;
-import org.teleal.cling.model.meta.StateVariableTypeDetails;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.ServiceType;
-import org.teleal.cling.model.types.StringDatatype;
-import org.teleal.cling.model.types.UDADeviceType;
-import org.teleal.cling.model.types.UDAServiceId;
-import org.teleal.cling.model.types.UDN;
-import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-import org.teleal.cling.support.avtransport.callback.GetCurrentTransportActions;
-import org.teleal.cling.support.avtransport.callback.GetMediaInfo;
-import org.teleal.cling.support.contentdirectory.callback.Browse.Status;
-import org.teleal.cling.support.model.BrowseFlag;
-import org.teleal.cling.support.model.MediaInfo;
-import org.teleal.cling.support.model.Res;
-import org.teleal.cling.support.model.TransportAction;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
+import org.fourthline.cling.controlpoint.ActionCallback;
+import org.fourthline.cling.model.action.ActionArgumentValue;
+import org.fourthline.cling.model.action.ActionInvocation;
+import org.fourthline.cling.model.message.UpnpResponse;
+import org.fourthline.cling.model.meta.Action;
+import org.fourthline.cling.model.meta.ActionArgument;
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.DeviceDetails;
+import org.fourthline.cling.model.meta.DeviceIdentity;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.LocalService;
+import org.fourthline.cling.model.meta.Service;
+import org.fourthline.cling.model.meta.StateVariable;
+import org.fourthline.cling.model.meta.StateVariableTypeDetails;
+import org.fourthline.cling.model.types.ServiceId;
+import org.fourthline.cling.model.types.ServiceType;
+import org.fourthline.cling.model.types.StringDatatype;
+import org.fourthline.cling.model.types.UDADeviceType;
+import org.fourthline.cling.model.types.UDAServiceId;
+import org.fourthline.cling.model.types.UDN;
+import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.support.avtransport.callback.GetCurrentTransportActions;
+import org.fourthline.cling.support.avtransport.callback.GetMediaInfo;
+import org.fourthline.cling.support.contentdirectory.callback.Browse.Status;
+import org.fourthline.cling.support.model.BrowseFlag;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.TransportAction;
+import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.Item;
 
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +67,7 @@ import android.webkit.MimeTypeMap;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.player.Player;
 import de.yaacc.upnp.server.LocalUpnpServer;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -109,7 +110,7 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 	}
 	
 	protected UpnpClient getInitializedUpnpClientWithYaaccUpnpServer() {
-		return getInitializedUpnpClientWithDevice(YaaccUpnpServerService.UDN_ID);
+		return getInitializedUpnpClientWithDevice(YaaccUpnpServerService.MEDIA_SERVER_UDN_ID);
 	}
 	
 	protected UpnpClient getInitializedUpnpClientWithDevice(String deviceId) {
@@ -767,7 +768,11 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult());
 		assertNotNull(result.getResult().getItems());
 		assertNotNull(result.getResult().getItems().get(0));
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		
+		for (Player player : players) {
+			player.play();
+		}  
 		
 	}
 	
@@ -782,17 +787,21 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
-				YaaccUpnpServerService.UDN_ID);
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
+				YaaccUpnpServerService.MEDIA_SERVER_UDN_ID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		
+		for (Player player : players) {
+			player.play();
+		}
 		myWait(120000L);
 	}
 	
 	
 	public void testUseCasePlayLocalMusicFromYaaccUpnpServer() {
 		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
-		Device<?, ?, ?> device = upnpClient.getDevice(YaaccUpnpServerService.UDN_ID);			
+		Device<?, ?, ?> device = upnpClient.getDevice(YaaccUpnpServerService.MEDIA_SERVER_UDN_ID);			
 		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"102");			
 		//MusicTrack
 		assertNotNull(result);
@@ -801,10 +810,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		
+		for (Player player : players) {
+			player.play();
+		}
 		myWait(120000L);
 	}
 	
@@ -819,10 +832,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getItems().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getItems().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		
+		for (Player player : players) {
+			player.play();
+		}
 		myWait();
 	}
 
@@ -837,10 +854,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getContainers().get(0));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getContainers().get(0)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		
+		for (Player player : players) {
+			player.play();
+		}
 		
 	}
 	
@@ -855,10 +876,14 @@ public class UpnpClientTest extends ServiceTestCase<UpnpRegistryService> {
 		assertNotNull(result.getResult().getContainers().get(1));
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(upnpClient.getContext()).edit();
 		editor.putString(
-				upnpClient.getContext().getString(R.string.settings_selected_receiver_title),
+				upnpClient.getContext().getString(R.string.settings_selected_receivers_title),
 				UpnpClient.LOCAL_UID);
 		editor.commit();
-		upnpClient.initializePlayer(result.getResult().getContainers().get(1)).play();
+		List<Player> players = upnpClient.initializePlayers(result.getResult().getItems().get(0));
+		
+		for (Player player : players) {
+			player.play();
+		}
 		
 	}
 // TODO must be implemented in another way	

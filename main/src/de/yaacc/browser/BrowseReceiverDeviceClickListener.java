@@ -16,7 +16,7 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
-import org.teleal.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;

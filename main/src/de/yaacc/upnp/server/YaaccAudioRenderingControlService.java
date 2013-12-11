@@ -18,10 +18,11 @@
  */
 package de.yaacc.upnp.server;
 
-import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-import org.teleal.cling.model.types.UnsignedIntegerTwoBytes;
-import org.teleal.cling.support.renderingcontrol.AbstractAudioRenderingControl;
-import org.teleal.cling.support.renderingcontrol.RenderingControlException;
+import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
+import org.fourthline.cling.support.model.Channel;
+import org.fourthline.cling.support.renderingcontrol.AbstractAudioRenderingControl;
+import org.fourthline.cling.support.renderingcontrol.RenderingControlException;
 
 import android.util.Log;
 
@@ -68,6 +69,18 @@ public class YaaccAudioRenderingControlService extends
 			UnsignedIntegerTwoBytes desiredVolume) throws RenderingControlException {
 		Log.d(getClass().getName(), "setVolume() - not yet implemented");
 
+	}
+
+	@Override
+	public UnsignedIntegerFourBytes[] getCurrentInstanceIds() {
+		Log.d(getClass().getName(), "getVolume() - not yet implemented");
+		return null;
+	}
+
+	@Override
+	protected Channel[] getCurrentChannels() {
+		Log.d(getClass().getName(), "getVolume() - not yet implemented");
+		return null;
 	}
 
 }

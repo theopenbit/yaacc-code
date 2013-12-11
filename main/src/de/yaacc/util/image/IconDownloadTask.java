@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import org.teleal.cling.support.model.item.ImageItem;
+import org.fourthline.cling.support.model.item.ImageItem;
 
 import java.io.IOException;
 

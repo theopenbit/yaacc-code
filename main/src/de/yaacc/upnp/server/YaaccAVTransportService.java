@@ -18,11 +18,11 @@
  */
 package de.yaacc.upnp.server;
 
-import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-import org.teleal.cling.support.avtransport.impl.AVTransportService;
-import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
-import org.teleal.cling.support.model.AVTransport;
-import org.teleal.common.statemachine.StateMachineBuilder;
+import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.support.avtransport.impl.AVTransportService;
+import org.fourthline.cling.support.avtransport.impl.AVTransportStateMachine;
+import org.fourthline.cling.support.model.AVTransport;
+import org.seamless.statemachine.StateMachineBuilder;
 
 import de.yaacc.upnp.UpnpClient;
 

@@ -19,13 +19,13 @@
 package de.yaacc.upnp.server;
 import java.net.URI;
 import java.util.List;
-import org.teleal.cling.support.avtransport.impl.state.AbstractState;
-import org.teleal.cling.support.avtransport.impl.state.Playing;
-import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
-import org.teleal.cling.support.model.AVTransport;
-import org.teleal.cling.support.model.MediaInfo;
-import org.teleal.cling.support.model.PositionInfo;
-import org.teleal.cling.support.model.SeekMode;
+import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
+import org.fourthline.cling.support.avtransport.impl.state.Playing;
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
+import org.fourthline.cling.support.model.AVTransport;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.model.SeekMode;
 import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
@@ -51,7 +51,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#onEntry()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#onEntry()
     */
     @Override
     public void onEntry() {
@@ -65,7 +65,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#setTransportURI(java.net.URI, java.lang.String)
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#setTransportURI(java.net.URI, java.lang.String)
     */
     @Override
     public Class<? extends AbstractState> setTransportURI(URI uri,
@@ -85,7 +85,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#stop()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#stop()
     */
     @Override
     public Class<? extends AbstractState> stop() {
@@ -95,7 +95,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#play(java.lang.String)
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#play(java.lang.String)
     */
     @Override
     public Class<? extends AbstractState> play(String speed) {
@@ -104,7 +104,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#pause()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#pause()
     */
     @Override
     public Class<? extends AbstractState> pause() {
@@ -113,7 +113,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#next()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#next()
     */
     @Override
     public Class<? extends AbstractState> next() {
@@ -122,7 +122,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#previous()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#previous()
     */
     @Override
     public Class<? extends AbstractState> previous() {
@@ -131,7 +131,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#seek(org.teleal.cling.support.model.SeekMode, java.lang.String)
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#seek(org.fourthline.cling.support.model.SeekMode, java.lang.String)
     */
     @Override
     public Class<? extends AbstractState> seek(SeekMode unit, String target) {

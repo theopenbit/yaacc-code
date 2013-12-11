@@ -34,7 +34,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpService;
-import org.teleal.common.util.MimeType;
+import org.seamless.util.MimeType;
 
 import android.content.Context;
 import android.database.Cursor;

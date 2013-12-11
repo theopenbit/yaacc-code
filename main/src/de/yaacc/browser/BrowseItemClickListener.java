@@ -18,8 +18,8 @@
 package de.yaacc.browser;
 import java.util.ArrayList;
 import java.util.List;
-import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.DIDLObject;
+import org.fourthline.cling.support.model.container.Container;
 import android.content.Context;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;

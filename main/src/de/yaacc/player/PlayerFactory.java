@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import org.teleal.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;

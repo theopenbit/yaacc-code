@@ -17,7 +17,7 @@
  */
 package de.yaacc.browser;
 
-import org.teleal.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device;
 
 import android.view.View;
 import android.widget.AdapterView;

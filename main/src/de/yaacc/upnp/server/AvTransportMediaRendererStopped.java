@@ -19,13 +19,13 @@
 package de.yaacc.upnp.server;
 import java.net.URI;
 import java.util.List;
-import org.teleal.cling.support.avtransport.impl.state.AbstractState;
-import org.teleal.cling.support.avtransport.impl.state.Stopped;
-import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
-import org.teleal.cling.support.model.AVTransport;
-import org.teleal.cling.support.model.MediaInfo;
-import org.teleal.cling.support.model.PositionInfo;
-import org.teleal.cling.support.model.SeekMode;
+import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
+import org.fourthline.cling.support.avtransport.impl.state.Stopped;
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
+import org.fourthline.cling.support.model.AVTransport;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.model.SeekMode;
 import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
@@ -52,7 +52,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     /*
     * (non-Javadoc)
     *
-    * @see org.teleal.cling.support.avtransport.impl.state.Stopped#onEntry()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#onEntry()
     */
     @Override
     public void onEntry() {
@@ -69,7 +69,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     * (non-Javadoc)
     *
     * @see
-    * org.teleal.cling.support.avtransport.impl.state.Stopped#setTransportURI
+    * org.fourthline.cling.support.avtransport.impl.state.Stopped#setTransportURI
     * (java.net.URI, java.lang.String)
     */
     @Override
@@ -97,7 +97,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     /*
     * (non-Javadoc)
     *
-    * @see org.teleal.cling.support.avtransport.impl.state.Stopped#stop()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#stop()
     */
     @Override
     public Class<? extends AbstractState> stop() {
@@ -110,7 +110,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     * (non-Javadoc)
     *
     * @see
-    * org.teleal.cling.support.avtransport.impl.state.Stopped#play(java.lang
+    * org.fourthline.cling.support.avtransport.impl.state.Stopped#play(java.lang
     * .String)
     */
     @Override
@@ -122,7 +122,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     /*
     * (non-Javadoc)
     *
-    * @see org.teleal.cling.support.avtransport.impl.state.Stopped#next()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#next()
     */
     @Override
     public Class<? extends AbstractState> next() {
@@ -132,7 +132,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     /*
     * (non-Javadoc)
     *
-    * @see org.teleal.cling.support.avtransport.impl.state.Stopped#previous()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#previous()
     */
     @Override
     public Class<? extends AbstractState> previous() {
@@ -143,7 +143,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     * (non-Javadoc)
     *
     * @see
-    * org.teleal.cling.support.avtransport.impl.state.Stopped#seek(org.teleal
+    * org.fourthline.cling.support.avtransport.impl.state.Stopped#seek(org.fourthline
     * .cling.support.model.SeekMode, java.lang.String)
     */
     @Override

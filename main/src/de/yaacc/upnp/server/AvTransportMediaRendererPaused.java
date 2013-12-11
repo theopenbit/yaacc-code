@@ -19,12 +19,12 @@
 package de.yaacc.upnp.server;
 import java.net.URI;
 import java.util.List;
-import org.teleal.cling.support.avtransport.impl.state.AbstractState;
-import org.teleal.cling.support.avtransport.impl.state.PausedPlay;
-import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
-import org.teleal.cling.support.model.AVTransport;
-import org.teleal.cling.support.model.MediaInfo;
-import org.teleal.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
+import org.fourthline.cling.support.avtransport.impl.state.PausedPlay;
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
+import org.fourthline.cling.support.model.AVTransport;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
 import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
@@ -49,7 +49,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
         this.upnpClient = upnpClient;
     }
     /* (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.PausedPlay#play(java.lang.String)
+    * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#play(java.lang.String)
     */
     @Override
     public Class<? extends AbstractState> play(String arg0) {
@@ -57,7 +57,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
         return AvTransportMediaRendererPlaying.class;
     }
     /* (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.PausedPlay#setTransportURI(java.net.URI, java.lang.String)
+    * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#setTransportURI(java.net.URI, java.lang.String)
     */
     @Override
     public Class<? extends AbstractState> setTransportURI(URI uri, String metaData) {
@@ -81,7 +81,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
         return AvTransportMediaRendererStopped.class;
     }
     /* (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.PausedPlay#stop()
+    * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#stop()
     */
     @Override
     public Class<? extends AbstractState> stop() {
@@ -90,7 +90,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
     }
     /*
     * (non-Javadoc)
-    * @see org.teleal.cling.support.avtransport.impl.state.Playing#onEntry()
+    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#onEntry()
     */
     @Override
     public void onEntry() {

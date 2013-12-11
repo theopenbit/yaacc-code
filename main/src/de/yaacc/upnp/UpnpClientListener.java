@@ -18,7 +18,7 @@
  */
 package de.yaacc.upnp;
 
-import org.teleal.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device;
 
 
 /**

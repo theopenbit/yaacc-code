@@ -15,8 +15,8 @@
 
 package de.yaacc.upnp.server;
 
-import static org.teleal.cling.model.XMLUtil.appendNewElement;
-import static org.teleal.cling.model.XMLUtil.appendNewElementIfNotNull;
+import static org.fourthline.cling.model.XMLUtil.appendNewElement;
+import static org.fourthline.cling.model.XMLUtil.appendNewElementIfNotNull;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -32,23 +32,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.teleal.cling.model.types.Datatype;
-import org.teleal.cling.model.types.InvalidValueException;
-import org.teleal.cling.support.model.DIDLAttribute;
-import org.teleal.cling.support.model.DIDLContent;
-import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.DescMeta;
-import org.teleal.cling.support.model.Person;
-import org.teleal.cling.support.model.PersonWithRole;
-import org.teleal.cling.support.model.ProtocolInfo;
-import org.teleal.cling.support.model.Res;
-import org.teleal.cling.support.model.StorageMedium;
-import org.teleal.cling.support.model.WriteStatus;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
-import org.teleal.common.io.IO;
-import org.teleal.common.util.Exceptions;
-import org.teleal.common.xml.SAXParser;
+import org.fourthline.cling.model.types.Datatype;
+import org.fourthline.cling.model.types.InvalidValueException;
+import org.fourthline.cling.support.model.DIDLAttribute;
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.DIDLObject;
+import org.fourthline.cling.support.model.DescMeta;
+import org.fourthline.cling.support.model.Person;
+import org.fourthline.cling.support.model.PersonWithRole;
+import org.fourthline.cling.support.model.ProtocolInfo;
+import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.StorageMedium;
+import org.fourthline.cling.support.model.WriteStatus;
+import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.Item;
+import org.seamless.util.io.IO;
+import org.seamless.util.Exceptions;
+import org.seamless.xml.SAXParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

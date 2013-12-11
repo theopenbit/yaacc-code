@@ -18,8 +18,8 @@
  */
 package de.yaacc.upnp.server;
 
-import org.teleal.cling.support.avtransport.impl.AVTransportStateMachine;
-import org.teleal.common.statemachine.States;
+import org.fourthline.cling.support.avtransport.impl.AVTransportStateMachine;
+import org.seamless.statemachine.States;
 /**
  * @author Tobias Schöne (openbit)  
  *
