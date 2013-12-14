@@ -39,7 +39,7 @@ public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
         this.cache = IconDownloadCacheHandler.getInstance();
     }
     
-    //TODO just to make it run. the cache isn't suitable for more than one ListView
+    //FIXME just to make it run. the cache isn't suitable for more than one ListView
     public IconDownloadTask(ListView list,int position, boolean cached){
         this.listView = list;
         this.position = position;

@@ -26,6 +26,7 @@ import java.util.LinkedList;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
+import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.RemoteDeviceIdentity;
 
@@ -97,25 +98,22 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 
 		Device device = (Device) getItem(position);
 		holder.icon.setImageResource(R.drawable.device);
-		if ( device.hasIcons()) {
+		if ( device instanceof RemoteDevice && device.hasIcons()) {
 			Icon[] icons = device.getIcons();
 			for (int i = 0; i < icons.length; i++) {
-				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())&&device.getDetails().getBaseURL() != null) {
-					URI iconUri = icons[i].getUri();
-					//URIUtil.createAbsoluteURL(getIdentity().getDescriptorURL()
-					
-					String baseURL = device.getDetails().getBaseURL().toString();
-					if (iconUri != null && baseURL != null) {
-						if (baseURL.endsWith("/")){
-							baseURL = baseURL.substring(0, baseURL.length()-1);
-						}
-						Log.d(getClass().getName(),"Device icon uri:" + baseURL +  iconUri);
-						new IconDownloadTask((ListView) parent, position,false).execute(Uri.parse(baseURL + iconUri.toString()));							
+				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())&&device.getDetails().getBaseURL() != null) {					
+					URL iconUri = ((RemoteDevice)device).normalizeURI(icons[i].getUri());
+					if (iconUri != null) {
+						Log.d(getClass().getName(),"Device icon uri:" + iconUri);
+						new IconDownloadTask((ListView) parent, position,false).execute(Uri.parse(iconUri.toString()));							
 						break;
 						
 					}
 				}
 			}
+		} else if (device instanceof LocalDevice){
+			//We know our icon
+			holder.icon.setImageResource(R.drawable.yaacc48_24_png);
 		}
 		holder.name.setText(device.getDisplayString());
 
