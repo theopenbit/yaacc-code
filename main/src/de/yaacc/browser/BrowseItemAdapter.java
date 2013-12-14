@@ -126,7 +126,7 @@ public class BrowseItemAdapter extends BaseAdapter{
         } else if(currentObject instanceof ImageItem){
             holder.icon.setImageResource(R.drawable.image);
             if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
-                iconDownloadTask.execute((ImageItem) currentObject);
+                iconDownloadTask.execute(Uri.parse(((ImageItem) currentObject).getFirstResource().getValue()));
         } else if(currentObject instanceof VideoItem){
             holder.icon.setImageResource(R.drawable.video);
         } else if(currentObject instanceof PlaylistItem){
