@@ -21,9 +21,9 @@ import de.yaacc.browser.BrowseActivity;
  *
  * @author: Christoph Hähnel (eyeless)
  */
-public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
+public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
 
-    private Bitmap result;
+   
     private ListView listView;
     private int position;
     private IconDownloadCacheHandler cache;
@@ -38,18 +38,30 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
         this.position = position;
         this.cache = IconDownloadCacheHandler.getInstance();
     }
+    
+    //FIXME just to make it run. the cache isn't suitable for more than one ListView
+    public IconDownloadTask(ListView list,int position, boolean cached){
+        this.listView = list;
+        this.position = position;
+        this.cache = cached? IconDownloadCacheHandler.getInstance():null;
+    }
 
     /**
      * Download image and convert it to icon
-     * @param images DIDLObject containing the ressource URL
+     * @param uri uri of resource
      * @return icon
      */
     @Override
-    protected Bitmap doInBackground(ImageItem... images) {
-        result = cache.getBitmap(position);
+    protected Bitmap doInBackground(Uri... uri) {
+    	Bitmap result =null;
+    	if(cache != null){
+    		result = cache.getBitmap(position);
+    	}
         if (result == null){
-            result = new ImageDownloader().retrieveIcon(Uri.parse(images[0].getFirstResource().getValue()));
-            cache.addBitmap(position,result);
+            result = new ImageDownloader().retrieveIcon(uri[0]);            
+            if(cache != null){
+            	cache.addBitmap(position,result);
+            }
         }
         return result;
     }
@@ -62,7 +74,7 @@ public class IconDownloadTask extends AsyncTask<ImageItem, Integer, Bitmap> {
     protected void onPostExecute(Bitmap result) {
         int visiblePosition = listView.getFirstVisiblePosition();
         View v = listView.getChildAt(position - visiblePosition);
-        if (v != null){
+        if (v != null && result != null){
             ImageView c = (ImageView) v.findViewById(R.id.browseItemIcon);
             c.setImageBitmap(result);
         }

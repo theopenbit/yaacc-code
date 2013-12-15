@@ -16,10 +16,17 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
+
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Icon;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.RemoteDevice;
+
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +34,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import de.yaacc.R;
+import de.yaacc.util.image.IconDownloadTask;
 
 /**
  * @author Christoph Hähnel (eyeless)
@@ -75,10 +84,27 @@ public class BrowseReceiverDeviceAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         holder.icon.setImageResource(R.drawable.device);
-        Device currentDevice = (Device) getItem(position);
-        holder.name.setText(currentDevice.getDisplayString());
-        holder.checkBox.setChecked(selectedDevices.contains(currentDevice));
-        Log.d(getClass().getName(), "checkBox isChecked (" + currentDevice.getDisplayString()+"):" + holder.checkBox.isChecked());
+        Device device = (Device) getItem(position);
+        if ( device instanceof RemoteDevice && device.hasIcons()) {
+			Icon[] icons = device.getIcons();
+			for (int i = 0; i < icons.length; i++) {
+				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())&&device.getDetails().getBaseURL() != null) {					
+					URL iconUri = ((RemoteDevice)device).normalizeURI(icons[i].getUri());
+					if (iconUri != null) {
+						Log.d(getClass().getName(),"Device icon uri:" + iconUri);
+						new IconDownloadTask((ListView) parent, position,false).execute(Uri.parse(iconUri.toString()));							
+						break;
+						
+					}
+				}
+			}
+		}else if (device instanceof LocalDevice){
+			//We know our icon
+			holder.icon.setImageResource(R.drawable.yaacc48_24_png);
+		}
+        holder.name.setText(device.getDisplayString());
+        holder.checkBox.setChecked(selectedDevices.contains(device));
+        Log.d(getClass().getName(), "checkBox isChecked (" + device.getDisplayString()+"):" + holder.checkBox.isChecked());
         return convertView;
     }
     public void setDevices(Collection<Device<?,?,?>> devices) {

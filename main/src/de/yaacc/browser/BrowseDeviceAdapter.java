@@ -17,33 +17,51 @@
  */
 package de.yaacc.browser;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 
+
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Icon;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.RemoteDevice;
+import org.fourthline.cling.model.meta.RemoteDeviceIdentity;
+
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseItemAdapter.ViewHolder;
+import de.yaacc.util.image.IconDownloadTask;
+import de.yaacc.util.image.ImageDownloader;
 
 /**
  * @author Christoph Hähnel (eyeless)
  */
 public class BrowseDeviceAdapter extends BaseAdapter {
-	
-	LinkedList<Device> devices;
-	private LayoutInflater inflator;	
-	
 
-	public BrowseDeviceAdapter(Context ctx, LinkedList <Device> devices) {
+	LinkedList<Device> devices;
+	private LayoutInflater inflator;
+
+	public BrowseDeviceAdapter(Context ctx, LinkedList<Device> devices) {
 		super();
-		
+
 		this.devices = devices;
 
 		inflator = LayoutInflater.from(ctx);
@@ -68,25 +86,43 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
-		
-		if(convertView == null){
-			convertView = inflator.inflate(R.layout.browse_item,parent,false);
-			
+
+		if (convertView == null) {
+			convertView = inflator.inflate(R.layout.browse_item, parent, false);
+
 			holder = new ViewHolder();
 			holder.icon = (ImageView) convertView.findViewById(R.id.browseItemIcon);
-			holder.name = (TextView) convertView.findViewById(R.id.browseItemName);			
+			holder.name = (TextView) convertView.findViewById(R.id.browseItemName);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		
+
+		Device device = (Device) getItem(position);
 		holder.icon.setImageResource(R.drawable.device);
-		holder.name.setText(((Device)getItem(position)).getDisplayString());
-		
+		if ( device instanceof RemoteDevice && device.hasIcons()) {
+			Icon[] icons = device.getIcons();
+			for (int i = 0; i < icons.length; i++) {
+				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())&&device.getDetails().getBaseURL() != null) {					
+					URL iconUri = ((RemoteDevice)device).normalizeURI(icons[i].getUri());
+					if (iconUri != null) {
+						Log.d(getClass().getName(),"Device icon uri:" + iconUri);
+						new IconDownloadTask((ListView) parent, position,false).execute(Uri.parse(iconUri.toString()));							
+						break;
+						
+					}
+				}
+			}
+		} else if (device instanceof LocalDevice){
+			//We know our icon
+			holder.icon.setImageResource(R.drawable.yaacc48_24_png);
+		}
+		holder.name.setText(device.getDisplayString());
+
 		return convertView;
 	}
-	
-	public void setDevices(Collection <Device> devices){
+
+	public void setDevices(Collection<Device> devices) {
 		this.devices = new LinkedList<Device>();
 		this.devices.addAll(devices);
 	}

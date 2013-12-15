@@ -467,26 +467,21 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		return result;
 	}
 
+	
 	/**
-	 * get the internet address of the device
+	 * get the ip address of the device
 	 * 
-	 * @return the address or null if anything goes wrong
+	 * @return the address or null if anything went wrong
 	 * 
 	 */
-	public String getIpAddress() {
+	public  String getIpAddress() {
 		String hostAddress = null;
 		try {
-			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
-					.getNetworkInterfaces(); networkInterfaces
-					.hasMoreElements();) {
-				NetworkInterface networkInterface = networkInterfaces
-						.nextElement();
-				for (Enumeration<InetAddress> inetAddresses = networkInterface
-						.getInetAddresses(); inetAddresses.hasMoreElements();) {
+			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
+				NetworkInterface networkInterface = networkInterfaces.nextElement();
+				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
 					InetAddress inetAddress = inetAddresses.nextElement();
-					if (!inetAddress.isLoopbackAddress()
-							&& InetAddressUtils.isIPv4Address(inetAddress
-									.getHostAddress())) {
+					if (!inetAddress.isLoopbackAddress() && InetAddressUtils.isIPv4Address(inetAddress.getHostAddress())) {
 
 						hostAddress = inetAddress.getHostAddress();
 					}
@@ -494,25 +489,11 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 				}
 			}
 		} catch (SocketException se) {
-			Log.d(getClass().getName(),
-					"Error while retrieving network interfaces", se);
+			Log.d(YaaccUpnpServerService.class.getName(), "Error while retrieving network interfaces", se);
 		}
 		// maybe wifi is off we have to use the loopback device
 		hostAddress = hostAddress == null ? "0.0.0.0" : hostAddress;
 		return hostAddress;
 	}
-	// private String getIpAddress(){
-	// WifiManager wifiManager = (WifiManager)
-	// getContext().getSystemService(Service.WIFI_SERVICE);
-	// WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-	// int ip = wifiInfo.getIpAddress();
-	// String ipString = String.format(
-	// "%d.%d.%d.%d",
-	// (ip & 0xff),
-	// (ip >> 8 & 0xff),
-	// (ip >> 16 & 0xff),
-	// (ip >> 24 & 0xff)
-	// );
-	// return ipString;
-	// }
+	
 }

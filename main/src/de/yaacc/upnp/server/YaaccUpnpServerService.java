@@ -18,20 +18,24 @@
  */
 package de.yaacc.upnp.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.BindException;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpServerConnection;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.DefaultHttpServerConnection;
@@ -46,11 +50,13 @@ import org.apache.http.protocol.ResponseConnControl;
 import org.apache.http.protocol.ResponseContent;
 import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
+
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.DefaultServiceManager;
 import org.fourthline.cling.model.ValidationException;
 import org.fourthline.cling.model.meta.DeviceDetails;
 import org.fourthline.cling.model.meta.DeviceIdentity;
+import org.fourthline.cling.model.meta.Icon;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
 import org.fourthline.cling.model.meta.ManufacturerDetails;
@@ -67,6 +73,7 @@ import org.fourthline.cling.support.model.ProtocolInfos;
 import org.fourthline.cling.support.renderingcontrol.AbstractAudioRenderingControl;
 import org.fourthline.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarService;
 
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.NotificationManager;
@@ -76,13 +83,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.yaacc.R;
-import de.yaacc.browser.BrowseActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 
@@ -97,13 +106,9 @@ public class YaaccUpnpServerService extends Service {
 
 	private static final String UDN_ID = "35"
 			+ // we make this look like a valid IMEI
-			Build.BOARD.length() % 10 + Build.BRAND.length() % 10
-			+ Build.CPU_ABI.length() % 10 + Build.DEVICE.length() % 10
-			+ Build.DISPLAY.length() % 10 + Build.HOST.length() % 10
-			+ Build.ID.length() % 10 + Build.MANUFACTURER.length() % 10
-			+ Build.MODEL.length() % 10 + Build.PRODUCT.length() % 10
-			+ Build.TAGS.length() % 10 + Build.TYPE.length() % 10
-			+ Build.USER.length() % 10;
+			Build.BOARD.length() % 10 + Build.BRAND.length() % 10 + Build.CPU_ABI.length() % 10 + Build.DEVICE.length() % 10 + Build.DISPLAY.length()
+			% 10 + Build.HOST.length() % 10 + Build.ID.length() % 10 + Build.MANUFACTURER.length() % 10 + Build.MODEL.length() % 10
+			+ Build.PRODUCT.length() % 10 + Build.TAGS.length() % 10 + Build.TYPE.length() % 10 + Build.USER.length() % 10;
 
 	public static int PORT = 4711;
 
@@ -145,8 +150,7 @@ public class YaaccUpnpServerService extends Service {
 	public void onStart(Intent intent, int startid) {
 
 		// when the service starts, the preferences are initialized
-		preferences = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+		preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		if (upnpClient == null) {
 			upnpClient = new UpnpClient();
@@ -173,13 +177,11 @@ public class YaaccUpnpServerService extends Service {
 		Log.d(this.getClass().getName(), "Destroying the service");
 		if (upnpClient != null) {
 			if (localServer != null) {
-				upnpClient.localDeviceRemoved(upnpClient.getRegistry(),
-						localServer);
+				upnpClient.localDeviceRemoved(upnpClient.getRegistry(), localServer);
 				localServer = null;
 			}
 			if (localRenderer != null) {
-				upnpClient.localDeviceRemoved(upnpClient.getRegistry(),
-						localRenderer);
+				upnpClient.localDeviceRemoved(upnpClient.getRegistry(), localRenderer);
 				localRenderer = null;
 			}
 
@@ -188,8 +190,7 @@ public class YaaccUpnpServerService extends Service {
 			try {
 				httpServer.serversocket.close();
 			} catch (IOException e) {
-				Log.e(this.getClass().getName(),
-						"Error while closing http request thread", e);
+				Log.e(this.getClass().getName(), "Error while closing http request thread", e);
 			}
 		}
 		cancleNotification();
@@ -200,27 +201,15 @@ public class YaaccUpnpServerService extends Service {
 	 * Displays the notification.
 	 */
 	private void showNotification() {
-		Intent notificationIntent = new Intent(this,
-				YaaccUpnpServerControlActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				notificationIntent, 0);
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				this)
-				.setOngoing(true)
-				.setSmallIcon(R.drawable.ic_launcher)
+		Intent notificationIntent = new Intent(this, YaaccUpnpServerControlActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setOngoing(true).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Yaacc Upnp Server")
-				.setContentText(
-						preferences
-								.getString(
-										getApplicationContext()
-												.getString(
-														R.string.settings_local_server_name_key),
-										""));
+				.setContentText(preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), ""));
 		mBuilder.setContentIntent(contentIntent);
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		// mId allows you to update the notification later on.
-		mNotificationManager.notify(NotificationId.UPNP_SERVER.getId(),
-				mBuilder.build());
+		mNotificationManager.notify(NotificationId.UPNP_SERVER.getId(), mBuilder.build());
 	}
 
 	/**
@@ -254,10 +243,7 @@ public class YaaccUpnpServerService extends Service {
 			}
 		}
 		if (upnpClient.isInitialized()) {
-			if (preferences.getBoolean(
-					getApplicationContext().getString(
-							R.string.settings_local_server_provider_chkbx),
-					false)) {
+			if (preferences.getBoolean(getApplicationContext().getString(R.string.settings_local_server_provider_chkbx), false)) {
 				if (localServer == null) {
 					localServer = createMediaServerDevice();
 				}
@@ -266,10 +252,7 @@ public class YaaccUpnpServerService extends Service {
 				createHttpServer();
 			}
 
-			if (preferences.getBoolean(
-					getApplicationContext().getString(
-							R.string.settings_local_server_receiver_chkbx),
-					false)) {
+			if (preferences.getBoolean(getApplicationContext().getString(R.string.settings_local_server_receiver_chkbx), false)) {
 				if (localRenderer == null) {
 					localRenderer = createMediaRendererDevice();
 				}
@@ -297,8 +280,7 @@ public class YaaccUpnpServerService extends Service {
 			Log.w(this.getClass().getName(), "Server already running");
 		} catch (IOException e) {
 			// FIXME Ignored right error handling on rebind needed
-			Log.w(this.getClass().getName(),
-					"ContentProvider can not be initialized!", e);
+			Log.w(this.getClass().getName(), "ContentProvider can not be initialized!", e);
 			// throw new
 			// IllegalStateException("ContentProvider can not be initialized!",
 			// e);
@@ -310,21 +292,19 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	private void startUpnpAliveNotifications() {
 		int upnpNotificationFrequency = getUpnpNotificationFrequency();
-		if (upnpNotificationFrequency != -1
-				&& preferences.getBoolean(
-						getString(R.string.settings_local_server_chkbx), false)) {
+		if (upnpNotificationFrequency != -1 && preferences.getBoolean(getString(R.string.settings_local_server_chkbx), false)) {
 			new Timer().schedule(new TimerTask() {
 				@Override
 				public void run() {
-					Log.d(YaaccUpnpServerService.this.getClass().getName(),
-							"Sending upnp alive notivication");
-					SendingNotificationAlive sendingNotificationAlive = new SendingNotificationAlive(
-							upnpClient.getRegistry().getUpnpService(),
-							localServer);
-					sendingNotificationAlive.run();
-					sendingNotificationAlive = new SendingNotificationAlive(
-							upnpClient.getRegistry().getUpnpService(),
-							localRenderer);
+					Log.d(YaaccUpnpServerService.this.getClass().getName(), "Sending upnp alive notivication");
+					SendingNotificationAlive sendingNotificationAlive = null;
+					if (localServer != null) {
+						sendingNotificationAlive = new SendingNotificationAlive(upnpClient.getRegistry().getUpnpService(), localServer);
+						sendingNotificationAlive.run();
+					}
+					if (localRenderer != null) {
+						sendingNotificationAlive = new SendingNotificationAlive(upnpClient.getRegistry().getUpnpService(), localRenderer);
+					}
 					sendingNotificationAlive.run();
 					startUpnpAliveNotifications();
 				}
@@ -340,9 +320,7 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the time
 	 */
 	private int getUpnpNotificationFrequency() {
-		return Integer.parseInt(preferences.getString(upnpClient.getContext()
-				.getString(R.string.settings_sending_upnp_alive_interval_key),
-				"-1"));
+		return Integer.parseInt(preferences.getString(upnpClient.getContext().getString(R.string.settings_sending_upnp_alive_interval_key), "5000"));
 	}
 
 	/**
@@ -353,36 +331,24 @@ public class YaaccUpnpServerService extends Service {
 	private LocalDevice createMediaRendererDevice() {
 		LocalDevice device;
 		String versionName;
-		Log.d(this.getClass().getName(), "Create MediaRenderer with ID: "
-				+ MEDIA_SERVER_UDN_ID);
+		Log.d(this.getClass().getName(), "Create MediaRenderer with ID: " + MEDIA_SERVER_UDN_ID);
 		try {
-			versionName = getApplicationContext()
-					.getPackageManager()
-					.getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+			versionName = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException ex) {
 			Log.e(this.getClass().getName(), "Error while creating device", ex);
 			versionName = "??";
 		}
 		try {
-			device = new LocalDevice(
-					new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)),
-					new UDADeviceType("MediaRenderer"),
-					// Used for shown name: first part of ManufactDet, first
-					// part of ModelDet and version number
-					new DeviceDetails(
-							"YAACC - MediaRenderer (" + getLocalServerName()
-									+ ")",
-							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
-							new ModelDetails(
-									getLocalServerName() + "-Renderer",
-									"Free Android UPnP AV MediaRender, GNU GPL",
-									versionName)),
-					createMediaRendererServices());
+			device = new LocalDevice(new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)), new UDADeviceType("MediaRenderer"),
+			// Used for shown name: first part of ManufactDet, first
+			// part of ModelDet and version number
+					new DeviceDetails("YAACC - MediaRenderer (" + getLocalServerName() + ")",
+							new ManufacturerDetails("yaacc", "http://www.yaacc.de"), new ModelDetails(getLocalServerName() + "-Renderer",
+									"Free Android UPnP AV MediaRender, GNU GPL", versionName)), createDeviceIcons(), createMediaRendererServices());
 
 			return device;
 		} catch (ValidationException e) {
-			throw new IllegalStateException("Exception during device creation",
-					e);
+			throw new IllegalStateException("Exception during device creation", e);
 		}
 
 	}
@@ -393,43 +359,68 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the device
 	 */
 	private LocalDevice createMediaServerDevice() {
+		// https://bitbucket.org/longkerdandy/chii2/src/
 		LocalDevice device;
 		String versionName;
-		Log.d(this.getClass().getName(), "Create MediaServer whith ID: "
-				+ MEDIA_SERVER_UDN_ID);
+		Log.d(this.getClass().getName(), "Create MediaServer whith ID: " + MEDIA_SERVER_UDN_ID);
 		try {
-			versionName = getApplicationContext()
-					.getPackageManager()
-					.getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+			versionName = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException ex) {
 			Log.e(this.getClass().getName(), "Error while creating device", ex);
 			versionName = "??";
 		}
 		try {
-			device = new LocalDevice(new DeviceIdentity(new UDN(
-					MEDIA_SERVER_UDN_ID)), new UDADeviceType("MediaServer"),
-					// Used for shown name: first part of ManufactDet, first
-					// part of ModelDet and version number
-					new DeviceDetails(
-							"YAACC - MediaServer(" + getLocalServerName() + ")",
-							new ManufacturerDetails("yaacc.de", "www.yaacc.de"),
-							new ModelDetails(
-									getLocalServerName() + "-MediaServer",
-									"Free Android UPnP AV MediaServer, GNU GPL",
-									versionName)), createMediaServerServices());
+
+			// Yaacc Details
+			// Used for shown name: first part of ManufactDet, first
+			// part of ModelDet and version number
+			DeviceDetails yaaccDetails = new DeviceDetails("YAACC - MediaServer(" + getLocalServerName() + ")",
+					new ManufacturerDetails("yaacc.de", "http://www.yaacc.de"), new ModelDetails(getLocalServerName() + "-MediaServer",
+							"Free Android UPnP AV MediaServer, GNU GPL", versionName));
+
+			DeviceIdentity identity = new DeviceIdentity(new UDN(MEDIA_SERVER_UDN_ID));
+
+			device = new LocalDevice(identity, new UDADeviceType("MediaServer"), yaaccDetails, createDeviceIcons(), createMediaServerServices());
 
 			return device;
 		} catch (ValidationException e) {
-			throw new IllegalStateException("Exception during device creation",
-					e);
+			Log.e(this.getClass().getName(), "Exception during device creation", e);
+			Log.e(this.getClass().getName(), "Exception during device creation Errors:" + e.getErrors());
+			throw new IllegalStateException("Exception during device creation", e);
 		}
 
 	}
 
+	private Icon[] createDeviceIcons() {
+		Drawable drawable = getResources().getDrawable(R.drawable.yaacc120_jpg);
+		Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+		//
+		// return new Icon("image/png", 48, 48, 24,
+		// URI.create("/icon.png"),stream.toByteArray());
+		ArrayList<Icon> icons = new ArrayList<Icon>();
+
+		icons.add(new Icon("image/jpeg", 120, 120, 24, "yaacc120.jpg", getIconAsByteArray(R.drawable.yaacc120_jpg)));
+		icons.add(new Icon("image/jpeg", 48, 48, 24, "yaacc48.jpg", getIconAsByteArray(R.drawable.yaacc48_jpg)));
+		icons.add(new Icon("image/jpeg", 32, 32, 24, "yaacc32.jpg", getIconAsByteArray(R.drawable.yaacc32_jpg)));
+		icons.add(new Icon("image/bmp", 120, 120, 24, "yaacc120_24.bmp", getIconAsByteArray(R.drawable.yaacc120_24_bmp)));
+		icons.add(new Icon("image/png", 120, 120, 24, "yaacc120_24.png", getIconAsByteArray(R.drawable.yaacc120_24_png)));
+		icons.add(new Icon("image/bmp", 120, 120, 8, "yaacc120_8.bmp", getIconAsByteArray(R.drawable.yaacc120_8_bmp)));
+		icons.add(new Icon("image/png", 120, 120, 8, "yaacc120_8.png", getIconAsByteArray(R.drawable.yaacc120_8_png)));
+		icons.add(new Icon("image/png", 48, 48, 24, "yaacc48_24.bmp", getIconAsByteArray(R.drawable.yaacc48_24_bmp)));
+		icons.add(new Icon("image/png", 48, 48, 24, "yaacc48_24.png", getIconAsByteArray(R.drawable.yaacc48_24_png)));
+		icons.add(new Icon("image/bmp", 48, 48, 8, "yaacc48_8.bmp", getIconAsByteArray(R.drawable.yaacc48_8_bmp)));
+		icons.add(new Icon("image/png", 48, 48, 8, "yaacc48_8.png", getIconAsByteArray(R.drawable.yaacc48_8_png)));
+		icons.add(new Icon("image/bmp", 32, 32, 24,"yaacc32_24.bmp", getIconAsByteArray(R.drawable.yaacc32_24_bmp)));
+		icons.add(new Icon("image/png", 32, 32, 24,"yaacc32_24.png", getIconAsByteArray(R.drawable.yaacc32_24_png)));
+		icons.add(new Icon("image/bmp", 32, 32, 8, "yaacc32_8.bmp", getIconAsByteArray(R.drawable.yaacc32_8_bmp)));
+		icons.add(new Icon("image/png", 32, 32, 8, "yaacc32_8.png", getIconAsByteArray(R.drawable.yaacc32_8_png)));
+		return icons.toArray(new Icon[icons.size()]);
+	}
+
 	private String getLocalServerName() {
-		return preferences.getString(
-				getApplicationContext().getString(
-						R.string.settings_local_server_name_key), "Yaacc");
+		return preferences.getString(getApplicationContext().getString(R.string.settings_local_server_name_key), "Yaacc");
 	}
 
 	/**
@@ -441,7 +432,7 @@ public class YaaccUpnpServerService extends Service {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createContentDirectoryService());
 		services.add(createConnectionManagerService());
-		services.add(createMediaReceiverRegistrarService());
+		// services.add(createMediaReceiverRegistrarService());
 		return services.toArray(new LocalService[] {});
 	}
 
@@ -468,16 +459,12 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<AbstractContentDirectoryService> createContentDirectoryService() {
 		LocalService<AbstractContentDirectoryService> contentDirectoryService = new AnnotationLocalServiceBinder()
 				.read(AbstractContentDirectoryService.class);
-		contentDirectoryService
-				.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(
-						contentDirectoryService, null) {
-					@Override
-					protected AbstractContentDirectoryService createServiceInstance()
-							throws Exception {
-						return new YaaccContentDirectory(
-								getApplicationContext());
-					}
-				});
+		contentDirectoryService.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(contentDirectoryService, null) {
+			@Override
+			protected AbstractContentDirectoryService createServiceInstance() throws Exception {
+				return new YaaccContentDirectory(getApplicationContext());
+			}
+		});
 		return contentDirectoryService;
 	}
 
@@ -488,52 +475,40 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@SuppressWarnings("unchecked")
 	private LocalService<AbstractAVTransportService> createAVTransportService() {
-		LocalService<AbstractAVTransportService> avTransportService = new AnnotationLocalServiceBinder()
-				.read(AbstractAVTransportService.class);
-		avTransportService
-				.setManager(new DefaultServiceManager<AbstractAVTransportService>(
-						avTransportService, null) {
-					@Override
-					protected AbstractAVTransportService createServiceInstance()
-							throws Exception {
-						return new YaaccAVTransportService(upnpClient);
-					}
-				});
+		LocalService<AbstractAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(AbstractAVTransportService.class);
+		avTransportService.setManager(new DefaultServiceManager<AbstractAVTransportService>(avTransportService, null) {
+			@Override
+			protected AbstractAVTransportService createServiceInstance() throws Exception {
+				return new YaaccAVTransportService(upnpClient);
+			}
+		});
 		return avTransportService;
 	}
 
 	private LocalService<AbstractAudioRenderingControl> createRenderingControl() {
 		LocalService<AbstractAudioRenderingControl> renderingControlService = new AnnotationLocalServiceBinder()
 				.read(AbstractAudioRenderingControl.class);
-		renderingControlService
-				.setManager(new DefaultServiceManager<AbstractAudioRenderingControl>(
-						renderingControlService, null) {
-					@Override
-					protected AbstractAudioRenderingControl createServiceInstance()
-							throws Exception {
-						return new YaaccAudioRenderingControlService(upnpClient);
-					}
-				});
+		renderingControlService.setManager(new DefaultServiceManager<AbstractAudioRenderingControl>(renderingControlService, null) {
+			@Override
+			protected AbstractAudioRenderingControl createServiceInstance() throws Exception {
+				return new YaaccAudioRenderingControlService(upnpClient);
+			}
+		});
 		return renderingControlService;
 	}
-	
+
 	private LocalService<AbstractMediaReceiverRegistrarService> createMediaReceiverRegistrarService() {
 		LocalService<AbstractMediaReceiverRegistrarService> service = new AnnotationLocalServiceBinder()
 				.read(AbstractMediaReceiverRegistrarService.class);
-		service
-				.setManager(new DefaultServiceManager<AbstractMediaReceiverRegistrarService>(
-						service, null) {
-					@Override
-					protected AbstractMediaReceiverRegistrarService createServiceInstance()
-							throws Exception {
-						return new YaaccMediaReceiverRegistrarService(upnpClient);
-					}
-				});
+		service.setManager(new DefaultServiceManager<AbstractMediaReceiverRegistrarService>(service, null) {
+			@Override
+			protected AbstractMediaReceiverRegistrarService createServiceInstance() throws Exception {
+				return new YaaccMediaReceiverRegistrarService(upnpClient);
+			}
+		});
 		return service;
 	}
-	
 
-	
 	/**
 	 * creates a ConnectionManagerService.
 	 * 
@@ -541,14 +516,11 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@SuppressWarnings("unchecked")
 	private LocalService<ConnectionManagerService> createConnectionManagerService() {
-		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder()
-				.read(ConnectionManagerService.class);
+		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);
 		final ProtocolInfos sourceProtocols = getProtocolInfos();
-		service.setManager(new DefaultServiceManager<ConnectionManagerService>(
-				service, ConnectionManagerService.class) {
+		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
 			@Override
-			protected ConnectionManagerService createServiceInstance()
-					throws Exception {
+			protected ConnectionManagerService createServiceInstance() throws Exception {
 				return new ConnectionManagerService(sourceProtocols, null);
 			}
 		});
@@ -560,69 +532,30 @@ public class YaaccUpnpServerService extends Service {
 	 * @return
 	 */
 	private ProtocolInfos getProtocolInfos() {
-		return new ProtocolInfos(
-				new ProtocolInfo(
-						"http-get:*:audio/L16;rate=44100;channels=1:DLNA.ORG_PN=LPCM"),
-				new ProtocolInfo(
-						"http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"),
-				new ProtocolInfo(
-						"http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"),
-				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,
-						"audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"),
-				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"),
-				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3X"),
-				new ProtocolInfo("http-get:*:audio/x-ms-wma:*"),
-				new ProtocolInfo(
-						"http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"),
-				new ProtocolInfo(
-						"http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
-				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAPRO"),
-				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG"),
-				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED"),
-				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM"),
-				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN"),
-				new ProtocolInfo("http-get:*:image/x-ycbcr-yuv420:*"),
-				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,
-						"video/mpeg",
-						"DLNA.ORG_PN=MPEG1;DLNA.ORG_OP=01;DLNA.ORG_CI=0"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG1"),
-				new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
-				new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"),
-				new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"),
-				new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
-				new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"),
-				new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"),
-				new ProtocolInfo("http-get:*:video/wtv:*"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
-				new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"),
-				new ProtocolInfo(
+		return new ProtocolInfos(new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=1:DLNA.ORG_PN=LPCM"), new ProtocolInfo(
+				"http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"), new ProtocolInfo(
+				"http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"), new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,
+				"audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"), new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"), new ProtocolInfo(
+				"http-get:*:audio/mpeg:DLNA.ORG_PN=MP3X"), new ProtocolInfo("http-get:*:audio/x-ms-wma:*"), new ProtocolInfo(
+				"http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"), new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAPRO"), new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED"), new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN"), new ProtocolInfo("http-get:*:image/x-ycbcr-yuv420:*"),
+				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, "video/mpeg", "DLNA.ORG_PN=MPEG1;DLNA.ORG_OP=01;DLNA.ORG_CI=0"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG1"), new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"), new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"), new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"), new ProtocolInfo(
+						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"), new ProtocolInfo("http-get:*:video/wtv:*"), new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"), new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"), new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"), new ProtocolInfo(
+						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"), new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"), new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"), new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"), new ProtocolInfo(
+						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"), new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"), new ProtocolInfo(
 						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_MP3"));
 	}
 
@@ -636,18 +569,12 @@ public class YaaccUpnpServerService extends Service {
 		private BasicHttpParams params;
 		private HttpService httpService;
 
-		public RequestListenerThread(Context context) throws IOException,
-				BindException {
+		public RequestListenerThread(Context context) throws IOException, BindException {
 			serversocket = new ServerSocket(PORT);
 			params = new BasicHttpParams();
-			params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000)
-					.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE,
-							8 * 1024)
-					.setBooleanParameter(
-							CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
-					.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
-					.setParameter(CoreProtocolPNames.ORIGIN_SERVER,
-							"HttpComponents/1.1");
+			params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000).setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024)
+					.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
+					.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true).setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/1.1");
 
 			// Set up the HTTP protocol processor
 			BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
@@ -657,34 +584,28 @@ public class YaaccUpnpServerService extends Service {
 			httpProcessor.addInterceptor(new ResponseConnControl());
 
 			// Set up the HTTP service
-			this.httpService = new YaaccHttpService(httpProcessor,
-					new DefaultConnectionReuseStrategy(),
-					new DefaultHttpResponseFactory(), context);
+			this.httpService = new YaaccHttpService(httpProcessor, new DefaultConnectionReuseStrategy(), new DefaultHttpResponseFactory(), context);
 
 		}
 
 		@Override
 		public void run() {
-			Log.d(getClass().getName(),
-					"Listening on port " + serversocket.getLocalPort());
+			Log.d(getClass().getName(), "Listening on port " + serversocket.getLocalPort());
 			while (!Thread.interrupted()) {
 				try {
 					// Set up HTTP connection
 					Socket socket = serversocket.accept();
 					DefaultHttpServerConnection connection = new DefaultHttpServerConnection();
-					Log.d(getClass().getName(), "Incoming connection from "
-							+ socket.getInetAddress());
+					Log.d(getClass().getName(), "Incoming connection from " + socket.getInetAddress());
 					connection.bind(socket, params);
 					// Start worker thread
-					Thread workerThread = new WorkerThread(httpService,
-							connection);
+					Thread workerThread = new WorkerThread(httpService, connection);
 					workerThread.setDaemon(true);
 					workerThread.start();
 				} catch (InterruptedIOException ex) {
 					break;
 				} catch (IOException e) {
-					Log.d(getClass().getName(),
-							"I/O error initialising connection thread: ", e);
+					Log.d(getClass().getName(), "I/O error initialising connection thread: ", e);
 					break;
 				}
 			}
@@ -697,8 +618,7 @@ public class YaaccUpnpServerService extends Service {
 		private final HttpService httpservice;
 		private final HttpServerConnection conn;
 
-		public WorkerThread(final HttpService httpservice,
-				final HttpServerConnection conn) {
+		public WorkerThread(final HttpService httpservice, final HttpServerConnection conn) {
 			super();
 			this.httpservice = httpservice;
 			this.conn = conn;
@@ -709,8 +629,7 @@ public class YaaccUpnpServerService extends Service {
 			Log.d(getClass().getName(), "New connection thread");
 			try {
 				Log.d(getClass().getName(), "conn.isOpen(): " + conn.isOpen());
-				Log.d(getClass().getName(),
-						"!Thread.interrupted(): " + !Thread.interrupted());
+				Log.d(getClass().getName(), "!Thread.interrupted(): " + !Thread.interrupted());
 				while (!Thread.interrupted() && conn.isOpen()) {
 					HttpContext context = new BasicHttpContext();
 					httpservice.handleRequest(conn, context);
@@ -720,16 +639,14 @@ public class YaaccUpnpServerService extends Service {
 			} catch (IOException ex) {
 				Log.d(getClass().getName(), "I/O error: ", ex);
 			} catch (HttpException ex) {
-				Log.d(getClass().getName(),
-						"Unrecoverable HTTP protocol violation: ", ex);
+				Log.d(getClass().getName(), "Unrecoverable HTTP protocol violation: ", ex);
 			} finally {
 				try {
 					Log.d(getClass().getName(), "Shutdown connection!");
 					conn.shutdown();
 				} catch (IOException ignore) {
 					// ignore it
-					Log.d(getClass().getName(), "Error closing connection: ",
-							ignore);
+					Log.d(getClass().getName(), "Error closing connection: ", ignore);
 				}
 
 			}
@@ -737,16 +654,30 @@ public class YaaccUpnpServerService extends Service {
 
 	}
 
-	private boolean isYaaccUpnpServerServiceRunning() {
-		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if (this.getClass().getName()
-					.equals(service.service.getClassName())) {
-				return true;
-			}
+	// private boolean isYaaccUpnpServerServiceRunning() {
+	// ActivityManager manager = (ActivityManager)
+	// getSystemService(Context.ACTIVITY_SERVICE);
+	// for (RunningServiceInfo service :
+	// manager.getRunningServices(Integer.MAX_VALUE)) {
+	// if (this.getClass().getName().equals(service.service.getClassName())) {
+	// return true;
+	// }
+	// }
+	// return false;
+	// }
+
+	private byte[] getIconAsByteArray(int drawableId) {
+
+		Drawable drawable = getResources().getDrawable(drawableId);
+		byte[] result = null;
+		if (drawable != null) {
+			Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+			ByteArrayEntity body = new ByteArrayEntity(stream.toByteArray());
 		}
-		return false;
+		return result;
 	}
 
+	
 }

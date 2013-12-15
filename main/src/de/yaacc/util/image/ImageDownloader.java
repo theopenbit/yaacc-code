@@ -99,7 +99,7 @@ public class ImageDownloader {
                 Log.w(this.getClass().getName(), "Bitmap has wrong size !!! height: "+bitmap.getHeight()+" width: "+bitmap.getWidth());
             }
 
-        } catch (IOException e){
+        } catch (Exception e){
             Log.d(this.getClass().getName(),"while decoding image: "+e.getMessage());
         }
 

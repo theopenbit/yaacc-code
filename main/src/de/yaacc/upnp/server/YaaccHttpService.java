@@ -72,20 +72,22 @@ public class YaaccHttpService extends HttpService {
 			HttpContext context) throws HttpException, IOException {
 		Log.d(getClass().getName(), "Processing HTTP request: "
 				+ request.getRequestLine().toString());
-		
+
 		// Extract what we need from the HTTP httpRequest
 		String requestMethod = request.getRequestLine().getMethod()
 				.toUpperCase(Locale.ENGLISH);
 		// Only accept HTTP-GET
 		if (!requestMethod.equals("GET") && !requestMethod.equals("HEAD")) {
-			Log.d(getClass().getName(), "HTTP request isn't GET or HEAD stop! Method was: " + requestMethod);
+			Log.d(getClass().getName(),
+					"HTTP request isn't GET or HEAD stop! Method was: "
+							+ requestMethod);
 			throw new MethodNotSupportedException(requestMethod
 					+ " method not supported");
 		}
-		
+
 		Uri requestUri = Uri.parse(request.getRequestLine().getUri());
 		String contentId = requestUri.getQueryParameter("id");
-
+		
 		if (contentId == null || contentId.equals("")) {
 
 			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
@@ -119,6 +121,7 @@ public class YaaccHttpService extends HttpService {
 		Log.d(getClass().getName(), "end doService: ");
 	}
 
+	
 	private Context getContext() {
 		return context;
 	}
