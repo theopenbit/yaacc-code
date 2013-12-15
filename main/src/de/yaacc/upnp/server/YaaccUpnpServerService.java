@@ -432,7 +432,7 @@ public class YaaccUpnpServerService extends Service {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createContentDirectoryService());
 		services.add(createConnectionManagerService());
-		// services.add(createMediaReceiverRegistrarService());
+		services.add(createMediaReceiverRegistrarService());
 		return services.toArray(new LocalService[] {});
 	}
 

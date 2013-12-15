@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -52,6 +53,7 @@ import org.fourthline.cling.model.types.UDAServiceType;
 import org.fourthline.cling.model.types.UDN;
 import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.registry.RegistryListener;
+import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.contentdirectory.callback.Browse.Status;
 import org.fourthline.cling.support.model.AVTransport;
 import org.fourthline.cling.support.model.BrowseFlag;
@@ -62,6 +64,7 @@ import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
+
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -113,12 +116,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public boolean initialize(Context context) {
 		this.context = context;
-		this.preferences = PreferenceManager
-				.getDefaultSharedPreferences(context);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		// FIXME check if this is right: Context.BIND_AUTO_CREATE kills the
 		// service after closing the activity
-		return context.bindService(new Intent(context,
-				UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
+		return context.bindService(new Intent(context, UpnpRegistryService.class), this, Context.BIND_AUTO_CREATE);
 	}
 
 	private void deviceAdded(@SuppressWarnings("rawtypes") final Device device) {
@@ -180,8 +181,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	// ----------Implementation Upnp RegistryListener Interface
 	@Override
-	public void remoteDeviceDiscoveryStarted(Registry registry,
-			RemoteDevice remotedevice) {
+	public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice remotedevice) {
 		// TODO Auto-generated method stub
 	}
 
@@ -194,23 +194,21 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * org.fourthline.cling.model.meta.RemoteDevice, java.lang.Exception)
 	 */
 	@Override
-	public void remoteDeviceDiscoveryFailed(Registry registry,
-			RemoteDevice remotedevice, Exception exception) {
-		Log.d(getClass().getName(), "remoteDeviceDiscoveryFailed: "
-				+ remotedevice.getDisplayString(), exception);
+	public void remoteDeviceDiscoveryFailed(Registry registry, RemoteDevice remotedevice, Exception exception) {
+		Log.d(getClass().getName(), "remoteDeviceDiscoveryFailed: " + remotedevice.getDisplayString(), exception);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceAdded(org.fourthline
-	 * .cling.registry.Registry, org.fourthline.cling.model.meta.RemoteDevice)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceAdded(org.
+	 * fourthline .cling.registry.Registry,
+	 * org.fourthline.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceAdded(Registry registry, RemoteDevice remotedevice) {
-		Log.d(getClass().getName(),
-				"remoteDeviceAdded: " + remotedevice.getDisplayString());
+		Log.d(getClass().getName(), "remoteDeviceAdded: " + remotedevice.getDisplayString());
 		deviceAdded(remotedevice);
 	}
 
@@ -218,13 +216,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceUpdated(org.fourthline
-	 * .cling.registry.Registry, org.fourthline.cling.model.meta.RemoteDevice)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceUpdated(org
+	 * .fourthline .cling.registry.Registry,
+	 * org.fourthline.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceUpdated(Registry registry, RemoteDevice remotedevice) {
-		Log.d(getClass().getName(),
-				"remoteDeviceUpdated: " + remotedevice.getDisplayString());
+		Log.d(getClass().getName(), "remoteDeviceUpdated: " + remotedevice.getDisplayString());
 		deviceUpdated(remotedevice);
 	}
 
@@ -232,27 +230,26 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceRemoved(org.fourthline
-	 * .cling.registry.Registry, org.fourthline.cling.model.meta.RemoteDevice)
+	 * org.fourthline.cling.registry.RegistryListener#remoteDeviceRemoved(org
+	 * .fourthline .cling.registry.Registry,
+	 * org.fourthline.cling.model.meta.RemoteDevice)
 	 */
 	@Override
 	public void remoteDeviceRemoved(Registry registry, RemoteDevice remotedevice) {
-		Log.d(getClass().getName(),
-				"remoteDeviceRemoved: " + remotedevice.getDisplayString());
+		Log.d(getClass().getName(), "remoteDeviceRemoved: " + remotedevice.getDisplayString());
 		deviceRemoved(remotedevice);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.fourthline.cling.registry.RegistryListener#localDeviceAdded(org.fourthline
-	 * .cling.registry.Registry, org.fourthline.cling.model.meta.LocalDevice)
+	 * @see org.fourthline.cling.registry.RegistryListener#localDeviceAdded(org.
+	 * fourthline .cling.registry.Registry,
+	 * org.fourthline.cling.model.meta.LocalDevice)
 	 */
 	@Override
 	public void localDeviceAdded(Registry registry, LocalDevice localdevice) {
-		Log.d(getClass().getName(),
-				"localDeviceAdded: " + localdevice.getDisplayString());
+		Log.d(getClass().getName(), "localDeviceAdded: " + localdevice.getDisplayString());
 		this.getRegistry().addDevice(localdevice);
 		this.deviceAdded(localdevice);
 	}
@@ -261,15 +258,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.fourthline.cling.registry.RegistryListener#localDeviceRemoved(org.fourthline
-	 * .cling.registry.Registry, org.fourthline.cling.model.meta.LocalDevice)
+	 * org.fourthline.cling.registry.RegistryListener#localDeviceRemoved(org
+	 * .fourthline .cling.registry.Registry,
+	 * org.fourthline.cling.model.meta.LocalDevice)
 	 */
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice localdevice) {
 		Registry currentRegistry = this.getRegistry();
 		if (localdevice != null && currentRegistry != null) {
-			Log.d(getClass().getName(),
-					"localDeviceRemoved: " + localdevice.getDisplayString());
+			Log.d(getClass().getName(), "localDeviceRemoved: " + localdevice.getDisplayString());
 			this.deviceRemoved(localdevice);
 			this.getRegistry().removeDevice(localdevice);
 		}
@@ -279,8 +276,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.fourthline.cling.registry.RegistryListener#beforeShutdown(org.fourthline.
-	 * cling.registry.Registry)
+	 * org.fourthline.cling.registry.RegistryListener#beforeShutdown(org.fourthline
+	 * . cling.registry.Registry)
 	 */
 	@Override
 	public void beforeShutdown(Registry registry) {
@@ -313,9 +310,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		ServiceId serviceId = new UDAServiceId("AVTransport");
 		Service service = device.findService(serviceId);
 		if (service != null) {
-			Log.d(getClass().getName(),
-					"Service found: " + service.getServiceId() + " Type: "
-							+ service.getServiceType());
+			Log.d(getClass().getName(), "Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
 		}
 		return service;
 	}
@@ -335,13 +330,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (mime != null) {
 			// test if special activity to choose
 			if (mime.indexOf("audio") > -1) {
-				boolean background = preferences.getBoolean(
-						context.getString(R.string.settings_audio_app), true);
+				boolean background = preferences.getBoolean(context.getString(R.string.settings_audio_app), true);
 				if (background) {
-					Log.d(getClass().getName(),
-							"Starting Background service... ");
-					Intent svc = new Intent(context,
-							BackgroundMusicService.class);
+					Log.d(getClass().getName(), "Starting Background service... ");
+					Intent svc = new Intent(context, BackgroundMusicService.class);
 					if (uris.length == 1) {
 						svc.setData(uris[0]);
 					} else {
@@ -359,8 +351,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 					}
 				}
 			} else if (mime.indexOf("image") > -1) {
-				boolean yaaccImageViewer = preferences.getBoolean(
-						context.getString(R.string.settings_image_app), true);
+				boolean yaaccImageViewer = preferences.getBoolean(context.getString(R.string.settings_image_app), true);
 				if (yaaccImageViewer) {
 					intent = new Intent(context, ImageViewerActivity.class);
 					if (uris.length == 1) {
@@ -385,10 +376,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				context.startActivity(intent);
 			} catch (ActivityNotFoundException anfe) {
 				Resources res = getContext().getResources();
-				String text = String.format(
-						res.getString(R.string.error_no_activity_found), mime);
-				Toast toast = Toast.makeText(getContext(), text,
-						Toast.LENGTH_LONG);
+				String text = String.format(res.getString(R.string.error_no_activity_found), mime);
+				Toast toast = Toast.makeText(getContext(), text, Toast.LENGTH_LONG);
 				toast.show();
 			}
 		}
@@ -442,8 +431,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public Collection<Device> getDevicesProvidingContentDirectoryService() {
 		if (isInitialized()) {
-			return getRegistry().getDevices(
-					new UDAServiceType("ContentDirectory"));
+			return getRegistry().getDevices(new UDAServiceType("ContentDirectory"));
 		}
 		return new ArrayList<Device>();
 	}
@@ -457,8 +445,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		ArrayList<Device> result = new ArrayList<Device>();
 		result.add(getLocalDummyDevice());
 		if (isInitialized()) {
-			result.addAll(getRegistry().getDevices(
-					new UDAServiceType("AVTransport")));
+			result.addAll(getRegistry().getDevices(new UDAServiceType("AVTransport")));
 		}
 		return result;
 	}
@@ -557,8 +544,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	private void refreshUpnpDeviceCatalog() {
 		if (isInitialized()) {
-			for (Device<?, ?, ?> device : getAndroidUpnpService().getRegistry()
-					.getDevices()) {
+			for (Device<?, ?, ?> device : getAndroidUpnpService().getRegistry().getDevices()) {
 				// FIXME: What about removed devices?
 				this.deviceAdded(device);
 			}
@@ -577,10 +563,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the browsing root
 	 * @return the browsing result
 	 */
-	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
-			String objectID) {
-		return browseSync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*",
-				0L, null, new SortCriterion[0]);
+	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device, String objectID) {
+		return browseSync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
 	}
 
 	/**
@@ -594,8 +578,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		if (pos == null || pos.getDevice() == null) {
 			return null;
 		}
-		return browseSync(pos.getDevice(), pos.getObjectId(),
-				BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
+		return browseSync(pos.getDevice(), pos.getObjectId(), BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
 	}
 
 	/**
@@ -617,27 +600,20 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            sorting criteria @see {@link SortCriterion}
 	 * @return the browsing result
 	 */
-	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device,
-			String objectID, BrowseFlag flag, String filter, long firstResult,
+	public ContentDirectoryBrowseResult browseSync(Device<?, ?, ?> device, String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		if (device == null) {
 			return result;
 		}
 		Object[] services = device.getServices();
-		Service service = device.findService(new UDAServiceId(
-				"ContentDirectory"));
+		Service service = device.findService(new UDAServiceId("ContentDirectory"));
 		ContentDirectoryBrowseActionCallback actionCallback = null;
 		if (service != null) {
-			Log.d(getClass().getName(),
-					"#####Service found: " + service.getServiceId() + " Type: "
-							+ service.getServiceType());
-			actionCallback = new ContentDirectoryBrowseActionCallback(service,
-					objectID, flag, filter, firstResult, maxResults, result,
-					orderBy);
+			Log.d(getClass().getName(), "#####Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
+			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID, flag, filter, firstResult, maxResults, result, orderBy);
 			getControlPoint().execute(actionCallback);
-			while (actionCallback.getStatus() != Status.OK
-					&& actionCallback.getUpnpFailure() == null)
+			while (actionCallback.getStatus() != Status.OK && actionCallback.getUpnpFailure() == null)
 				;
 		}
 		return result;
@@ -652,10 +628,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the browsing root
 	 * @return the browsing result
 	 */
-	public ContentDirectoryBrowseResult browseAsync(Device<?, ?, ?> device,
-			String objectID) {
-		return browseAsync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*",
-				0L, null, new SortCriterion[0]);
+	public ContentDirectoryBrowseResult browseAsync(Device<?, ?, ?> device, String objectID) {
+		return browseAsync(device, objectID, BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
 	}
 
 	/**
@@ -677,20 +651,14 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            sorting criteria @see {@link SortCriterion}
 	 * @return the browsing result
 	 */
-	public ContentDirectoryBrowseResult browseAsync(Device<?, ?, ?> device,
-			String objectID, BrowseFlag flag, String filter, long firstResult,
+	public ContentDirectoryBrowseResult browseAsync(Device<?, ?, ?> device, String objectID, BrowseFlag flag, String filter, long firstResult,
 			Long maxResults, SortCriterion... orderBy) {
-		Service service = device.findService(new UDAServiceId(
-				"ContentDirectory"));
+		Service service = device.findService(new UDAServiceId("ContentDirectory"));
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		ContentDirectoryBrowseActionCallback actionCallback = null;
 		if (service != null) {
-			Log.d(getClass().getName(),
-					"#####Service found: " + service.getServiceId() + " Type: "
-							+ service.getServiceType());
-			actionCallback = new ContentDirectoryBrowseActionCallback(service,
-					objectID, flag, filter, firstResult, maxResults, result,
-					orderBy);
+			Log.d(getClass().getName(), "#####Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
+			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID, flag, filter, firstResult, maxResults, result, orderBy);
 			getControlPoint().execute(actionCallback);
 		}
 		return result;
@@ -732,24 +700,45 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
+		Log.d(getClass().getName(), "positionInfo: " + positionInfo);
 		if (positionInfo == null) {
 			return PlayerFactory.createPlayer(this, items);
 		}
-		playableItem.setTitle(positionInfo.getTrackMetaData());
+		DIDLContent metadata = null;
+		try {
+			metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
+		} catch (Exception e) {
+			Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
+		}
+		String mimeType = "";
+		if (metadata != null) {
+			List<Item> metadataItems = metadata.getItems();
+			for (Item item : metadataItems) {
+				playableItem.setTitle(item.getTitle());
+				List<Res> metadataResources = item.getResources();
+				for (Res res : metadataResources) {
+					if (res.getProtocolInfo() != null) {
+						mimeType = res.getProtocolInfo().getContentFormatMimeType().toString();
+						break;
+					}
+				}
+				break;
+			}
+		} else {
+			playableItem.setTitle(positionInfo.getTrackURI().toString());
+			String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
+			mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+			Log.d(getClass().getName(), "fileextension from trackURI: " + fileExtension);
+		}		
+		playableItem.setMimeType(mimeType);
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
-		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo
-				.getTrackURI());
-		playableItem.setMimeType(MimeTypeMap.getSingleton()
-				.getMimeTypeFromExtension(fileExtension));
+		Log.d(getClass().getName(), "positionInfo.getTrackURI(): " + positionInfo.getTrackURI());
 		// FIXME Duration not supported in receiver yet
 		// playableItem.setDuration(duration)
 		items.add(playableItem);
-		Log.d(getClass().getName(),
-				"TransportUri: " + positionInfo.getTrackURI());
-		Log.d(getClass().getName(),
-				"Current duration: " + positionInfo.getTrackDuration());
-		Log.d(getClass().getName(),
-				"TrackMetaData: " + positionInfo.getTrackMetaData());
+		Log.d(getClass().getName(), "TransportUri: " + positionInfo.getTrackURI());
+		Log.d(getClass().getName(), "Current duration: " + positionInfo.getTrackDuration());
+		Log.d(getClass().getName(), "TrackMetaData: " + positionInfo.getTrackMetaData());
 		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
 		return PlayerFactory.createPlayer(this, items);
 	}
@@ -768,18 +757,38 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			return PlayerFactory.createPlayer(this, items);
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
-		if (positionInfo == null)
+		if (positionInfo == null) {
 			return PlayerFactory.createPlayer(this, items);
-		playableItem.setTitle(positionInfo.getTrackMetaData());
+		}
+		DIDLContent metadata = null;
+		try {
+			metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
+		} catch (Exception e) {
+			Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
+		}
+		String mimeType = "";
+		if (metadata != null) {
+			List<Item> metadataItems = metadata.getItems();
+			for (Item item : metadataItems) {
+				playableItem.setTitle(item.getTitle());
+				List<Res> metadataResources = item.getResources();
+				for (Res res : metadataResources) {
+					if (res.getProtocolInfo() != null) {
+						mimeType = res.getProtocolInfo().getContentFormatMimeType().toString();
+						break;
+					}
+				}
+				break;
+			}
+		} else {
+			playableItem.setTitle(positionInfo.getTrackURI().toString());
+			String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
+			mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+		}
+		playableItem.setMimeType(mimeType);
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
-		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo
-				.getTrackURI());
-		String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-				fileExtension);
 		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
-		List<Player> avTransportPlayers = PlayerFactory
-				.getCurrentPlayersOfType(PlayerFactory
-						.getPlayerClassForMimeType(mimeType));
+		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
 		return avTransportPlayers;
 	}
 
@@ -801,8 +810,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			Res resource = item.getFirstResource();
 			if (resource != null) {
 				playableItem.setUri(Uri.parse(resource.getValue()));
-				playableItem.setMimeType(resource.getProtocolInfo()
-						.getContentFormat());
+				playableItem.setMimeType(resource.getProtocolInfo().getContentFormat());
 				// FIXME: filter cover.jpg for testing purpose
 				if (playableItem.getMimeType().startsWith("audio")) {
 					audioItemsCount++;
@@ -816,8 +824,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				if (resource.getDuration() != null) {
 					try {
 						Date date = dateFormat.parse(resource.getDuration());
-						millis = (date.getHours() * 3600 + date.getMinutes()
-								* 60 + date.getSeconds()) * 1000;
+						millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
 					} catch (ParseException e) {
 						Log.d(getClass().getName(), "bad duration format", e);
 					}
@@ -866,11 +873,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the loaded content
 	 */
 	private DIDLContent loadContainer(Container container) {
-		ContentDirectoryBrowseResult result = browseSync(getProviderDevice(),
-				container.getId());
+		ContentDirectoryBrowseResult result = browseSync(getProviderDevice(), container.getId());
 		if (result.getUpnpFailure() != null) {
-			Toast toast = Toast.makeText(getContext(), result.getUpnpFailure()
-					.getDefaultMsg(), Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(getContext(), result.getUpnpFailure().getDefaultMsg(), Toast.LENGTH_LONG);
 			toast.show();
 			return null;
 		}
@@ -886,9 +891,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	public Set<String> getReceiverDeviceIds() {
 		HashSet<String> defaultReceiverSet = new HashSet<String>();
 		defaultReceiverSet.add(UpnpClient.LOCAL_UID);
-		Set<String> receiverDeviceIds = preferences.getStringSet(
-				context.getString(R.string.settings_selected_receivers_title),
-				defaultReceiverSet);
+		Set<String> receiverDeviceIds = preferences.getStringSet(context.getString(R.string.settings_selected_receivers_title), defaultReceiverSet);
 		return receiverDeviceIds;
 	}
 
@@ -955,8 +958,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		HashSet<String> receiverIds = new HashSet<String>();
 		for (Device receiver : receiverDevices) {
 			Log.d(this.getClass().getName(), "Receiver: " + receiver);
-			receiverIds.add(receiver.getIdentity().getUdn()
-					.getIdentifierString());
+			receiverIds.add(receiver.getIdentity().getUdn().getIdentifierString());
 		}
 		setReceiverDeviceIds(receiverIds);
 	}
@@ -970,9 +972,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	protected void setReceiverDeviceIds(Set<String> receiverDeviceIds) {
 		assert (receiverDeviceIds != null);
 		Editor prefEdit = preferences.edit();
-		prefEdit.putStringSet(
-				context.getString(R.string.settings_selected_receivers_title),
-				receiverDeviceIds);
+		prefEdit.putStringSet(context.getString(R.string.settings_selected_receivers_title), receiverDeviceIds);
 		prefEdit.apply();
 	}
 
@@ -981,9 +981,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the providerDeviceId
 	 */
 	public String getProviderDeviceId() {
-		return preferences.getString(
-				context.getString(R.string.settings_selected_provider_title),
-				null);
+		return preferences.getString(context.getString(R.string.settings_selected_provider_title), null);
 	}
 
 	/**
@@ -992,9 +990,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public void setProviderDevice(Device provider) {
 		Editor prefEdit = preferences.edit();
-		prefEdit.putString(
-				context.getString(R.string.settings_selected_provider_title),
-				provider.getIdentity().getUdn().getIdentifierString());
+		prefEdit.putString(context.getString(R.string.settings_selected_provider_title), provider.getIdentity().getUdn().getIdentifierString());
 		prefEdit.apply();
 	}
 
@@ -1019,15 +1015,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public void shutdown() {
 		// shutdown UpnpRegistry
-		boolean result = getContext().stopService(
-				new Intent(context, UpnpRegistryService.class));
-		Log.d(getClass().getName(),
-				"Stopping UpnpRegistryService succsessful= " + result);
+		boolean result = getContext().stopService(new Intent(context, UpnpRegistryService.class));
+		Log.d(getClass().getName(), "Stopping UpnpRegistryService succsessful= " + result);
 		// shutdown yaacc server service
-		result = getContext().stopService(
-				new Intent(context, YaaccUpnpServerService.class));
-		Log.d(getClass().getName(),
-				"Stopping YaaccUpnpServerService succsessful= " + result);
+		result = getContext().stopService(new Intent(context, YaaccUpnpServerService.class));
+		Log.d(getClass().getName(), "Stopping YaaccUpnpServerService succsessful= " + result);
 		// stop all players
 		PlayerFactory.shutdown();
 	}
@@ -1038,11 +1030,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the duration
 	 */
 	public int getDefaultDuration() {
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getContext());
-		return Integer.parseInt(preferences.getString(
-				getContext().getString(R.string.settings_default_duration_key),
-				"0"));
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return Integer.parseInt(preferences.getString(getContext().getString(R.string.settings_default_duration_key), "0"));
 	}
 
 	/**
@@ -1051,11 +1040,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the duration
 	 */
 	public int getSilenceDuration() {
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getContext());
-		return Integer.parseInt(preferences.getString(
-				getContext().getString(R.string.settings_silence_duration_key),
-				"2000"));
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return Integer.parseInt(preferences.getString(getContext().getString(R.string.settings_silence_duration_key), "2000"));
 	}
 
 	public Device<?, ?, ?> getLocalDummyDevice() {
@@ -1065,8 +1051,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		} catch (ValidationException e) {
 			// TODO Auto-generated catch block
 			// Ignore
-			Log.d(this.getClass().getName(),
-					"Something wrong with the LocalDummyDevice...", e);
+			Log.d(this.getClass().getName(), "Something wrong with the LocalDummyDevice...", e);
 		}
 		return result;
 	}
@@ -1108,18 +1093,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		}
 
 		@Override
-		public Device newInstance(UDN arg0, UDAVersion arg1, DeviceType arg2,
-				DeviceDetails arg3, Icon[] arg4, Service[] arg5, List arg6)
+		public Device newInstance(UDN arg0, UDAVersion arg1, DeviceType arg2, DeviceDetails arg3, Icon[] arg4, Service[] arg5, List arg6)
 				throws ValidationException {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public Service newInstance(ServiceType servicetype,
-				ServiceId serviceid, URI uri, URI uri1, URI uri2,
-				Action[] aaction, StateVariable[] astatevariable)
-				throws ValidationException {
+		public Service newInstance(ServiceType servicetype, ServiceId serviceid, URI uri, URI uri1, URI uri2, Action[] aaction,
+				StateVariable[] astatevariable) throws ValidationException {
 			// TODO Auto-generated method stub
 			return null;
 		}

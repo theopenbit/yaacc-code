@@ -31,7 +31,7 @@ import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 /**
  * State stopped
- * @author Tobias Sch��ne (openbit)
+ * @author Tobias Schoene (openbit)
  *
  */
 public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
@@ -76,6 +76,8 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     public Class<? extends AbstractState> setTransportURI(URI uri,
                                                           String metaData) {
         Log.d(this.getClass().getName(), "setTransportURI");
+        Log.d(this.getClass().getName(), "uri: " + uri);
+        Log.d(this.getClass().getName(), "metaData: " + metaData);
         getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));
 // If you can, you should find and set the duration of the track here!
         getTransport().setPositionInfo(

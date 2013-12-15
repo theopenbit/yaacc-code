@@ -71,6 +71,8 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
     public Class<? extends AbstractState> setTransportURI(URI uri,
                                                           String metaData) {
         Log.d(this.getClass().getName(), "Set TransportURI");
+        Log.d(this.getClass().getName(), "uri: " + uri);
+        Log.d(this.getClass().getName(), "metaData: " + metaData);
         getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));
 // If you can, you should find and set the duration of the track here!
         getTransport().setPositionInfo(
