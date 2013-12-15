@@ -88,7 +88,7 @@ public class BrowseReceiverDeviceAdapter extends BaseAdapter {
         if ( device instanceof RemoteDevice && device.hasIcons()) {
 			Icon[] icons = device.getIcons();
 			for (int i = 0; i < icons.length; i++) {
-				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())&&device.getDetails().getBaseURL() != null) {					
+				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())) {					
 					URL iconUri = ((RemoteDevice)device).normalizeURI(icons[i].getUri());
 					if (iconUri != null) {
 						Log.d(getClass().getName(),"Device icon uri:" + iconUri);

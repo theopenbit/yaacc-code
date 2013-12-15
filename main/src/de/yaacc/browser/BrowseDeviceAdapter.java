@@ -17,26 +17,16 @@
  */
 package de.yaacc.browser;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
-
 
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Icon;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
-import org.fourthline.cling.model.meta.RemoteDeviceIdentity;
-
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,7 +39,6 @@ import android.widget.TextView;
 import de.yaacc.R;
 import de.yaacc.browser.BrowseItemAdapter.ViewHolder;
 import de.yaacc.util.image.IconDownloadTask;
-import de.yaacc.util.image.ImageDownloader;
 
 /**
  * @author Christoph Hähnel (eyeless)
@@ -103,7 +92,7 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 		if ( device instanceof RemoteDevice && device.hasIcons()) {
 			Icon[] icons = device.getIcons();
 			for (int i = 0; i < icons.length; i++) {
-				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())&&device.getDetails().getBaseURL() != null) {					
+				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())) {					
 					URL iconUri = ((RemoteDevice)device).normalizeURI(icons[i].getUri());
 					if (iconUri != null) {
 						Log.d(getClass().getName(),"Device icon uri:" + iconUri);
