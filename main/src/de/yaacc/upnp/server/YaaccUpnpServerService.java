@@ -674,7 +674,7 @@ public class YaaccUpnpServerService extends Service {
 			Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-			ByteArrayEntity body = new ByteArrayEntity(stream.toByteArray());
+			result = stream.toByteArray();
 		}
 		return result;
 	}
