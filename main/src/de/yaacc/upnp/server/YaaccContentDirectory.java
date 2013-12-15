@@ -18,6 +18,7 @@
  */
 package de.yaacc.upnp.server;
 
+import java.beans.PropertyChangeSupport;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -28,6 +29,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.conn.util.InetAddressUtils;
+import org.fourthline.cling.binding.annotations.UpnpAction;
+import org.fourthline.cling.binding.annotations.UpnpInputArgument;
+import org.fourthline.cling.binding.annotations.UpnpService;
+import org.fourthline.cling.binding.annotations.UpnpStateVariable;
+import org.fourthline.cling.binding.annotations.UpnpStateVariables;
+import org.fourthline.cling.binding.annotations.UpnpServiceId;
+import org.fourthline.cling.binding.annotations.UpnpServiceType;
+import org.fourthline.cling.binding.annotations.UpnpOutputArgument;
+import org.fourthline.cling.model.types.ErrorCode;
+import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.model.types.csv.CSV;
+import org.fourthline.cling.model.types.csv.CSVString;
 import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService;
 import org.fourthline.cling.support.contentdirectory.ContentDirectoryErrorCode;
 import org.fourthline.cling.support.contentdirectory.ContentDirectoryException;
@@ -61,15 +74,83 @@ import de.yaacc.R;
  * a content directory which uses the content of the MediaStore in order to
  * provide it via upnp.
  * 
- * @author Tobias Schöne (openbit)
+ * @author Tobias Schoene (openbit)
  * 
  */
-public class YaaccContentDirectory extends AbstractContentDirectoryService {
+@UpnpService(
+        serviceId = @UpnpServiceId("ContentDirectory"),
+        serviceType = @UpnpServiceType(value = "ContentDirectory", version = 1)
+)
+
+@UpnpStateVariables({
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_ObjectID",
+                                    sendEvents = false,
+                                    datatype = "string"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_Result",
+                                    sendEvents = false,
+                                    datatype = "string"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_BrowseFlag",
+                                    sendEvents = false,
+                                    datatype = "string",
+                                    allowedValuesEnum = BrowseFlag.class),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_Filter",
+                                    sendEvents = false,
+                                    datatype = "string"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_SortCriteria",
+                                    sendEvents = false,
+                                    datatype = "string"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_Index",
+                                    sendEvents = false,
+                                    datatype = "ui4"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_Count",
+                                    sendEvents = false,
+                                    datatype = "ui4"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_UpdateID",
+                                    sendEvents = false,
+                                    datatype = "ui4"),
+                            @UpnpStateVariable(
+                                    name = "A_ARG_TYPE_URI",
+                                    sendEvents = false,
+                                    datatype = "uri"),
+//                            @UpnpStateVariable(
+//                                    name = "A_ARG_TYPE_SearchCriteria",
+//                                    sendEvents = false,
+//                                    datatype = "string")
+                    })
+public class YaaccContentDirectory {
 
 	private Map<String, DIDLObject> content = new HashMap<String, DIDLObject>();
 	private Context context;
 	private SharedPreferences preferences;
+	public static final String CAPS_WILDCARD = "*";
 
+    @UpnpStateVariable(sendEvents = false)
+    final private CSV<String> searchCapabilities;
+
+    @UpnpStateVariable(sendEvents = false)
+    final private CSV<String> sortCapabilities;
+
+    @UpnpStateVariable(
+            sendEvents = true,
+            defaultValue = "0",
+            eventMaximumRateMilliseconds = 200
+    )
+    private UnsignedIntegerFourBytes systemUpdateID = new UnsignedIntegerFourBytes(0);
+
+    final private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+
+
+
+    
 	public YaaccContentDirectory(Context context) {
 		this.context = context;
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -81,7 +162,10 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		} else {
 			createMediaStoreContentDirectory();
 		}
-
+        this.searchCapabilities = new CSVString();
+        this.searchCapabilities.addAll(searchCapabilities);
+        this.sortCapabilities = new CSVString();
+        this.sortCapabilities.addAll(sortCapabilities);
 	}
 
 	private Context getContext() {
@@ -227,21 +311,91 @@ public class YaaccContentDirectory extends AbstractContentDirectoryService {
 		return result;
 	}
 
-	/**
-	 * basic implementation of search. At the moment it will be currently
-	 * redirected to the browse method.
-	 */
-	@Override
-	public BrowseResult search(String containerId, String searchCriteria,
-			String filter, long firstResult, long maxResults,
-			SortCriterion[] orderBy) throws ContentDirectoryException {
+	//*******************************************************************
+	
+    @UpnpAction(out = @UpnpOutputArgument(name = "SearchCaps"))
+    public CSV<String> getSearchCapabilities() {
+        return searchCapabilities;
+    }
 
-		return browse(containerId, BrowseFlag.DIRECT_CHILDREN, filter,
-				firstResult, maxResults, orderBy);
+    @UpnpAction(out = @UpnpOutputArgument(name = "SortCaps"))
+    public CSV<String> getSortCapabilities() {
+        return sortCapabilities;
+    }
 
-	}
+    @UpnpAction(out = @UpnpOutputArgument(name = "Id"))
+    synchronized public UnsignedIntegerFourBytes getSystemUpdateID() {
+        return systemUpdateID;
+    }
 
-	@Override
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        return propertyChangeSupport;
+    }
+
+    /**
+     * Call this method after making changes to your content directory.
+     * <p>
+     * This will notify clients that their view of the content directory is potentially
+     * outdated and has to be refreshed.
+     * </p>
+     */
+    synchronized protected void changeSystemUpdateID() {
+        Long oldUpdateID = getSystemUpdateID().getValue();
+        systemUpdateID.increment(true);
+        getPropertyChangeSupport().firePropertyChange(
+                "SystemUpdateID",
+                oldUpdateID,
+                getSystemUpdateID().getValue()
+        );
+    }
+
+    @UpnpAction(out = {
+            @UpnpOutputArgument(name = "Result",
+                                stateVariable = "A_ARG_TYPE_Result",
+                                getterName = "getResult"),
+            @UpnpOutputArgument(name = "NumberReturned",
+                                stateVariable = "A_ARG_TYPE_Count",
+                                getterName = "getCount"),
+            @UpnpOutputArgument(name = "TotalMatches",
+                                stateVariable = "A_ARG_TYPE_Count",
+                                getterName = "getTotalMatches"),
+            @UpnpOutputArgument(name = "UpdateID",
+                                stateVariable = "A_ARG_TYPE_UpdateID",
+                                getterName = "getContainerUpdateID")
+    })
+    public BrowseResult browse(
+            @UpnpInputArgument(name = "ObjectID", aliases = "ContainerID") String objectId,
+            @UpnpInputArgument(name = "BrowseFlag") String browseFlag,
+            @UpnpInputArgument(name = "Filter") String filter,
+            @UpnpInputArgument(name = "StartingIndex", stateVariable = "A_ARG_TYPE_Index") UnsignedIntegerFourBytes firstResult,
+            @UpnpInputArgument(name = "RequestedCount", stateVariable = "A_ARG_TYPE_Count") UnsignedIntegerFourBytes maxResults,
+            @UpnpInputArgument(name = "SortCriteria") String orderBy)
+            throws ContentDirectoryException {
+
+        SortCriterion[] orderByCriteria;
+        try {
+            orderByCriteria = SortCriterion.valueOf(orderBy);
+        } catch (Exception ex) {
+            throw new ContentDirectoryException(ContentDirectoryErrorCode.UNSUPPORTED_SORT_CRITERIA, ex.toString());
+        }
+
+        try {
+            return browse(
+                    objectId,
+                    BrowseFlag.valueOrNullOf(browseFlag),
+                    filter,
+                    firstResult.getValue(), maxResults.getValue(),
+                    orderByCriteria
+            );
+        } catch (ContentDirectoryException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ContentDirectoryException(ErrorCode.ACTION_FAILED, ex.toString());
+        }
+    }
+	
+
+	
 	public BrowseResult browse(String objectID, BrowseFlag browseFlag,
 			String filter, long firstResult, long maxResults,
 			SortCriterion[] orderby) throws ContentDirectoryException {

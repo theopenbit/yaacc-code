@@ -456,12 +456,12 @@ public class YaaccUpnpServerService extends Service {
 	 * @return The ContenDiractoryService.
 	 */
 	@SuppressWarnings("unchecked")
-	private LocalService<AbstractContentDirectoryService> createContentDirectoryService() {
-		LocalService<AbstractContentDirectoryService> contentDirectoryService = new AnnotationLocalServiceBinder()
-				.read(AbstractContentDirectoryService.class);
-		contentDirectoryService.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(contentDirectoryService, null) {
+	private LocalService<YaaccContentDirectory> createContentDirectoryService() {
+		LocalService<YaaccContentDirectory> contentDirectoryService = new AnnotationLocalServiceBinder()
+				.read(YaaccContentDirectory.class);
+		contentDirectoryService.setManager(new DefaultServiceManager<YaaccContentDirectory>(contentDirectoryService, null) {
 			@Override
-			protected AbstractContentDirectoryService createServiceInstance() throws Exception {
+			protected YaaccContentDirectory createServiceInstance() throws Exception {
 				return new YaaccContentDirectory(getApplicationContext());
 			}
 		});
