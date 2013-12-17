@@ -40,7 +40,7 @@
     </PreferenceScreen>
     <PreferenceScreen android:title="@string/settings_local_server_title">
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_stopped" android:summaryOn="@string/settings_local_server_started" android:key="@string/settings_local_server_chkbx"/>
-        <CheckBoxPreference android:summaryOff="@string/settings_local_server_autostart_deactivated" android:summaryOn="@string/settings_local_server_autostart_activated" android:key="@string/settings_local_server_autostart_chkbx"/>
+        <CheckBoxPreference android:summaryOff="@string/settings_local_server_autostart_deactivated" android:summaryOn="@string/settings_local_server_autostart_activated" android:key="@string/settings_local_server_autostart_chkbx" android:dependency="@string/settings_local_server_chkbx"/>
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_receiver_off" android:summaryOn="@string/settings_local_server_receiver_on" android:key="@string/settings_local_server_receiver_chkbx"/>
         <CheckBoxPreference android:summaryOff="@string/settings_local_server_provider_off" android:summaryOn="@string/settings_local_server_provider_on" android:key="@string/settings_local_server_provider_chkbx"/>
 		<CheckBoxPreference android:summaryOff="@string/settings_local_server_mediastore" android:summaryOn="@string/settings_local_server_testcontent" android:key="@string/settings_local_server_testcontent_chkbx"/>          
