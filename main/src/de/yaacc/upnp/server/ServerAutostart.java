@@ -20,10 +20,12 @@ public class ServerAutostart extends BroadcastReceiver {
                 .getDefaultSharedPreferences(context);
 
         if (preferences.getBoolean(
-                context.getString(R.string.settings_local_server_chkbx), false) && "android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+                context.getString(R.string.settings_local_server_autostart_chkbx), false) && "android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             Log.d(this.getClass().toString(),"Starting YAACC server on device start");
             Intent serviceIntent = new Intent(context,YaaccUpnpServerService.class);
             context.startService(serviceIntent);
+        } else {
+            Log.d(this.getClass().toString(),"Not starting YAACC server on device start");
         }
     }
 
