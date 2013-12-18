@@ -97,11 +97,11 @@ import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 
 /**
- * A simple local upnpserver implementation. This class encapsulate the creation
+ * A simple local upnp server implementation. This class encapsulate the creation
  * and registration of local upnp services. it is implemented as a android
  * service in order to run in background
  * 
- * @author Tobias Schöne (openbit)
+ * @author Tobias Schoene (openbit)
  */
 public class YaaccUpnpServerService extends Service {
 
@@ -129,6 +129,8 @@ public class YaaccUpnpServerService extends Service {
 	private boolean watchdog;
 
 	private RequestListenerThread httpServer;
+	
+	private boolean initialized=false;
 
 	/*
 	 * (non-Javadoc)
@@ -153,8 +155,8 @@ public class YaaccUpnpServerService extends Service {
 		// when the service starts, the preferences are initialized
 		preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		if (upnpClient == null) {
-			upnpClient = new UpnpClient();
+		if (getUpnpClient() == null) {
+			setUpnpClient(new UpnpClient());
 		}
 		// the footprint of the onStart() method must be small
 		// otherwise android will kill the service
@@ -176,13 +178,13 @@ public class YaaccUpnpServerService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.d(this.getClass().getName(), "Destroying the service");
-		if (upnpClient != null) {
+		if (getUpnpClient() != null) {
 			if (localServer != null) {
-				upnpClient.localDeviceRemoved(upnpClient.getRegistry(), localServer);
+				getUpnpClient().localDeviceRemoved(getUpnpClient().getRegistry(), localServer);
 				localServer = null;
 			}
 			if (localRenderer != null) {
-				upnpClient.localDeviceRemoved(upnpClient.getRegistry(), localRenderer);
+				getUpnpClient().localDeviceRemoved(getUpnpClient().getRegistry(), localRenderer);
 				localRenderer = null;
 			}
 
@@ -227,9 +229,9 @@ public class YaaccUpnpServerService extends Service {
 	 * 
 	 */
 	private void initialize() {
-
-		if (!upnpClient.isInitialized()) {
-			upnpClient.initialize(getApplicationContext());
+		this.initialized = false;
+		if (!getUpnpClient().isInitialized()) {
+			getUpnpClient().initialize(getApplicationContext());
 			watchdog = false;
 			new Timer().schedule(new TimerTask() {
 
@@ -239,16 +241,16 @@ public class YaaccUpnpServerService extends Service {
 				}
 			}, 30000L); // 30 sec. watchdog
 
-			while (!(upnpClient.isInitialized() && watchdog)) {
+			while (!getUpnpClient().isInitialized() && !watchdog) {
 				// wait for upnpClient initialization
 			}
 		}
-		if (upnpClient.isInitialized()) {
+		if (getUpnpClient().isInitialized()) {
 			if (preferences.getBoolean(getApplicationContext().getString(R.string.settings_local_server_provider_chkbx), false)) {
 				if (localServer == null) {
 					localServer = createMediaServerDevice();
 				}
-				upnpClient.getRegistry().addDevice(localServer);
+				getUpnpClient().getRegistry().addDevice(localServer);
 
 				createHttpServer();
 			}
@@ -257,14 +259,14 @@ public class YaaccUpnpServerService extends Service {
 				if (localRenderer == null) {
 					localRenderer = createMediaRendererDevice();
 				}
-				upnpClient.getRegistry().addDevice(localRenderer);
+				getUpnpClient().getRegistry().addDevice(localRenderer);
 			}
+			this.initialized = true;
 		} else {
 			throw new IllegalStateException("UpnpClient is not initialized!");
 		}
 
 		startUpnpAliveNotifications();
-
 	}
 
 	/**
@@ -300,11 +302,11 @@ public class YaaccUpnpServerService extends Service {
 					Log.d(YaaccUpnpServerService.this.getClass().getName(), "Sending upnp alive notivication");
 					SendingNotificationAlive sendingNotificationAlive = null;
 					if (localServer != null) {
-						sendingNotificationAlive = new SendingNotificationAlive(upnpClient.getRegistry().getUpnpService(), localServer);
+						sendingNotificationAlive = new SendingNotificationAlive(getUpnpClient().getRegistry().getUpnpService(), localServer);
 						sendingNotificationAlive.run();
 					}
 					if (localRenderer != null) {
-						sendingNotificationAlive = new SendingNotificationAlive(upnpClient.getRegistry().getUpnpService(), localRenderer);
+						sendingNotificationAlive = new SendingNotificationAlive(getUpnpClient().getRegistry().getUpnpService(), localRenderer);
 					}
 					sendingNotificationAlive.run();
 					startUpnpAliveNotifications();
@@ -321,7 +323,7 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the time
 	 */
 	private int getUpnpNotificationFrequency() {
-		return Integer.parseInt(preferences.getString(upnpClient.getContext().getString(R.string.settings_sending_upnp_alive_interval_key), "5000"));
+		return Integer.parseInt(preferences.getString(getUpnpClient().getContext().getString(R.string.settings_sending_upnp_alive_interval_key), "5000"));
 	}
 
 	/**
@@ -437,7 +439,7 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<?>[] createMediaServerServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createContentDirectoryService());
-		services.add(createSourceConnectionManagerService());
+		services.add(createServerConnectionManagerService());
 		services.add(createMediaReceiverRegistrarService());
 		return services.toArray(new LocalService[] {});
 	}
@@ -450,7 +452,7 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<?>[] createMediaRendererServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createAVTransportService());
-		services.add(createSinkConnectionManagerService());
+		services.add(createRendererConnectionManagerService());
 		services.add(createRenderingControl());
 		return services.toArray(new LocalService[] {});
 	}
@@ -484,7 +486,7 @@ public class YaaccUpnpServerService extends Service {
 		avTransportService.setManager(new DefaultServiceManager<AbstractAVTransportService>(avTransportService, null) {
 			@Override
 			protected AbstractAVTransportService createServiceInstance() throws Exception {
-				return new YaaccAVTransportService(upnpClient);
+				return new YaaccAVTransportService(getUpnpClient());
 			}
 		});
 		return avTransportService;
@@ -496,7 +498,7 @@ public class YaaccUpnpServerService extends Service {
 		renderingControlService.setManager(new DefaultServiceManager<AbstractAudioRenderingControl>(renderingControlService, null) {
 			@Override
 			protected AbstractAudioRenderingControl createServiceInstance() throws Exception {
-				return new YaaccAudioRenderingControlService(upnpClient);
+				return new YaaccAudioRenderingControlService(getUpnpClient());
 			}
 		});
 		return renderingControlService;
@@ -508,7 +510,7 @@ public class YaaccUpnpServerService extends Service {
 		service.setManager(new DefaultServiceManager<AbstractMediaReceiverRegistrarService>(service, null) {
 			@Override
 			protected AbstractMediaReceiverRegistrarService createServiceInstance() throws Exception {
-				return new YaaccMediaReceiverRegistrarService(upnpClient);
+				return new YaaccMediaReceiverRegistrarService(getUpnpClient());
 			}
 		});
 		return service;
@@ -520,9 +522,10 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the service
 	 */
 	@SuppressWarnings("unchecked")
-	private LocalService<ConnectionManagerService> createSourceConnectionManagerService() {
+	private LocalService<ConnectionManagerService> createServerConnectionManagerService() {
 		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);
-		final ProtocolInfos sourceProtocols = getSourceProtocolInfos();		
+		final ProtocolInfos sourceProtocols = getSourceProtocolInfos();	
+		
 		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
 			@Override
 			protected ConnectionManagerService createServiceInstance() throws Exception {
@@ -539,9 +542,9 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the service
 	 */
 	@SuppressWarnings("unchecked")
-	private LocalService<ConnectionManagerService> createSinkConnectionManagerService() {
-		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);
-		final ProtocolInfos sinkProtocols = getSinkProtocolInfos();		
+	private LocalService<ConnectionManagerService> createRendererConnectionManagerService() {
+		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);		
+		final ProtocolInfos sinkProtocols = getSinkProtocolInfos();	
 		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
 			@Override
 			protected ConnectionManagerService createServiceInstance() throws Exception {
@@ -636,8 +639,7 @@ public class YaaccUpnpServerService extends Service {
 	
 	private ProtocolInfos getSinkProtocolInfos() {
 		return new ProtocolInfos(
-		new ProtocolInfo("http-get:*:*:*"),
-		new ProtocolInfo("xbmc-get:*:*:*"),
+		new ProtocolInfo("http-get:*:*:*"),		
 		new ProtocolInfo("http-get:*:audio/mkv:*"),
 		new ProtocolInfo("http-get:*:audio/mpegurl:*"),
 		new ProtocolInfo("http-get:*:audio/mpeg:*"),
@@ -869,5 +871,28 @@ public class YaaccUpnpServerService extends Service {
 		}
 		return result;
 	}
+
+	/**
+	 * @return the upnpClient
+	 */
+	public UpnpClient getUpnpClient() {
+		return upnpClient;
+	}
+
+	/**
+	 * @param upnpClient the upnpClient to set
+	 */
+	private void setUpnpClient(UpnpClient upnpClient) {
+		this.upnpClient = upnpClient;
+	}
+
+	/**
+	 * @return the initialized
+	 */
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	
 
 }
