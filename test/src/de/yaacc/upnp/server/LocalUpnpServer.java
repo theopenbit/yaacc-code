@@ -99,15 +99,15 @@ public class LocalUpnpServer implements ServiceConnection{
 	}
 
 
-	private LocalService<AbstractContentDirectoryService> createContentDirectoryService() {
-		LocalService<AbstractContentDirectoryService> contentDirectoryService = new AnnotationLocalServiceBinder()
-				.read(AbstractContentDirectoryService.class);
-		contentDirectoryService.setManager(new DefaultServiceManager<AbstractContentDirectoryService>(
+	private LocalService<YaaccContentDirectory> createContentDirectoryService() {
+		LocalService<YaaccContentDirectory> contentDirectoryService = new AnnotationLocalServiceBinder()
+				.read(YaaccContentDirectory.class);
+		contentDirectoryService.setManager(new DefaultServiceManager<YaaccContentDirectory>(
 				contentDirectoryService, null) {
 			
 
 			@Override
-			protected AbstractContentDirectoryService createServiceInstance()
+			protected YaaccContentDirectory createServiceInstance()
 					throws Exception {
 				return new YaaccContentDirectory(context);
 			}
