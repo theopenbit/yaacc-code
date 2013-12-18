@@ -307,6 +307,7 @@ public class YaaccUpnpServerService extends Service {
 					}
 					if (localRenderer != null) {
 						sendingNotificationAlive = new SendingNotificationAlive(getUpnpClient().getRegistry().getUpnpService(), localRenderer);
+                        sendingNotificationAlive.run();
 					}
                     startUpnpAliveNotifications();
 				}
