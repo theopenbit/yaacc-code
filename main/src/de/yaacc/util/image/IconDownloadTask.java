@@ -38,13 +38,6 @@ public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
         this.position = position;
         this.cache = IconDownloadCacheHandler.getInstance();
     }
-    
-    //FIXME just to make it run. the cache isn't suitable for more than one ListView
-    public IconDownloadTask(ListView list,int position, boolean cached){
-        this.listView = list;
-        this.position = position;
-        this.cache = cached? IconDownloadCacheHandler.getInstance():null;
-    }
 
     /**
      * Download image and convert it to icon

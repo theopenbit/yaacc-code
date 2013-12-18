@@ -5,7 +5,7 @@ import android.util.LruCache;
  * Provides cache functionality for Bitmap images in lists. Implemented as singleton to assure the
  * is always just one instance. Since there is always only one list shown at once there must not be
  * any other caches.
- * @author Christoph H채hnel (eyeless)
+ * @author Christoph Hähnel (eyeless)
  */
 public class IconDownloadCacheHandler {
     private LruCache<Integer, Bitmap> cache;
