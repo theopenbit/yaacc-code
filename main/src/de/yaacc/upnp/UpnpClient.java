@@ -86,6 +86,7 @@ import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
+import android.media.AudioManager;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -93,7 +94,7 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * all services to manage devices.
  * 
  * 
- * @author Tobias Sch��ne (openbit)
+ * @author Tobias Schoene (openbit)
  * 
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
@@ -103,6 +104,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private AndroidUpnpService androidUpnpService;
 	private Context context;
 	SharedPreferences preferences;
+	private boolean mute = false;
 
 	public UpnpClient() {
 	}
@@ -729,7 +731,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
 			mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
 			Log.d(getClass().getName(), "fileextension from trackURI: " + fileExtension);
-		}		
+		}
 		playableItem.setMimeType(mimeType);
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
 		Log.d(getClass().getName(), "positionInfo.getTrackURI(): " + positionInfo.getTrackURI());
@@ -1056,6 +1058,54 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return result;
 	}
 
+	/**
+	 * set the mute state
+	 * @param mute the state
+	 */
+	public void setMute(boolean mute) {
+		this.mute=mute;
+		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, mute);
+	}
+	
+	/**
+	 * returns the mute state
+	 * @return the state
+	 */
+	public boolean isMute(){		
+		return mute;
+	}
+	
+	/**
+	 * set the volume in the range of 0-100
+	 * @param desired
+	 */
+	public void setVolume(int desired){
+		if (desired < 0 ){
+			desired = 0;
+		}
+		if (desired > 100 ){
+			desired = 100;
+		}
+		AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		int volume = desired * maxVolume / 100;
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_SHOW_UI);
+	}
+	
+	/**
+	 * returns the current volume level
+	 * @return the value in the range of 0-100
+	 */
+	public int getVolume(){
+		
+		AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+		int volume = currentVolume * 100 / maxVolume;
+		return volume; 
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
@@ -1133,5 +1183,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		public String getDisplayString() {
 			return android.os.Build.MODEL;
 		}
+
+		
 	}
 }

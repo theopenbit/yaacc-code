@@ -31,7 +31,7 @@ import de.yaacc.upnp.UpnpClient;
 
 
 /**
- * @author Tobias Schöne (openbit)
+ * @author Tobias Schoene (openbit)
  */
 public class YaaccAudioRenderingControlService extends
 		AbstractAudioRenderingControl {
@@ -46,29 +46,31 @@ public class YaaccAudioRenderingControlService extends
 	@Override
 	public boolean getMute(UnsignedIntegerFourBytes instanceId, String channelName)
 			throws RenderingControlException {
-		Log.d(getClass().getName(), "getMute() - not yet implemented");
-		return false;
+		Log.d(getClass().getName(), "getMute() ");
+		return upnpClient.isMute();
 	}
 
 	@Override
 	public UnsignedIntegerTwoBytes getVolume(UnsignedIntegerFourBytes instanceId,
 			String channelName) throws RenderingControlException {
-		Log.d(getClass().getName(), "getVolume() - not yet implemented");
-		return null;
+		Log.d(getClass().getName(), "getVolume() ");
+		
+		return new UnsignedIntegerTwoBytes(upnpClient.getVolume());
 	}
 
 	@Override
 	public void setMute(UnsignedIntegerFourBytes instanceId, String channelName, boolean desiredMute)
 			throws RenderingControlException {
-		Log.d(getClass().getName(), "setMute() - not yet implemented");
-
+		Log.d(getClass().getName(), "setMute()");
+		upnpClient.setMute(desiredMute);
+		
 	}
 
 	@Override
 	public void setVolume(UnsignedIntegerFourBytes instanceId, String channelName,
 			UnsignedIntegerTwoBytes desiredVolume) throws RenderingControlException {
-		Log.d(getClass().getName(), "setVolume() - not yet implemented");
-
+		Log.d(getClass().getName(), "setVolume() ");
+		upnpClient.setVolume(desiredVolume.getValue().intValue());
 	}
 
 	@Override
