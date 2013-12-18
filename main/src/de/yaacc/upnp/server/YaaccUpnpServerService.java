@@ -61,6 +61,8 @@ import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
 import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
+import org.fourthline.cling.model.types.DLNACaps;
+import org.fourthline.cling.model.types.DLNADoc;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDN;
 import org.fourthline.cling.protocol.async.SendingNotificationAlive;
@@ -72,7 +74,6 @@ import org.fourthline.cling.support.model.ProtocolInfo;
 import org.fourthline.cling.support.model.ProtocolInfos;
 import org.fourthline.cling.support.renderingcontrol.AbstractAudioRenderingControl;
 import org.fourthline.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarService;
-
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -343,8 +344,13 @@ public class YaaccUpnpServerService extends Service {
 			// Used for shown name: first part of ManufactDet, first
 			// part of ModelDet and version number
 					new DeviceDetails("YAACC - MediaRenderer (" + getLocalServerName() + ")",
-							new ManufacturerDetails("yaacc", "http://www.yaacc.de"), new ModelDetails(getLocalServerName() + "-Renderer",
-									"Free Android UPnP AV MediaRender, GNU GPL", versionName)), createDeviceIcons(), createMediaRendererServices());
+							new ManufacturerDetails("yaacc", "http://www.yaacc.de"), 
+							new ModelDetails(getLocalServerName() + "-Renderer", "Free Android UPnP AV MediaRender, GNU GPL", versionName), 
+							new DLNADoc[]{
+                        		new DLNADoc("DMS", DLNADoc.Version.V1_5),
+                        		new DLNADoc("M-DMS", DLNADoc.Version.V1_5)
+							},
+							new DLNACaps(new String[] {"av-upload", "image-upload", "audio-upload"})), createDeviceIcons(), createMediaRendererServices());
 
 			return device;
 		} catch (ValidationException e) {
@@ -374,9 +380,9 @@ public class YaaccUpnpServerService extends Service {
 			// Yaacc Details
 			// Used for shown name: first part of ManufactDet, first
 			// part of ModelDet and version number
-			DeviceDetails yaaccDetails = new DeviceDetails("YAACC - MediaServer(" + getLocalServerName() + ")",
-					new ManufacturerDetails("yaacc.de", "http://www.yaacc.de"), new ModelDetails(getLocalServerName() + "-MediaServer",
-							"Free Android UPnP AV MediaServer, GNU GPL", versionName));
+			DeviceDetails yaaccDetails = new DeviceDetails("YAACC - MediaServer(" + getLocalServerName() + ")", new ManufacturerDetails("yaacc.de",
+					"http://www.yaacc.de"), new ModelDetails(getLocalServerName() + "-MediaServer", "Free Android UPnP AV MediaServer, GNU GPL",
+					versionName));
 
 			DeviceIdentity identity = new DeviceIdentity(new UDN(MEDIA_SERVER_UDN_ID));
 
@@ -412,8 +418,8 @@ public class YaaccUpnpServerService extends Service {
 		icons.add(new Icon("image/png", 48, 48, 24, "yaacc48_24.png", getIconAsByteArray(R.drawable.yaacc48_24_png)));
 		icons.add(new Icon("image/bmp", 48, 48, 8, "yaacc48_8.bmp", getIconAsByteArray(R.drawable.yaacc48_8_bmp)));
 		icons.add(new Icon("image/png", 48, 48, 8, "yaacc48_8.png", getIconAsByteArray(R.drawable.yaacc48_8_png)));
-		icons.add(new Icon("image/bmp", 32, 32, 24,"yaacc32_24.bmp", getIconAsByteArray(R.drawable.yaacc32_24_bmp)));
-		icons.add(new Icon("image/png", 32, 32, 24,"yaacc32_24.png", getIconAsByteArray(R.drawable.yaacc32_24_png)));
+		icons.add(new Icon("image/bmp", 32, 32, 24, "yaacc32_24.bmp", getIconAsByteArray(R.drawable.yaacc32_24_bmp)));
+		icons.add(new Icon("image/png", 32, 32, 24, "yaacc32_24.png", getIconAsByteArray(R.drawable.yaacc32_24_png)));
 		icons.add(new Icon("image/bmp", 32, 32, 8, "yaacc32_8.bmp", getIconAsByteArray(R.drawable.yaacc32_8_bmp)));
 		icons.add(new Icon("image/png", 32, 32, 8, "yaacc32_8.png", getIconAsByteArray(R.drawable.yaacc32_8_png)));
 		return icons.toArray(new Icon[icons.size()]);
@@ -431,7 +437,7 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<?>[] createMediaServerServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createContentDirectoryService());
-		services.add(createConnectionManagerService());
+		services.add(createSourceConnectionManagerService());
 		services.add(createMediaReceiverRegistrarService());
 		return services.toArray(new LocalService[] {});
 	}
@@ -444,7 +450,7 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<?>[] createMediaRendererServices() {
 		List<LocalService<?>> services = new ArrayList<LocalService<?>>();
 		services.add(createAVTransportService());
-		services.add(createConnectionManagerService());
+		services.add(createSinkConnectionManagerService());
 		services.add(createRenderingControl());
 		return services.toArray(new LocalService[] {});
 	}
@@ -457,8 +463,7 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@SuppressWarnings("unchecked")
 	private LocalService<YaaccContentDirectory> createContentDirectoryService() {
-		LocalService<YaaccContentDirectory> contentDirectoryService = new AnnotationLocalServiceBinder()
-				.read(YaaccContentDirectory.class);
+		LocalService<YaaccContentDirectory> contentDirectoryService = new AnnotationLocalServiceBinder().read(YaaccContentDirectory.class);
 		contentDirectoryService.setManager(new DefaultServiceManager<YaaccContentDirectory>(contentDirectoryService, null) {
 			@Override
 			protected YaaccContentDirectory createServiceInstance() throws Exception {
@@ -515,9 +520,9 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the service
 	 */
 	@SuppressWarnings("unchecked")
-	private LocalService<ConnectionManagerService> createConnectionManagerService() {
+	private LocalService<ConnectionManagerService> createSourceConnectionManagerService() {
 		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);
-		final ProtocolInfos sourceProtocols = getProtocolInfos();
+		final ProtocolInfos sourceProtocols = getSourceProtocolInfos();		
 		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
 			@Override
 			protected ConnectionManagerService createServiceInstance() throws Exception {
@@ -529,34 +534,220 @@ public class YaaccUpnpServerService extends Service {
 	}
 
 	/**
+	 * creates a ConnectionManagerService.
+	 * 
+	 * @return the service
+	 */
+	@SuppressWarnings("unchecked")
+	private LocalService<ConnectionManagerService> createSinkConnectionManagerService() {
+		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);
+		final ProtocolInfos sinkProtocols = getSinkProtocolInfos();		
+		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
+			@Override
+			protected ConnectionManagerService createServiceInstance() throws Exception {
+				return new ConnectionManagerService(null, sinkProtocols);
+			}
+		});
+
+		return service;
+	}
+	
+	/**
 	 * @return
 	 */
-	private ProtocolInfos getProtocolInfos() {
-		return new ProtocolInfos(new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=1:DLNA.ORG_PN=LPCM"), new ProtocolInfo(
-				"http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"), new ProtocolInfo(
-				"http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"), new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD,
-				"audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"), new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"), new ProtocolInfo(
-				"http-get:*:audio/mpeg:DLNA.ORG_PN=MP3X"), new ProtocolInfo("http-get:*:audio/x-ms-wma:*"), new ProtocolInfo(
-				"http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"), new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
-				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAPRO"), new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG"),
-				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED"), new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM"),
-				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN"), new ProtocolInfo("http-get:*:image/x-ycbcr-yuv420:*"),
+	private ProtocolInfos getSourceProtocolInfos() {
+		return new ProtocolInfos(
+				new ProtocolInfo("http-get:*:audio:*"),
+				new ProtocolInfo("http-get:*:audio/mpeg:*"),
+				new ProtocolInfo("http-get:*:audio/x-mpegurl:*"),
+				new ProtocolInfo("http-get:*:audio/x-wav:*"),
+				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"),
+				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP2"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"),
+				new ProtocolInfo("http-get:*:audio/mp4:DLNA.ORG_PN=AAC_ISO"),
+				new ProtocolInfo("http-get:*:audio/x-flac:*"),
+				new ProtocolInfo("http-get:*:audio/x-aiff:*"),
+				new ProtocolInfo("http-get:*:audio/x-ogg:*"),
+				new ProtocolInfo("http-get:*:audio/wav:*"),
+				new ProtocolInfo("http-get:*:audio/x-ape:*"),
+				new ProtocolInfo("http-get:*:audio/x-m4a:*"),
+				new ProtocolInfo("http-get:*:audio/x-m4b:*"),
+				new ProtocolInfo("http-get:*:audio/x-wavpack:*"),
+				new ProtocolInfo("http-get:*:audio/x-musepack:*"),
+				new ProtocolInfo("http-get:*:audio/basic:*"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=11025;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=22050;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=44100;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=48000;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=88200;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=96000;channels=2:DLNA.ORG_PN=LPCM"),
+				new ProtocolInfo("http-get:*:audio/L16;rate=192000;channels=2:DLNA.ORG_PN=LPCM"),				
+				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, "audio/mpeg", "DLNA.ORG_PN=MP3;DLNA.ORG_OP=01"), 
+				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3"), 
+				new ProtocolInfo("http-get:*:audio/mpeg:DLNA.ORG_PN=MP3X"), 
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:*"), 
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE"), 
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAFULL"),
+				new ProtocolInfo("http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMAPRO"), 
+				new ProtocolInfo("http-get:*:image/gif:*"),
+				new ProtocolInfo("http-get:*:image/jpeg:*"),
+				new ProtocolInfo("http-get:*:image/png:*"),
+				new ProtocolInfo("http-get:*:image/x-ico:*"),
+				new ProtocolInfo("http-get:*:image/x-ms-bmp:*"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED"), 
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM"),
+				new ProtocolInfo("http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN"), 
+				new ProtocolInfo("http-get:*:image/x-ycbcr-yuv420:*"),
+				new ProtocolInfo("http-get:*:video/mp4:*"),
+				new ProtocolInfo("http-get:*:video/mpeg:*"),
+				new ProtocolInfo("http-get:*:video/quicktime:*"),
+				new ProtocolInfo("http-get:*:video/x-flc:*"),
+				new ProtocolInfo("http-get:*:video/x-msvideo:*"),
 				new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, "video/mpeg", "DLNA.ORG_PN=MPEG1;DLNA.ORG_OP=01;DLNA.ORG_CI=0"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG1"), new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"), new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"), new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
-				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"), new ProtocolInfo(
-						"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"), new ProtocolInfo("http-get:*:video/wtv:*"), new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"), new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"), new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"), new ProtocolInfo(
-						"http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"), new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"), new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"), new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"), new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"), new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
-				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"), new ProtocolInfo(
-						"http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_MP3"));
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG1"), 
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_NTSC_XAC3"), 
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL"), 
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL_XAC3"),
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL"), 
+				new ProtocolInfo("http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_PAL_XAC3"), 
+				new ProtocolInfo("http-get:*:video/wtv:*"), 
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L4_SO_G726"), 
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_ASP_L5_SO_G726"), 
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=MPEG4_P2_ASF_SP_G726"), 
+				new ProtocolInfo("http-get:*:video/x-ms-asf:DLNA.ORG_PN=VC1_ASF_AP_L1_WMA"), 
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_FULL"), 
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVHIGH_PRO"), 
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_FULL"), 
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_PRO"), 
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPLL_BASE"),
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_BASE"), 
+				new ProtocolInfo("http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVSPML_MP3"));
+		
+		
+		
+		
+		
+		
+	}
+	
+	private ProtocolInfos getSinkProtocolInfos() {
+		return new ProtocolInfos(
+		new ProtocolInfo("http-get:*:*:*"),
+		new ProtocolInfo("xbmc-get:*:*:*"),
+		new ProtocolInfo("http-get:*:audio/mkv:*"),
+		new ProtocolInfo("http-get:*:audio/mpegurl:*"),
+		new ProtocolInfo("http-get:*:audio/mpeg:*"),
+		new ProtocolInfo("http-get:*:audio/mpeg3:*"),
+		new ProtocolInfo("http-get:*:audio/mp3:*"),
+		new ProtocolInfo("http-get:*:audio/mp4:*"),
+		new ProtocolInfo("http-get:*:audio/basic:*"),
+		new ProtocolInfo("http-get:*:audio/midi:*"),
+		new ProtocolInfo("http-get:*:audio/ulaw:*"),
+		new ProtocolInfo("http-get:*:audio/ogg:*"),
+		new ProtocolInfo("http-get:*:audio/DVI4:*"),
+		new ProtocolInfo("http-get:*:audio/G722:*"),
+		new ProtocolInfo("http-get:*:audio/G723:*"),
+		new ProtocolInfo("http-get:*:audio/G726-16:*"),
+		new ProtocolInfo("http-get:*:audio/G726-24:*"),
+		new ProtocolInfo("http-get:*:audio/G726-32:*"),
+		new ProtocolInfo("http-get:*:audio/G726-40:*"),
+		new ProtocolInfo("http-get:*:audio/G728:*"),
+		new ProtocolInfo("http-get:*:audio/G729:*"),
+		new ProtocolInfo("http-get:*:audio/G729D:*"),
+		new ProtocolInfo("http-get:*:audio/G729E:*"),
+		new ProtocolInfo("http-get:*:audio/GSM:*"),
+		new ProtocolInfo("http-get:*:audio/GSM-EFR:*"),
+		new ProtocolInfo("http-get:*:audio/L8:*"),
+		new ProtocolInfo("http-get:*:audio/L16:*"),
+		new ProtocolInfo("http-get:*:audio/LPC:*"),
+		new ProtocolInfo("http-get:*:audio/MPA:*"),
+		new ProtocolInfo("http-get:*:audio/PCMA:*"),
+		new ProtocolInfo("http-get:*:audio/PCMU:*"),
+		new ProtocolInfo("http-get:*:audio/QCELP:*"),
+		new ProtocolInfo("http-get:*:audio/RED:*"),
+		new ProtocolInfo("http-get:*:audio/VDVI:*"),
+		new ProtocolInfo("http-get:*:audio/ac3:*"),
+		new ProtocolInfo("http-get:*:audio/vorbis:*"),
+		new ProtocolInfo("http-get:*:audio/speex:*"),
+		new ProtocolInfo("http-get:*:audio/flac:*"),
+		new ProtocolInfo("http-get:*:audio/x-flac:*"),
+		new ProtocolInfo("http-get:*:audio/x-aiff:*"),
+		new ProtocolInfo("http-get:*:audio/x-pn-realaudio:*"),
+		new ProtocolInfo("http-get:*:audio/x-realaudio:*"),
+		new ProtocolInfo("http-get:*:audio/x-wav:*"),
+		new ProtocolInfo("http-get:*:audio/x-matroska:*"),
+		new ProtocolInfo("http-get:*:audio/x-ms-wma:*"),
+		new ProtocolInfo("http-get:*:audio/x-mpegurl:*"),
+		new ProtocolInfo("http-get:*:application/x-shockwave-flash:*"),
+		new ProtocolInfo("http-get:*:application/ogg:*"),
+		new ProtocolInfo("http-get:*:application/sdp:*"),
+		new ProtocolInfo("http-get:*:image/gif:*"),
+		new ProtocolInfo("http-get:*:image/jpeg:*"),
+		new ProtocolInfo("http-get:*:image/ief:*"),
+		new ProtocolInfo("http-get:*:image/png:*"),
+		new ProtocolInfo("http-get:*:image/tiff:*"),
+		new ProtocolInfo("http-get:*:video/avi:*"),
+		new ProtocolInfo("http-get:*:video/divx:*"),
+		new ProtocolInfo("http-get:*:video/mpeg:*"),
+		new ProtocolInfo("http-get:*:video/fli:*"),
+		new ProtocolInfo("http-get:*:video/flv:*"),
+		new ProtocolInfo("http-get:*:video/quicktime:*"),
+		new ProtocolInfo("http-get:*:video/vnd.vivo:*"),
+		new ProtocolInfo("http-get:*:video/vc1:*"),
+		new ProtocolInfo("http-get:*:video/ogg:*"),
+		new ProtocolInfo("http-get:*:video/mp4:*"),
+		new ProtocolInfo("http-get:*:video/mkv:*"),
+		new ProtocolInfo("http-get:*:video/BT656:*"),
+		new ProtocolInfo("http-get:*:video/CelB:*"),
+		new ProtocolInfo("http-get:*:video/JPEG:*"),
+		new ProtocolInfo("http-get:*:video/H261:*"),
+		new ProtocolInfo("http-get:*:video/H263:*"),
+		new ProtocolInfo("http-get:*:video/H263-1998:*"),
+		new ProtocolInfo("http-get:*:video/H263-2000:*"),
+		new ProtocolInfo("http-get:*:video/MPV:*"),
+		new ProtocolInfo("http-get:*:video/MP2T:*"),
+		new ProtocolInfo("http-get:*:video/MP1S:*"),
+		new ProtocolInfo("http-get:*:video/MP2P:*"),
+		new ProtocolInfo("http-get:*:video/BMPEG:*"),
+		new ProtocolInfo("http-get:*:video/xvid:*"),
+		new ProtocolInfo("http-get:*:video/x-divx:*"),
+		new ProtocolInfo("http-get:*:video/x-matroska:*"),
+		new ProtocolInfo("http-get:*:video/x-ms-wmv:*"),
+		new ProtocolInfo("http-get:*:video/x-ms-avi:*"),
+		new ProtocolInfo("http-get:*:video/x-flv:*"),
+		new ProtocolInfo("http-get:*:video/x-fli:*"),
+		new ProtocolInfo("http-get:*:video/x-ms-asf:*"),
+		new ProtocolInfo("http-get:*:video/x-ms-asx:*"),
+		new ProtocolInfo("http-get:*:video/x-ms-wmx:*"),
+		new ProtocolInfo("http-get:*:video/x-ms-wvx:*"),
+		new ProtocolInfo("http-get:*:video/x-msvideo:*"),
+		new ProtocolInfo("http-get:*:video/x-xvid:*"),
+		new ProtocolInfo("http-get:*:audio/L16:*"),
+		new ProtocolInfo("http-get:*:audio/mp3:*"),
+		new ProtocolInfo("http-get:*:audio/x-mp3:*"),
+		new ProtocolInfo("http-get:*:audio/mpeg:*"),
+		new ProtocolInfo("http-get:*:audio/x-ms-wma:*"),
+		new ProtocolInfo("http-get:*:audio/wma:*"),
+		new ProtocolInfo("http-get:*:audio/mpeg3:*"),
+		new ProtocolInfo("http-get:*:audio/wav:*"),
+		new ProtocolInfo("http-get:*:audio/x-wav:*"),
+		new ProtocolInfo("http-get:*:audio/ogg:*"),
+		new ProtocolInfo("http-get:*:audio/x-ogg:*"),
+		new ProtocolInfo("http-get:*:audio/musepack:*"),
+		new ProtocolInfo("http-get:*:audio/x-musepack:*"),
+		new ProtocolInfo("http-get:*:audio/flac:*"),
+		new ProtocolInfo("http-get:*:audio/x-flac:*"),
+		new ProtocolInfo("http-get:*:audio/mp4:*"),
+		new ProtocolInfo("http-get:*:audio/m4a:*"),
+		new ProtocolInfo("http-get:*:audio/aiff:*"),
+		new ProtocolInfo("http-get:*:audio/x-aiff:*"),
+		new ProtocolInfo("http-get:*:audio/basic:*"),
+		new ProtocolInfo("http-get:*:audio/x-wavpack:*"),
+		new ProtocolInfo("http-get:*:application/octet-stream:*"));
 	}
 
 	/**
@@ -679,5 +870,4 @@ public class YaaccUpnpServerService extends Service {
 		return result;
 	}
 
-	
 }
