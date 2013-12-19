@@ -103,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/musicActivityControls"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="50dp"
         android:text="@string/playerPosition" />
 
     <TextView
@@ -135,38 +135,48 @@
         android:layout_toRightOf="@+id/musicActivityNextLabel"
         android:text="@string/playerNextItem" />
 
-    <TextView
-        android:id="@+id/musicActivityDurationLabel"
+    <RelativeLayout
+        android:id="@+id/musicActivityTiming"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/musicActivityNextItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Timing: "/>
+        android:orientation="horizontal" >
 
-    <TextView
-        android:id="@+id/musicActivityElapsedTime"
-        android:layout_alignBaseline="@+id/musicActivityDurationLabel"
-        android:layout_alignBottom="@+id/musicActivityDurationLabel"
-        android:layout_toRightOf="@id/musicActivityDurationLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Elapsed"/>
+        <TextView
+            android:id="@+id/musicActivityDurationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playerTiming"/>
 
-    <TextView
-        android:id="@+id/musicActivityDuration"
-        android:layout_alignBaseline="@+id/musicActivityDurationLabel"
-        android:layout_alignBottom="@+id/musicActivityDurationLabel"
-        android:layout_toRightOf="@id/musicActivityElapsedTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="/Duration"/>
+        <TextView
+            android:id="@+id/musicActivityElapsedTime"
+            android:layout_toRightOf="@id/musicActivityDurationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playerTimeElapsed"/>
 
-    <!--ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:id="@+id/musicActivityDurationProgressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/musicActivityDuration"
-        android:layout_alignRight="@+id/musicActivityPosition"
-        android:layout_alignEnd="@+id/musicActivityPosition" /-->
+        <TextView
+            android:id="@+id/musicActivitySeparator"
+            android:layout_toRightOf="@id/musicActivityElapsedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playerTimeSeparator"/>
+
+        <TextView
+            android:id="@+id/musicActivityDuration"
+            android:layout_toRightOf="@id/musicActivitySeparator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playerTimeDuration"/>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/musicActivityDurationProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/musicActivityDuration"
+            android:layout_alignRight="@+id/musicActivityPosition"
+            android:layout_alignEnd="@+id/musicActivityPosition" />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -129,5 +129,9 @@
     <string name="musicActivityNextLabel">"Nächstes:  "</string>
     <string name="playerNextItem">nextItem</string>
     <string name="playerPosition">Position</string>
+    <string name="playerTiming">Timing: </string>
+    <string name="playerTimeDuration">Dauer</string>
+    <string name="playerTimeSeparator"> / </string>
+    <string name="playerTimeElapsed">Verstrichene Zeit</string>
     
 </resources>
