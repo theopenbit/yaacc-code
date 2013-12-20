@@ -109,19 +109,31 @@ public interface Player {
 	 * returns the current item position in the playlist 
 	 * @return the position string
 	 */
-	public String getPositionString();
+	String getPositionString();
 
 	/**
 	 * returns the title of the current item 
 	 * @return the title
 	 */
-	public String getCurrentItemTitle();
+	String getCurrentItemTitle();
 
 	
 	/**
-	 * returns the title of the next current item 
+	 * returns the title of the next item 
 	 * @return the title
 	 */
-	public String getNextItemTitle();
+	String getNextItemTitle();
+	
+	/**
+	 * returns the duration of the current item 
+	 * @return the duration
+	 */
+	String getDuration();
+	
+	/**
+	 * returns the elapsed time of the current item 
+	 * @return the elapsed time
+	 */
+	String getElapsedTime();
 
 }

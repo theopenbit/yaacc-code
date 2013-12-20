@@ -17,19 +17,25 @@
  */
 package de.yaacc.player;
 
+import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.musicplayer.BackgroundMusicService;
+import de.yaacc.musicplayer.BackgroundMusicService.BackgroundMusicServiceBinder;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 
@@ -39,33 +45,39 @@ import de.yaacc.util.NotificationId;
  * @author Tobias Schoene (openbit)
  * 
  */
-public class LocalBackgoundMusicPlayer extends AbstractPlayer {
-	
-	private boolean background = true;
-	private BackgroundMusicService musicService;
+public class LocalBackgoundMusicPlayer extends AbstractPlayer implements ServiceConnection {
+
+	private BackgroundMusicService backgroundMusicService;
+	private boolean watchdog;
 	private Timer commandExecutionTimer;
 
 	/**
 	 * @param context
-	 * @param name playerName
+	 * @param name
+	 *            playerName
 	 * 
 	 */
-	public LocalBackgoundMusicPlayer(UpnpClient upnpClient, String name) {		
+	public LocalBackgoundMusicPlayer(UpnpClient upnpClient, String name) {
 		this(upnpClient);
 		setName(name);
 	}
-	
+
 	/**
 	 * @param context
 	 */
 	public LocalBackgoundMusicPlayer(UpnpClient upnpClient) {
 		super(upnpClient);
-		Context context = upnpClient.getContext();
 		Log.d(getClass().getName(), "Starting background music service... ");
-		Intent svc = new Intent(context, BackgroundMusicService.class);
-		context.startService(svc);
+		Context context = getUpnpClient().getContext();
+		//context.startService(new Intent(context, BackgroundMusicService.class));
+		// Bind Service
+		//Context context = getUpnpClient().getContext();
+		context.startService(new Intent(context, BackgroundMusicService.class));
+		context.bindService(new Intent(context, BackgroundMusicService.class), LocalBackgoundMusicPlayer.this, Context.BIND_AUTO_CREATE);		
+
 	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -78,11 +90,13 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 		getContext().stopService(svc);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.AbstractPlayer#pause()
 	 */
 	@Override
-	public void pause() {		
+	public void pause() {
 		super.pause();
 		commandExecutionTimer = new Timer();
 		commandExecutionTimer.schedule(new TimerTask() {
@@ -94,7 +108,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 				getContext().sendBroadcast(intent);
 
 			}
-		}, 1000L);
+		}, 600L);
 	}
 
 	/*
@@ -109,7 +123,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 		// Communicating with the activity is only possible after the activity
 		// is started
 		// if we send an broadcast event to early the activity won't be up
-		// in order there is no known way to query the activity state
+		// because there is no known way to query the activity state
 		// we are sending the command delayed
 		commandExecutionTimer = new Timer();
 		commandExecutionTimer.schedule(new TimerTask() {
@@ -121,8 +135,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 				getContext().sendBroadcast(intent);
 
 			}
-		}, 300L);
-
+		}, 600L);
 	}
 
 	/*
@@ -137,7 +150,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 		// Communicating with the activity is only possible after the activity
 		// is started
 		// if we send an broadcast event to early the activity won't be up
-		// in order there is no known way to query the activity state
+		// because there is no known way to query the activity state
 		// we are sending the command delayed
 		commandExecutionTimer = new Timer();
 		commandExecutionTimer.schedule(new TimerTask() {
@@ -147,9 +160,9 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 				Intent intent = new Intent();
 				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_SET_DATA);
 				intent.putExtra(BackgroundMusicBroadcastReceiver.ACTION_SET_DATA_URI_PARAM, uri);
-				getContext().sendBroadcast(intent);				
+				getContext().sendBroadcast(intent);
 			}
-		}, 500L);				
+		}, 600L);
 		return uri;
 	}
 
@@ -162,12 +175,12 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 	 */
 	@Override
 	protected void startItem(PlayableItem playableItem, Object loadedItem) {
-
 		// Communicating with the activity is only possible after the activity
 		// is started
 		// if we send an broadcast event to early the activity won't be up
-		// in order there is no known way to query the activity state
+		// because there is no known way to query the activity state
 		// we are sending the command delayed
+		
 		commandExecutionTimer = new Timer();
 		commandExecutionTimer.schedule(new TimerTask() {
 
@@ -175,44 +188,91 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer {
 			public void run() {
 				Intent intent = new Intent();
 				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_PLAY);
-				getContext().sendBroadcast(intent);				
+				getContext().sendBroadcast(intent);
 			}
 		}, 600L);
 	}
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
 	 */
 	@Override
-	protected PendingIntent getNotificationIntent(){
-		Intent notificationIntent = new Intent(getContext(),
-			    MusicPlayerActivity.class);
-			PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
-			    notificationIntent, 0);
-			return contentIntent;
+	protected PendingIntent getNotificationIntent() {
+		Intent notificationIntent = new Intent(getContext(), MusicPlayerActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0, notificationIntent, 0);
+		return contentIntent;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.yaacc.player.AbstractPlayer#getNotificationId()
 	 */
 	@Override
 	protected int getNotificationId() {
-		 
+
 		return NotificationId.LOCAL_BACKGROUND_MUSIC_PLAYER.getId();
 	}
-	
+
 	/**
 	 * read the setting for music player shuffle play.
+	 * 
 	 * @return true, if shuffle play is enabled
 	 */
 	@Override
-	protected boolean isShufflePlay() {		
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(getContext());
-		return preferences.getBoolean(
-				getContext().getString(
-						R.string.settings_music_player_shuffle_chkbx), false);
-		
+	protected boolean isShufflePlay() {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		return preferences.getBoolean(getContext().getString(R.string.settings_music_player_shuffle_chkbx), false);
+
+	}
+
+	/**
+	 * Returns the duration of the current track
+	 * 
+	 * @return the duration
+	 */
+	public String getDuration() {
+		if(!isMusicServiceBound()) return "";
+		return formatMillis(getBackgroundService().getDuration());
+
+	}
+
+	public String getElapsedTime() {
+		if(!isMusicServiceBound()) return "";
+		return formatMillis(getBackgroundService().getCurrentPosition());
+	}
+
+	private String formatMillis(int millis){		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");		
+		return dateFormat.format(millis);
+	}
+	
+	@Override
+	public void onServiceConnected(ComponentName className, IBinder binder) {
+		Log.d(getClass().getName(),"onServiceConnected...");
+		backgroundMusicService = ((BackgroundMusicServiceBinder) binder).getService();
+
+	}
+
+	@Override
+	public void onServiceDisconnected(ComponentName className) {
+		Log.d(getClass().getName(),"onServiceDisconnected...");
+		backgroundMusicService = null;
+
+	}
+
+	/**
+	 * True if the player is initialized.
+	 * 
+	 * @return true or false
+	 */
+	public boolean isMusicServiceBound() {
+		return backgroundMusicService != null;
+	}
+
+	private BackgroundMusicService getBackgroundService() {
+		return backgroundMusicService;
 	}
 }

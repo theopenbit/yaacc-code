@@ -395,5 +395,14 @@ public class LocalImagePlayer implements Player {
 		return "";
 	}
 
+	@Override
+	public String getDuration(){
+		return "";
+	}
+	
+	@Override
+	public String getElapsedTime(){
+		return "";
+	}
 
 }

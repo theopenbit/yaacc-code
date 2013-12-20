@@ -495,4 +495,13 @@ public abstract class AbstractPlayer implements Player {
 		this.pcs.firePropertyChange(property, oldValue, newValue);
 	}
 
+	@Override
+	public String getDuration(){
+		return "";
+	}
+	
+	@Override
+	public String getElapsedTime(){
+		return "";
+	}
 }

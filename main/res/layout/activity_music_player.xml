@@ -142,15 +142,9 @@
         android:layout_below="@+id/musicActivityNextItem"
         android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/musicActivityDurationLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/playerTiming"/>
 
         <TextView
-            android:id="@+id/musicActivityElapsedTime"
-            android:layout_toRightOf="@id/musicActivityDurationLabel"
+            android:id="@+id/musicActivityElapsedTime"            
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/playerTimeElapsed"/>
@@ -169,14 +163,14 @@
             android:layout_height="wrap_content"
             android:text="@string/playerTimeDuration"/>
 
-        <ProgressBar
+        <!-- ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
             android:id="@+id/musicActivityDurationProgressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/musicActivityDuration"
             android:layout_alignRight="@+id/musicActivityPosition"
-            android:layout_alignEnd="@+id/musicActivityPosition" />
+            android:layout_alignEnd="@+id/musicActivityPosition" /-->
     </RelativeLayout>
 
 </RelativeLayout>

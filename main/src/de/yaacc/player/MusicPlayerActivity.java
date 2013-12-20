@@ -19,6 +19,8 @@ package de.yaacc.player;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -30,6 +32,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import de.yaacc.R;
+import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
 
@@ -41,7 +44,32 @@ import de.yaacc.util.AboutActivity;
  */
 public class MusicPlayerActivity extends Activity {
 
+	protected boolean updateTime = false;
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		updateTime = false;
+	}
+
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		updateTime = true;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		setTrackInfo();
+		updateTime = true;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();		
+		updateTime = false;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +95,7 @@ public class MusicPlayerActivity extends Activity {
 
 				@Override
 				public void propertyChange(PropertyChangeEvent event) {
-					if (LocalBackgoundMusicPlayer.PROPERTY_ITEM.equals(event
-							.getPropertyName())) {
+					if (LocalBackgoundMusicPlayer.PROPERTY_ITEM.equals(event.getPropertyName())) {
 						runOnUiThread(new Runnable() {
 							public void run() {
 								setTrackInfo();
@@ -148,16 +175,15 @@ public class MusicPlayerActivity extends Activity {
 			public void onClick(View v) {
 				Player player = getPlayer();
 				if (player != null) {
-					player.exit();					
+					player.exit();
 				}
 				finish();
 			}
 		});
 	}
 
-	private Player getPlayer() {		
-		return PlayerFactory
-				.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);		
+	private Player getPlayer() {
+		return PlayerFactory.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);
 	}
 
 	@Override
@@ -184,11 +210,39 @@ public class MusicPlayerActivity extends Activity {
 	}
 
 	private void setTrackInfo() {
+		if (getPlayer() == null)
+			return;
 		TextView current = (TextView) findViewById(R.id.musicActivityCurrentItem);
 		current.setText(getPlayer().getCurrentItemTitle());
 		TextView position = (TextView) findViewById(R.id.musicActivityPosition);
 		position.setText(getPlayer().getPositionString());
 		TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
-		next.setText(getPlayer().getNextItemTitle());
+		next.setText(getPlayer().getNextItemTitle());	
+		updateTime();		
+
+	}
+
+	private void updateTime() {
+		Timer commandExecutionTimer = new Timer();
+		commandExecutionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
+						duration.setText(getPlayer().getDuration());
+						TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
+						elapsedTime.setText(getPlayer().getElapsedTime());
+						if (updateTime) {
+							updateTime();
+						}
+					}
+				});
+			}
+		}, 1000L);
+
 	}
 }

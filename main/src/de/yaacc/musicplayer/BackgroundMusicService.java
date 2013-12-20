@@ -18,29 +18,44 @@
  */
 package de.yaacc.musicplayer;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.seamless.util.time.DateFormat;
+
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 /**
  * A simple service for playing music in background.
  * 
- * @author Tobias Schöne (openbit)
+ * @author Tobias Schoene (openbit)
  * 
  */
 public class BackgroundMusicService extends Service {
 
+
 	public static final String URIS = "URIS_PARAM"; // String Intent parameter
 	private MediaPlayer player;
+	private IBinder binder = new BackgroundMusicServiceBinder();
 	private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
 
-
 	public BackgroundMusicService() {
-		super();
+			super();
+	}
+	
+	
 
+
+	public class BackgroundMusicServiceBinder extends Binder {
+		public BackgroundMusicService getService() {
+			return BackgroundMusicService.this;
+		}
 	}
 
 	/*
@@ -51,7 +66,7 @@ public class BackgroundMusicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(this.getClass().getName(), "On Create");		
+		Log.d(this.getClass().getName(), "On Create");
 
 	}
 
@@ -77,8 +92,8 @@ public class BackgroundMusicService extends Service {
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		Log.d(this.getClass().getName(), "On Bind");
-		return null;
+		Log.d(this.getClass().getName(), "On Bind");		
+		return binder;
 	}
 
 	/*
@@ -89,8 +104,11 @@ public class BackgroundMusicService extends Service {
 	@Override
 	public void onStart(Intent intent, int startid) {
 		Log.d(this.getClass().getName(), "On Start");
-		backgroundMusicBroadcastReceiver = new BackgroundMusicBroadcastReceiver(
-				this);
+		initialize(intent);
+	}
+
+	private void initialize(Intent intent) {
+		backgroundMusicBroadcastReceiver = new BackgroundMusicBroadcastReceiver(this);
 		backgroundMusicBroadcastReceiver.registerReceiver();
 		if (player == null) {
 			player = new MediaPlayer();
@@ -102,8 +120,7 @@ public class BackgroundMusicService extends Service {
 				player.setDataSource(this, intent.getData());
 			}
 		} catch (Exception e) {
-			Log.e(this.getClass().getName(),
-					"Exception while changing datasource uri", e);
+			Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
 		}
 		if (player != null) {
@@ -145,8 +162,7 @@ public class BackgroundMusicService extends Service {
 	 * @param uri
 	 */
 	public void setMusicUri(Uri uri) {
-		Log.d(this.getClass().getName(),
-				"changing datasource uri to:" + uri.toString());
+		Log.d(this.getClass().getName(), "changing datasource uri to:" + uri.toString());
 		if (player != null) {
 			player.release();
 		}
@@ -158,14 +174,39 @@ public class BackgroundMusicService extends Service {
 			player.setDataSource(this, uri);
 			player.prepare();
 		} catch (Exception e) {
-			Log.e(this.getClass().getName(),
-					"Exception while changing datasource uri", e);
+			Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
 		}
 
 	}
-	
-	
-	
+
+	/**
+	 * returns the duration of the current track
+	 * 
+	 * @return the duration
+	 */
+	public int getDuration() {
+		int duration = 0;
+		if (player != null) {
+			duration = player.getDuration();
+		}
+			
+		return duration;
+	}
+
+	/**
+	 * return the current position in the playing track
+	 * 
+	 * @return the position
+	 */
+	public int getCurrentPosition() {
+		int currentPosition = 0;
+		if (player != null) {
+			currentPosition = player.getCurrentPosition();
+		}
+				
+		return currentPosition;
+	}
+
 
 }
