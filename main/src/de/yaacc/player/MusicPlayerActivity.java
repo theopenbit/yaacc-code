@@ -64,10 +64,10 @@ public class MusicPlayerActivity extends Activity {
 		setTrackInfo();
 		updateTime = true;
 	}
-	
+
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();		
+		super.onDestroy();
 		updateTime = false;
 	}
 
@@ -217,8 +217,8 @@ public class MusicPlayerActivity extends Activity {
 		TextView position = (TextView) findViewById(R.id.musicActivityPosition);
 		position.setText(getPlayer().getPositionString());
 		TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
-		next.setText(getPlayer().getNextItemTitle());	
-		updateTime();		
+		next.setText(getPlayer().getNextItemTitle());
+		updateTime();
 
 	}
 
@@ -232,10 +232,12 @@ public class MusicPlayerActivity extends Activity {
 
 					@Override
 					public void run() {
-						TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
-						duration.setText(getPlayer().getDuration());
-						TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
-						elapsedTime.setText(getPlayer().getElapsedTime());
+						if (getPlayer() != null) {
+							TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
+							duration.setText(getPlayer().getDuration());
+							TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
+							elapsedTime.setText(getPlayer().getElapsedTime());
+						}
 						if (updateTime) {
 							updateTime();
 						}
