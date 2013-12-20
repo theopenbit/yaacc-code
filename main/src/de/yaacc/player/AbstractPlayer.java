@@ -326,7 +326,7 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	private void loadItem(int previousIndex, int nextIndex) {
-		if (items == null)
+		if (items == null || items.size() == 0)
 			return;
 		firePropertyChange(PROPERTY_ITEM, items.get(previousIndex),
 				items.get(nextIndex));
