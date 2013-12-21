@@ -18,11 +18,6 @@
  */
 package de.yaacc.musicplayer;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.seamless.util.time.DateFormat;
-
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -39,18 +34,14 @@ import android.util.Log;
  */
 public class BackgroundMusicService extends Service {
 
-
 	public static final String URIS = "URIS_PARAM"; // String Intent parameter
 	private MediaPlayer player;
 	private IBinder binder = new BackgroundMusicServiceBinder();
 	private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
 
 	public BackgroundMusicService() {
-			super();
+		super();
 	}
-	
-	
-
 
 	public class BackgroundMusicServiceBinder extends Binder {
 		public BackgroundMusicService getService() {
@@ -92,7 +83,7 @@ public class BackgroundMusicService extends Service {
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		Log.d(this.getClass().getName(), "On Bind");		
+		Log.d(this.getClass().getName(), "On Bind");
 		return binder;
 	}
 
@@ -112,6 +103,7 @@ public class BackgroundMusicService extends Service {
 		backgroundMusicBroadcastReceiver.registerReceiver();
 		if (player == null) {
 			player = new MediaPlayer();
+
 		} else {
 			player.stop();
 		}
@@ -187,10 +179,15 @@ public class BackgroundMusicService extends Service {
 	 */
 	public int getDuration() {
 		int duration = 0;
+
 		if (player != null) {
-			duration = player.getDuration();
+			try {
+				duration = player.getDuration();
+			} catch (Exception ex) {
+				Log.d(getClass().getName(), "Caught player exception", ex);
+			}
 		}
-			
+
 		return duration;
 	}
 
@@ -202,11 +199,14 @@ public class BackgroundMusicService extends Service {
 	public int getCurrentPosition() {
 		int currentPosition = 0;
 		if (player != null) {
-			currentPosition = player.getCurrentPosition();
+			try {
+				currentPosition = player.getCurrentPosition();
+			} catch (Exception ex) {
+				Log.d(getClass().getName(), "Caught player exception", ex);
+			}
 		}
-				
+
 		return currentPosition;
 	}
-
 
 }

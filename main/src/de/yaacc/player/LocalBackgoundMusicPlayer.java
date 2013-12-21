@@ -87,7 +87,8 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	public void onDestroy() {
 		super.onDestroy();
 		Intent svc = new Intent(getContext(), BackgroundMusicService.class);
-		getContext().stopService(svc);
+		getContext().stopService(svc);	
+		getContext().unbindService(this);
 	}
 
 	/*
@@ -162,7 +163,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 				intent.putExtra(BackgroundMusicBroadcastReceiver.ACTION_SET_DATA_URI_PARAM, uri);
 				getContext().sendBroadcast(intent);
 			}
-		}, 600L);
+		}, 500L); //Must be the first command
 		return uri;
 	}
 
