@@ -125,7 +125,8 @@ public class BrowseItemAdapter extends BaseAdapter{
             holder.icon.setImageResource(R.drawable.cdtrack);
         } else if(currentObject instanceof ImageItem){
             holder.icon.setImageResource(R.drawable.image);
-            if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
+            //FIXME: Why is the context null ?!
+            if (null != context && preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
                 iconDownloadTask.execute(Uri.parse(((ImageItem) currentObject).getFirstResource().getValue()));
         } else if(currentObject instanceof VideoItem){
             holder.icon.setImageResource(R.drawable.video);
