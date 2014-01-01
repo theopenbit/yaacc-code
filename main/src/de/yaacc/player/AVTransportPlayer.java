@@ -27,6 +27,12 @@ import org.fourthline.cling.support.avtransport.callback.Pause;
 import org.fourthline.cling.support.avtransport.callback.Play;
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
+import org.fourthline.cling.support.contentdirectory.DIDLParser;
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.DescMeta;
+import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.item.Item;
+
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
@@ -134,10 +140,19 @@ public class AVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action SetAVTransportURI ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
+        Item item = playableItem.getItem();        
+        String metadata;
+		try {
+			metadata = (item == null)? "" : new DIDLParser().generate(new DIDLContent().addItem(item), false);
+		} catch (Exception e) {
+			 Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
+			 metadata = ""; 
+		}
         SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
-                service, playableItem.getUri().toString(), actionState);
-        getUpnpClient().getControlPoint().execute(setAVTransportURI);
+                service, playableItem.getUri().toString(), actionState, metadata);
+        getUpnpClient().getControlPoint().execute(setAVTransportURI);        
         waitForActionComplete(actionState);
+        
 // Now start Playing
         Log.d(getClass().getName(), "Action Play");
         actionState.actionFinished = false;
@@ -185,8 +200,8 @@ public class AVTransportPlayer extends AbstractPlayer {
     private static class InternalSetAVTransportURI extends SetAVTransportURI {
         ActionState actionState = null;
         private InternalSetAVTransportURI(Service service, String uri,
-                                          ActionState actionState) {
-            super(service, uri);
+                                          ActionState actionState, String metadata) {
+            super(service, uri, metadata);
             this.actionState = actionState;
         }
         @Override

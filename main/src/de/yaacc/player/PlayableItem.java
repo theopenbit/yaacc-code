@@ -17,7 +17,15 @@
  */
 package de.yaacc.player;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.item.Item;
+
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * representation of an item which is to be played
@@ -29,14 +37,42 @@ public class PlayableItem {
 	private String mimeType;
 	private String title;
 	private Uri uri;
-	private long duration;
+	private long duration;	
+	private Item item;
 	
+	
+	public PlayableItem(Item item, int defaultDuration){
+		this.item =item;
+		setTitle(item.getTitle());		
+		Res resource = item.getFirstResource();
+		if (resource != null) {
+			setUri(Uri.parse(resource.getValue()));
+			setMimeType(resource.getProtocolInfo().getContentFormat());
+			
+			// calculate duration
+			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+			long millis = defaultDuration;
+			if (resource.getDuration() != null) {
+				try {
+					Date date = dateFormat.parse(resource.getDuration());
+					millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
+				} catch (ParseException e) {
+					Log.d(getClass().getName(), "bad duration format", e);
+				}
+			}
+			setDuration(millis);			
+		}
+	}
 	
 	/**
 	 * 
 	 */
 	public PlayableItem() {
-		// TODO Auto-generated constructor stub
+		mimeType="";
+		title="";
+		uri=null;
+		duration=0;		
+		item = null;
 	}
 
 
@@ -105,4 +141,10 @@ public class PlayableItem {
 		this.duration = duration;
 	}
 
+
+	
+	public Item getItem(){
+		return item;
+	      
+	}
 }

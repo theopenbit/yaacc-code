@@ -807,31 +807,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		List<PlayableItem> coverImageItems = new ArrayList<PlayableItem>();
 		int audioItemsCount = 0;
 		for (Item item : items) {
-			PlayableItem playableItem = new PlayableItem();
-			playableItem.setTitle(item.getTitle());
-			Res resource = item.getFirstResource();
-			if (resource != null) {
-				playableItem.setUri(Uri.parse(resource.getValue()));
-				playableItem.setMimeType(resource.getProtocolInfo().getContentFormat());
-				// FIXME: filter cover.jpg for testing purpose
-				if (playableItem.getMimeType().startsWith("audio")) {
-					audioItemsCount++;
-				}
-				if (playableItem.getMimeType().startsWith("image")) {
-					coverImageItems.add(playableItem);
-				}
-				// calculate duration
-				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-				long millis = getDefaultDuration();
-				if (resource.getDuration() != null) {
-					try {
-						Date date = dateFormat.parse(resource.getDuration());
-						millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
-					} catch (ParseException e) {
-						Log.d(getClass().getName(), "bad duration format", e);
-					}
-				}
-				playableItem.setDuration(millis);
+			PlayableItem playableItem = new PlayableItem(item, getDefaultDuration());
+			// FIXME: filter cover.jpg for testing purpose
+			if (playableItem.getMimeType().startsWith("audio")) {
+				audioItemsCount++;
+			}
+			if (playableItem.getMimeType().startsWith("image")) {
+				coverImageItems.add(playableItem);
 			}
 			playableItems.add(playableItem);
 		}
@@ -1060,31 +1042,35 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * set the mute state
-	 * @param mute the state
+	 * 
+	 * @param mute
+	 *            the state
 	 */
 	public void setMute(boolean mute) {
-		this.mute=mute;
+		this.mute = mute;
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, mute);
 	}
-	
+
 	/**
 	 * returns the mute state
+	 * 
 	 * @return the state
 	 */
-	public boolean isMute(){		
+	public boolean isMute() {
 		return mute;
 	}
-	
+
 	/**
 	 * set the volume in the range of 0-100
+	 * 
 	 * @param desired
 	 */
-	public void setVolume(int desired){
-		if (desired < 0 ){
+	public void setVolume(int desired) {
+		if (desired < 0) {
 			desired = 0;
 		}
-		if (desired > 100 ){
+		if (desired > 100) {
 			desired = 100;
 		}
 		AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -1092,20 +1078,21 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		int volume = desired * maxVolume / 100;
 		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_SHOW_UI);
 	}
-	
+
 	/**
 	 * returns the current volume level
+	 * 
 	 * @return the value in the range of 0-100
 	 */
-	public int getVolume(){
-		
+	public int getVolume() {
+
 		AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
 		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 		int volume = currentVolume * 100 / maxVolume;
-		return volume; 
+		return volume;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
@@ -1184,6 +1171,5 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			return android.os.Build.MODEL;
 		}
 
-		
 	}
 }
