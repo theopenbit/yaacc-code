@@ -56,8 +56,6 @@ public class BrowseItemClickListener implements OnItemClickListener{
             a.setAdapter(bItemAdapter);
             BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
             a.setOnItemClickListener(bItemClickListener);
-// when entering a new folder the cache must be emptied
-            IconDownloadCacheHandler.getInstance().resetCache();
         } else {
             List<Player> players = BrowseActivity.uClient.initializePlayers(currentObject);
             for (Player player : players) {

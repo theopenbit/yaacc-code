@@ -319,6 +319,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
      * device to access
      */
     private void populateItemList(Device providerDevice) {
+        //FIXME: Cache should be able to decide whether it is used for browing or for devices lists
+        IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
 // Load adapter if selected device is configured and found
