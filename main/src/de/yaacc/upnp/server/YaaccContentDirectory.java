@@ -128,7 +128,7 @@ public class YaaccContentDirectory {
 		this.sortCapabilities.addAll(sortCapabilities);
 	}
 
-	private Context getContext() {
+	public Context getContext() {
 		return context;
 	}
 
@@ -139,19 +139,19 @@ public class YaaccContentDirectory {
 		StorageFolder rootContainer = new StorageFolder("0", "-1", "root", "yaacc", 2, 907000L);
 		rootContainer.setClazz(new DIDLObject.Class("object.container"));
 		rootContainer.setRestricted(true);
-		content.put(rootContainer.getId(), rootContainer);
+		addContent(rootContainer.getId(), rootContainer);
 		List<MusicTrack> musicTracks = createMusicTracks("1");
 		MusicAlbum musicAlbum = new MusicAlbum("1", rootContainer, "Music", null, musicTracks.size(), musicTracks);
 		musicAlbum.setClazz(new DIDLObject.Class("object.container"));
 		musicAlbum.setRestricted(true);
 		rootContainer.addContainer(musicAlbum);
-		content.put(musicAlbum.getId(), musicAlbum);
+		addContent(musicAlbum.getId(), musicAlbum);
 		List<Photo> photos = createPhotos("2");
 		PhotoAlbum photoAlbum = new PhotoAlbum("2", rootContainer, "Photos", null, photos.size(), photos);
 		photoAlbum.setClazz(new DIDLObject.Class("object.container"));
 		photoAlbum.setRestricted(true);
 		rootContainer.addContainer(photoAlbum);
-		content.put(photoAlbum.getId(), photoAlbum);
+		addContent(photoAlbum.getId(), photoAlbum);
 	}
 
 	private List<MusicTrack> createMusicTracks(String parentId) {
@@ -163,19 +163,19 @@ public class YaaccContentDirectory {
 		MusicTrack musicTrack = new MusicTrack("101", parentId, "Bluey Shoey", creator, album, artist, new Res(mimeType, 123456l, "00:02:33", 8192L,
 				"http://api.jamendo.com/get2/stream/track/redirect/?id=310355&streamencoding=mp31"));
 		musicTrack.setRestricted(true);
-		content.put(musicTrack.getId(), musicTrack);
+		addContent(musicTrack.getId(), musicTrack);
 		result.add(musicTrack);
 
 		musicTrack = new MusicTrack("102", parentId, "8-Bit", creator, album, artist, new Res(mimeType, 123456l, "00:02:01", 8192L,
 				"http://api.jamendo.com/get2/stream/track/redirect/?id=310370&streamencoding=mp31"));
 		musicTrack.setRestricted(true);
-		content.put(musicTrack.getId(), musicTrack);
+		addContent(musicTrack.getId(), musicTrack);
 		result.add(musicTrack);
 
 		musicTrack = new MusicTrack("103", parentId, "Spooky Number 3", creator, album, artist, new Res(mimeType, 123456l, "00:02:18", 8192L,
 				"http://api.jamendo.com/get2/stream/track/redirect/?id=310371&streamencoding=mp31"));
 		musicTrack.setRestricted(true);
-		content.put(musicTrack.getId(), musicTrack);
+		addContent(musicTrack.getId(), musicTrack);
 		result.add(musicTrack);
 		return result;
 	}
@@ -192,7 +192,7 @@ public class YaaccContentDirectory {
 		Photo photo = new Photo("201", parentId, url, creator, album, new Res(mimeType, 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
-		content.put(photo.getId(), photo);
+		addContent(photo.getId(), photo);
 		result.add(photo);
 
 		url = "http://kde-look.org/CONTENT/content-files/156246-DSC_0021-1600.jpg";
@@ -200,12 +200,12 @@ public class YaaccContentDirectory {
 		photo = new Photo("202", parentId, url, creator, album, new Res(mimeType, 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
-		content.put(photo.getId(), photo);
+		addContent(photo.getId(), photo);
 		result.add(photo);
 
 		url = "http://kde-look.org/CONTENT/content-files/156225-raining-bolt-1920x1200.JPG";
 
-		content.put(photo.getId(), photo);
+		addContent(photo.getId(), photo);
 		photo = new Photo("203", parentId, url, creator, album, new Res(mimeType, 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
@@ -216,7 +216,7 @@ public class YaaccContentDirectory {
 		photo = new Photo("204", parentId, url, creator, album, new Res(mimeType, 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
-		content.put(photo.getId(), photo);
+		addContent(photo.getId(), photo);
 		result.add(photo);
 
 		url = "http://kde-look.org/CONTENT/content-files/156218-DSC_0012-1600.jpg";
@@ -224,7 +224,7 @@ public class YaaccContentDirectory {
 		photo = new Photo("205", parentId, url, creator, album, new Res(mimeType, 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
-		content.put(photo.getId(), photo);
+		addContent(photo.getId(), photo);
 		result.add(photo);
 
 		return result;
@@ -262,6 +262,15 @@ public class YaaccContentDirectory {
 		Long oldUpdateID = getSystemUpdateID().getValue();
 		systemUpdateID.increment(true);
 		getPropertyChangeSupport().firePropertyChange("SystemUpdateID", oldUpdateID, getSystemUpdateID().getValue());
+	}
+
+	/**
+	 * add an object to the content of the directory
+	 * @param id of the object
+	 * @param content the object
+	 */
+	public void addContent(String id, DIDLObject content) {
+		this.content.put(id, content);
 	}
 
 	@UpnpAction(out = { @UpnpOutputArgument(name = "Result", stateVariable = "A_ARG_TYPE_Result", getterName = "getResult"),
@@ -343,41 +352,33 @@ public class YaaccContentDirectory {
 	 * mediastore.
 	 */
 	private void createMediaStoreContentDirectory() {
-		StorageFolder rootContainer = new StorageFolder("0", "-1", "Root", "yaacc", 3, 907000L);
+		StorageFolder rootContainer = new StorageFolder(ContentDirectoryFolder.ROOT.getId(), ContentDirectoryFolder.PARENT_OF_ROOT.getId(), "Root", "yaacc", 3, 907000L);
 		rootContainer.setRestricted(true);
-		content.put(rootContainer.getId(), rootContainer);
-		StorageFolder music = new StorageFolder("-10", rootContainer, "Audio", "yaacc", 2, 907000L);
+		addContent(rootContainer.getId(), rootContainer);
+		StorageFolder music = new StorageFolder(ContentDirectoryFolder.MUSIC.getId(), rootContainer, "Audio", "yaacc", 4, 907000L);
 		music.setRestricted(true);
-		content.put(music.getId(), music);
-
-		List<MusicAlbum> genresAlbums = createMediaStoreGenreFolder("-20");
-		StorageFolder genres = new StorageFolder("-20", "-10", "Genres", "yaacc", genresAlbums.size(), 907000L);
-		for (MusicAlbum musicAlbum : genresAlbums) {
-			genres.addContainer(musicAlbum);
-		}
-		music.addContainer(genres);
-		content.put(genres.getId(), genres);
-
-		List<MusicTrack> musicTracks = createMediaStoreMusicTracks("-30");
-		MusicAlbum allMusicAlbum = new MusicAlbum("-30", "-10", "All", "yaacc", musicTracks.size(), musicTracks);
-		music.addContainer(allMusicAlbum);
-		content.put(allMusicAlbum.getId(), allMusicAlbum);
+		addContent(music.getId(), music);
+		
+		music.addContainer(new MusicAllTitlesFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
+		music.addContainer(new MusicAlbumsFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
+		music.addContainer(new MusicArtistFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
+		music.addContainer(new MusicGenreFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));	
 
 		rootContainer.addContainer(music);
 
-		List<Photo> photos = createMediaStorePhotos("-40");
-		PhotoAlbum photoAlbum = new PhotoAlbum("-40", rootContainer, "Images", null, photos.size(), photos);
+		List<Photo> photos = createMediaStorePhotos(ContentDirectoryFolder.IMAGES.getId());
+		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryFolder.IMAGES.getId(), rootContainer, "Images", null, photos.size(), photos);
 		photoAlbum.setRestricted(true);
 		rootContainer.addContainer(photoAlbum);
-		content.put(photoAlbum.getId(), photoAlbum);
-		List<VideoItem> videos = createMediaStoreVidos("-50");
-		StorageFolder videosFolder = new StorageFolder("-50", rootContainer, "Videos", "yaacc", videos.size(), 907000L);
+		addContent(photoAlbum.getId(), photoAlbum);
+		List<VideoItem> videos = createMediaStoreVidos(ContentDirectoryFolder.MOVIES.getId());
+		StorageFolder videosFolder = new StorageFolder(ContentDirectoryFolder.MOVIES.getId(), rootContainer, "Videos", "yaacc", videos.size(), 907000L);
 		for (VideoItem videoItem : videos) {
 			videosFolder.addItem(videoItem);
 		}
 		videosFolder.setRestricted(true);
 		rootContainer.addContainer(videosFolder);
-		content.put(videosFolder.getId(), videosFolder);
+		addContent(videosFolder.getId(), videosFolder);
 	}
 
 	private List<VideoItem> createMediaStoreVidos(String parentID) {
@@ -446,159 +447,16 @@ public class YaaccContentDirectory {
 		return result;
 	}
 
-	private List<MusicAlbum> createMediaStoreGenreFolder(String parentID) {
-		List<MusicAlbum> result = new ArrayList<MusicAlbum>();
-		String[] projection = { MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME };
-		String selection = "";
-		String[] selectionArgs = null;
-		Cursor mediaCursor = getContext().getContentResolver().query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, projection, selection,
-				selectionArgs, null);
+	
 
-		if (mediaCursor != null) {
-			mediaCursor.moveToFirst();
-			while (!mediaCursor.isAfterLast()) {
-				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres._ID));
-				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
-				List<MusicTrack> musicTracks = createMediaStoreGenreMusicTracks(id);
-				MusicAlbum musicAlbum = new MusicAlbum(id, parentID, name, "", musicTracks.size(), musicTracks);
-				result.add(musicAlbum);
-				content.put(musicAlbum.getId(), musicAlbum);
-				Log.d(getClass().getName(), "Genre Folder: " + id + " Name: " + name);
-				mediaCursor.moveToNext();
-			}
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
-		mediaCursor.close();
-		Collections.sort(result, new Comparator<MusicAlbum>() {
-
-			@Override
-			public int compare(MusicAlbum lhs, MusicAlbum rhs) {
-				return lhs.getTitle().compareTo(rhs.getTitle());
-			}
-		});
-
-		return result;
-	}
-
-	private List<MusicTrack> createMediaStoreGenreMusicTracks(String genreID) {
-		List<MusicTrack> result = new ArrayList<MusicTrack>();
-		
-		String[] projection = { MediaStore.Audio.Genres.Members.AUDIO_ID, MediaStore.Audio.Genres.Members.DISPLAY_NAME,
-				MediaStore.Audio.Genres.Members.MIME_TYPE, MediaStore.Audio.Genres.Members.SIZE, MediaStore.Audio.Genres.Members.ALBUM,
-				MediaStore.Audio.Genres.Members.TITLE, MediaStore.Audio.Genres.Members.ARTIST, MediaStore.Audio.Genres.Members.DURATION };
-		// String selection = MediaStore.Audio.Genres.Members.GENRE_ID + "=?";
-		// String[] selectionArgs = new String[]{genreID};
-		String selection = "";
-		String[] selectionArgs = null;
-		Cursor mediaCursor = getContext().getContentResolver().query(
-				MediaStore.Audio.Genres.Members.getContentUri("external", Long.parseLong(genreID)), projection, selection, selectionArgs, null);
-
-		if (mediaCursor != null) {
-			mediaCursor.moveToFirst();
-			while (!mediaCursor.isAfterLast()) {
-				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.AUDIO_ID));
-		
-					String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.DISPLAY_NAME));
-					Long size = Long.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.SIZE)));
-
-					String album = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.ALBUM));
-					String title = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.TITLE));
-					String artist = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.ARTIST));
-					String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.DURATION));
-					// String track = mediaCursor.getString(mediaCursor
-					// .getColumnIndex(MediaStore.Audio.AudioColumns.TRACK));
-					// String year = mediaCursor.getString(mediaCursor
-					// .getColumnIndex(MediaStore.Audio.AudioColumns.YEAR));
-					//
-
-					Log.d(getClass().getName(),
-							"Mimetype: " + mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.MIME_TYPE)));
-					MimeType mimeType = MimeType
-							.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.MIME_TYPE)));
-					// file parameter only needed for media players which decide
-					// the
-					// ability of playing a file by the file extension
-					String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
-					Res resource = new Res(mimeType, size, uri);
-					resource.setDuration(duration);
-
-					result.add(new MusicTrack(id, genreID, title +"-" + name, "", album, artist, resource));
-					Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
-				
-				mediaCursor.moveToNext();
-			}
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
-		mediaCursor.close();
-		Collections.sort(result, new Comparator<MusicTrack>() {
-
-			@Override
-			public int compare(MusicTrack lhs, MusicTrack rhs) {
-				return lhs.getTitle().compareTo(rhs.getTitle());
-			}
-		});
-
-		return result;
-	}
-
-	private List<MusicTrack> createMediaStoreMusicTracks(String parentID) {
-		List<MusicTrack> result = new ArrayList<MusicTrack>();		
-		String[] projection = { MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.MIME_TYPE,
-				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
-				MediaStore.Audio.Media.DURATION };
-		String selection = "";
-		String[] selectionArgs = null;
-		Cursor mediaCursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
-				selectionArgs, null);
-
-		if (mediaCursor != null) {
-			mediaCursor.moveToFirst();
-			while (!mediaCursor.isAfterLast()) {
-				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID));				
-					String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.DISPLAY_NAME));
-					Long size = Long.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.SIZE)));
-
-					String album = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
-					String title = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
-					String artist = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
-					String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
-					// String track = mediaCursor.getString(mediaCursor
-					// .getColumnIndex(MediaStore.Audio.AudioColumns.TRACK));
-					// String year = mediaCursor.getString(mediaCursor
-					// .getColumnIndex(MediaStore.Audio.AudioColumns.YEAR));
-					//
-
-					Log.d(getClass().getName(),
-							"Mimetype: " + mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.MIME_TYPE)));
-					MimeType mimeType = MimeType.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.AudioColumns.MIME_TYPE)));
-					// file parameter only needed for media players which decide
-					// the
-					// ability of playing a file by the file extension
-					String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
-					Res resource = new Res(mimeType, size, uri);
-					resource.setDuration(duration);
-					result.add(new MusicTrack(id, parentID, title +"-" + name, "", album, artist, resource));
-					Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
-				
-				mediaCursor.moveToNext();
-			}
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
-		mediaCursor.close();
-		Collections.sort(result, new Comparator<MusicTrack>() {
-
-			@Override
-			public int compare(MusicTrack lhs, MusicTrack rhs) {
-				return lhs.getTitle().compareTo(rhs.getTitle());
-			}
-		});
-
-		return result;
-	}
-
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * get the ip address of the device
 	 * 
