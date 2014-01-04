@@ -16,6 +16,7 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import org.fourthline.cling.support.model.DIDLContent;
@@ -124,12 +125,10 @@ public class BrowseItemAdapter extends BaseAdapter{
             }
         } else if(currentObject instanceof AudioItem){
             holder.icon.setImageResource(R.drawable.cdtrack);
-            if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
-                for(DIDLObject.Property currentProperty: ((AudioItem) currentObject).getProperties()){
-                        if ("albumArtUri".equalsIgnoreCase(currentProperty.getDescriptorName())){
-                            iconDownloadTask.execute(Uri.parse(currentProperty.getValue().toString()));
-                        }
-                }
+            if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false)){
+                DIDLObject.Property<URI> albumArtProperties= ((AudioItem) currentObject).getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+                iconDownloadTask.execute(Uri.parse(albumArtProperties.getValue().toString()));
+            }
         } else if(currentObject instanceof ImageItem){
             holder.icon.setImageResource(R.drawable.image);
             if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
