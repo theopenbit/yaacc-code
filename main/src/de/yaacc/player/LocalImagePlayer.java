@@ -18,6 +18,7 @@
 package de.yaacc.player;
 
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
@@ -30,6 +31,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import org.fourthline.cling.support.model.DIDLObject;
+
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.imageviewer.ImageViewerBroadcastReceiver;
@@ -404,5 +408,10 @@ public class LocalImagePlayer implements Player {
 	public String getElapsedTime(){
 		return "";
 	}
+
+    @Override
+    public DIDLObject.Property<URI> getAlbumArt() {
+        return null;
+    }
 
 }

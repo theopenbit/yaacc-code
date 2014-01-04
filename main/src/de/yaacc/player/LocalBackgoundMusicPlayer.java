@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,6 +33,9 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.fourthline.cling.support.model.DIDLObject;
+
 import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.musicplayer.BackgroundMusicService;
@@ -50,6 +54,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	private BackgroundMusicService backgroundMusicService;
 	private boolean watchdog;
 	private Timer commandExecutionTimer;
+    private DIDLObject.Property<URI> albumArtUri;
 
 	/**
 	 * @param name
@@ -181,7 +186,9 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 		// if we send an broadcast event to early the activity won't be up
 		// because there is no known way to query the activity state
 		// we are sending the command delayed
-		
+
+        albumArtUri = playableItem.getItem().getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+
 		commandExecutionTimer = new Timer();
 		commandExecutionTimer.schedule(new TimerTask() {
 
@@ -245,7 +252,12 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 		return formatMillis(getBackgroundService().getCurrentPosition());
 	}
 
-	private String formatMillis(int millis){		
+    @Override
+    public DIDLObject.Property<URI> getAlbumArt() {
+        return albumArtUri  ;
+    }
+
+    private String formatMillis(int millis){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");		
 		return dateFormat.format(millis);
 	}
@@ -276,4 +288,5 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	private BackgroundMusicService getBackgroundService() {
 		return backgroundMusicService;
 	}
+
 }

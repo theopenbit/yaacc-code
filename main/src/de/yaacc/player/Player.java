@@ -17,7 +17,10 @@
  */
 package de.yaacc.player;
 
+import org.fourthline.cling.support.model.DIDLObject;
+
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 
 
 /**
@@ -135,5 +138,10 @@ public interface Player {
 	 * @return the elapsed time
 	 */
 	String getElapsedTime();
+
+    /**
+     *
+     */
+    DIDLObject.Property<URI> getAlbumArt();
 
 }

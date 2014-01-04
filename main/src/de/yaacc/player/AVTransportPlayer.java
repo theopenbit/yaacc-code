@@ -16,6 +16,7 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.player;
+import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
 import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.DescMeta;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.item.Item;
@@ -293,5 +295,10 @@ public class AVTransportPlayer extends AbstractPlayer {
             }
         };
         getUpnpClient().getControlPoint().execute(actionCallback);
+    }
+
+    @Override
+    public DIDLObject.Property<URI> getAlbumArt() {
+        return null;
     }
 } 

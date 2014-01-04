@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import java.net.URI;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -31,6 +32,9 @@ import android.content.Intent;
 import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.fourthline.cling.support.model.DIDLObject;
+
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
@@ -164,11 +168,16 @@ public class MultiContentPlayer extends AbstractPlayer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
-	 */
+    @Override
+    public DIDLObject.Property<URI> getAlbumArt() {
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+     */
 	@Override
 	protected PendingIntent getNotificationIntent() {
 		Intent notificationIntent = new Intent(getContext(),
