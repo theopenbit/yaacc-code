@@ -255,9 +255,11 @@ public class BrowseActivity extends Activity implements OnClickListener,
             uClient.shutdown();
             super.finish();
         } else {
+            //Fixme: Cache should store information for different folders....
+            IconDownloadCacheHandler.getInstance().resetCache();
             final ListView itemList = (ListView) findViewById(R.id.itemList);
             Position pos = navigator.popPosition(); // First pop is our
-// currentPosition
+            // currentPosition
             bItemAdapter = new BrowseItemAdapter(this,
                     navigator.getCurrentPosition());
             itemList.setAdapter(bItemAdapter);
