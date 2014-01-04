@@ -60,7 +60,7 @@ public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
     }
 
     /**
-     * Replaces the icon in the list with the freshly loaded icon
+     * Replaces the icon in the list with the recently loaded icon
      * @param result downloaded icon
      */
     @Override
