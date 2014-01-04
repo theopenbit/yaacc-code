@@ -47,6 +47,8 @@ public class BrowseItemClickListener implements OnItemClickListener{
         BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
         currentObject = adapter.getFolder(position);
         if (currentObject instanceof Container) {
+            //Fixme: Cache should store information for different folders....
+            IconDownloadCacheHandler.getInstance().resetCache();
 // if the current id is null, go back to the top level
             String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID: adapter
                     .getFolder(position).getId();
