@@ -124,6 +124,12 @@ public class BrowseItemAdapter extends BaseAdapter{
             }
         } else if(currentObject instanceof AudioItem){
             holder.icon.setImageResource(R.drawable.cdtrack);
+            if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))
+                for(DIDLObject.Property currentProperty: ((AudioItem) currentObject).getProperties()){
+                        if ("albumArtUri".equalsIgnoreCase(currentProperty.getDescriptorName())){
+                            iconDownloadTask.execute(Uri.parse(currentProperty.getValue().toString()));
+                        }
+                }
         } else if(currentObject instanceof ImageItem){
             holder.icon.setImageResource(R.drawable.image);
             if (preferences.getBoolean(context.getString(R.string.settings_thumbnails_chkbx), false))

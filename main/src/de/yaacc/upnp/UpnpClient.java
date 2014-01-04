@@ -63,6 +63,7 @@ import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.AudioItem;
 import org.fourthline.cling.support.model.item.Item;
 
 import android.content.ActivityNotFoundException;
@@ -618,6 +619,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			while (actionCallback.getStatus() != Status.NO_CONTENT && actionCallback.getStatus() != Status.OK && actionCallback.getUpnpFailure() == null)
 				;
 		}
+
 		return result;
 	}
 
