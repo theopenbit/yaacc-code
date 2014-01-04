@@ -113,7 +113,7 @@ public class MusicGenreFolderCreator  {
 					String title = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.TITLE));
 					String artist = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.ARTIST));
 					String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.DURATION));				
-
+					duration = contentDirectory.formatDuration(duration);
 					Log.d(getClass().getName(),
 							"Mimetype: " + mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.Members.MIME_TYPE)));
 					MimeType mimeType = MimeType
@@ -125,7 +125,7 @@ public class MusicGenreFolderCreator  {
 					Res resource = new Res(mimeType, size, uri);
 					resource.setDuration(duration);
 
-					MusicTrack musicTrack = new MusicTrack("GMT"+id, genreID, title +"-(" + name + "/" + id + ")", "", album, artist, resource);
+					MusicTrack musicTrack = new MusicTrack("GMT"+id, genreID, title +"-(" + name + ")", "", album, artist, resource);
 					result.add(musicTrack);
 					contentDirectory.addContent(musicTrack.getId(), musicTrack);
 					Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);

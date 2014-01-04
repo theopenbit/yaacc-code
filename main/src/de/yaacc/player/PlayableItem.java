@@ -50,7 +50,7 @@ public class PlayableItem {
 			setMimeType(resource.getProtocolInfo().getContentFormat());
 			
 			// calculate duration
-			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 			long millis = defaultDuration;
 			if (resource.getDuration() != null) {
 				try {

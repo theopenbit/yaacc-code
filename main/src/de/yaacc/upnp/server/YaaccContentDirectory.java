@@ -22,15 +22,19 @@ import java.beans.PropertyChangeSupport;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.conn.util.InetAddressUtils;
 import org.fourthline.cling.binding.annotations.UpnpAction;
@@ -64,12 +68,14 @@ import org.fourthline.cling.support.model.item.MusicTrack;
 import org.fourthline.cling.support.model.item.Photo;
 import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
+import org.seamless.util.time.DateFormat;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.text.format.DateUtils;
 import android.util.Log;
 import de.yaacc.R;
 
@@ -266,8 +272,11 @@ public class YaaccContentDirectory {
 
 	/**
 	 * add an object to the content of the directory
-	 * @param id of the object
-	 * @param content the object
+	 * 
+	 * @param id
+	 *            of the object
+	 * @param content
+	 *            the object
 	 */
 	public void addContent(String id, DIDLObject content) {
 		this.content.put(id, content);
@@ -352,17 +361,18 @@ public class YaaccContentDirectory {
 	 * mediastore.
 	 */
 	private void createMediaStoreContentDirectory() {
-		StorageFolder rootContainer = new StorageFolder(ContentDirectoryFolder.ROOT.getId(), ContentDirectoryFolder.PARENT_OF_ROOT.getId(), "Root", "yaacc", 3, 907000L);
+		StorageFolder rootContainer = new StorageFolder(ContentDirectoryFolder.ROOT.getId(), ContentDirectoryFolder.PARENT_OF_ROOT.getId(), "Root",
+				"yaacc", 3, 907000L);
 		rootContainer.setRestricted(true);
 		addContent(rootContainer.getId(), rootContainer);
 		StorageFolder music = new StorageFolder(ContentDirectoryFolder.MUSIC.getId(), rootContainer, "Audio", "yaacc", 4, 907000L);
 		music.setRestricted(true);
 		addContent(music.getId(), music);
-		
+
 		music.addContainer(new MusicAllTitlesFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
 		music.addContainer(new MusicAlbumsFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
 		music.addContainer(new MusicArtistFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
-		music.addContainer(new MusicGenreFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));	
+		music.addContainer(new MusicGenreFolderCreator().build(this, ContentDirectoryFolder.MUSIC.getId()));
 
 		rootContainer.addContainer(music);
 
@@ -372,7 +382,8 @@ public class YaaccContentDirectory {
 		rootContainer.addContainer(photoAlbum);
 		addContent(photoAlbum.getId(), photoAlbum);
 		List<VideoItem> videos = createMediaStoreVidos(ContentDirectoryFolder.MOVIES.getId());
-		StorageFolder videosFolder = new StorageFolder(ContentDirectoryFolder.MOVIES.getId(), rootContainer, "Videos", "yaacc", videos.size(), 907000L);
+		StorageFolder videosFolder = new StorageFolder(ContentDirectoryFolder.MOVIES.getId(), rootContainer, "Videos", "yaacc", videos.size(),
+				907000L);
 		for (VideoItem videoItem : videos) {
 			videosFolder.addItem(videoItem);
 		}
@@ -384,7 +395,7 @@ public class YaaccContentDirectory {
 	private List<VideoItem> createMediaStoreVidos(String parentID) {
 		List<VideoItem> result = new ArrayList<VideoItem>();
 		String[] projection = { MediaStore.Video.Media._ID, MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.MIME_TYPE,
-				MediaStore.Video.Media.SIZE };
+				MediaStore.Video.Media.SIZE, MediaStore.Video.Media.DURATION };
 		String selection = "";
 		String[] selectionArgs = null;
 		Cursor mediaCursor = getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
@@ -395,6 +406,8 @@ public class YaaccContentDirectory {
 			while (!mediaCursor.isAfterLast()) {
 				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns._ID));
 				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.DISPLAY_NAME));
+				String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION));
+				duration = formatDuration(duration);
 				Long size = Long.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.SIZE)));
 				Log.d(getClass().getName(), "Mimetype: " + mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
 				MimeType mimeType = MimeType.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
@@ -402,6 +415,7 @@ public class YaaccContentDirectory {
 				// ability of playing a file by the file extension
 				String uri = "http://" + getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
 				Res resource = new Res(mimeType, size, uri);
+				resource.setDuration(duration);
 				result.add(new VideoItem(id, parentID, name, "", resource));
 				Log.d(getClass().getName(), "VideoItem: " + id + " Name: " + name + " uri: " + uri);
 				mediaCursor.moveToNext();
@@ -447,16 +461,6 @@ public class YaaccContentDirectory {
 		return result;
 	}
 
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
 	/**
 	 * get the ip address of the device
 	 * 
@@ -485,4 +489,21 @@ public class YaaccContentDirectory {
 		return hostAddress;
 	}
 
+	public String formatDuration(String millisStr) {
+		  	String res = "";
+		  	long duration = Long.valueOf(millisStr);		    
+		    long hours = TimeUnit.MILLISECONDS.toHours(duration)
+		                   - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(duration));
+		    long minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
+		                     - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
+		    long seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
+		                   - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
+		    
+		    res = String.format(Locale.US,"%02d:%02d:%02d", hours, minutes, seconds);
+		    
+		    return res;
+//		Date d = new Date(Long.parseLong(millis));		
+//		SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+//		return df.format(d);
+	}
 }

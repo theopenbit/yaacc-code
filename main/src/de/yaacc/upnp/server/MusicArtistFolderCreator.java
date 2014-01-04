@@ -110,7 +110,7 @@ public class MusicArtistFolderCreator  {
 					String title = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
 					String artist = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
 					String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));				
-					
+					duration = contentDirectory.formatDuration(duration);
 					Log.d(getClass().getName(),
 							"Mimetype: " + mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)));
 					MimeType mimeType = MimeType.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)));
@@ -120,7 +120,7 @@ public class MusicArtistFolderCreator  {
 					String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
 					Res resource = new Res(mimeType, size, uri);
 					resource.setDuration(duration);
-					MusicTrack musicTrack = new MusicTrack("AMT"+id, artistID, title +"-(" + name + "/" + id + ")", "", album, artist, resource);
+					MusicTrack musicTrack = new MusicTrack("AMT"+id, artistID, title +"-(" + name + ")", "", album, artist, resource);
 					result.add(musicTrack);
 					contentDirectory.addContent(musicTrack.getId(), musicTrack);
 					Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
