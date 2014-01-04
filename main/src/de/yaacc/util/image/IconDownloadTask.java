@@ -48,12 +48,12 @@ public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
     protected Bitmap doInBackground(Uri... uri) {
     	Bitmap result =null;
     	if(cache != null){
-    		result = cache.getBitmap(position);
+    		result = cache.getBitmap(uri[0]);
     	}
         if (result == null){
             result = new ImageDownloader().retrieveIcon(uri[0]);            
             if(cache != null){
-            	cache.addBitmap(position,result);
+            	cache.addBitmap(uri[0],result);
             }
         }
         return result;

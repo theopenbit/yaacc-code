@@ -1,5 +1,6 @@
 package de.yaacc.util.image;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.LruCache;
 /**
  * Provides cache functionality for Bitmap images in lists. Implemented as singleton to assure the
@@ -8,7 +9,7 @@ import android.util.LruCache;
  * @author Christoph Hähnel (eyeless)
  */
 public class IconDownloadCacheHandler {
-    private LruCache<Integer, Bitmap> cache;
+    private LruCache<Uri, Bitmap> cache;
     private static IconDownloadCacheHandler instance;
     private IconDownloadCacheHandler(){
         initializeCache();
@@ -25,19 +26,19 @@ public class IconDownloadCacheHandler {
     }
     /**
      * Loads image from cache
-     * @param position position in list the image corresponds to
+     * @param uri uri the image is saved at
      * @return required image
      */
-    public Bitmap getBitmap(int position){
-        return cache.get(position);
+    public Bitmap getBitmap(Uri uri){
+        return cache.get(uri);
     }
     /**
      * Adds image to cache
-     * @param position position in list the image belongs to
+     * @param uri uri the image is saved at
      * @param img image to save
      */
-    public void addBitmap(int position, Bitmap img){
-        cache.put(position,img);
+    public void addBitmap(Uri uri, Bitmap img){
+        cache.put(uri,img);
     }
     /**
      * Clear the whole cache.
@@ -52,6 +53,6 @@ public class IconDownloadCacheHandler {
     private void initializeCache(){
         Long maxCacheSize = Runtime.getRuntime().maxMemory();
         int cacheSize = maxCacheSize.intValue() / 1024 / 8;
-        cache = new LruCache<Integer, Bitmap>(cacheSize);
+        cache = new LruCache<Uri, Bitmap>(cacheSize);
     }
 } 
