@@ -52,7 +52,6 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	private Timer commandExecutionTimer;
 
 	/**
-	 * @param context
 	 * @param name
 	 *            playerName
 	 * 
@@ -62,9 +61,10 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 		setName(name);
 	}
 
-	/**
-	 * @param context
-	 */
+    /**
+     *
+     * @param upnpClient
+     */
 	public LocalBackgoundMusicPlayer(UpnpClient upnpClient) {
 		super(upnpClient);
 		Log.d(getClass().getName(), "Starting background music service... ");
