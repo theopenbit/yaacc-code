@@ -42,6 +42,7 @@ public class ImageDownloader {
         return result;
     }
 
+
     /**
      * Loads an image from the given URI and return a Bitmap that matches the requested size
      * @param imageUri image location
@@ -64,7 +65,7 @@ public class ImageDownloader {
             options.outWidth = reqWidth;
             options.outHeight = reqHeight;
             options.inPreferQualityOverSpeed = false;
-            options.inDensity = DisplayMetrics.DENSITY_LOW;
+            options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
             options.inTempStorage = new byte[7680016];
 
             Log.d(this.getClass().getName(),
