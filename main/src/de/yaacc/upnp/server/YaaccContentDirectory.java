@@ -95,7 +95,7 @@ import de.yaacc.R;
 		@UpnpStateVariable(name = "A_ARG_TYPE_Index", sendEvents = false, datatype = "ui4"),
 		@UpnpStateVariable(name = "A_ARG_TYPE_Count", sendEvents = false, datatype = "ui4"),
 		@UpnpStateVariable(name = "A_ARG_TYPE_UpdateID", sendEvents = false, datatype = "ui4"),
-		@UpnpStateVariable(name = "A_ARG_TYPE_URI", sendEvents = false, datatype = "uri"),
+		@UpnpStateVariable(name = "A_ARG_TYPE_URI", sendEvents = false, datatype = "uri")
 // @UpnpStateVariable(
 // name = "A_ARG_TYPE_SearchCriteria",
 // sendEvents = false,
