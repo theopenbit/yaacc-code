@@ -94,6 +94,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.upnp.server.contentdirectory.YaaccContentDirectory;
 import de.yaacc.util.NotificationId;
 
 /**

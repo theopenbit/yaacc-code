@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,32 +24,30 @@ import java.util.List;
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
+import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
-import org.fourthline.cling.support.model.item.Photo;
+import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import de.yaacc.upnp.server.ContentDirectoryFolder;
-import de.yaacc.upnp.server.YaaccContentDirectory;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
- * Browser  for the image folder.
+ * Browser  for the video folder.
  * 
  * 
  * @author openbit (Tobias Schoene)
  * 
  */
-public class ImageFolderBrowser extends ContentBrowser {
+public class VideosFolderBrowser extends ContentBrowser {
 
 	@Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryIDs.IMAGES_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Images", "yaacc", getSize(contentDirectory, myId));
-		return null;
+		StorageFolder videosFolder = new StorageFolder(ContentDirectoryIDs.VIDEOS_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Videos", "yaacc", getSize(contentDirectory,myId),
+				907000L);
+		return videosFolder;
 	}
 
 	private Integer getSize(YaaccContentDirectory contentDirectory, String myId){
@@ -57,7 +55,7 @@ public class ImageFolderBrowser extends ContentBrowser {
 				String[] projection = { "count(*) as count" };
 				String selection = "";
 				String[] selectionArgs = null;
-				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
+				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
 						selectionArgs, null);
 
 				if (cursor != null) {
@@ -77,32 +75,33 @@ public class ImageFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Item> browseItem(YaaccContentDirectory contentDirectory, String myId) {
 		List<Item> result = new ArrayList<Item>();
-		// Query for all images on external storage
-		String[] projection = { MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE,
-				MediaStore.Images.Media.SIZE };
+		String[] projection = { MediaStore.Video.Media._ID, MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.MIME_TYPE,
+				MediaStore.Video.Media.SIZE, MediaStore.Video.Media.DURATION };
 		String selection = "";
 		String[] selectionArgs = null;
-		Cursor mImageCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
+		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 
-		if (mImageCursor != null) {
-			mImageCursor.moveToFirst();
-			while (!mImageCursor.isAfterLast()) {
-				String id = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
-				String name = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
-				Long size = Long.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
-				Log.d(getClass().getName(),
-						"Mimetype: " + mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
-				MimeType mimeType = MimeType.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+		if (mediaCursor != null) {
+			mediaCursor.moveToFirst();
+			while (!mediaCursor.isAfterLast()) {
+				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns._ID));
+				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.DISPLAY_NAME));
+				String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION));
+				duration = contentDirectory.formatDuration(duration);
+				Long size = Long.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.SIZE)));
+				Log.d(getClass().getName(), "Mimetype: " + mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
+				MimeType mimeType = MimeType.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
 				// file parameter only needed for media players which decide the
 				// ability of playing a file by the file extension
 				String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
 				Res resource = new Res(mimeType, size, uri);
-				result.add(new Photo(ContentDirectoryIDs.IMAGE_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "", resource));
-				Log.d(getClass().getName(), "Image: " + id + " Name: " + name + " uri: " + uri);
-				mImageCursor.moveToNext();
+				resource.setDuration(duration);
+				result.add(new VideoItem(ContentDirectoryIDs.VIDEO_PREFIX.getId() +  id, ContentDirectoryIDs.VIDEOS_FOLDER.getId(), name, "", resource));
+				Log.d(getClass().getName(), "VideoItem: " + id + " Name: " + name + " uri: " + uri);
+				mediaCursor.moveToNext();
 			}
-			mImageCursor.close();
+			mediaCursor.close();
 		} else {
 			Log.d(getClass().getName(), "System media store is empty.");
 		}

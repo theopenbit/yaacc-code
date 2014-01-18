@@ -25,7 +25,6 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 
-import de.yaacc.upnp.server.YaaccContentDirectory;
 
 /**
  * Super class for all contentent directory browsers.

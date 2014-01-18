@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,24 +24,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
-import org.fourthline.cling.support.model.item.MusicTrack;
-import org.fourthline.cling.support.model.item.Photo;
-import org.fourthline.cling.support.model.item.VideoItem;
-import org.seamless.util.MimeType;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import de.yaacc.upnp.server.ContentDirectoryFolder;
-import de.yaacc.upnp.server.YaaccContentDirectory;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for the music genres folder.
  * 
@@ -54,7 +44,7 @@ public class MusicGenresFolderBrowser extends ContentBrowser {
 	@Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryFolder.MUSIC_GENRES.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "Genres", "yaacc", getSize(contentDirectory,myId),
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "Genres", "yaacc", getSize(contentDirectory,myId),
 				907000L);
 		return folder;
 	}
@@ -106,7 +96,7 @@ public class MusicGenresFolderBrowser extends ContentBrowser {
 			while (!mediaCursor.isAfterLast()) {
 				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres._ID));
 				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
-				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_GENRES_TRACK_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), name, "", getMusicTrackSize(contentDirectory, id));
+				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), name, "", getMusicTrackSize(contentDirectory, id));
 				result.add(musicAlbum);			
 				Log.d(getClass().getName(), "Genre Folder: " + id + " Name: " + name);
 				mediaCursor.moveToNext();

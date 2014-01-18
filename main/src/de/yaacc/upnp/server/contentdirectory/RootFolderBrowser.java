@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,29 +19,12 @@
 package de.yaacc.upnp.server.contentdirectory;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.container.MusicAlbum;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
-import org.fourthline.cling.support.model.item.MusicTrack;
-import org.fourthline.cling.support.model.item.Photo;
-import org.fourthline.cling.support.model.item.VideoItem;
-import org.seamless.util.MimeType;
-
-import android.database.Cursor;
-import android.provider.MediaStore;
-import android.util.Log;
-
-import de.yaacc.upnp.server.ContentDirectoryFolder;
-import de.yaacc.upnp.server.YaaccContentDirectory;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for the root folder.
  * 
@@ -65,8 +48,8 @@ public class RootFolderBrowser extends ContentBrowser {
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
         result.add((Container)new MusicFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_FOLDER.getId()));
-        result.add((Container)new ImageFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_FOLDER.getId()));
-        result.add((Container)new VideoFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.VIDEOS_FOLDER.getId()));
+        result.add((Container)new ImagesFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_FOLDER.getId()));
+        result.add((Container)new VideosFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.VIDEOS_FOLDER.getId()));
         
         return result;
 	}

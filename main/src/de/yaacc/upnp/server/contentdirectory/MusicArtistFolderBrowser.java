@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,20 +27,13 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
-import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
-import org.fourthline.cling.support.model.item.Photo;
-import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import de.yaacc.upnp.server.ContentDirectoryFolder;
-import de.yaacc.upnp.server.YaaccContentDirectory;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -66,7 +59,7 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 		String result = "";
 		String[] projection = { MediaStore.Audio.Artists.ARTIST };
 		String selection = MediaStore.Audio.Artists._ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_TRACK_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()))};
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -85,7 +78,7 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 		Integer result = 0;
 		String[] projection = { "count(*) as count" };
 		String selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_TRACK_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()))};
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -112,10 +105,10 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 			String myId) {
 		List<Item> result = new ArrayList<Item>();
 		String[] projection = { MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.MIME_TYPE,
-				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
+				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.ARTIST,
 				MediaStore.Audio.Media.DURATION };
 		String selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_TRACK_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()))};
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 
@@ -129,6 +122,7 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 					String album = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
 					String title = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
 					String artist = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+					String artistId = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
 					String duration = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));				
 					duration = contentDirectory.formatDuration(duration);
 					Log.d(getClass().getName(),
@@ -141,7 +135,7 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 					String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
 					Res resource = new Res(mimeType, size, uri);
 					resource.setDuration(duration);
-					MusicTrack musicTrack = new MusicTrack(ContentDirectoryIDs.MUSIC_ARTIST_TRACK_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId(), title+"-(" + name + ")", "", album, artist, resource);
+					MusicTrack musicTrack = new MusicTrack(ContentDirectoryIDs.MUSIC_ARTIST_ITEM_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId() + artistId, title+"-(" + name + ")", "", album, artist, resource);
 					result.add(musicTrack);
 					Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
 				

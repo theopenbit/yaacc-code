@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,20 +27,13 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
-import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
-import org.fourthline.cling.support.model.item.Photo;
-import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import de.yaacc.upnp.server.ContentDirectoryFolder;
-import de.yaacc.upnp.server.YaaccContentDirectory;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for the music all titles folder.
@@ -54,7 +47,7 @@ public class MusicAllTitlesFolderBrowser extends ContentBrowser {
 	@Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		MusicAlbum folder = new MusicAlbum(ContentDirectoryFolder.MUSIC_ALL_TITLES.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "All", "yaacc", getSize(contentDirectory,myId));
+		MusicAlbum folder = new MusicAlbum(ContentDirectoryIDs.MUSIC_ALL_TITLES_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "All", "yaacc", getSize(contentDirectory,myId));
 		return folder;
 	}
 
@@ -113,7 +106,7 @@ public class MusicAllTitlesFolderBrowser extends ContentBrowser {
 					String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
 					Res resource = new Res(mimeType, size, uri);
 					resource.setDuration(duration);
-					MusicTrack musicTrack = new MusicTrack(ContentDirectoryIDs.MUSIC_ALL_TITLES_TRACK_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_FOLDER.getId(), title+"-(" + name + ")", "", album, artist, resource);
+					MusicTrack musicTrack = new MusicTrack(ContentDirectoryIDs.MUSIC_ALL_TITLES_ITEM_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_FOLDER.getId(), title+"-(" + name + ")", "", album, artist, resource);
 					result.add(musicTrack);
 					Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
 				

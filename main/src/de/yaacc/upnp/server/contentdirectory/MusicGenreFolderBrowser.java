@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de 
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,20 +27,13 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
-import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
-import org.fourthline.cling.support.model.item.Photo;
-import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import de.yaacc.upnp.server.ContentDirectoryFolder;
-import de.yaacc.upnp.server.YaaccContentDirectory;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -113,6 +106,7 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 			String myId) {
 		List<Item> result = new ArrayList<Item>();
 		String[] projection = { MediaStore.Audio.Genres.Members.AUDIO_ID,
+				MediaStore.Audio.Genres.Members.GENRE_ID,
 				MediaStore.Audio.Genres.Members.DISPLAY_NAME,
 				MediaStore.Audio.Genres.Members.MIME_TYPE,
 				MediaStore.Audio.Genres.Members.SIZE,
@@ -137,7 +131,9 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				String id = mediaCursor
 						.getString(mediaCursor
 								.getColumnIndex(MediaStore.Audio.Genres.Members.AUDIO_ID));
-
+				String genreId = mediaCursor
+						.getString(mediaCursor
+								.getColumnIndex(MediaStore.Audio.Genres.Members.GENRE_ID));
 				String name = mediaCursor
 						.getString(mediaCursor
 								.getColumnIndex(MediaStore.Audio.Genres.Members.DISPLAY_NAME));
@@ -172,8 +168,8 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				resource.setDuration(duration);
 
 				MusicTrack musicTrack = new MusicTrack(
-						ContentDirectoryIDs.MUSIC_GENRES_TRACK_PREFIX.getId()
-								+ id, myId, title + "-(" + name + ")", "",
+						ContentDirectoryIDs.MUSIC_GENRE_ITEM_PREFIX.getId()
+								+ id, ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId() + genreId, title + "-(" + name + ")", "",
 						album, artist, resource);
 				result.add(musicTrack);
 		
