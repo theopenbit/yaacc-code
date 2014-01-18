@@ -50,7 +50,7 @@ public class MusicAllTitleItemBrowser extends ContentBrowser {
 				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
 				MediaStore.Audio.Media.DURATION };
 		String selection = MediaStore.Audio.Media._ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ALL_TITLES_ITEM_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_ALL_TITLES_ITEM_PREFIX.getId().length())};
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 		

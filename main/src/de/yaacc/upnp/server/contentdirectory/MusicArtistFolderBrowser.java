@@ -78,7 +78,7 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 		Integer result = 0;
 		String[] projection = { "count(*) as count" };
 		String selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId().length())};
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -108,7 +108,7 @@ public class MusicArtistFolderBrowser extends ContentBrowser {
 				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.ARTIST,
 				MediaStore.Audio.Media.DURATION };
 		String selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId().length())};
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 

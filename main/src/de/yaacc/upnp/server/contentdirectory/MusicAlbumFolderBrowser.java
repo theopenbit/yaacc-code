@@ -78,7 +78,7 @@ public class MusicAlbumFolderBrowser extends ContentBrowser {
 		Integer result = 0;
 		String[] projection = { "count(*) as count" };
 		String selection = MediaStore.Audio.Media.ALBUM_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId().length())};
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -103,12 +103,13 @@ public class MusicAlbumFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Item> browseItem(YaaccContentDirectory contentDirectory,
 			String myId) {
+		Log.d(getClass().getName(), "myId: " + myId + " Select id:" + myId.substring(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId().length()));
 		List<Item> result = new ArrayList<Item>();
 		String[] projection = { MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.MIME_TYPE,
 				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM , MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
 				MediaStore.Audio.Media.DURATION };
 		String selection = MediaStore.Audio.Media.ALBUM_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId().length())};
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 

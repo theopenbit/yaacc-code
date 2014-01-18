@@ -51,8 +51,7 @@ public class VideoItemBrowser extends ContentBrowser {
 		String[] projection = { MediaStore.Video.Media._ID, MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.MIME_TYPE,
 				MediaStore.Video.Media.SIZE, MediaStore.Video.Media.DURATION };
 		String selection = MediaStore.Video.Media._ID+"=?";
-		String[] selectionArgs = new String[] { myId.substring(myId
-				.indexOf(ContentDirectoryIDs.VIDEO_PREFIX.getId())) };
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.VIDEO_PREFIX.getId().length()) };
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 		

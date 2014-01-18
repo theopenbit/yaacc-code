@@ -51,8 +51,7 @@ public class ImageItemBrowser extends ContentBrowser {
 				MediaStore.Images.Media.DISPLAY_NAME,
 				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE };
 		String selection = MediaStore.Images.Media._ID + "= ?";
-		String[] selectionArgs = new String[] { myId.substring(myId
-				.indexOf(ContentDirectoryIDs.IMAGE_PREFIX.getId())) };
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGE_PREFIX.getId().length()) };
 		Cursor mImageCursor = contentDirectory
 				.getContext()
 				.getContentResolver()

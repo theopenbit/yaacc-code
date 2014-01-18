@@ -59,7 +59,7 @@ public class MusicGenreItemBrowser extends ContentBrowser {
 				MediaStore.Audio.Genres.Members.ARTIST,
 				MediaStore.Audio.Genres.Members.DURATION };
 		String selection = MediaStore.Audio.Genres.Members.AUDIO_ID + "=?";
-		String[] selectionArgs = new String[]{myId.substring(myId.indexOf(ContentDirectoryIDs.MUSIC_GENRE_ITEM_PREFIX.getId()))};
+		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_GENRE_ITEM_PREFIX.getId().length())};
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, null);
 		

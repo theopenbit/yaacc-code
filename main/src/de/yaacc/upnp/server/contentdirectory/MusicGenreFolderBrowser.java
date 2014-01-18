@@ -83,7 +83,7 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				.getContext()
 				.getContentResolver()
 				.query(MediaStore.Audio.Genres.Members.getContentUri(
-						"external", Long.parseLong(myId)), projection,
+						"external", Long.parseLong(myId.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId().length()))), projection,
 						selection, selectionArgs, null);
 
 		if (cursor != null) {
@@ -122,7 +122,7 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				.getContext()
 				.getContentResolver()
 				.query(MediaStore.Audio.Genres.Members.getContentUri(
-						"external", Long.parseLong(myId)), projection,
+						"external", Long.parseLong(myId.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId().length()))), projection,
 						selection, selectionArgs, null);
 
 		if (mediaCursor != null) {
