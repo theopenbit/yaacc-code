@@ -11,13 +11,16 @@ then
 fi
 apt-get update
 
+apt-get install ia32-libs -y
 
 ##############################################
 ##Install common unix tools
 ##############################################
 apt-get install vim -y
+apt-get install nano -y
 
-##############################################
+
+#############################################
 ## Install xterm and roxterm in order to
 ## enable an ssh access using an  X tunnel
 ##############################################
@@ -206,14 +209,26 @@ cd /home/$developerName
 if [ ! -f "yaacc-code/main/local.properties" ];
 then
    sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
+   chown -R  $developerName:$developerName yaacc-code/main/local.properties
 fi
 
 if [ ! -f "yaacc-code/main/project.properties" ];
 then
   sudo -n -u $developerName echo "target=android-15" > yaacc-code/main/project.properties
+  chown -R  $developerName:$developerName yaacc-code/main/project.properties
 fi
 
+if [ ! -f "yaacc-code/test/local.properties" ];
+then
+   sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
+   chown -R  $developerName:$developerName yaacc-code/main/local.properties
+fi
 
+if [ ! -f "yaacc-code/test/project.properties" ];
+then
+  sudo -n -u $developerName echo "target=android-15" > yaacc-code/main/project.properties
+  chown -R  $developerName:$developerName yaacc-code/main/project.properties
+fi
 #############################################################
 ## Setup F-droid server tools
 #############################################################
@@ -309,26 +324,30 @@ sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p 
 ###############################################
 # create  AVD
 ##############################################
-#if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ]
-#then
-# sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
-#fi
+if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ]
+then
+ sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
+fi
 
 ############################################
 # start avd and install yaacc on it
 ###########################################
-# /usr/local/android-sdk/tools/emulator -avd yaacc-emu
-# /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
+ /usr/local/android-sdk/tools/emulator -avd yaacc-emu
+ /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
 #
 ############################################
 # install eclipse
 ############################################
-#apt-get install eclipse -y
-#if [  -d "/home/$developerName/.swt/lib/linux" ]
-#then
-#  cd /home/$developerName/.swt/lib/linux
-#  sudo -n -u $developerName  rm -rf x86
-#  sudo -n -u $developerName  ln -s /usr/lib/jni x86  
-#fi
+apt-get install eclipse -y
+if [  -d "/home/$developerName/.swt/lib/linux" ]
+then
+  cd /home/$developerName/.swt/lib/linux
+  sudo -n -u $developerName  rm -rf x86_64
+  sudo -n -u $developerName  ln -s /usr/lib/jni x86_64
+fi
+############################################
+# install qgit
+############################################
+apt-get install qgit -y
 
 echo ready enjoy developing!
