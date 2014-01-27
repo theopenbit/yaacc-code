@@ -34,6 +34,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpService;
+import org.eclipse.jetty.http.MimeTypes;
 import org.seamless.util.MimeType;
 
 import android.content.Context;
@@ -41,6 +42,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 /**
  * A http service to retrieve media content by an id.
@@ -87,8 +89,8 @@ public class YaaccHttpService extends HttpService {
 
 		Uri requestUri = Uri.parse(request.getRequestLine().getUri());
 		String contentId = requestUri.getQueryParameter("id");
-		
-		if (contentId == null || contentId.equals("")) {
+		String albumId = requestUri.getQueryParameter("album");
+		if ((contentId == null || contentId.equals("")) && (albumId == null || albumId.equals(""))) {
 
 			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 			StringEntity entity = new StringEntity(
@@ -97,13 +99,20 @@ public class YaaccHttpService extends HttpService {
 			Log.d(getClass().getName(), "end doService: Access denied");
 			return;
 		}
-		ContentHolder contentHolder = lookup(contentId);
+		ContentHolder contentHolder = null;
+		if (contentId == null || contentId.equals("")) {
+			contentHolder = lookupContent(contentId);
+			
+		}else if (albumId == null || albumId.equals("")){
+			contentHolder = lookupAlbumArt(albumId);
+		}
 		if (contentHolder == null) {
-			Log.d(getClass().getName(), "Content with id " + contentId
+			//tricky but works
+			Log.d(getClass().getName(), "Resource with id " + contentId + albumId
 					+ " not found");
 			response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 			StringEntity entity = new StringEntity(
-					"<html><body><h1>Content with id " + contentId
+					"<html><body><h1>Resource with id " + contentId + albumId
 							+ " not found</h1></body></html>", "UTF-8");
 			response.setEntity(entity);
 		} else {
@@ -133,7 +142,7 @@ public class YaaccHttpService extends HttpService {
 	 *            the id of the content
 	 * @return the content description
 	 */
-	private ContentHolder lookup(String contentId) {
+	private ContentHolder lookupContent(String contentId) {
 		ContentHolder result = null;
 		if (contentId == null) {
 			return null;
@@ -170,6 +179,55 @@ public class YaaccHttpService extends HttpService {
 			Log.d(getClass().getName(), "System media store is empty.");
 		}
 		mFilesCursor.close();
+		return result;
+	}
+	
+	/**
+	 * Lookup content in the mediastore
+	 * 
+	 * @param albumId
+	 *            the id of the album
+	 * @return the content description
+	 */
+	private ContentHolder lookupAlbumArt(String albumId) {
+		ContentHolder result = null;
+		if (albumId == null) {
+			return null;
+		}
+		Log.d(getClass().getName(), "System media store lookup album: " + albumId);
+		String[] projection = { MediaStore.Audio.Albums.ALBUM_ID,
+				//FIXME what is the right mime type? MediaStore.Audio.Albums.MIME_TYPE,
+				MediaStore.Audio.Albums.ALBUM_ART };
+		String selection = MediaStore.Audio.Albums.ALBUM_ID + "=?";
+		String[] selectionArgs = { albumId };
+		Cursor cursor = getContext().getContentResolver().query(
+				MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection,
+				selection, selectionArgs, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				String dataUri = cursor.getString(cursor
+						.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+
+				String mimeTypeStr = null; 
+//FIXME mime type resolving 				cursor
+//						.getString(cursor
+//								.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE));
+				
+				MimeType mimeType = MimeType.valueOf("image/png");
+				if (mimeTypeStr != null) {
+					mimeType = MimeType.valueOf(mimeTypeStr);
+				}
+				Log.d(getClass().getName(), "Content found: " + mimeType
+						+ " Uri: " + dataUri);
+				result = new ContentHolder(mimeType, dataUri);
+				cursor.moveToNext();
+			}
+		} else {
+			Log.d(getClass().getName(), "System media store is empty.");
+		}
+		cursor.close();
 		return result;
 	}
 

@@ -18,11 +18,13 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
@@ -47,7 +49,7 @@ public class MusicArtistItemBrowser extends ContentBrowser {
 			String myId) {
 		Item result = null;
 		String[] projection = { MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.MIME_TYPE,
-				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
+				MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
 				MediaStore.Audio.Media.DURATION };
 		String selection = MediaStore.Audio.Media._ID + "=?";
 		String[] selectionArgs = new String[]{myId.substring(ContentDirectoryIDs.MUSIC_ARTIST_ITEM_PREFIX.getId().length())};
@@ -61,6 +63,7 @@ public class MusicArtistItemBrowser extends ContentBrowser {
 			Long size = Long.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.SIZE)));
 
 			String album = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+			String albumId = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
 			String artistId = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
 			String title = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
 			String artist = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
@@ -74,9 +77,12 @@ public class MusicArtistItemBrowser extends ContentBrowser {
 			// the
 			// ability of playing a file by the file extension
 			String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
+			URI albumArtUri = URI.create("http://" + contentDirectory.getIpAddress() + ":"
+					+ YaaccUpnpServerService.PORT + "/?album=" + albumId);
 			Res resource = new Res(mimeType, size, uri);
 			resource.setDuration(duration);
 			MusicTrack musicTrack = new MusicTrack(ContentDirectoryIDs.MUSIC_ARTIST_ITEM_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()+ artistId, title+"-(" + name + ")", "", album, artist, resource);
+			musicTrack.replaceFirstProperty(new UPNP.ALBUM_ART_URI( albumArtUri));
 			result = musicTrack;
 			Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
 		

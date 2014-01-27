@@ -18,11 +18,13 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
@@ -74,9 +76,12 @@ public class MusicAlbumItemBrowser extends ContentBrowser {
 			// the
 			// ability of playing a file by the file extension
 			String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
+			URI albumArtUri = URI.create("http://" + contentDirectory.getIpAddress() + ":"
+					+ YaaccUpnpServerService.PORT + "/?album=" + albumId);
 			Res resource = new Res(mimeType, size, uri);
 			resource.setDuration(duration);
 			MusicTrack musicTrack = new MusicTrack(ContentDirectoryIDs.MUSIC_ALBUM_ITEM_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId()+ albumId, title+"-(" + name + ")", "", album, artist, resource);
+			musicTrack.replaceFirstProperty(new UPNP.ALBUM_ART_URI( albumArtUri));
 			result = musicTrack;
 			Log.d(getClass().getName(), "MusicTrack: " + id + " Name: " + name + " uri: " + uri);
 		

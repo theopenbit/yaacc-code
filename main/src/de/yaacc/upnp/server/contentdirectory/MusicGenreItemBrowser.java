@@ -18,6 +18,9 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +58,7 @@ public class MusicGenreItemBrowser extends ContentBrowser {
 				MediaStore.Audio.Genres.Members.MIME_TYPE,
 				MediaStore.Audio.Genres.Members.SIZE,
 				MediaStore.Audio.Genres.Members.ALBUM,
+				MediaStore.Audio.Genres.Members.ALBUM_ID,
 				MediaStore.Audio.Genres.Members.TITLE,
 				MediaStore.Audio.Genres.Members.ARTIST,
 				MediaStore.Audio.Genres.Members.DURATION };
@@ -74,9 +78,11 @@ public class MusicGenreItemBrowser extends ContentBrowser {
 							.getColumnIndex(MediaStore.Audio.Genres.Members.DISPLAY_NAME));
 			Long size = Long.valueOf(mediaCursor.getString(mediaCursor
 					.getColumnIndex(MediaStore.Audio.Genres.Members.SIZE)));
-
+		
 			String album = mediaCursor.getString(mediaCursor
 					.getColumnIndex(MediaStore.Audio.Genres.Members.ALBUM));
+			String albumId = mediaCursor.getString(mediaCursor
+					.getColumnIndex(MediaStore.Audio.Genres.Members.ALBUM_ID));
 			String title = mediaCursor.getString(mediaCursor
 					.getColumnIndex(MediaStore.Audio.Genres.Members.TITLE));
 			String artist = mediaCursor
@@ -99,16 +105,21 @@ public class MusicGenreItemBrowser extends ContentBrowser {
 			// file parameter only needed for media players which decide
 			// the
 			// ability of playing a file by the file extension
+			//FIXME should the name be file.<MimeTypeSpecificFileExtension>?
 			String uri = "http://" + contentDirectory.getIpAddress() + ":"
-					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f='"
+					+ YaaccUpnpServerService.PORT + "/?id=" + id  +"&f='"
 					+ name + "'";
+			URI albumArtUri = URI.create("http://" + contentDirectory.getIpAddress() + ":"
+					+ YaaccUpnpServerService.PORT + "/?album=" + albumId);
 			Res resource = new Res(mimeType, size, uri);
 			resource.setDuration(duration);
+			
 
 			MusicTrack musicTrack = new MusicTrack(
 					ContentDirectoryIDs.MUSIC_GENRE_ITEM_PREFIX.getId()
 							+ id, ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId() + genreId, title + "-(" + name + ")", "",
 					album, artist, resource);
+			musicTrack.replaceFirstProperty(new UPNP.ALBUM_ART_URI( albumArtUri));
 			result = musicTrack;
 	
 			Log.d(getClass().getName(), "MusicTrack: " + id + " Name: "
