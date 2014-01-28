@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
+import org.fourthline.cling.support.model.DescMeta;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.PhotoAlbum;
@@ -95,7 +96,11 @@ public class ImagesFolderBrowser extends ContentBrowser {
 				// ability of playing a file by the file extension
 				String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
 				Res resource = new Res(mimeType, size, uri);
-				result.add(new Photo(ContentDirectoryIDs.IMAGE_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "", resource));
+				
+				Photo photo = new Photo(ContentDirectoryIDs.IMAGE_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "", resource);
+	
+				
+				result.add(photo);
 				Log.d(getClass().getName(), "Image: " + id + " Name: " + name + " uri: " + uri);
 				mImageCursor.moveToNext();
 			}

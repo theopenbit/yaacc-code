@@ -18,6 +18,9 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
 import org.fourthline.cling.support.model.item.Item;
@@ -50,8 +54,9 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 			String myId) {
 
 		MusicAlbum folder = new MusicAlbum(myId,
-				ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), getName(contentDirectory,myId),
-				"yaacc", getSize(contentDirectory, myId));
+				ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), getName(
+						contentDirectory, myId), "yaacc", getSize(
+						contentDirectory, myId));
 		return folder;
 	}
 
@@ -59,12 +64,12 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 		String result = "";
 		String[] projection = { MediaStore.Audio.Genres.NAME };
 		String selection = MediaStore.Audio.Genres._ID + "=?";
-		String[] selectionArgs = new String[]{myId};
+		String[] selectionArgs = new String[] { myId };
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
-				.query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, projection,
-						selection, selectionArgs, null);
+				.query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
+						projection, selection, selectionArgs, null);
 
 		if (cursor != null) {
 			cursor.moveToFirst();
@@ -83,7 +88,10 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				.getContext()
 				.getContentResolver()
 				.query(MediaStore.Audio.Genres.Members.getContentUri(
-						"external", Long.parseLong(myId.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId().length()))), projection,
+						"external",
+						Long.parseLong(myId
+								.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX
+										.getId().length()))), projection,
 						selection, selectionArgs, null);
 
 		if (cursor != null) {
@@ -111,6 +119,7 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				MediaStore.Audio.Genres.Members.MIME_TYPE,
 				MediaStore.Audio.Genres.Members.SIZE,
 				MediaStore.Audio.Genres.Members.ALBUM,
+				MediaStore.Audio.Genres.Members.ALBUM_ID,
 				MediaStore.Audio.Genres.Members.TITLE,
 				MediaStore.Audio.Genres.Members.ARTIST,
 				MediaStore.Audio.Genres.Members.DURATION };
@@ -122,7 +131,10 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				.getContext()
 				.getContentResolver()
 				.query(MediaStore.Audio.Genres.Members.getContentUri(
-						"external", Long.parseLong(myId.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId().length()))), projection,
+						"external",
+						Long.parseLong(myId
+								.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX
+										.getId().length()))), projection,
 						selection, selectionArgs, null);
 
 		if (mediaCursor != null) {
@@ -142,6 +154,9 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 
 				String album = mediaCursor.getString(mediaCursor
 						.getColumnIndex(MediaStore.Audio.Genres.Members.ALBUM));
+				String albumId = mediaCursor
+						.getString(mediaCursor
+								.getColumnIndex(MediaStore.Audio.Genres.Members.ALBUM_ID));
 				String title = mediaCursor.getString(mediaCursor
 						.getColumnIndex(MediaStore.Audio.Genres.Members.TITLE));
 				String artist = mediaCursor
@@ -161,18 +176,32 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 				// file parameter only needed for media players which decide
 				// the
 				// ability of playing a file by the file extension
+				String encodedName = "";
+				try {
+					encodedName = URLEncoder.encode(name, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					Log.e(getClass().getName(), "Unable to encode item name", e);
+				}
 				String uri = "http://" + contentDirectory.getIpAddress() + ":"
 						+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f='"
-						+ name + "'";
+						+ encodedName + "'";
+
+				URI albumArtUri = URI.create("http://"
+						+ contentDirectory.getIpAddress() + ":"
+						+ YaaccUpnpServerService.PORT + "/?album=" + albumId);
 				Res resource = new Res(mimeType, size, uri);
 				resource.setDuration(duration);
 
 				MusicTrack musicTrack = new MusicTrack(
 						ContentDirectoryIDs.MUSIC_GENRE_ITEM_PREFIX.getId()
-								+ id, ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId() + genreId, title + "-(" + name + ")", "",
+								+ id,
+						ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId()
+								+ genreId, title + "-(" + name + ")", "",
 						album, artist, resource);
+				musicTrack.replaceFirstProperty(new UPNP.ALBUM_ART_URI(
+						albumArtUri));
 				result.add(musicTrack);
-		
+
 				Log.d(getClass().getName(), "MusicTrack: " + id + " Name: "
 						+ name + " uri: " + uri);
 

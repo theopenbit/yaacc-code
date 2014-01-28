@@ -100,10 +100,10 @@ public class YaaccHttpService extends HttpService {
 			return;
 		}
 		ContentHolder contentHolder = null;
-		if (contentId == null || contentId.equals("")) {
+		if (!(contentId == null || contentId.equals(""))) {
 			contentHolder = lookupContent(contentId);
 			
-		}else if (albumId == null || albumId.equals("")){
+		}else if (!(albumId == null || albumId.equals(""))){
 			contentHolder = lookupAlbumArt(albumId);
 		}
 		if (contentHolder == null) {
@@ -194,11 +194,12 @@ public class YaaccHttpService extends HttpService {
 		if (albumId == null) {
 			return null;
 		}
+		//FixME need for default icon!
 		Log.d(getClass().getName(), "System media store lookup album: " + albumId);
-		String[] projection = { MediaStore.Audio.Albums.ALBUM_ID,
+		String[] projection = { MediaStore.Audio.Albums._ID,
 				//FIXME what is the right mime type? MediaStore.Audio.Albums.MIME_TYPE,
 				MediaStore.Audio.Albums.ALBUM_ART };
-		String selection = MediaStore.Audio.Albums.ALBUM_ID + "=?";
+		String selection = MediaStore.Audio.Albums._ID + "=?";
 		String[] selectionArgs = { albumId };
 		Cursor cursor = getContext().getContentResolver().query(
 				MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection,
