@@ -31,7 +31,7 @@ import org.fourthline.cling.support.model.DIDLContent;
  *
  */
 public class ContentDirectoryBrowseResult {
-	private Status status = Status.NO_CONTENT;
+	private Status status = Status.LOADING;
 	private DIDLContent result  = null;
 	private UpnpFailure upnpFailure;
 	

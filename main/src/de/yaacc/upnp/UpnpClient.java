@@ -608,15 +608,15 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		if (device == null) {
 			return result;
-		}
-		Object[] services = device.getServices();
+		}		
 		Service service = device.findService(new UDAServiceId("ContentDirectory"));
 		ContentDirectoryBrowseActionCallback actionCallback = null;
 		if (service != null) {
 			Log.d(getClass().getName(), "#####Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
 			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID, flag, filter, firstResult, maxResults, result, orderBy);
-			getControlPoint().execute(actionCallback);
-			while (actionCallback.getStatus() != Status.NO_CONTENT && actionCallback.getStatus() != Status.OK && actionCallback.getUpnpFailure() == null)
+			getControlPoint().execute(actionCallback);			
+			while (  actionCallback.getStatus() != Status.OK  && actionCallback.getStatus() != Status.NO_CONTENT && actionCallback.getUpnpFailure() == null)				
+				
 				;
 		}
 
