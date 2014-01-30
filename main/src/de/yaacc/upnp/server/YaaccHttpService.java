@@ -18,17 +18,22 @@
  */
 package de.yaacc.upnp.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Locale;
 
 import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpStatus;
 import org.apache.http.MethodNotSupportedException;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
@@ -37,8 +42,13 @@ import org.apache.http.protocol.HttpService;
 import org.eclipse.jetty.http.MimeTypes;
 import org.seamless.util.MimeType;
 
+import de.yaacc.R;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -90,7 +100,8 @@ public class YaaccHttpService extends HttpService {
 		Uri requestUri = Uri.parse(request.getRequestLine().getUri());
 		String contentId = requestUri.getQueryParameter("id");
 		String albumId = requestUri.getQueryParameter("album");
-		if ((contentId == null || contentId.equals("")) && (albumId == null || albumId.equals(""))) {
+		if ((contentId == null || contentId.equals(""))
+				&& (albumId == null || albumId.equals(""))) {
 
 			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 			StringEntity entity = new StringEntity(
@@ -102,14 +113,14 @@ public class YaaccHttpService extends HttpService {
 		ContentHolder contentHolder = null;
 		if (!(contentId == null || contentId.equals(""))) {
 			contentHolder = lookupContent(contentId);
-			
-		}else if (!(albumId == null || albumId.equals(""))){
+
+		} else if (!(albumId == null || albumId.equals(""))) {
 			contentHolder = lookupAlbumArt(albumId);
 		}
 		if (contentHolder == null) {
-			//tricky but works
-			Log.d(getClass().getName(), "Resource with id " + contentId + albumId
-					+ " not found");
+			// tricky but works
+			Log.d(getClass().getName(), "Resource with id " + contentId
+					+ albumId + " not found");
 			response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 			StringEntity entity = new StringEntity(
 					"<html><body><h1>Resource with id " + contentId + albumId
@@ -117,20 +128,13 @@ public class YaaccHttpService extends HttpService {
 			response.setEntity(entity);
 		} else {
 
-			File file = new File(contentHolder.getUri());
+			
 			response.setStatusCode(HttpStatus.SC_OK);
-			FileEntity body = new FileEntity(file, contentHolder.getMimeType()
-					.toString());
-			Log.d(getClass().getName(),
-					"Return file-Uri: " + contentHolder.getUri() + "Mimetype: "
-							+ contentHolder.getMimeType());
-
-			response.setEntity(body);
+			response.setEntity(contentHolder.getHttpEntity());
 		}
 		Log.d(getClass().getName(), "end doService: ");
 	}
 
-	
 	private Context getContext() {
 		return context;
 	}
@@ -181,7 +185,7 @@ public class YaaccHttpService extends HttpService {
 		mFilesCursor.close();
 		return result;
 	}
-	
+
 	/**
 	 * Lookup content in the mediastore
 	 * 
@@ -190,14 +194,18 @@ public class YaaccHttpService extends HttpService {
 	 * @return the content description
 	 */
 	private ContentHolder lookupAlbumArt(String albumId) {
-		ContentHolder result = null;
+
+		
+		ContentHolder result = new ContentHolder(MimeType.valueOf("image/png"),getDefaultIcon());
 		if (albumId == null) {
 			return null;
 		}
-		//FixME need for default icon!
-		Log.d(getClass().getName(), "System media store lookup album: " + albumId);
+		// FixME need for default icon!
+		Log.d(getClass().getName(), "System media store lookup album: "
+				+ albumId);
 		String[] projection = { MediaStore.Audio.Albums._ID,
-				//FIXME what is the right mime type? MediaStore.Audio.Albums.MIME_TYPE,
+				// FIXME what is the right mime type?
+				// MediaStore.Audio.Albums.MIME_TYPE,
 				MediaStore.Audio.Albums.ALBUM_ART };
 		String selection = MediaStore.Audio.Albums._ID + "=?";
 		String[] selectionArgs = { albumId };
@@ -211,24 +219,38 @@ public class YaaccHttpService extends HttpService {
 				String dataUri = cursor.getString(cursor
 						.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
 
-				String mimeTypeStr = null; 
-//FIXME mime type resolving 				cursor
-//						.getString(cursor
-//								.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE));
-				
+				String mimeTypeStr = null;
+				// FIXME mime type resolving cursor
+				// .getString(cursor
+				// .getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE));
+
 				MimeType mimeType = MimeType.valueOf("image/png");
 				if (mimeTypeStr != null) {
 					mimeType = MimeType.valueOf(mimeTypeStr);
 				}
-				Log.d(getClass().getName(), "Content found: " + mimeType
-						+ " Uri: " + dataUri);
-				result = new ContentHolder(mimeType, dataUri);
+				if (dataUri != null) {
+					Log.d(getClass().getName(), "Content found: " + mimeType
+							+ " Uri: " + dataUri);
+					result = new ContentHolder(mimeType, dataUri);
+				}
 				cursor.moveToNext();
 			}
 		} else {
 			Log.d(getClass().getName(), "System media store is empty.");
 		}
 		cursor.close();
+		return result;
+	}
+
+	private byte[] getDefaultIcon() {
+		Drawable drawable = getContext().getResources().getDrawable(R.drawable.yaacc48_24_png);
+		byte[] result = null;
+		if (drawable != null) {
+			Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+			result = stream.toByteArray();
+		}
 		return result;
 	}
 
@@ -240,6 +262,8 @@ public class YaaccHttpService extends HttpService {
 	static class ContentHolder {
 		private String uri;
 		private MimeType mimeType;
+		private byte[]  content; 
+		
 
 		public ContentHolder(MimeType mimeType, String uri) {
 			this.uri = uri;
@@ -247,6 +271,11 @@ public class YaaccHttpService extends HttpService {
 
 		}
 
+		public ContentHolder(MimeType mimeType, byte[] content) {
+			this.content = content;
+			this.mimeType = mimeType;
+
+		}
 		/**
 		 * @return the uri
 		 */
@@ -259,6 +288,22 @@ public class YaaccHttpService extends HttpService {
 		 */
 		public MimeType getMimeType() {
 			return mimeType;
+		}
+		
+		public HttpEntity getHttpEntity(){
+			HttpEntity result = null;
+			if( getUri() != null && !getUri().equals("")) {
+				File file = new File(getUri());
+				
+				result= new FileEntity(file, getMimeType()
+						.toString());
+				Log.d(getClass().getName(),
+						"Return file-Uri: " + getUri() + "Mimetype: "
+								+ getMimeType());				
+			} else if(content != null){
+				result = new ByteArrayEntity(content);
+			}
+			return  result;
 		}
 	}
 }
