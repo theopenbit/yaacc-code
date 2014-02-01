@@ -139,10 +139,6 @@ public class BrowseItemAdapter extends BaseAdapter {
 		holder.name.setText(currentObject.getTitle());
 		if (currentObject instanceof Container) {
 			holder.icon.setImageResource(R.drawable.folder);
-			Bitmap cover = containedCoverImage((Container) currentObject);
-			if (cover != null) {
-				holder.icon.setImageBitmap(cover);
-			}
 		} else if (currentObject instanceof AudioItem) {
 			holder.icon.setImageResource(R.drawable.cdtrack);
 			if (preferences.getBoolean(
@@ -190,24 +186,4 @@ public class BrowseItemAdapter extends BaseAdapter {
 				.getValue()));
 	}
 
-	private Bitmap containedCoverImage(Container currentObject) {
-		List<Item> a = currentObject.getItems();
-		ImageDownloader downloader = new ImageDownloader();
-		while (!a.isEmpty()) {
-			Item toTest = a.remove(0);
-			if (toTest instanceof ImageItem) {
-				return downloader.retrieveIcon(Uri.parse(((ImageItem) toTest)
-						.getFirstResource().getValue()));
-			}
-		}
-		return null;
-	}
-
-	private boolean isCoverImage(ImageItem toTest) {
-		String title = ((ImageItem) toTest).getTitle();
-		if (title.equalsIgnoreCase("cover.jpg")) {
-			return true;
-		}
-		return false;
-	}
 }
