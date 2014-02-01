@@ -25,6 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.Locale;
 
 import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -32,14 +34,17 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpStatus;
 import org.apache.http.MethodNotSupportedException;
+import org.apache.http.ParseException;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpService;
 import org.eclipse.jetty.http.MimeTypes;
+import org.fourthline.cling.transport.impl.apache.HeaderUtil;
 import org.seamless.util.MimeType;
 
 import de.yaacc.R;
@@ -301,7 +306,8 @@ public class YaaccHttpService extends HttpService {
 						"Return file-Uri: " + getUri() + "Mimetype: "
 								+ getMimeType());				
 			} else if(content != null){
-				result = new ByteArrayEntity(content);
+				result = new ByteArrayEntity(content);				
+				((ByteArrayEntity)result).setContentType(new BasicHeader("Content-Type", getMimeType().toString())); 
 			}
 			return  result;
 		}
