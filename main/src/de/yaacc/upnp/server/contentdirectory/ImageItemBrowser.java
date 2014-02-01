@@ -18,11 +18,13 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.item.Item;
@@ -32,6 +34,7 @@ import org.seamless.util.MimeType;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for an  image item.
@@ -77,12 +80,16 @@ public class ImageItemBrowser extends ContentBrowser {
 			// file parameter only needed for media players which decide the
 			// ability of playing a file by the file extension
 			String uri = "http://" + contentDirectory.getIpAddress() + ":"
-					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f='"
-					+ name + "'";
+					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 			Res resource = new Res(mimeType, size, uri);
 			result = new Photo(ContentDirectoryIDs.IMAGE_PREFIX.getId() + id,
 					ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "",
 					resource);
+			URI albumArtUri = URI.create("http://"
+					+ contentDirectory.getIpAddress() + ":"
+					+ YaaccUpnpServerService.PORT + "/?thumb=" + id);
+			result.replaceFirstProperty(new UPNP.ALBUM_ART_URI(
+					albumArtUri));
 			Log.d(getClass().getName(), "Image: " + id + " Name: " + name
 					+ " uri: " + uri);
 			mImageCursor.close();

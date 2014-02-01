@@ -38,6 +38,7 @@ import org.seamless.util.MimeType;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -175,16 +176,10 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 								.getColumnIndex(MediaStore.Audio.Genres.Members.MIME_TYPE)));
 				// file parameter only needed for media players which decide
 				// the
-				// ability of playing a file by the file extension
-				String encodedName = "";
-				try {
-					encodedName = URLEncoder.encode(name, "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					Log.e(getClass().getName(), "Unable to encode item name", e);
-				}
+				// ability of playing a file by the file extension				
 				String uri = "http://" + contentDirectory.getIpAddress() + ":"
-						+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f='"
-						+ encodedName + "'";
+						+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file."
+								+ MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 
 				URI albumArtUri = URI.create("http://"
 						+ contentDirectory.getIpAddress() + ":"
