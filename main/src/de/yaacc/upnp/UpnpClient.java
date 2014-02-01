@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +65,7 @@ import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.AudioItem;
+import org.fourthline.cling.support.model.item.ImageItem;
 import org.fourthline.cling.support.model.item.Item;
 
 import android.content.ActivityNotFoundException;
@@ -619,8 +621,61 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				
 				;
 		}
-		return result;
+
+
+		return enrichWithCover(result);
 	}
+
+    /**
+     * Trying to add album art if there are only audiofiles and exactly one imagefile in a folder
+     * @param callbackResult orginal callback
+     * @return if albumart and audiofiles are contained enriched audiofiles, otherwise the original result
+     */
+    private ContentDirectoryBrowseResult enrichWithCover(ContentDirectoryBrowseResult callbackResult){
+
+        DIDLContent cont = callbackResult.getResult();
+
+        if (cont.getContainers().size() != 0){
+            return callbackResult;
+        }
+        URI albumArtUri = null;
+        LinkedList<Item> audioFiles = null;
+
+        for(Item currentItem: cont.getItems()){
+            if(!(currentItem instanceof AudioItem)){
+                if(null == albumArtUri &&(currentItem instanceof ImageItem)){
+                    albumArtUri = URI.create(((ImageItem) currentItem).getFirstResource().getValue().toString());
+                } else {
+                    //There seem to be multiple images or other media files
+                    audioFiles = null;
+                    return callbackResult;
+                }
+
+            }
+
+            if(null != audioFiles){
+                audioFiles.add(currentItem);
+            } else {
+                audioFiles = new LinkedList<Item>();
+                audioFiles.add(currentItem);
+            }
+        }
+
+        if (null == albumArtUri){
+            audioFiles = null;
+            return callbackResult;
+        }
+        //We should only be here if there are just musicfiles and exactly one imagefile
+        for(Item currentItem: audioFiles){
+            currentItem.replaceFirstProperty((new DIDLObject.Property.UPNP.ALBUM_ART_URI(albumArtUri)));
+        }
+
+        //this hopefully overwrites all previously existing contents
+        cont.setItems(audioFiles);
+        callbackResult.setResult(cont);
+
+        return callbackResult;
+    }
 
 	/**
 	 * Browse ContenDirctory asynchronous
