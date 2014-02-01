@@ -20,8 +20,6 @@ package de.yaacc.upnp.server.contentdirectory;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
@@ -29,7 +27,6 @@ import org.fourthline.cling.support.model.DescMeta;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.container.MusicAlbum;
 import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.Photo;
@@ -52,15 +49,17 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 	@Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId(), ContentDirectoryIDs.IMAGES_FOLDER.getId(), "by date", "yaacc", getSize(contentDirectory, myId));
+		PhotoAlbum photoAlbum = new PhotoAlbum(myId, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId(),getName(
+				contentDirectory, myId), "yaacc", getSize(contentDirectory, myId));
 		return photoAlbum;
 	}
 
 	private Integer getSize(YaaccContentDirectory contentDirectory, String myId){
 		 Integer result = 0;
 				String[] projection = { "count(*) as count" };
-				String selection = "";
-				String[] selectionArgs = null;
+				String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+				String[] selectionArgs = new String[] { myId.substring(myId
+						.indexOf(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) };
 				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
 						selectionArgs, null);
 
@@ -72,43 +71,72 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 				return result;
 	}
 	
+	private String getName(YaaccContentDirectory contentDirectory, String myId) {
+		String result = "";
+		String[] projection = { MediaStore.Images.Media.DATE_TAKEN  };
+		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+		String[] selectionArgs = new String[] { myId.substring(myId
+				.indexOf(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) };
+		Cursor cursor = contentDirectory
+				.getContext()
+				.getContentResolver()
+				.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+						projection, selection, selectionArgs, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+			result = cursor.getString(0);
+			cursor.close();
+		}
+		return result;
+	}
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
-		List<Container> result = new ArrayList<Container>();
-//		String[] projection = { MediaStore.Audio.Artists._ID, MediaStore.Audio.Artists.ARTIST };
-//		String selection = "";
-//		String[] selectionArgs = null;
-//		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, projection, selection,
-//				selectionArgs, MediaStore.Audio.Artists.ARTIST + " ASC");
-//
-//		if (mediaCursor != null) {
-//			mediaCursor.moveToFirst();
-//			while (!mediaCursor.isAfterLast()) {
-//				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Albums._ID));
-//				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST));
-//				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId(), name, "", getMusicTrackSize(contentDirectory, id));
-//				result.add(musicAlbum);			
-//				Log.d(getClass().getName(), "Artists Folder: " + id + " Name: " + name);
-//				mediaCursor.moveToNext();
-//			}
-//		} else {
-//			Log.d(getClass().getName(), "System media store is empty.");
-//		}
-//		mediaCursor.close();
-//		Collections.sort(result, new Comparator<Container>() {
-//
-//			@Override
-//			public int compare(Container lhs, Container rhs) {
-//				return lhs.getTitle().compareTo(rhs.getTitle());
-//			}
-//		});
-
-		return result;		
+		
+		return new ArrayList<Container>();
 	}
 
 	@Override
 	public List<Item> browseItem(YaaccContentDirectory contentDirectory, String myId) {
-		List<Item> result = new ArrayList<Item>();		
+		List<Item> result = new ArrayList<Item>();
+		// Query for all images on external storage
+		String[] projection = { MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE,
+				MediaStore.Images.Media.SIZE,MediaStore.Images.Media.DATE_TAKEN  };
+		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+		String[] selectionArgs = new String[] { myId.substring(myId
+				.indexOf(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) };
+		Cursor mImageCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
+				selectionArgs, MediaStore.Images.Media.DISPLAY_NAME + " ASC");
+
+		if (mImageCursor != null) {
+			mImageCursor.moveToFirst();
+			while (!mImageCursor.isAfterLast()) {
+				String id = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+				String name = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+				Long size = Long.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
+				Log.d(getClass().getName(),
+						"Mimetype: " + mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+				MimeType mimeType = MimeType.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+				// file parameter only needed for media players which decide the
+				// ability of playing a file by the file extension
+				String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
+				Res resource = new Res(mimeType, size, uri);
+				
+				Photo photo = new Photo(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId()+id, myId, name, "", "", resource);
+				URI albumArtUri = URI.create("http://"
+						+ contentDirectory.getIpAddress() + ":"
+						+ YaaccUpnpServerService.PORT + "/?thumb=" + id);
+				photo.replaceFirstProperty(new UPNP.ALBUM_ART_URI(
+						albumArtUri));
+				
+				result.add(photo);
+				Log.d(getClass().getName(), "Image: " + id + " Name: " + name + " uri: " + uri);
+				mImageCursor.moveToNext();
+			}
+			mImageCursor.close();
+		} else {
+			Log.d(getClass().getName(), "System media store is empty.");
+		}
 		return result;
 		
 	}

@@ -48,7 +48,7 @@ public class ImagesFolderBrowser extends ContentBrowser {
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
         result.add((Container)new ImagesAllFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId()));
-        result.add((Container)new ImagesByDateFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId()));        
+        result.add((Container)new ImagesByDatesFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId()));        
         return result;
 	}
 

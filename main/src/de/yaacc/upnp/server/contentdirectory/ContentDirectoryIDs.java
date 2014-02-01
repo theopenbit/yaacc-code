@@ -4,7 +4,7 @@ public enum ContentDirectoryIDs {
 	PARENT_OF_ROOT("-1"),
 	ROOT("0"),
     IMAGES_FOLDER("-100"),
-    IMAGES_BY_DATE_FOLDER("-200"),
+    IMAGES_BY_DATE_FOLDER("-200"),    
     IMAGES_BY_DATE_PREFIX("-210"),
     IMAGE_BY_DATE_PREFIX("-220"),
     IMAGES_ALL_FOLDER("-300"),

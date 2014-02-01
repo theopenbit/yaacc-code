@@ -462,9 +462,11 @@ public class YaaccContentDirectory {
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId())) {
 			result = new ImagesAllFolderBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId())) {
-			result = new ImagesByDateFolderBrowser();
+			result = new ImagesByDatesFolderBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_ALL_PREFIX.getId())) {
 			result = new ImageAllItemBrowser();
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) {
+			result = new ImagesByDateFolderBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) {
 			result = new ImageByDatetemBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.VIDEO_PREFIX.getId())) {

@@ -52,9 +52,10 @@ public class ImageByDatetemBrowser extends ContentBrowser {
 		Item result = null;
 		String[] projection = { MediaStore.Images.Media._ID,
 				MediaStore.Images.Media.DISPLAY_NAME,
-				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE };
-		String selection = MediaStore.Images.Media._ID + "= ?";
-		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId().length()) };
+				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE , MediaStore.Images.Media.DATE_TAKEN};
+		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+		String[] selectionArgs = new String[] { myId.substring(myId
+				.indexOf(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) };
 		Cursor mImageCursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -64,26 +65,28 @@ public class ImageByDatetemBrowser extends ContentBrowser {
 		if (mImageCursor != null) {
 			mImageCursor.moveToFirst();
 			String id = mImageCursor.getString(mImageCursor
-					.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+					.getColumnIndex(MediaStore.Images.Media._ID));
 			String name = mImageCursor
 					.getString(mImageCursor
-							.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+							.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
 			Long size = Long.valueOf(mImageCursor.getString(mImageCursor
-					.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
+					.getColumnIndex(MediaStore.Images.Media.SIZE)));
+			Long dateTaken = Long.valueOf(mImageCursor.getString(mImageCursor
+					.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN)));
 			Log.d(getClass().getName(),
 					"Mimetype: "
 							+ mImageCursor.getString(mImageCursor
-									.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+									.getColumnIndex(MediaStore.Images.Media.MIME_TYPE)));
 			MimeType mimeType = MimeType
 					.valueOf(mImageCursor.getString(mImageCursor
-							.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+							.getColumnIndex(MediaStore.Images.Media.MIME_TYPE)));
 			// file parameter only needed for media players which decide the
 			// ability of playing a file by the file extension
 			String uri = "http://" + contentDirectory.getIpAddress() + ":"
 					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 			Res resource = new Res(mimeType, size, uri);
-			result = new Photo(ContentDirectoryIDs.IMAGE_ALL_PREFIX.getId() + id,
-					ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "",
+			result = new Photo(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId() + id,
+					ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId()+dateTaken, name, "", "",
 					resource);
 			URI albumArtUri = URI.create("http://"
 					+ contentDirectory.getIpAddress() + ":"
