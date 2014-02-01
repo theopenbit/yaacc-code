@@ -341,6 +341,8 @@ fi
 apt-get install gtk2-engines-oxygen -y
 apt-get install gtk-theme-switch  -y
 apt-get install eclipse -y
+apt-get install kdiff3 -y
+
 if [  -d "/home/$developerName/.swt/lib/linux" ]
 then
   cd /home/$developerName/.swt/lib/linux
