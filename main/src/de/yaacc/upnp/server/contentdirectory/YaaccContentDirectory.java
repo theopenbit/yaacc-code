@@ -459,8 +459,14 @@ public class YaaccContentDirectory {
 			result = new MusicAlbumItemBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_ARTIST_ITEM_PREFIX.getId())) {
 			result = new MusicArtistItemBrowser();
-		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_PREFIX.getId())) {
-			result = new ImageItemBrowser();
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId())) {
+			result = new ImagesAllFolderBrowser();
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId())) {
+			result = new ImagesByDateFolderBrowser();
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_ALL_PREFIX.getId())) {
+			result = new ImageAllItemBrowser();
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) {
+			result = new ImageByDatetemBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.VIDEO_PREFIX.getId())) {
 			result = new VideoItemBrowser();
 		}

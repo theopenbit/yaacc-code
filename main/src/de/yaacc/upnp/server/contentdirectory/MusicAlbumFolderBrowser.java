@@ -132,7 +132,7 @@ public class MusicAlbumFolderBrowser extends ContentBrowser {
 				.getContext()
 				.getContentResolver()
 				.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
-						selection, selectionArgs, null);
+						selection, selectionArgs, MediaStore.Audio.Media.DISPLAY_NAME + " ASC");
 
 		if (mediaCursor != null) {
 			mediaCursor.moveToFirst();

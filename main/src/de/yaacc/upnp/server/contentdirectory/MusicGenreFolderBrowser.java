@@ -136,7 +136,7 @@ public class MusicGenreFolderBrowser extends ContentBrowser {
 						Long.parseLong(myId
 								.substring(ContentDirectoryIDs.MUSIC_GENRE_PREFIX
 										.getId().length()))), projection,
-						selection, selectionArgs, null);
+						selection, selectionArgs, MediaStore.Audio.Genres.Members.DISPLAY_NAME + " ASC");
 
 		if (mediaCursor != null) {
 			mediaCursor.moveToFirst();
