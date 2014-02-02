@@ -25,6 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.Locale;
 
 import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -32,14 +34,17 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpStatus;
 import org.apache.http.MethodNotSupportedException;
+import org.apache.http.ParseException;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpService;
 import org.eclipse.jetty.http.MimeTypes;
+import org.fourthline.cling.transport.impl.apache.HeaderUtil;
 import org.seamless.util.MimeType;
 
 import de.yaacc.R;
@@ -99,10 +104,12 @@ public class YaaccHttpService extends HttpService {
 
 		Uri requestUri = Uri.parse(request.getRequestLine().getUri());
 		String contentId = requestUri.getQueryParameter("id");
+		contentId = contentId == null ? "" : contentId;
 		String albumId = requestUri.getQueryParameter("album");
-		if ((contentId == null || contentId.equals(""))
-				&& (albumId == null || albumId.equals(""))) {
-
+		albumId = albumId == null ? "" : albumId;
+		String thumbId = requestUri.getQueryParameter("thumb");
+		thumbId = thumbId == null ? "" : thumbId;
+		if (contentId.equals("") && albumId.equals("") && thumbId.equals("")) {
 			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 			StringEntity entity = new StringEntity(
 					"<html><body><h1>Access denied</h1></body></html>", "UTF-8");
@@ -111,24 +118,26 @@ public class YaaccHttpService extends HttpService {
 			return;
 		}
 		ContentHolder contentHolder = null;
-		if (!(contentId == null || contentId.equals(""))) {
+		if (!contentId.equals("")) {
 			contentHolder = lookupContent(contentId);
 
-		} else if (!(albumId == null || albumId.equals(""))) {
+		} else if (!albumId.equals("")) {
 			contentHolder = lookupAlbumArt(albumId);
+		} else if (!thumbId.equals("")) {
+			contentHolder = lookupThumbnail(thumbId);
 		}
 		if (contentHolder == null) {
 			// tricky but works
 			Log.d(getClass().getName(), "Resource with id " + contentId
-					+ albumId + " not found");
+					+ albumId + thumbId + " not found");
 			response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 			StringEntity entity = new StringEntity(
 					"<html><body><h1>Resource with id " + contentId + albumId
-							+ " not found</h1></body></html>", "UTF-8");
+							+ thumbId + " not found</h1></body></html>",
+					"UTF-8");
 			response.setEntity(entity);
 		} else {
 
-			
 			response.setStatusCode(HttpStatus.SC_OK);
 			response.setEntity(contentHolder.getHttpEntity());
 		}
@@ -195,12 +204,11 @@ public class YaaccHttpService extends HttpService {
 	 */
 	private ContentHolder lookupAlbumArt(String albumId) {
 
-		
-		ContentHolder result = new ContentHolder(MimeType.valueOf("image/png"),getDefaultIcon());
+		ContentHolder result = new ContentHolder(MimeType.valueOf("image/png"),
+				getDefaultIcon());
 		if (albumId == null) {
 			return null;
 		}
-		// FixME need for default icon!
 		Log.d(getClass().getName(), "System media store lookup album: "
 				+ albumId);
 		String[] projection = { MediaStore.Audio.Albums._ID,
@@ -219,15 +227,15 @@ public class YaaccHttpService extends HttpService {
 				String dataUri = cursor.getString(cursor
 						.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
 
-				String mimeTypeStr = null;
+				// String mimeTypeStr = null;
 				// FIXME mime type resolving cursor
 				// .getString(cursor
 				// .getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE));
 
 				MimeType mimeType = MimeType.valueOf("image/png");
-				if (mimeTypeStr != null) {
-					mimeType = MimeType.valueOf(mimeTypeStr);
-				}
+				// if (mimeTypeStr != null) {
+				// mimeType = MimeType.valueOf(mimeTypeStr);
+				// }
 				if (dataUri != null) {
 					Log.d(getClass().getName(), "Content found: " + mimeType
 							+ " Uri: " + dataUri);
@@ -242,8 +250,51 @@ public class YaaccHttpService extends HttpService {
 		return result;
 	}
 
+	/**
+	 * Lookup a thumbnail content in the mediastore
+	 * 
+	 * @param idStr
+	 *            the id of the thumbnail
+	 * @return the content description
+	 */
+	private ContentHolder lookupThumbnail(String idStr) {
+
+		ContentHolder result = new ContentHolder(MimeType.valueOf("image/png"),
+				getDefaultIcon());
+		if (idStr == null) {
+			return null;
+		}
+		Long id = null;
+		try {
+			id = Long.valueOf(idStr);
+		} catch (NumberFormatException nfe) {
+			Log.d(getClass().getName(), "ParsingError of id: " + idStr, nfe);
+			return null;
+		}
+
+		Log.d(getClass().getName(), "System media store lookup thumbnail: "
+				+ idStr);
+		Bitmap bitmap = MediaStore.Images.Thumbnails.getThumbnail(getContext()
+				.getContentResolver(), id,
+				MediaStore.Images.Thumbnails.MINI_KIND, null);
+		if (bitmap != null) {
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+			byte[] byteArray = stream.toByteArray();
+
+			MimeType mimeType = MimeType.valueOf("image/png");
+
+			result = new ContentHolder(mimeType, byteArray);
+
+		} else {
+			Log.d(getClass().getName(), "System media store is empty.");
+		}
+		return result;
+	}
+
 	private byte[] getDefaultIcon() {
-		Drawable drawable = getContext().getResources().getDrawable(R.drawable.yaacc48_24_png);
+		Drawable drawable = getContext().getResources().getDrawable(
+				R.drawable.yaacc48_24_png);
 		byte[] result = null;
 		if (drawable != null) {
 			Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
@@ -262,8 +313,7 @@ public class YaaccHttpService extends HttpService {
 	static class ContentHolder {
 		private String uri;
 		private MimeType mimeType;
-		private byte[]  content; 
-		
+		private byte[] content;
 
 		public ContentHolder(MimeType mimeType, String uri) {
 			this.uri = uri;
@@ -276,6 +326,7 @@ public class YaaccHttpService extends HttpService {
 			this.mimeType = mimeType;
 
 		}
+
 		/**
 		 * @return the uri
 		 */
@@ -289,21 +340,21 @@ public class YaaccHttpService extends HttpService {
 		public MimeType getMimeType() {
 			return mimeType;
 		}
-		
-		public HttpEntity getHttpEntity(){
+
+		public HttpEntity getHttpEntity() {
 			HttpEntity result = null;
-			if( getUri() != null && !getUri().equals("")) {
+			if (getUri() != null && !getUri().equals("")) {
 				File file = new File(getUri());
-				
-				result= new FileEntity(file, getMimeType()
-						.toString());
-				Log.d(getClass().getName(),
-						"Return file-Uri: " + getUri() + "Mimetype: "
-								+ getMimeType());				
-			} else if(content != null){
+
+				result = new FileEntity(file, getMimeType().toString());
+				Log.d(getClass().getName(), "Return file-Uri: " + getUri()
+						+ "Mimetype: " + getMimeType());
+			} else if (content != null) {
 				result = new ByteArrayEntity(content);
+				((ByteArrayEntity) result).setContentType(new BasicHeader(
+						"Content-Type", getMimeType().toString()));
 			}
-			return  result;
+			return result;
 		}
 	}
 }

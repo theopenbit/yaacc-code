@@ -89,7 +89,7 @@ public class MusicAlbumsFolderBrowser extends ContentBrowser {
 		String selection = "";
 		String[] selectionArgs = null;
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection, selection,
-				selectionArgs, null);
+				selectionArgs, MediaStore.Audio.Albums.ALBUM + " ASC");
 
 		if (mediaCursor != null) {
 			mediaCursor.moveToFirst();

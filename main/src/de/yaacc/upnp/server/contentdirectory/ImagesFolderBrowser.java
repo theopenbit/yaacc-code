@@ -22,18 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.DescMeta;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
+import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
-import org.fourthline.cling.support.model.item.Photo;
-import org.seamless.util.MimeType;
-
-import android.database.Cursor;
-import android.provider.MediaStore;
-import android.util.Log;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for the image folder.
  * 
@@ -46,68 +37,25 @@ public class ImagesFolderBrowser extends ContentBrowser {
 	@Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryIDs.IMAGES_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Images", "yaacc", getSize(contentDirectory, myId));
-		return photoAlbum;
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.IMAGES_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Images", "yaacc", 4,
+				907000L);
+		return folder;
 	}
 
-	private Integer getSize(YaaccContentDirectory contentDirectory, String myId){
-		 Integer result = 0;
-				String[] projection = { "count(*) as count" };
-				String selection = "";
-				String[] selectionArgs = null;
-				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-						selectionArgs, null);
 
-				if (cursor != null) {
-					cursor.moveToFirst();
-					result = Integer.valueOf(cursor.getString(0));
-					cursor.close();
-				}
-				return result;
-	}
 	
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
-		
-		return new ArrayList<Container>();
+		List<Container> result = new ArrayList<Container>();
+        result.add((Container)new ImagesAllFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId()));
+        result.add((Container)new ImagesByDatesFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId()));        
+        return result;
 	}
 
 	@Override
 	public List<Item> browseItem(YaaccContentDirectory contentDirectory, String myId) {
 		List<Item> result = new ArrayList<Item>();
-		// Query for all images on external storage
-		String[] projection = { MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE,
-				MediaStore.Images.Media.SIZE };
-		String selection = "";
-		String[] selectionArgs = null;
-		Cursor mImageCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-				selectionArgs, null);
-
-		if (mImageCursor != null) {
-			mImageCursor.moveToFirst();
-			while (!mImageCursor.isAfterLast()) {
-				String id = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID));
-				String name = mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
-				Long size = Long.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
-				Log.d(getClass().getName(),
-						"Mimetype: " + mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
-				MimeType mimeType = MimeType.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
-				// file parameter only needed for media players which decide the
-				// ability of playing a file by the file extension
-				String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f='" + name + "'";
-				Res resource = new Res(mimeType, size, uri);
-				
-				Photo photo = new Photo(ContentDirectoryIDs.IMAGE_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "", resource);
-	
-				
-				result.add(photo);
-				Log.d(getClass().getName(), "Image: " + id + " Name: " + name + " uri: " + uri);
-				mImageCursor.moveToNext();
-			}
-			mImageCursor.close();
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
+		
 		return result;
 		
 	}

@@ -18,11 +18,13 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.item.Item;
@@ -32,6 +34,7 @@ import org.seamless.util.MimeType;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for an  image item.
@@ -40,7 +43,7 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * @author openbit (Tobias Schoene)
  * 
  */
-public class ImageItemBrowser extends ContentBrowser {
+public class ImageByDatetemBrowser extends ContentBrowser {
 
 
 	@Override
@@ -49,9 +52,10 @@ public class ImageItemBrowser extends ContentBrowser {
 		Item result = null;
 		String[] projection = { MediaStore.Images.Media._ID,
 				MediaStore.Images.Media.DISPLAY_NAME,
-				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE };
-		String selection = MediaStore.Images.Media._ID + "= ?";
-		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGE_PREFIX.getId().length()) };
+				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE , MediaStore.Images.Media.DATE_TAKEN};
+		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+		String[] selectionArgs = new String[] { myId.substring(myId
+				.indexOf(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) };
 		Cursor mImageCursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -61,28 +65,34 @@ public class ImageItemBrowser extends ContentBrowser {
 		if (mImageCursor != null) {
 			mImageCursor.moveToFirst();
 			String id = mImageCursor.getString(mImageCursor
-					.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+					.getColumnIndex(MediaStore.Images.Media._ID));
 			String name = mImageCursor
 					.getString(mImageCursor
-							.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+							.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
 			Long size = Long.valueOf(mImageCursor.getString(mImageCursor
-					.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
+					.getColumnIndex(MediaStore.Images.Media.SIZE)));
+			Long dateTaken = Long.valueOf(mImageCursor.getString(mImageCursor
+					.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN)));
 			Log.d(getClass().getName(),
 					"Mimetype: "
 							+ mImageCursor.getString(mImageCursor
-									.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+									.getColumnIndex(MediaStore.Images.Media.MIME_TYPE)));
 			MimeType mimeType = MimeType
 					.valueOf(mImageCursor.getString(mImageCursor
-							.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+							.getColumnIndex(MediaStore.Images.Media.MIME_TYPE)));
 			// file parameter only needed for media players which decide the
 			// ability of playing a file by the file extension
 			String uri = "http://" + contentDirectory.getIpAddress() + ":"
-					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f='"
-					+ name + "'";
+					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 			Res resource = new Res(mimeType, size, uri);
-			result = new Photo(ContentDirectoryIDs.IMAGE_PREFIX.getId() + id,
-					ContentDirectoryIDs.IMAGES_FOLDER.getId(), name, "", "",
+			result = new Photo(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId() + id,
+					ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId()+dateTaken, name, "", "",
 					resource);
+			URI albumArtUri = URI.create("http://"
+					+ contentDirectory.getIpAddress() + ":"
+					+ YaaccUpnpServerService.PORT + "/?thumb=" + id);
+			result.replaceFirstProperty(new UPNP.ALBUM_ART_URI(
+					albumArtUri));
 			Log.d(getClass().getName(), "Image: " + id + " Name: " + name
 					+ " uri: " + uri);
 			mImageCursor.close();

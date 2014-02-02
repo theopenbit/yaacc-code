@@ -18,14 +18,17 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.container.MusicAlbum;
+import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 
@@ -33,20 +36,19 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 /**
- * Browser  for the music artists folder.
+ * Browser  for the image folder.
  * 
  * 
  * @author openbit (Tobias Schoene)
  * 
  */
-public class MusicArtistsFolderBrowser extends ContentBrowser {
+public class ImagesByDatesFolderBrowser extends ContentBrowser {
 
 	@Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_ARTISTS_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "Artists", "yaacc", getSize(contentDirectory,myId),
-				907000L);
-		return folder;
+		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId(), ContentDirectoryIDs.IMAGES_FOLDER.getId(), "by date", "yaacc", getSize(contentDirectory, myId));
+		return photoAlbum;
 	}
 
 	private Integer getSize(YaaccContentDirectory contentDirectory, String myId){
@@ -54,7 +56,7 @@ public class MusicArtistsFolderBrowser extends ContentBrowser {
 				String[] projection = { "count(*) as count" };
 				String selection = "";
 				String[] selectionArgs = null;
-				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, projection, selection,
+				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
 						selectionArgs, null);
 
 				if (cursor != null) {
@@ -65,13 +67,12 @@ public class MusicArtistsFolderBrowser extends ContentBrowser {
 				return result;
 	}
 	
-	
-	private Integer getMusicTrackSize(YaaccContentDirectory contentDirectory, String parentId){
+	private Integer getDateFolderSize(YaaccContentDirectory contentDirectory, String dateStr){
 		 Integer result = 0;
 				String[] projection = { "count(*) as count" };
-				String selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
-				String[] selectionArgs = new String[]{parentId};
-				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection,
+				String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+				String[] selectionArgs = new String[]{dateStr};
+				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
 						selectionArgs, null);
 
 				if (cursor != null) {
@@ -81,24 +82,27 @@ public class MusicArtistsFolderBrowser extends ContentBrowser {
 				}
 				return result;
 	}
+	
+	
+	
 	
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
-		String[] projection = { MediaStore.Audio.Artists._ID, MediaStore.Audio.Artists.ARTIST };
-		String selection = "";
+		String[] projection = { MediaStore.Images.Media.DATE_TAKEN};
+		String selection = "0 == 0 ) group by ( " + MediaStore.Images.Media.DATE_TAKEN ;
 		String[] selectionArgs = null;
-		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, projection, selection,
-				selectionArgs, MediaStore.Audio.Artists.ARTIST + " ASC");
-
+		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
+				selectionArgs, MediaStore.Images.Media.DATE_TAKEN + " ASC");
+		DateFormat dateformat = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM);
 		if (mediaCursor != null) {
 			mediaCursor.moveToFirst();
 			while (!mediaCursor.isAfterLast()) {
-				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Albums._ID));
-				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST));
-				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId(), name, "", getMusicTrackSize(contentDirectory, id));
-				result.add(musicAlbum);			
-				Log.d(getClass().getName(), "Artists Folder: " + id + " Name: " + name);
+				Long id = mediaCursor.getLong(mediaCursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
+				String name = ( id > -1) ?  dateformat.format(new Date(id)): "<unknown>";
+				StorageFolder imageFolder = new StorageFolder(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId(), name, "yaacc", getDateFolderSize(contentDirectory,name),90700L);
+				result.add(imageFolder);			
+				Log.d(getClass().getName(), "image by date folder: " + id + " Name: " + name);
 				mediaCursor.moveToNext();
 			}
 		} else {
@@ -113,13 +117,12 @@ public class MusicArtistsFolderBrowser extends ContentBrowser {
 			}
 		});
 
-		return result;
+		return result;		
 	}
 
 	@Override
 	public List<Item> browseItem(YaaccContentDirectory contentDirectory, String myId) {
-		List<Item> result = new ArrayList<Item>();
-		
+		List<Item> result = new ArrayList<Item>();		
 		return result;
 		
 	}

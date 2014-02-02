@@ -38,6 +38,7 @@ import org.seamless.util.MimeType;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -131,7 +132,7 @@ public class MusicAlbumFolderBrowser extends ContentBrowser {
 				.getContext()
 				.getContentResolver()
 				.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
-						selection, selectionArgs, null);
+						selection, selectionArgs, MediaStore.Audio.Media.DISPLAY_NAME + " ASC");
 
 		if (mediaCursor != null) {
 			mediaCursor.moveToFirst();
@@ -164,16 +165,10 @@ public class MusicAlbumFolderBrowser extends ContentBrowser {
 								.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)));
 				// file parameter only needed for media players which decide
 				// the
-				// ability of playing a file by the file extension
-				String encodedName = "";
-				try {
-					encodedName = URLEncoder.encode(name, "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					Log.e(getClass().getName(), "Unable to encode item name", e);
-				}
+				// ability of playing a file by the file extension				
 				String uri = "http://" + contentDirectory.getIpAddress() + ":"
-						+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f='"
-						+ encodedName + "'";
+						+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file."
+						+ MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 				URI albumArtUri = URI.create("http://"
 						+ contentDirectory.getIpAddress() + ":"
 						+ YaaccUpnpServerService.PORT + "/?album=" + albumId);
@@ -183,7 +178,7 @@ public class MusicAlbumFolderBrowser extends ContentBrowser {
 						ContentDirectoryIDs.MUSIC_ALBUM_ITEM_PREFIX.getId()
 								+ id,
 						ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId()
-								+ albumId, title + "-(" + name + ")", "",
+								+ albumId, title , "",
 						album, artist, resource);
 				musicTrack.replaceFirstProperty(new UPNP.ALBUM_ART_URI(
 						albumArtUri));
