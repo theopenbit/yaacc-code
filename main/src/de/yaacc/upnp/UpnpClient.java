@@ -651,13 +651,14 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
                     return callbackResult;
                 }
 
-            }
-
-            if(null != audioFiles){
-                audioFiles.add(currentItem);
             } else {
-                audioFiles = new LinkedList<Item>();
-                audioFiles.add(currentItem);
+
+                if(null != audioFiles){
+                    audioFiles.add(currentItem);
+                } else {
+                    audioFiles = new LinkedList<Item>();
+                    audioFiles.add(currentItem);
+                }
             }
         }
 
