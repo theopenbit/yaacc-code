@@ -81,7 +81,7 @@ if ARGV[0] == "up"
 
 	if ! File.exist?("bootstrap.sh")
 	  puts "Download box configuration file bootstrap.sh "
-	  system("wget https://sourceforge.net/p/yaacc/code/ci/release1.1/tree/vagrant/bootstrap.sh?format=raw -O bootstrap.sh")
+	  system("wget https://sourceforge.net/p/yaacc/code/ci/release-1.1.4/tree/vagrant/bootstrap.sh?format=raw -O bootstrap.sh")
 	end
 
 	if ! File.exist?($yaaccSecretPath)  
