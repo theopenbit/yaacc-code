@@ -468,7 +468,7 @@ public class YaaccContentDirectory {
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) {
 			result = new ImagesByDateFolderBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) {
-			result = new ImageByDatetemBrowser();
+			result = new ImageByDateItemBrowser();
 		}else if (objectID.startsWith(ContentDirectoryIDs.VIDEO_PREFIX.getId())) {
 			result = new VideoItemBrowser();
 		}

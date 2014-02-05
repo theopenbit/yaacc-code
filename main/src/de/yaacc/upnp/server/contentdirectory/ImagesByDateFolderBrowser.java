@@ -75,8 +75,7 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 		String result = "";
 		String[] projection = { MediaStore.Images.Media.DATE_TAKEN  };
 		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
-		String[] selectionArgs = new String[] { myId.substring(myId
-				.indexOf(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) };
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId().length()) };
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -103,11 +102,9 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 		String[] projection = { MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE,
 				MediaStore.Images.Media.SIZE,MediaStore.Images.Media.DATE_TAKEN  };
 		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
-		String[] selectionArgs = new String[] { myId.substring(myId
-				.indexOf(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) };
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId().length()) };
 		Cursor mImageCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, MediaStore.Images.Media.DISPLAY_NAME + " ASC");
-
 		if (mImageCursor != null) {
 			mImageCursor.moveToFirst();
 			while (!mImageCursor.isAfterLast()) {

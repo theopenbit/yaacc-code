@@ -639,8 +639,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
             return callbackResult;
         }
         URI albumArtUri = null;
-        LinkedList<Item> audioFiles = null;
-
+        LinkedList<Item> audioFiles = new LinkedList<Item>();
+        
+        if(cont.getItems().size() == 1){
+        	//nothing to enrich
+        	return callbackResult;
+        }
+        
         for(Item currentItem: cont.getItems()){
             if(!(currentItem instanceof AudioItem)){
                 if(null == albumArtUri &&(currentItem instanceof ImageItem)){

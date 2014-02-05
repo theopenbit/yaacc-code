@@ -40,10 +40,10 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * Browser  for an  image item.
  * 
  * 
- * @author openbit (Tobias Schoene)
+ * @author TheOpenBit (Tobias Schoene)
  * 
  */
-public class ImageByDatetemBrowser extends ContentBrowser {
+public class ImageByDateItemBrowser extends ContentBrowser {
 
 
 	@Override
@@ -54,8 +54,7 @@ public class ImageByDatetemBrowser extends ContentBrowser {
 				MediaStore.Images.Media.DISPLAY_NAME,
 				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE , MediaStore.Images.Media.DATE_TAKEN};
 		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
-		String[] selectionArgs = new String[] { myId.substring(myId
-				.indexOf(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) };
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId().length())};
 		Cursor mImageCursor = contentDirectory
 				.getContext()
 				.getContentResolver()

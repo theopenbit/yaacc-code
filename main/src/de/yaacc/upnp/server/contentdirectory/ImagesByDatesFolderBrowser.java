@@ -89,8 +89,8 @@ public class ImagesByDatesFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
-		String[] projection = { MediaStore.Images.Media.DATE_TAKEN};
-		String selection = "0 == 0 ) group by ( " + MediaStore.Images.Media.DATE_TAKEN ;
+		String[] projection = { "distinct substr(" + MediaStore.Images.Media.DATE_TAKEN + ", 0, 7) || '00000'  as date"};
+		String selection = "0 == 0 ) group by ( substr(" + MediaStore.Images.Media.DATE_TAKEN + ", 0, 7) ";
 		String[] selectionArgs = null;
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, MediaStore.Images.Media.DATE_TAKEN + " ASC");
@@ -98,7 +98,7 @@ public class ImagesByDatesFolderBrowser extends ContentBrowser {
 		if (mediaCursor != null) {
 			mediaCursor.moveToFirst();
 			while (!mediaCursor.isAfterLast()) {
-				Long id = mediaCursor.getLong(mediaCursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
+				Long id = mediaCursor.getLong(mediaCursor.getColumnIndex("date"));
 				String name = ( id > -1) ?  dateformat.format(new Date(id)): "<unknown>";
 				StorageFolder imageFolder = new StorageFolder(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId(), name, "yaacc", getDateFolderSize(contentDirectory,name),90700L);
 				result.add(imageFolder);			
