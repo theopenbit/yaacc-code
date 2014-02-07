@@ -622,8 +622,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				;
 		}
 
-
-		return enrichWithCover(result);
+        if(preferences.getBoolean(context.getString(R.string.settings_browse_thumbnails_coverlookup_chkbx), false)){
+		    result = enrichWithCover(result);
+        }
+        return result;
 	}
 
     /**
@@ -725,7 +727,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID, flag, filter, firstResult, maxResults, result, orderBy);
 			getControlPoint().execute(actionCallback);
 		}
-		return result;
+        if(preferences.getBoolean(context.getString(R.string.settings_browse_thumbnails_coverlookup_chkbx), false)){
+            result = enrichWithCover(result);
+        }
+        return result;
 	}
 
 	/**
