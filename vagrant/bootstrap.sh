@@ -350,6 +350,16 @@ then
   sudo -n -u $developerName  ln -s /usr/lib/jni x86_64
 fi
 ############################################
+# install android studion
+############################################
+cd /home/$developerName/
+if [ ! -d "./android-studio" ] 
+then
+  sudo -n -u $developerName wget http://dl.google.com/android/studio/install/0.4.2/android-studio-bundle-133.970939-linux.tgz
+  sudo -n -u $developerName tar -xvfz android-studio-bundle-133.970939-linux.tgz  
+fi
+
+############################################
 # install qgit
 ############################################
 apt-get install qgit -y
