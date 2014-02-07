@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+*
+* Copyright (C) 2013 www.yaacc.de
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 3
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+-->
+<resources>
+    <string name="settings_category_send_rec">Sending and Receiving</string>
+    <string name="settings_category_browsing">Media browsing behavior</string>
+    <string name="settings_selected_provider_title">Current media provider</string>
+    <string name="settings_change_provider">Tab to change current provider</string>
+    <string name="settings_selected_receivers_title">Current media receivers</string>
+    <string name="settings_change_receiver">Tab to change current receiver</string>
+    <string name="settings_audio_app">Audio Playback</string>
+    <string name="settings_video_app">Image Playback</string>
+    <string name="settings_image_app">Video Playback</string>
+    <string name="settings_default_duration">default item duration</string>
+    <string name="settings_default_duration_key">default item duration</string>
+    <string name="settings_silence_duration">silence duration</string>
+    <string name="settings_silence_duration_key">silence duration</string>
+    <string name="settings_audio_app_on">Local audio playback directly in YAACC is enabled</string>
+    <string name="settings_audio_app_off">Local audio playback opens a third party application</string>
+    <string name="settings_image_app_on">Local image playback directly in YAACC is enabled</string>
+    <string name="settings_image_app_off">Local image playback opens a third party application</string>
+    <string name="settings_video_app_on">Local video playback directly in YAACC is enabled</string>
+    <string name="settings_video_app_off">Local video playback opens a third party application</string>
+    <string name="settings_browse_audio_on">Show audio files</string>
+    <string name="settings_browse_audio_off">Show no audio files</string>
+    <string name="settings_browse_video_on">Show video files</string>
+    <string name="settings_browse_video_off">Show no video files</string>
+    <string name="settings_browse_image_on">Show image files</string>
+    <string name="settings_browse_image_off">Show no image files</string>
+    <string name="settings_thumbnails_chkbx" translateable="false">thumbnails_chkbx</string>
+    <string name="settings_browse_thumbnails_on">Show image thumbnails</string>
+    <string name="settings_browse_thumbnails_off">Show no image thumbnails</string>
+    <string name="settings_browse_thumbnails_coverlookup_on">Images in directories are used as music covers</string>
+    <string name="settings_browse_thumbnails_coverlookup_off">Images in directories are not used as covers</string>
+    <string name="settings_browse_thumbnails_coverlookup_chkbx" translatable="false">thumbnail_cover_lookup_chkbx</string>
+    <string name="settings_no_content_found">No content found for browsing</string>
+    <string name="settings_audio_chkbx">audio_chkbx</string>
+    <string name="settings_video_chkbx">video_chkbx</string>
+    <string name="settings_image_chkbx">image_chkbx</string>
+    <string name="settings_local_server_title">Local server configuration</string>
+    <string name="settings_local_server_started">local server is started</string>
+    <string name="settings_local_server_stopped">local server is stopped</string>
+    <string name="settings_local_server_chkbx">local_server_chkbx</string>
+    <string name="settings_local_server_receiver_off">media receiver is disabled</string>
+    <string name="settings_local_server_receiver_on">media receiver is enabled</string>
+    <string name="settings_local_server_receiver_chkbx">local_server_receiver_chkbx</string>
+    <string name="settings_local_server_provider_off">content directory is disabled</string>
+    <string name="settings_local_server_provider_on">content directory is enabled</string>
+    <string name="settings_local_server_provider_chkbx">local_server_provider_chkbx</string>
+    <string name="settings_local_server_testcontent">local server using test content</string>
+    <string name="settings_local_server_mediastore">local server using mediastore</string>
+    <string name="settings_local_server_testcontent_chkbx" translatable="false">local_server_testcontent_chkbx</string>
+    <string name="settings_local_server_name">network name for local server</string>
+    <string name="settings_local_server_name_key">Local server name</string>
+    <string name="settings_local_server_autostart_deactivated">Server will not start after booting</string>
+    <string name="settings_local_server_autostart_activated">Server will start after booting</string>
+    <string name="settings_local_server_autostart_chkbx">settings_local_server_autostart_chkbx</string>
+    <string name="settings_sending_upnp_alive_interval">Sending upnp alive notifications</string>
+    <string name="settings_sending_upnp_alive_interval_key" translatable="false">settings_sending_upnp_alive_interval_key</string>
+    <string name="settings_category_playing">Media playing behavior</string>
+    <string name="settings_replay_playlist_chkbx">settings_replay_playlist_chkbx</string>
+    <string name="settings_replay_playlist_on">Replay playlist</string>
+    <string name="settings_replay_playlist_off">Don\'t replay playlist</string>
+    <string name="settings_music_player_shuffle_chkbx">settings_music_player_chkbx</string>
+    <string name="settings_music_player_shuffle_on">Shuffled music play</string>
+    <string name="settings_music_player_shuffle_off">Ordered music play</string>
+</resources>
