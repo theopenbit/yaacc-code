@@ -146,8 +146,10 @@ public class BrowseItemAdapter extends BaseAdapter {
 					false)) {
 				DIDLObject.Property<URI> albumArtProperties = ((AudioItem) currentObject)
 						.getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
-				iconDownloadTask.execute(Uri.parse(albumArtProperties
+                if(null != albumArtProperties){
+				    iconDownloadTask.execute(Uri.parse(albumArtProperties
 						.getValue().toString()));
+                }
 			}
 		} else if (currentObject instanceof ImageItem) {
 			holder.icon.setImageResource(R.drawable.image);
