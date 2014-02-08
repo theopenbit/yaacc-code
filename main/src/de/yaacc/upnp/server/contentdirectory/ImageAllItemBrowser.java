@@ -31,6 +31,7 @@ import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.Photo;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -45,8 +46,11 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  */
 public class ImageAllItemBrowser extends ContentBrowser {
 
+    public ImageAllItemBrowser(Context context) {
+        super(context);
+    }
 
-	@Override
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory,
 			String myId) {
 		Item result = null;

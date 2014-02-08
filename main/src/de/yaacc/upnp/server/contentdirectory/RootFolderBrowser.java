@@ -18,6 +18,8 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +35,11 @@ import org.fourthline.cling.support.model.item.Item;
  * 
  */
 public class RootFolderBrowser extends ContentBrowser {
+    public RootFolderBrowser(Context context) {
+        super(context);
+    }
 
-	@Override
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
 		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.ROOT.getId(), ContentDirectoryIDs.PARENT_OF_ROOT.getId(), "Yaacc", "yaacc", 3,
@@ -47,9 +52,9 @@ public class RootFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
-        result.add((Container)new MusicFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_FOLDER.getId()));
-        result.add((Container)new ImagesFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_FOLDER.getId()));
-        result.add((Container)new VideosFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.VIDEOS_FOLDER.getId()));
+        result.add((Container)new MusicFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_FOLDER.getId()));
+        result.add((Container)new ImagesFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_FOLDER.getId()));
+        result.add((Container)new VideosFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.VIDEOS_FOLDER.getId()));
         
         return result;
 	}

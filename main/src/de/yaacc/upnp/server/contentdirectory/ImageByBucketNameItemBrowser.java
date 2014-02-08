@@ -26,11 +26,11 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.container.PhotoAlbum;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.Photo;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -43,18 +43,21 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * @author TheOpenBit (Tobias Schoene)
  * 
  */
-public class ImageByDateItemBrowser extends ContentBrowser {
+public class ImageByBucketNameItemBrowser extends ContentBrowser {
 
+    public ImageByBucketNameItemBrowser(Context context) {
+        super(context);
+    }
 
-	@Override
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory,
 			String myId) {
 		Item result = null;
 		String[] projection = { MediaStore.Images.Media._ID,
 				MediaStore.Images.Media.DISPLAY_NAME,
 				MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.SIZE , MediaStore.Images.Media.DATE_TAKEN};
-		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
-		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId().length())};
+		String selection = MediaStore.Images.Media.BUCKET_ID+ "=?";
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGE_BY_BUCKET_PREFIX.getId().length())};
 		Cursor mImageCursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -84,8 +87,8 @@ public class ImageByDateItemBrowser extends ContentBrowser {
 			String uri = "http://" + contentDirectory.getIpAddress() + ":"
 					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 			Res resource = new Res(mimeType, size, uri);
-			result = new Photo(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId() + id,
-					ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId()+dateTaken, name, "", "",
+			result = new Photo(ContentDirectoryIDs.IMAGE_BY_BUCKET_PREFIX.getId() + id,
+					ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId()+dateTaken, name, "", "",
 					resource);
 			URI albumArtUri = URI.create("http://"
 					+ contentDirectory.getIpAddress() + ":"

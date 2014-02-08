@@ -22,18 +22,12 @@ import java.beans.PropertyChangeSupport;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.conn.util.InetAddressUtils;
@@ -66,16 +60,11 @@ import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
 import org.fourthline.cling.support.model.item.Photo;
-import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
-import org.seamless.util.time.DateFormat;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.text.format.DateUtils;
 import android.util.Log;
 import de.yaacc.R;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
@@ -430,47 +419,47 @@ public class YaaccContentDirectory {
 	private ContentBrowser findBrowserFor(String objectID) {
 		ContentBrowser  result = null;
 		if(objectID == null || objectID.equals("")|| ContentDirectoryIDs.ROOT.getId().equals(objectID)){
-			result = new RootFolderBrowser();
+			result = new RootFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.IMAGES_FOLDER.getId().equals(objectID)) {
-			result = new ImagesFolderBrowser();
+			result = new ImagesFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.VIDEOS_FOLDER.getId().equals(objectID)) {
-			result = new VideosFolderBrowser();
+			result = new VideosFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.MUSIC_FOLDER.getId().equals(objectID)) {
-			result = new MusicFolderBrowser();
+			result = new MusicFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId().equals(objectID)) {
-			result = new MusicGenresFolderBrowser();
+			result = new MusicGenresFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId().equals(objectID)) {
-			result = new MusicAlbumsFolderBrowser();
+			result = new MusicAlbumsFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.MUSIC_ARTISTS_FOLDER.getId().equals(objectID)) {
-			result = new MusicArtistsFolderBrowser();
+			result = new MusicArtistsFolderBrowser(getContext());
 		}else if (ContentDirectoryIDs.MUSIC_ALL_TITLES_FOLDER.getId().equals(objectID)) {
-			result = new MusicAllTitlesFolderBrowser();
+			result = new MusicAllTitlesFolderBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId())) {
-			result = new MusicAlbumFolderBrowser();
+			result = new MusicAlbumFolderBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_ARTIST_PREFIX.getId())) {
-			result = new MusicArtistFolderBrowser();
+			result = new MusicArtistFolderBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId())) {
-			result = new MusicGenreFolderBrowser();
+			result = new MusicGenreFolderBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_ALL_TITLES_ITEM_PREFIX.getId())) {
-			result = new MusicAllTitleItemBrowser();
+			result = new MusicAllTitleItemBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_GENRE_ITEM_PREFIX.getId())) {
-			result = new MusicGenreItemBrowser();
+			result = new MusicGenreItemBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_ALBUM_ITEM_PREFIX.getId())) {
-			result = new MusicAlbumItemBrowser();
+			result = new MusicAlbumItemBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.MUSIC_ARTIST_ITEM_PREFIX.getId())) {
-			result = new MusicArtistItemBrowser();
+			result = new MusicArtistItemBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId())) {
-			result = new ImagesAllFolderBrowser();
-		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId())) {
-			result = new ImagesByDatesFolderBrowser();
+			result = new ImagesAllFolderBrowser(getContext());
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId())) {
+			result = new ImagesByBucketNamesFolderBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_ALL_PREFIX.getId())) {
-			result = new ImageAllItemBrowser();
-		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) {
-			result = new ImagesByDateFolderBrowser();
-		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId())) {
-			result = new ImageByDateItemBrowser();
+			result = new ImageAllItemBrowser(getContext());
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId())) {
+			result = new ImagesByBucketNameFolderBrowser(getContext());
+		}else if (objectID.startsWith(ContentDirectoryIDs.IMAGE_BY_BUCKET_PREFIX.getId())) {
+			result = new ImageByBucketNameItemBrowser(getContext());
 		}else if (objectID.startsWith(ContentDirectoryIDs.VIDEO_PREFIX.getId())) {
-			result = new VideoItemBrowser();
+			result = new VideoItemBrowser(getContext());
 		}
 		
 		return result;

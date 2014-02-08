@@ -763,7 +763,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Returns all player instances initialized with the given transport object
 	 * 
-	 * @param didlObject
+	 * @param transport
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
@@ -821,7 +821,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Returns all current player instances for the given transport object
 	 * 
-	 * @param didlObject
+	 * @param transport
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */

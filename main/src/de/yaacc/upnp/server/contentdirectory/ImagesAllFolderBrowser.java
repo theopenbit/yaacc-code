@@ -32,10 +32,13 @@ import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.Photo;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+
+import de.yaacc.R;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for the image folder.
@@ -46,10 +49,14 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  */
 public class ImagesAllFolderBrowser extends ContentBrowser {
 
-	@Override
+    public ImagesAllFolderBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId(), ContentDirectoryIDs.IMAGES_FOLDER.getId(), "All Images", "yaacc", getSize(contentDirectory, myId));
+		PhotoAlbum photoAlbum = new PhotoAlbum(ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId(), ContentDirectoryIDs.IMAGES_FOLDER.getId(), getContext().getString(R.string.all_images), "yaacc", getSize(contentDirectory, myId));
 		return photoAlbum;
 	}
 

@@ -29,9 +29,13 @@ import org.fourthline.cling.support.model.container.MusicAlbum;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import de.yaacc.R;
+
 /**
  * Browser  for the music genres folder.
  * 
@@ -40,11 +44,14 @@ import android.util.Log;
  * 
  */
 public class MusicGenresFolderBrowser extends ContentBrowser {
+    public MusicGenresFolderBrowser(Context context) {
+        super(context);
+    }
 
-	@Override
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "Genres", "yaacc", getSize(contentDirectory,myId),
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(),getContext().getString(R.string.genres) , "yaacc", getSize(contentDirectory,myId),
 				907000L);
 		return folder;
 	}
