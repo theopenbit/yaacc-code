@@ -169,7 +169,7 @@ public class MultiContentPlayer extends AbstractPlayer {
 	}
 
     @Override
-    public DIDLObject.Property<URI> getAlbumArt() {
+    public URI getAlbumArt() {
         return null;
     }
 

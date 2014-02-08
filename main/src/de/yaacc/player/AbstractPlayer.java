@@ -58,7 +58,7 @@ public abstract class AbstractPlayer implements Player {
 	private UpnpClient upnpClient;
 	private String name;
 
-    private DIDLObject.Property<URI> albumArtUri;
+    private URI albumArtUri;
 
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -511,7 +511,7 @@ public abstract class AbstractPlayer implements Player {
 		return "";
 	}
 
-    public DIDLObject.Property<URI> getAlbumArtUri(){
+    public URI getAlbumArtUri(){
         return albumArtUri;
     }
 }

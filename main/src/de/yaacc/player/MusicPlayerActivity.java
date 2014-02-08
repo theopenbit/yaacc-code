@@ -227,10 +227,10 @@ public class MusicPlayerActivity extends Activity {
 		next.setText(getPlayer().getNextItemTitle());
 		updateTime();
         ImageView albumArtView = (ImageView) findViewById(R.id.musicActivityImageView);
-        DIDLObject.Property<URI> albumArtUri = getPlayer().getAlbumArt();
+        URI albumArtUri = getPlayer().getAlbumArt();
         if (null != albumArtUri){
             ImageDownloadTask imageDownloadTask = new ImageDownloadTask(albumArtView);
-            imageDownloadTask.execute(Uri.parse(albumArtUri.getValue().toString()));
+            imageDownloadTask.execute(Uri.parse(albumArtUri.toString()));
         }
 
 	}

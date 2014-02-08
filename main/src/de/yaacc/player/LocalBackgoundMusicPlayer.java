@@ -54,7 +54,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	private BackgroundMusicService backgroundMusicService;
 	private boolean watchdog;
 	private Timer commandExecutionTimer;
-    private DIDLObject.Property<URI> albumArtUri;
+    private URI albumArtUri;
 
 	/**
 	 * @param name
@@ -187,7 +187,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 		// because there is no known way to query the activity state
 		// we are sending the command delayed
 
-        albumArtUri = playableItem.getItem().getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+        albumArtUri = playableItem.getItem().getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class).getValue();
 
 		commandExecutionTimer = new Timer();
 		commandExecutionTimer.schedule(new TimerTask() {
@@ -253,7 +253,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	}
 
     @Override
-    public DIDLObject.Property<URI> getAlbumArt() {
+    public URI getAlbumArt() {
         return albumArtUri  ;
     }
 

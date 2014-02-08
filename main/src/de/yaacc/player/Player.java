@@ -142,6 +142,6 @@ public interface Player {
     /**
      *
      */
-    DIDLObject.Property<URI> getAlbumArt();
+    URI getAlbumArt();
 
 }

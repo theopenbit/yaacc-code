@@ -410,7 +410,7 @@ public class LocalImagePlayer implements Player {
 	}
 
     @Override
-    public DIDLObject.Property<URI> getAlbumArt() {
+    public URI getAlbumArt() {
         return null;
     }
 

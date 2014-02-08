@@ -158,7 +158,7 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	}
 
     @Override
-    public DIDLObject.Property<URI> getAlbumArt() {
+    public URI getAlbumArt() {
         return null;
     }
 
