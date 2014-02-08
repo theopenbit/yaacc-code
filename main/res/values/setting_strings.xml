@@ -66,6 +66,15 @@
     <string name="settings_local_server_testcontent">local server using test content</string>
     <string name="settings_local_server_mediastore">local server using mediastore</string>
     <string name="settings_local_server_testcontent_chkbx" translatable="false">local_server_testcontent_chkbx</string>
+    <string name="settings_local_server_serve_images_off">serve images is disabled</string>
+    <string name="settings_local_server_serve_images_on">serve images is enabled</string>
+    <string name="settings_local_server_serve_images_chkbx">local_server_serve_images_chkbx</string>
+    <string name="settings_local_server_serve_music_off">serve music is disabled</string>
+    <string name="settings_local_server_serve_music_on">serve music is enabled</string>
+    <string name="settings_local_server_serve_music_chkbx">local_server_serve_music_chkbx</string>
+    <string name="settings_local_server_serve_video_off">serve video is disabled</string>
+    <string name="settings_local_server_serve_video_on">serve video is enabled</string>
+    <string name="settings_local_server_serve_video_chkbx">local_server_serve_video_chkbx</string>
     <string name="settings_local_server_name">network name for local server</string>
     <string name="settings_local_server_name_key">Local server name</string>
     <string name="settings_local_server_autostart_deactivated">Server will not start after booting</string>
