@@ -73,7 +73,7 @@ then
     echo "android sdk tools environment already set up"
 else
     echo "export PATH=$PATH:/usr/local/android-sdk/tools" >> /etc/bash.bashrc
-f
+fi
 
 
 #Check if the ddms symlink is set up.
@@ -354,10 +354,9 @@ cd /home/$developerName/
 if [ ! -d "./android-studio" ] 
 then
   sudo -n -u $developerName wget http://dl.google.com/android/studio/install/0.4.2/android-studio-bundle-133.970939-linux.tgz
-  sudo -n -u $developerName tar -xvfz android-studio-bundle-133.970939-linux.tgz  
+  sudo -n -u $developerName tar -xvzf /home/$developerName/android-studio-bundle-133.970939-linux.tgz  
   sudo -n -u $developerName echo "PATH=\$PATH:/home/$developerName/android-studio/bin/" >> /home/$developerName/.bashrc   
-fi
-
+fi  
 ############################################
 # install qgit
 ############################################
