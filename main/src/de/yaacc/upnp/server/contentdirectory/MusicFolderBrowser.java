@@ -27,6 +27,9 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
+
+import de.yaacc.R;
+
 /**
  * Browser  for the music folder.
  * 
@@ -43,7 +46,7 @@ public class MusicFolderBrowser extends ContentBrowser {
     @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Music", "yaacc", 4,
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(),getContext().getString(R.string.music), "yaacc", 4,
 				907000L);
 		return folder;
 	}

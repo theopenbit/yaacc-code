@@ -82,5 +82,6 @@
     <string name="artists">Künstler</string>
     <string name="genres">Genres</string>
     <string name="videos">Videos</string>
+    <string name="music">Musik</string>
     
 </resources>
