@@ -29,10 +29,13 @@ import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+
+import de.yaacc.R;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 /**
  * Browser  for the video folder.
@@ -43,10 +46,14 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  */
 public class VideosFolderBrowser extends ContentBrowser {
 
-	@Override
+    public VideosFolderBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder videosFolder = new StorageFolder(ContentDirectoryIDs.VIDEOS_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Videos", "yaacc", getSize(contentDirectory,myId),
+		StorageFolder videosFolder = new StorageFolder(ContentDirectoryIDs.VIDEOS_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), getContext().getString(R.string.videos), "yaacc", getSize(contentDirectory,myId),
 				907000L);
 		return videosFolder;
 	}

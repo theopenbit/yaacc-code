@@ -35,10 +35,13 @@ import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+
+import de.yaacc.R;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -49,14 +52,17 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * 
  */
 public class MusicAllTitlesFolderBrowser extends ContentBrowser {
+    public MusicAllTitlesFolderBrowser(Context context) {
+        super(context);
+    }
 
-	@Override
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory,
 			String myId) {
 
 		MusicAlbum folder = new MusicAlbum(
 				ContentDirectoryIDs.MUSIC_ALL_TITLES_FOLDER.getId(),
-				ContentDirectoryIDs.MUSIC_FOLDER.getId(), "All", "yaacc",
+				ContentDirectoryIDs.MUSIC_FOLDER.getId(), getContext().getString(R.string.all), "yaacc",
 				getSize(contentDirectory, myId));
 		return folder;
 	}

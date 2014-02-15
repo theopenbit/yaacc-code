@@ -32,6 +32,7 @@ import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -47,7 +48,11 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  */
 public class MusicGenreItemBrowser extends ContentBrowser {
 
-	@Override
+    public MusicGenreItemBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory,
 			String myId) {
 		Item result = null;

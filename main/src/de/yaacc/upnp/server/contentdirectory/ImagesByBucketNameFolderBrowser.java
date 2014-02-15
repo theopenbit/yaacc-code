@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.DescMeta;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
 import org.fourthline.cling.support.model.container.Container;
@@ -32,6 +31,7 @@ import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.Photo;
 import org.seamless.util.MimeType;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -41,15 +41,19 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  * Browser  for the image folder.
  * 
  * 
- * @author openbit (Tobias Schoene)
+ * @author TheOpenBit  (Tobias Schoene)
  * 
  */
-public class ImagesByDateFolderBrowser extends ContentBrowser {
+public class ImagesByBucketNameFolderBrowser extends ContentBrowser {
 
-	@Override
+    public ImagesByBucketNameFolderBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		PhotoAlbum photoAlbum = new PhotoAlbum(myId, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId(),getName(
+		PhotoAlbum photoAlbum = new PhotoAlbum(myId, ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId(),getName(
 				contentDirectory, myId), "yaacc", getSize(contentDirectory, myId));
 		return photoAlbum;
 	}
@@ -57,9 +61,9 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 	private Integer getSize(YaaccContentDirectory contentDirectory, String myId){
 		 Integer result = 0;
 				String[] projection = { "count(*) as count" };
-				String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
+				String selection = MediaStore.Images.Media.BUCKET_ID + "=?";
 				String[] selectionArgs = new String[] { myId.substring(myId
-						.indexOf(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId())) };
+						.indexOf(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId())) };
 				Cursor cursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
 						selectionArgs, null);
 
@@ -73,9 +77,9 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 	
 	private String getName(YaaccContentDirectory contentDirectory, String myId) {
 		String result = "";
-		String[] projection = { MediaStore.Images.Media.DATE_TAKEN  };
-		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
-		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId().length()) };
+		String[] projection = { MediaStore.Images.Media.BUCKET_ID,  MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
+		String selection = MediaStore.Images.Media.BUCKET_ID + "=?";
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId().length()) };
 		Cursor cursor = contentDirectory
 				.getContext()
 				.getContentResolver()
@@ -101,10 +105,10 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 		// Query for all images on external storage
 		String[] projection = { MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE,
 				MediaStore.Images.Media.SIZE,MediaStore.Images.Media.DATE_TAKEN  };
-		String selection = MediaStore.Images.Media.DATE_TAKEN + "=?";
-		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGES_BY_DATE_PREFIX.getId().length()) };
+		String selection = MediaStore.Images.Media.BUCKET_ID + "=?";
+		String[] selectionArgs = new String[] { myId.substring(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId().length()) };
 		Cursor mImageCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-				selectionArgs, MediaStore.Images.Media.DISPLAY_NAME + " ASC");
+				selectionArgs, MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " ASC");
 		if (mImageCursor != null) {
 			mImageCursor.moveToFirst();
 			while (!mImageCursor.isAfterLast()) {
@@ -119,7 +123,7 @@ public class ImagesByDateFolderBrowser extends ContentBrowser {
 				String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
 				Res resource = new Res(mimeType, size, uri);
 				
-				Photo photo = new Photo(ContentDirectoryIDs.IMAGE_BY_DATE_PREFIX.getId()+id, myId, name, "", "", resource);
+				Photo photo = new Photo(ContentDirectoryIDs.IMAGE_BY_BUCKET_PREFIX.getId()+id, myId, name, "", "", resource);
 				URI albumArtUri = URI.create("http://"
 						+ contentDirectory.getIpAddress() + ":"
 						+ YaaccUpnpServerService.PORT + "/?thumb=" + id);

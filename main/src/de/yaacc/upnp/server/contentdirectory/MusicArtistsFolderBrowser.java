@@ -29,9 +29,13 @@ import org.fourthline.cling.support.model.container.MusicAlbum;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import de.yaacc.R;
+
 /**
  * Browser  for the music artists folder.
  * 
@@ -41,10 +45,14 @@ import android.util.Log;
  */
 public class MusicArtistsFolderBrowser extends ContentBrowser {
 
-	@Override
+    public MusicArtistsFolderBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_ARTISTS_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), "Artists", "yaacc", getSize(contentDirectory,myId),
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_ARTISTS_FOLDER.getId(), ContentDirectoryIDs.MUSIC_FOLDER.getId(), getContext().getString(R.string.artists), "yaacc", getSize(contentDirectory,myId),
 				907000L);
 		return folder;
 	}

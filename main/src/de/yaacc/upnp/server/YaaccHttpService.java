@@ -294,7 +294,7 @@ public class YaaccHttpService extends HttpService {
 
 	private byte[] getDefaultIcon() {
 		Drawable drawable = getContext().getResources().getDrawable(
-				R.drawable.yaacc48_24_png);
+				R.drawable.yaacc192_32);
 		byte[] result = null;
 		if (drawable != null) {
 			Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();

@@ -18,6 +18,8 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,17 @@ import org.fourthline.cling.support.model.item.Item;
  * 
  */
 public abstract class ContentBrowser {
+
+    Context context;
+
+    protected ContentBrowser(Context context) {
+        this.context = context;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
 
 	public abstract DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId);
 

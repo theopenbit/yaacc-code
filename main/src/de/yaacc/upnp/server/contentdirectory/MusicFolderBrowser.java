@@ -18,6 +18,8 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,9 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
+
+import de.yaacc.R;
+
 /**
  * Browser  for the music folder.
  * 
@@ -34,10 +39,14 @@ import org.fourthline.cling.support.model.item.Item;
  */
 public class MusicFolderBrowser extends ContentBrowser {
 
-	@Override
+    public MusicFolderBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Music", "yaacc", 4,
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.MUSIC_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(),getContext().getString(R.string.music), "yaacc", 4,
 				907000L);
 		return folder;
 	}
@@ -47,10 +56,10 @@ public class MusicFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
-        result.add((Container)new MusicAllTitlesFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_ALL_TITLES_FOLDER.getId()));
-        result.add((Container)new MusicAlbumsFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId()));
-        result.add((Container)new MusicArtistsFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_ARTISTS_FOLDER.getId()));
-        result.add((Container)new MusicGenresFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId()));
+        result.add((Container)new MusicAllTitlesFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_ALL_TITLES_FOLDER.getId()));
+        result.add((Container)new MusicAlbumsFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId()));
+        result.add((Container)new MusicArtistsFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_ARTISTS_FOLDER.getId()));
+        result.add((Container)new MusicGenresFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId()));
         return result;
 	}
 

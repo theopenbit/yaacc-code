@@ -59,6 +59,15 @@
     <string name="settings_local_server_provider_chkbx">local_server_provider_chkbx</string>
     <string name="settings_local_server_testcontent">Lokaler Server verwendet Testinhalte</string>
     <string name="settings_local_server_mediastore">Lokaler Server verwendet den MediaStore</string>
+    <string name="settings_local_server_serve_images_off">Bilderbereistellung deaktiviert</string>
+    <string name="settings_local_server_serve_images_on">Bilderbereistellung aktiviert</string>
+    <string name="settings_local_server_serve_images_chkbx">local_server_serve_images_chkbx</string>
+    <string name="settings_local_server_serve_music_off">Videobereistellung deaktiviert</string>
+    <string name="settings_local_server_serve_music_on">Musikbereistellung aktiviert</string>
+    <string name="settings_local_server_serve_music_chkbx">local_server_serve_music_chkbx</string>
+    <string name="settings_local_server_serve_video_off">Videobereistellung deaktiviert</string>
+    <string name="settings_local_server_serve_video_on">Videobereistellung aktiviert</string>
+    <string name="settings_local_server_serve_video_chkbx">local_server_serve_video_chkbx</string>
     <string name="settings_local_server_name">Netzwerkname für lokalen Server</string>
     <string name="settings_local_server_name_key">Name des lokalen Servers</string>
     <string name="settings_local_server_autostart_deactivated">Server wird bei Gerätestart nicht aktiviert</string>
@@ -75,5 +84,5 @@
     <string name="settings_browse_thumbnails_on">Zeige Vorschaubilder</string>
     <string name="settings_browse_thumbnails_off">Zeige keine Vorschaubilder</string>
     <string name="settings_browse_thumbnails_coverlookup_on">Verwendet Cover aus Bildern in Musikverzeichnissen </string>
-    <string name="settings_browse_thumbnails_coverlookup_off">Bilder in Verzeichnissen werden nicht als Cober verwendet</string>
+    <string name="settings_browse_thumbnails_coverlookup_off">Bilder in Verzeichnissen werden nicht als Cover verwendet</string>
 </resources>

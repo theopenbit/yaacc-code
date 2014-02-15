@@ -74,5 +74,14 @@
     <string name="playerTimeDuration">Dauer</string>
     <string name="playerTimeSeparator"> / </string>
     <string name="playerTimeElapsed">Verstrichene Zeit</string>
+    <string name="bucket_names">Gallerien</string>
+    <string name="all_images">Alle Bilder</string>
+    <string name="images">Bilder</string>
+    <string name="albums">Alben</string>
+    <string name="all">Alle</string>
+    <string name="artists">Künstler</string>
+    <string name="genres">Genres</string>
+    <string name="videos">Videos</string>
+    <string name="music">Musik</string>
     
 </resources>

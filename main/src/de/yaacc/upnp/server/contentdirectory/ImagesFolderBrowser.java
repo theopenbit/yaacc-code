@@ -18,6 +18,8 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,9 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.StorageFolder;
 import org.fourthline.cling.support.model.item.Item;
+
+import de.yaacc.R;
+
 /**
  * Browser  for the image folder.
  * 
@@ -34,10 +39,14 @@ import org.fourthline.cling.support.model.item.Item;
  */
 public class ImagesFolderBrowser extends ContentBrowser {
 
-	@Override
+    public ImagesFolderBrowser(Context context) {
+        super(context);
+    }
+
+    @Override
 	public DIDLObject browseMeta(YaaccContentDirectory contentDirectory, String myId) {
 		
-		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.IMAGES_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), "Images", "yaacc", 4,
+		StorageFolder folder = new StorageFolder(ContentDirectoryIDs.IMAGES_FOLDER.getId(), ContentDirectoryIDs.ROOT.getId(), getContext().getString(R.string.images), "yaacc", 4,
 				907000L);
 		return folder;
 	}
@@ -47,8 +56,8 @@ public class ImagesFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
-        result.add((Container)new ImagesAllFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId()));
-        result.add((Container)new ImagesByDatesFolderBrowser().browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_BY_DATE_FOLDER.getId()));        
+        result.add((Container)new ImagesAllFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_ALL_FOLDER.getId()));
+        result.add((Container)new ImagesByBucketNamesFolderBrowser(getContext()).browseMeta(contentDirectory, ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId()));
         return result;
 	}
 
