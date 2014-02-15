@@ -160,6 +160,16 @@ public class BrowseItemAdapter extends BaseAdapter {
 						.getFirstResource().getValue()));
 		} else if (currentObject instanceof VideoItem) {
 			holder.icon.setImageResource(R.drawable.video);
+            if (preferences.getBoolean(
+                    context.getString(R.string.settings_thumbnails_chkbx),
+                    false)) {
+                DIDLObject.Property<URI> albumArtProperties = ((VideoItem) currentObject)
+                        .getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+                if(null != albumArtProperties){
+                    iconDownloadTask.execute(Uri.parse(albumArtProperties
+                            .getValue().toString()));
+                }
+            }
 		} else if (currentObject instanceof PlaylistItem) {
 			holder.icon.setImageResource(R.drawable.playlist);
 		} else if (currentObject instanceof TextItem) {
