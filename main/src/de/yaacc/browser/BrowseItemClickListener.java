@@ -47,7 +47,9 @@ public class BrowseItemClickListener implements OnItemClickListener{
         BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
         currentObject = adapter.getFolder(position);
         if (currentObject instanceof Container) {
-// if the current id is null, go back to the top level
+            //Fixme: Cache should store information for different folders....
+            IconDownloadCacheHandler.getInstance().resetCache();
+            // if the current id is null, go back to the top level
             String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID: adapter
                     .getFolder(position).getId();
             BrowseActivity.getNavigator().pushPosition(new Position(newObjectId, BrowseActivity.uClient.getProviderDevice()));
@@ -56,8 +58,6 @@ public class BrowseItemClickListener implements OnItemClickListener{
             a.setAdapter(bItemAdapter);
             BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
             a.setOnItemClickListener(bItemClickListener);
-// when entering a new folder the cache must be emptied
-            IconDownloadCacheHandler.getInstance().resetCache();
         } else {
             List<Player> players = BrowseActivity.uClient.initializePlayers(currentObject);
             for (Player player : players) {
@@ -71,11 +71,11 @@ public class BrowseItemClickListener implements OnItemClickListener{
                                     ContextMenuInfo menuInfo) {
         menu.setHeaderTitle(v.getContext().getString(R.string.browse_context_title));
         ArrayList<String> menuItems = new ArrayList<String>();
-//TODO: I think there might be some item dependent actions in the future, so this is designed as a dynamic list
+        //TODO: I think there might be some item dependent actions in the future, so this is designed as a dynamic list
         menuItems.add(v.getContext().getString(R.string.browse_context_play));
         menuItems.add(v.getContext().getString(R.string.browse_context_add_to_playplist));
         menuItems.add(v.getContext().getString(R.string.browse_context_download));
-//TODO: Check via bytecode whether listsize is calculated every loop or just once, if do calculation before calling the loop
+        //TODO: Check via bytecode whether listsize is calculated every loop or just once, if do calculation before calling the loop
         for (int i = 0; i<menuItems.toArray(new String[menuItems.size()]).length; i++) {
             menu.add(Menu.NONE, i, i, menuItems.get(i));
         }

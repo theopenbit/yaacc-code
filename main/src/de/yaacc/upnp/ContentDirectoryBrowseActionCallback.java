@@ -73,7 +73,7 @@ public class ContentDirectoryBrowseActionCallback extends Browse {
 	
 
 	@Override
-	public void updateStatus(Status status) {
+	public void updateStatus(Status status) {		
 		this.browsingResult.setStatus(status);
 	}
 

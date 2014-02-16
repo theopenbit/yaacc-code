@@ -255,9 +255,11 @@ public class BrowseActivity extends Activity implements OnClickListener,
             uClient.shutdown();
             super.finish();
         } else {
+            //Fixme: Cache should store information for different folders....
+            IconDownloadCacheHandler.getInstance().resetCache();
             final ListView itemList = (ListView) findViewById(R.id.itemList);
             Position pos = navigator.popPosition(); // First pop is our
-// currentPosition
+            // currentPosition
             bItemAdapter = new BrowseItemAdapter(this,
                     navigator.getCurrentPosition());
             itemList.setAdapter(bItemAdapter);
@@ -319,6 +321,8 @@ public class BrowseActivity extends Activity implements OnClickListener,
      * device to access
      */
     private void populateItemList(Device providerDevice) {
+        //FIXME: Cache should be able to decide whether it is used for browsing or for devices lists
+        IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
 // Load adapter if selected device is configured and found
@@ -336,7 +340,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
      * Shows all available devices in the main device list.
      */
     private void populateDeviceList(){
-        //FIXME: Cache should be able to decide whether it is used for browing or for devices lists
+        //FIXME: Cache should be able to decide whether it is used for browsing or for devices lists
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
@@ -353,7 +357,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
      * Shows all available devices in the receiver device list.
      */
     private void populateReceiverDeviceList(){
-        //FIXME: Cache should be able to decide whether it is used for browing or for devices lists
+        //FIXME: Cache should be able to decide whether it is used for browsing or for devices lists
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {

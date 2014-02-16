@@ -28,3 +28,4 @@ local.properties
 *.bak
 *.log
 *.orig
+.directory

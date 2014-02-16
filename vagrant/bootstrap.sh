@@ -11,13 +11,16 @@ then
 fi
 apt-get update
 
+apt-get install ia32-libs -y
 
 ##############################################
 ##Install common unix tools
 ##############################################
 apt-get install vim -y
+apt-get install nano -y
 
-##############################################
+
+#############################################
 ## Install xterm and roxterm in order to
 ## enable an ssh access using an  X tunnel
 ##############################################
@@ -49,6 +52,7 @@ if [ ! -d "/usr/local/android-sdk" ]; then
         for a in $( wget -qO- http://developer.android.com/sdk/index.html | egrep -o "http://dl.google.com[^\"']*linux.tgz" ); do 
                 wget $a && tar --wildcards --no-anchored -xvzf android-sdk_*-linux.tgz; mv android-sdk-linux /usr/local/android-sdk;  chmod 777 -R /usr/local/android-sdk; rm android-sdk_*-linux.tgz;
         done
+        
 else
      echo "Android SDK already installed to /usr/local/android-sdk.  Skipping."
 fi
@@ -61,6 +65,16 @@ then
 else
     echo "export PATH=$PATH:/usr/local/android-sdk/platform-tools" >> /etc/bash.bashrc
 fi
+
+#Check if the sdk tools environment is set up.
+
+if grep -q /usr/local/android-sdk/platform-tools /etc/bash.bashrc; 
+then
+    echo "android sdk tools environment already set up"
+else
+    echo "export PATH=$PATH:/usr/local/android-sdk/tools" >> /etc/bash.bashrc
+fi
+
 
 #Check if the ddms symlink is set up.
 
@@ -206,14 +220,26 @@ cd /home/$developerName
 if [ ! -f "yaacc-code/main/local.properties" ];
 then
    sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
+   chown -R  $developerName:$developerName yaacc-code/main/local.properties
 fi
 
 if [ ! -f "yaacc-code/main/project.properties" ];
 then
   sudo -n -u $developerName echo "target=android-15" > yaacc-code/main/project.properties
+  chown -R  $developerName:$developerName yaacc-code/main/project.properties
 fi
 
+if [ ! -f "yaacc-code/test/local.properties" ];
+then
+   sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
+   chown -R  $developerName:$developerName yaacc-code/main/local.properties
+fi
 
+if [ ! -f "yaacc-code/test/project.properties" ];
+then
+  sudo -n -u $developerName echo "target=android-15" > yaacc-code/main/project.properties
+  chown -R  $developerName:$developerName yaacc-code/main/project.properties
+fi
 #############################################################
 ## Setup F-droid server tools
 #############################################################
@@ -225,7 +251,7 @@ apt-get install python-magic -y
 if [ ! -d "fdroidserver.git" ];
 then
    sudo -n -u $developerName git clone $fdroidServerRepo fdroidserver.git
-   sudo -n -u $developerName echo "export PATH=\$PATH:/root/fdroidserver.git" >> /home/$developerName/.bashrc   
+   sudo -n -u $developerName echo "PATH=\$PATH:/home/$developerName/fdroidserver.git" >> /home/$developerName/.bashrc   
 else
    cd fdroidserver.git
    sudo -n -u $developerName git pull
@@ -274,11 +300,7 @@ then
    chown $developerName:$developerName fdroiddata.git/config.py 
  
 fi
-#####################################################################
-## Setup Path
-#####################################################################
-cd /home/$developerName
-echo -e "PATH=\$PATH:/home/$developerName/fdroidserver.git:/usr/local/android-sdk/platform-tools:/usr/local/android-sdk/tools" >> /home/$developerName/.bashrc
+
 
 #####################################################################
 ## Setup debug keystore 
@@ -303,32 +325,41 @@ sudo -n -u $developerName ant debug
 
 cd /home/$developerName/fdroiddata.git
 echo test build yaacc with fdroid
-sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p de.yaacc
+sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -l de.yaacc
 
 
 ###############################################
 # create  AVD
 ##############################################
-#if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ]
-#then
-# sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
-#fi
+if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ]
+then
+ sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
+fi
 
 ############################################
 # start avd and install yaacc on it
 ###########################################
-# /usr/local/android-sdk/tools/emulator -avd yaacc-emu
-# /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
+ /usr/local/android-sdk/tools/emulator -avd yaacc-emu
+ /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
 #
 ############################################
-# install eclipse
+# install kdiff3
 ############################################
-#apt-get install eclipse -y
-#if [  -d "/home/$developerName/.swt/lib/linux" ]
-#then
-#  cd /home/$developerName/.swt/lib/linux
-#  sudo -n -u $developerName  rm -rf x86
-#  sudo -n -u $developerName  ln -s /usr/lib/jni x86  
-#fi
+apt-get install kdiff3-qt -y
+
+############################################
+# install android studion
+############################################
+cd /home/$developerName/
+if [ ! -d "./android-studio" ] 
+then
+  sudo -n -u $developerName wget http://dl.google.com/android/studio/install/0.4.2/android-studio-bundle-133.970939-linux.tgz
+  sudo -n -u $developerName tar -xvzf /home/$developerName/android-studio-bundle-133.970939-linux.tgz  
+  sudo -n -u $developerName echo "PATH=\$PATH:/home/$developerName/android-studio/bin/" >> /home/$developerName/.bashrc   
+fi  
+############################################
+# install qgit
+############################################
+apt-get install qgit -y
 
 echo ready enjoy developing!

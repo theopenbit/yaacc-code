@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import java.net.URI;
 import java.util.List;
 
 import android.app.ActivityManager;
@@ -31,6 +32,9 @@ import android.net.Uri;
 import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.fourthline.cling.support.model.DIDLObject;
+
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
@@ -151,12 +155,17 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 		if(musicAppPid != 0){
 			Process.killProcess(musicAppPid);
 		}
-	}	
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
-	 */
+	}
+
+    @Override
+    public URI getAlbumArt() {
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+     */
 	@Override
 	protected PendingIntent getNotificationIntent(){
 		Intent notificationIntent = new Intent(getContext(),

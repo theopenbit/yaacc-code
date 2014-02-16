@@ -19,22 +19,29 @@ package de.yaacc.player;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.fourthline.cling.support.model.DIDLObject;
+
 import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
+import de.yaacc.util.image.ImageDownloadTask;
 
 /**
  * A music player activity based on a background music service.
@@ -219,6 +226,12 @@ public class MusicPlayerActivity extends Activity {
 		TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
 		next.setText(getPlayer().getNextItemTitle());
 		updateTime();
+        ImageView albumArtView = (ImageView) findViewById(R.id.musicActivityImageView);
+        URI albumArtUri = getPlayer().getAlbumArt();
+        if (null != albumArtUri){
+            ImageDownloadTask imageDownloadTask = new ImageDownloadTask(albumArtView);
+            imageDownloadTask.execute(Uri.parse(albumArtUri.toString()));
+        }
 
 	}
 

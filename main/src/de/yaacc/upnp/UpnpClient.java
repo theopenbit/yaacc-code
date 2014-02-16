@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -63,6 +64,8 @@ import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.AudioItem;
+import org.fourthline.cling.support.model.item.ImageItem;
 import org.fourthline.cling.support.model.item.Item;
 
 import android.content.ActivityNotFoundException;
@@ -607,19 +610,80 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		ContentDirectoryBrowseResult result = new ContentDirectoryBrowseResult();
 		if (device == null) {
 			return result;
-		}
-		Object[] services = device.getServices();
+		}		
 		Service service = device.findService(new UDAServiceId("ContentDirectory"));
 		ContentDirectoryBrowseActionCallback actionCallback = null;
 		if (service != null) {
 			Log.d(getClass().getName(), "#####Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
 			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID, flag, filter, firstResult, maxResults, result, orderBy);
-			getControlPoint().execute(actionCallback);
-			while (actionCallback.getStatus() != Status.NO_CONTENT && actionCallback.getStatus() != Status.OK && actionCallback.getUpnpFailure() == null)
+			getControlPoint().execute(actionCallback);			
+			while (  actionCallback.getStatus() == Status.LOADING && actionCallback.getUpnpFailure() == null)
+				
 				;
 		}
-		return result;
+
+        if(preferences.getBoolean(context.getString(R.string.settings_browse_thumbnails_coverlookup_chkbx), false)){
+		    result = enrichWithCover(result);
+        }
+        return result;
 	}
+
+    /**
+     * Trying to add album art if there are only audiofiles and exactly one imagefile in a folder
+     * @param callbackResult orginal callback
+     * @return if albumart and audiofiles are contained enriched audiofiles, otherwise the original result
+     */
+    private ContentDirectoryBrowseResult enrichWithCover(ContentDirectoryBrowseResult callbackResult){
+
+        DIDLContent cont = callbackResult.getResult();
+
+        if (cont.getContainers().size() != 0){
+            return callbackResult;
+        }
+        URI albumArtUri = null;
+        LinkedList<Item> audioFiles = new LinkedList<Item>();
+        
+        if(cont.getItems().size() == 1){
+        	//nothing to enrich
+        	return callbackResult;
+        }
+        
+        for(Item currentItem: cont.getItems()){
+            if(!(currentItem instanceof AudioItem)){
+                if(null == albumArtUri &&(currentItem instanceof ImageItem)){
+                    albumArtUri = URI.create(((ImageItem) currentItem).getFirstResource().getValue().toString());
+                } else {
+                    //There seem to be multiple images or other media files
+                    audioFiles = null;
+                    return callbackResult;
+                }
+
+            } else {
+
+                if(null != audioFiles){
+                    audioFiles.add(currentItem);
+                } else {
+                    audioFiles = new LinkedList<Item>();
+                    audioFiles.add(currentItem);
+                }
+            }
+        }
+
+        if (null == albumArtUri){
+            audioFiles = null;
+            return callbackResult;
+        }
+        //We should only be here if there are just musicfiles and exactly one imagefile
+        for(Item currentItem: audioFiles){
+            currentItem.replaceFirstProperty((new DIDLObject.Property.UPNP.ALBUM_ART_URI(albumArtUri)));
+        }
+
+        //this hopefully overwrites all previously existing contents
+        cont.setItems(audioFiles);
+        callbackResult.setResult(cont);
+
+        return callbackResult;
+    }
 
 	/**
 	 * Browse ContenDirctory asynchronous
@@ -663,7 +727,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			actionCallback = new ContentDirectoryBrowseActionCallback(service, objectID, flag, filter, firstResult, maxResults, result, orderBy);
 			getControlPoint().execute(actionCallback);
 		}
-		return result;
+        if(preferences.getBoolean(context.getString(R.string.settings_browse_thumbnails_coverlookup_chkbx), false)){
+            result = enrichWithCover(result);
+        }
+        return result;
 	}
 
 	/**
@@ -683,14 +750,20 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the player
 	 */
 	public List<Player> initializePlayers(DIDLObject didlObject) {
-		List<PlayableItem> playableItems = toPlayableItems(toItemList(didlObject));
+        LinkedList<PlayableItem> playableItems = new LinkedList<PlayableItem>();
+
+        for(Item currentItem: toItemList(didlObject)){
+            PlayableItem playableItem = new PlayableItem(currentItem, getDefaultDuration());
+            playableItems.add(playableItem);
+        }
+
 		return PlayerFactory.createPlayer(this, playableItems);
 	}
 
 	/**
 	 * Returns all player instances initialized with the given transport object
 	 * 
-	 * @param didlObject
+	 * @param transport
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
@@ -748,7 +821,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Returns all current player instances for the given transport object
 	 * 
-	 * @param didlObject
+	 * @param transport
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
@@ -794,55 +867,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return avTransportPlayers;
 	}
 
-	/**
-	 * Convert cling items into playable items
-	 * 
-	 * @param items
-	 *            the cling items
-	 * @return the playable items
-	 */
-	private List<PlayableItem> toPlayableItems(List<Item> items) {
-		List<PlayableItem> playableItems = new ArrayList<PlayableItem>();
-		// FIXME: filter cover.jpg for testing purpose
-		List<PlayableItem> coverImageItems = new ArrayList<PlayableItem>();
-		int audioItemsCount = 0;
-		for (Item item : items) {
-			PlayableItem playableItem = new PlayableItem();
-			playableItem.setTitle(item.getTitle());
-			Res resource = item.getFirstResource();
-			if (resource != null) {
-				playableItem.setUri(Uri.parse(resource.getValue()));
-				playableItem.setMimeType(resource.getProtocolInfo().getContentFormat());
-				// FIXME: filter cover.jpg for testing purpose
-				if (playableItem.getMimeType().startsWith("audio")) {
-					audioItemsCount++;
-				}
-				if (playableItem.getMimeType().startsWith("image")) {
-					coverImageItems.add(playableItem);
-				}
-				// calculate duration
-				SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-				long millis = getDefaultDuration();
-				if (resource.getDuration() != null) {
-					try {
-						Date date = dateFormat.parse(resource.getDuration());
-						millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
-					} catch (ParseException e) {
-						Log.d(getClass().getName(), "bad duration format", e);
-					}
-				}
-				playableItem.setDuration(millis);
-			}
-			playableItems.add(playableItem);
-		}
-		// FIXME: filter cover.jpg for testing purpose
-		// here comes the magic
-		if (audioItemsCount > 0 && coverImageItems.size() == 1) {
-			// hope there is only one cover image
-			playableItems.removeAll(coverImageItems);
-		}
-		return playableItems;
-	}
 
 	/**
 	 * Converts the content of a didlObject into a list of cling items.
@@ -1060,31 +1084,35 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 
 	/**
 	 * set the mute state
-	 * @param mute the state
+	 * 
+	 * @param mute
+	 *            the state
 	 */
 	public void setMute(boolean mute) {
-		this.mute=mute;
+		this.mute = mute;
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, mute);
 	}
-	
+
 	/**
 	 * returns the mute state
+	 * 
 	 * @return the state
 	 */
-	public boolean isMute(){		
+	public boolean isMute() {
 		return mute;
 	}
-	
+
 	/**
 	 * set the volume in the range of 0-100
+	 * 
 	 * @param desired
 	 */
-	public void setVolume(int desired){
-		if (desired < 0 ){
+	public void setVolume(int desired) {
+		if (desired < 0) {
 			desired = 0;
 		}
-		if (desired > 100 ){
+		if (desired > 100) {
 			desired = 100;
 		}
 		AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -1092,20 +1120,21 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		int volume = desired * maxVolume / 100;
 		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_SHOW_UI);
 	}
-	
+
 	/**
 	 * returns the current volume level
+	 * 
 	 * @return the value in the range of 0-100
 	 */
-	public int getVolume(){
-		
+	public int getVolume() {
+
 		AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
 		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 		int volume = currentVolume * 100 / maxVolume;
-		return volume; 
+		return volume;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
@@ -1184,6 +1213,5 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			return android.os.Build.MODEL;
 		}
 
-		
 	}
 }

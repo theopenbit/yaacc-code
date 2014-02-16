@@ -1,7 +1,6 @@
 # Vagrantfile for setup a yaacc development box
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
 def motdTemplate
         motdTemplate =                 "__/\\\\\\________/\\\\\\_____/\\\\\\\\\\\\\\\\\\________/\\\\\\\\\\\\\\\\\\___________/\\\\\\\\\\\\\\\\\\________/\\\\\\\\\\\\\\\\\\_        \n"
     motdTemplate =  motdTemplate + " _\\///\\\\\\____/\\\\\\/____/\\\\\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\\\\\\\\\\\\\\\\\\\______/\\\\\\////////______/\\\\\\////////__       \n"
@@ -196,7 +195,7 @@ if ARGV[0] == "up"
 
 	Vagrant::Config.run do |config|
 	 config.vm.box = "yaacc-dev" 
-	 config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+	 config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 	 config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
 	 config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
 	 config.vm.provision :shell, :path => "bootstrap.sh"
@@ -209,7 +208,7 @@ else
 
 Vagrant::Config.run do |config|
  config.vm.box = "yaacc-dev" 
- config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+ config.vm.box_url = "http://files.vagrantup.com/precise64.box"
  config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
  config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
  config.vm.provision :shell, :path => "bootstrap.sh"

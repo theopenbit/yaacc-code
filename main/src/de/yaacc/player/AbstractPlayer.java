@@ -19,6 +19,7 @@ package de.yaacc.player;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +36,9 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.fourthline.cling.support.model.DIDLObject;
+
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 
@@ -53,6 +57,8 @@ public abstract class AbstractPlayer implements Player {
 
 	private UpnpClient upnpClient;
 	private String name;
+
+    private URI albumArtUri;
 
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -504,4 +510,8 @@ public abstract class AbstractPlayer implements Player {
 	public String getElapsedTime(){
 		return "";
 	}
+
+    public URI getAlbumArtUri(){
+        return albumArtUri;
+    }
 }

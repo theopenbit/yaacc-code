@@ -94,6 +94,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:padding="10dp"
         android:contentDescription="@string/musicActivityImageView"
         android:src="@drawable/cdtrack" />
 
