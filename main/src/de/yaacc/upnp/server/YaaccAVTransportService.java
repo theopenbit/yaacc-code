@@ -57,4 +57,9 @@ public class YaaccAVTransportService extends AVTransportService<AVTransport> {
 						upnpClient });
 	}
 
+    public void getSyncOffset(org.fourthline.cling.model.types.UnsignedIntegerFourBytes instanceId){
+        //todo tbc
+    }
+
+
 }
