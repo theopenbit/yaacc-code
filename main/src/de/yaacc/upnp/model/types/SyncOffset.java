@@ -16,29 +16,58 @@ package de.yaacc.upnp.model.types;/*
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+import android.util.Log;
+
 /**
  * Representation of the upnp type SyncOffset.
+ * Format of the upnp type:
+ * duration ::= ['-']'P' time
+ * time::= HH ':' MM ':' SS'.' MilliS MicroS NanoS
+ * HH ::= 2DIGIT (* 00 - 23 *)
+ * MM ::= 2DIGIT (* 00 - 59 *)
+ * SS ::= 2DIGIT (* 00 - 59 *)
+ * MilliS ::= 3DIGIT
+ * MicroS ::= 3DIGIT
+ * NanoS  ::= 3DIGIT
  *
  * @author Tobias Schoene (TheOpenBit)
  */
 public class SyncOffset {
 
 
-    private int hour;
-    private int minute;
-    private int second;
-    private int millis;
-    private int micros;
-    private int nanos;
-    private boolean increase;
+    private int hour = 0;
+    private int minute = 0;
+    private int second = 0;
+    private int millis = 0;
+    private int micros = 0;
+    private int nanos = 0;
+    private boolean increase = true;
 
     public SyncOffset(boolean increase, int hour, int minute, int second, int millis, int micros, int nanos) {
-        assert (hour >= 0 && hour <= 23);
-        assert (minute >= 0 && minute <= 59);
-        assert (second >= 0 && second <= 59);
-        assert (millis >= 0 && millis <= 999);
-        assert (micros >= 0 && micros <= 999);
-        assert (nanos >= 0 && nanos <= 999);
+        if (!(hour >= 0 && hour <= 23)) {
+            throw new IllegalArgumentException("hour must fit interval 0-23, but was: " + hour);
+        }
+        if (!(minute >= 0 && minute <= 59)) {
+            throw new IllegalArgumentException("minute must fit interval 0-60, but was: " + minute);
+        }
+
+        if (!(second >= 0 && second <= 59)) {
+            throw new IllegalArgumentException("second must fit interval 0-60, but was: " + second);
+
+        }
+
+        if (!(millis >= 0 && millis <= 999)) {
+            throw new IllegalArgumentException("millis must fit interval 0-60, but was: " + millis);
+        }
+
+        if (!(micros >= 0 && micros <= 999)) {
+            throw new IllegalArgumentException("micros must fit interval 0-999, but was: " + micros);
+        }
+
+        if (!(nanos >= 0 && nanos <= 999)) {
+            throw new IllegalArgumentException("nanos must fit interval 0-999, but was: " + nanos);
+        }
+
         this.increase = increase;
         this.hour = hour;
         this.minute = minute;
@@ -50,33 +79,144 @@ public class SyncOffset {
 
     }
 
-    public SyncOffset(String offset){
-        //TODO to be implemented
+    public SyncOffset(String offset) {
+        if (offset == null || offset.equals("")) {
+            return;
+        }
+        increase = !offset.startsWith("-");
+        String toBeParsed = offset;
+        if (increase && toBeParsed.startsWith("P")) {
+            toBeParsed = toBeParsed.substring(1);
+        } else if (toBeParsed.startsWith("-P")) {
+            toBeParsed = toBeParsed.substring(2);
+        } else {
+            Log.w(this.getClass().getName(), "Can't parse offset format: " + offset + " ignoring it");
+            return;
+        }
+        //Minimum requiered format
+        if (toBeParsed.matches("^\\d{2}:\\d{2}:\\d{2}.*")) {
+            hour = Integer.parseInt(toBeParsed.substring(0, 2));
+            if (hour < 0 || hour > 23) {
+                hour = 0;
+                Log.w(this.getClass().getName(), "Can't parse offset hour format: " + offset + " ignoring it");
+            }
+            toBeParsed = toBeParsed.substring(3);
+            minute = Integer.parseInt(toBeParsed.substring(0, 2));
+            if (minute < 0 || minute > 59) {
+                minute = 0;
+                Log.w(this.getClass().getName(), "Can't parse offset minute format: " + offset + " ignoring it");
+            }
+            toBeParsed = toBeParsed.substring(3);
+            second = Integer.parseInt(toBeParsed.substring(0, 2));
+            if (second < 0 || second > 59) {
+                second = 0;
+                Log.w(this.getClass().getName(), "Can't parse offset second format: " + offset + " ignoring it");
+            }
+            toBeParsed = toBeParsed.substring(2);
+            if (toBeParsed.indexOf('.') > 0 || (toBeParsed.indexOf('.') == -1 && toBeParsed.length() > 0)){
+                Log.w(this.getClass().getName(), "Can't parse offset second format: " + offset + " ignoring it");
+                second = 0;
+                if(toBeParsed.indexOf('.') > 0){
+                  toBeParsed = toBeParsed.substring(toBeParsed.indexOf('.'));
+                }
+            }
+        } else {
+            Log.w(this.getClass().getName(), "Can't parse offset time format: " + offset + " ignoring it");
+            return;
+        }
+        if (toBeParsed.matches("^[.]\\d{3}.*")) {
+            millis = Integer.parseInt(toBeParsed.substring(1, 4));
+            if (millis < 0 || millis > 999) {
+                millis = 0;
+                Log.w(this.getClass().getName(), "Can't parse offset millis format: " + offset + " ignoring it");
+            }
+            toBeParsed = toBeParsed.substring(4);
+            if(!toBeParsed.startsWith(" ") && toBeParsed.indexOf(' ') > -1){
+                toBeParsed = toBeParsed.substring(toBeParsed.indexOf(' '));
+                millis = 0;
+                Log.w(this.getClass().getName(), "Can't parse offset millis format: " + offset + " ignoring it");
+            }
+            if (toBeParsed.matches("^\\s\\d{3}.*")) {
+                micros = Integer.parseInt(toBeParsed.substring(1, 4));
+                if (micros < 0 || micros > 999) {
+                    micros = 0;
+                    Log.w(this.getClass().getName(), "Can't parse offset micros format: " + offset + " ignoring it");
+                }
+                toBeParsed = toBeParsed.substring(4);
+                if(!toBeParsed.startsWith(" ") && toBeParsed.indexOf(' ') > -1){
+                    toBeParsed = toBeParsed.substring(toBeParsed.indexOf(' '));
+                    micros = 0;
+                    Log.w(this.getClass().getName(), "Can't parse offset micros format: " + offset + " ignoring it");
+                }
+                if (toBeParsed.matches("^\\s\\d{3}.*")) {
+                    nanos = Integer.parseInt(toBeParsed.substring(1, 4));
+                    if (nanos < 0 || nanos > 999) {
+                        nanos = 0;
+                        Log.w(this.getClass().getName(), "Can't parse offset nanos format: " + offset + " ignoring it");
+                    }
+                    toBeParsed = toBeParsed.substring(4);
+                    if(toBeParsed.length() > 0){
+                        nanos = 0;
+                        Log.w(this.getClass().getName(), "Can't parse offset nanos format: " + offset + " ignoring it");
+                    }
+                } else {
+                    Log.w(this.getClass().getName(), "Can't parse offset nanos : " + offset + " ignoring it");
+                }
+            } else {
+                Log.w(this.getClass().getName(), "Can't parse offset mircos : " + offset + " ignoring it");
+            }
+        } else {
+            Log.w(this.getClass().getName(), "Can't parse offset sub second format: " + offset + " ignoring it");
+            return;
+        }
+
     }
 
-    public java.lang.String toString(){
+    public java.lang.String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(increase ? "" : "-");
         sb.append("P");
-        sb.append(hour);
+        sb.append(String.format("%02d", hour));
         sb.append(":");
-        sb.append(minute);
+        sb.append(String.format("%02d", minute));
         sb.append(":");
-        sb.append(second);
+        sb.append(String.format("%02d", second));
         sb.append(".");
         sb.append(String.format("%03d", millis));
+        sb.append(" ");
         sb.append(String.format("%03d", micros));
+        sb.append(" ");
         sb.append(String.format("%03d", nanos));
         return sb.toString();
     }
-/*
-    duration ::= ['-']'P' time
-    time::= HH ':' MM ':' SS'.' MilliS MicroS NanoS
-    HH ::= 2DIGIT (* 00 - 23 *)
-    MM ::= 2DIGIT (* 00 - 59 *)
-    SS ::= 2DIGIT (* 00 - 59 *)
-    MilliS ::= 3DIGIT
-    MicroS ::= 3DIGIT
-    NanoS  ::= 3DIGIT
-*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SyncOffset that = (SyncOffset) o;
+
+        if (hour != that.hour) return false;
+        if (increase != that.increase) return false;
+        if (micros != that.micros) return false;
+        if (millis != that.millis) return false;
+        if (minute != that.minute) return false;
+        if (nanos != that.nanos) return false;
+        if (second != that.second) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hour;
+        result = 31 * result + minute;
+        result = 31 * result + second;
+        result = 31 * result + millis;
+        result = 31 * result + micros;
+        result = 31 * result + nanos;
+        result = 31 * result + (increase ? 1 : 0);
+        return result;
+    }
 }
