@@ -41,9 +41,11 @@ public class SyncOffset {
     private int millis = 0;
     private int micros = 0;
     private int nanos = 0;
-    private boolean increase = true;
 
-    public SyncOffset(boolean increase, int hour, int minute, int second, int millis, int micros, int nanos) {
+
+    private boolean positive = true;
+
+    public SyncOffset(boolean positive, int hour, int minute, int second, int millis, int micros, int nanos) {
         if (!(hour >= 0 && hour <= 23)) {
             throw new IllegalArgumentException("hour must fit interval 0-23, but was: " + hour);
         }
@@ -68,7 +70,7 @@ public class SyncOffset {
             throw new IllegalArgumentException("nanos must fit interval 0-999, but was: " + nanos);
         }
 
-        this.increase = increase;
+        this.positive = positive;
         this.hour = hour;
         this.minute = minute;
         this.second = second;
@@ -79,13 +81,29 @@ public class SyncOffset {
 
     }
 
+    public SyncOffset(long nanos) {
+        if(nanos < 0) {
+            positive = false;
+        }
+        hour = (int) (nanos / (60L * 60L * 1000L * 1000L *1000L));
+        long rest = nanos % (60L * 60L * 1000L * 1000L *1000L);
+        minute = (int) (rest / (60L  * 1000L * 1000L * 1000L));
+        rest = rest % (60L  * 1000L * 1000L * 1000L);
+        second = (int) (rest / (1000L * 1000L * 1000L));
+        rest = rest % (1000L * 1000L * 1000L);
+        millis = (int) (rest / (1000L * 1000L));
+        rest = rest % (1000L * 1000L);
+        micros = (int) (rest / 1000L);
+        this.nanos = (int) (rest % 1000L);
+    }
+
     public SyncOffset(String offset) {
         if (offset == null || offset.equals("")) {
             return;
         }
-        increase = !offset.startsWith("-");
+        positive = !offset.startsWith("-");
         String toBeParsed = offset;
-        if (increase && toBeParsed.startsWith("P")) {
+        if (positive && toBeParsed.startsWith("P")) {
             toBeParsed = toBeParsed.substring(1);
         } else if (toBeParsed.startsWith("-P")) {
             toBeParsed = toBeParsed.substring(2);
@@ -113,11 +131,11 @@ public class SyncOffset {
                 Log.w(this.getClass().getName(), "Can't parse offset second format: " + offset + " ignoring it");
             }
             toBeParsed = toBeParsed.substring(2);
-            if (toBeParsed.indexOf('.') > 0 || (toBeParsed.indexOf('.') == -1 && toBeParsed.length() > 0)){
+            if (toBeParsed.indexOf('.') > 0 || (toBeParsed.indexOf('.') == -1 && toBeParsed.length() > 0)) {
                 Log.w(this.getClass().getName(), "Can't parse offset second format: " + offset + " ignoring it");
                 second = 0;
-                if(toBeParsed.indexOf('.') > 0){
-                  toBeParsed = toBeParsed.substring(toBeParsed.indexOf('.'));
+                if (toBeParsed.indexOf('.') > 0) {
+                    toBeParsed = toBeParsed.substring(toBeParsed.indexOf('.'));
                 }
             }
         } else {
@@ -131,7 +149,7 @@ public class SyncOffset {
                 Log.w(this.getClass().getName(), "Can't parse offset millis format: " + offset + " ignoring it");
             }
             toBeParsed = toBeParsed.substring(4);
-            if(!toBeParsed.startsWith(" ") && toBeParsed.indexOf(' ') > -1){
+            if (!toBeParsed.startsWith(" ") && toBeParsed.indexOf(' ') > -1) {
                 toBeParsed = toBeParsed.substring(toBeParsed.indexOf(' '));
                 millis = 0;
                 Log.w(this.getClass().getName(), "Can't parse offset millis format: " + offset + " ignoring it");
@@ -143,7 +161,7 @@ public class SyncOffset {
                     Log.w(this.getClass().getName(), "Can't parse offset micros format: " + offset + " ignoring it");
                 }
                 toBeParsed = toBeParsed.substring(4);
-                if(!toBeParsed.startsWith(" ") && toBeParsed.indexOf(' ') > -1){
+                if (!toBeParsed.startsWith(" ") && toBeParsed.indexOf(' ') > -1) {
                     toBeParsed = toBeParsed.substring(toBeParsed.indexOf(' '));
                     micros = 0;
                     Log.w(this.getClass().getName(), "Can't parse offset micros format: " + offset + " ignoring it");
@@ -155,7 +173,7 @@ public class SyncOffset {
                         Log.w(this.getClass().getName(), "Can't parse offset nanos format: " + offset + " ignoring it");
                     }
                     toBeParsed = toBeParsed.substring(4);
-                    if(toBeParsed.length() > 0){
+                    if (toBeParsed.length() > 0) {
                         nanos = 0;
                         Log.w(this.getClass().getName(), "Can't parse offset nanos format: " + offset + " ignoring it");
                     }
@@ -174,7 +192,7 @@ public class SyncOffset {
 
     public java.lang.String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(increase ? "" : "-");
+        sb.append(positive ? "" : "-");
         sb.append("P");
         sb.append(String.format("%02d", hour));
         sb.append(":");
@@ -198,7 +216,7 @@ public class SyncOffset {
         SyncOffset that = (SyncOffset) o;
 
         if (hour != that.hour) return false;
-        if (increase != that.increase) return false;
+        if (positive != that.positive) return false;
         if (micros != that.micros) return false;
         if (millis != that.millis) return false;
         if (minute != that.minute) return false;
@@ -216,7 +234,53 @@ public class SyncOffset {
         result = 31 * result + millis;
         result = 31 * result + micros;
         result = 31 * result + nanos;
-        result = 31 * result + (increase ? 1 : 0);
+        result = 31 * result + (positive ? 1 : 0);
         return result;
     }
+
+    public int getHour() {
+        return hour;
+    }
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public int getSecond() {
+        return second;
+    }
+
+    public int getMillis() {
+        return millis;
+    }
+
+    public int getMicros() {
+        return micros;
+    }
+
+    public int getNanos() {
+        return nanos;
+    }
+
+
+    public boolean isPositive() {
+        return positive;
+    }
+
+
+    public SyncOffset add(SyncOffset syncOffset) {
+        return new SyncOffset((isPositive()?1:-1)*toNanos() + (syncOffset.isPositive()?1:-1)*syncOffset.toNanos());
+    }
+
+    public long toNanos() {
+        return getNanos() +
+                getMicros() * 1000L +
+                getMillis() * 1000L *1000L +
+                getSecond() * 1000L *1000L *1000L +
+                getMinute() * 60L * 1000L * 1000L *1000L +
+                getHour() * 60L * 60L * 1000L *1000L *1000L;
+    }
+
+
 }
+

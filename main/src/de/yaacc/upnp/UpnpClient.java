@@ -90,6 +90,8 @@ import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
 import android.media.AudioManager;
+
+import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 /**
@@ -108,11 +110,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private Context context;
 	SharedPreferences preferences;
 	private boolean mute = false;
+    private SyncOffset offset;
 
 	public UpnpClient() {
 	}
 
-	/**
+
+    /**
 	 * Initialize the Object.
 	 * 
 	 * @param context
@@ -1135,6 +1139,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return volume;
 	}
 
+    /**
+     * returns the currrent sync play offset
+     * @return syncoffset
+     */
+    public SyncOffset getOffset() {
+        return offset;
+    }
+
+    /**
+     * set the SyncOffset to the given offset
+     * @param offset the new  offset
+     */
+    public void setOffset(SyncOffset offset) {
+        this.offset = offset;
+    }
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
 		public LocalDummyDevice() throws ValidationException {
@@ -1213,5 +1233,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			return android.os.Build.MODEL;
 		}
 
-	}
+
+
+
+
+    }
 }

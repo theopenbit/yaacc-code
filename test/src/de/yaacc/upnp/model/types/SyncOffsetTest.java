@@ -162,4 +162,40 @@ public class SyncOffsetTest extends AndroidTestCase {
     }
 
 
+    public void  testAdjustOffset(){
+        SyncOffset syncOffset = new SyncOffset("P10:00:00.000 000 000");
+        syncOffset = syncOffset.add(new SyncOffset("P10:00:00.000 999 000"));
+        assertEquals("P20:00:00.000 999 000", syncOffset.toString());
+        syncOffset = new SyncOffset("P10:00:00.000 000 000");
+        syncOffset = syncOffset.add(new SyncOffset("P10:00:00.000 999 999"));
+        assertEquals("P20:00:00.000 999 999", syncOffset.toString());
+        syncOffset = new SyncOffset("P10:00:00.000 001 001");
+        syncOffset = syncOffset.add(new SyncOffset("P10:00:00.000 999 999"));
+        assertEquals("P20:00:00.001 001 000", syncOffset.toString());
+        syncOffset = new SyncOffset("P10:00:00.999 000 001");
+        syncOffset = syncOffset.add(new SyncOffset("P10:00:00.000 999 999"));
+        assertEquals("P20:00:01.000 000 000", syncOffset.toString());
+        syncOffset = new SyncOffset("P10:00:00.999 000 001");
+        syncOffset = syncOffset.add(new SyncOffset("P10:59:59.000 999 999"));
+        assertEquals("P21:00:00.000 000 000", syncOffset.toString());
+
+        syncOffset = new SyncOffset("P20:00:00.000 999 000");
+        syncOffset = syncOffset.add(new SyncOffset("-P10:00:00.000 999 000"));
+        assertEquals("P10:00:00.000 000 000", syncOffset.toString());
+        syncOffset = new SyncOffset("P20:00:00.000 999 999");
+        syncOffset = syncOffset.add(new SyncOffset("-P10:00:00.000 999 999"));
+        assertEquals("P10:00:00.000 000 000", syncOffset.toString());
+        syncOffset = new SyncOffset("P20:00:00.001 001 000");
+        syncOffset = syncOffset.add(new SyncOffset("-P10:00:00.000 999 999"));
+        assertEquals("P10:00:00.000 001 001", syncOffset.toString());
+        syncOffset = new SyncOffset("P20:00:01.000 000 000");
+        syncOffset = syncOffset.add(new SyncOffset("-P10:00:00.000 999 999"));
+        assertEquals("P10:00:00.999 000 001", syncOffset.toString());
+        syncOffset = new SyncOffset("P21:00:00.000 000 000");
+        syncOffset = syncOffset.add(new SyncOffset("-P10:59:59.000 999 999"));
+        assertEquals("P10:00:00.999 000 001", syncOffset.toString());
+    }
+
+
+
 }
