@@ -1,4 +1,5 @@
-package de.yaacc.upnp.model.types;/*
+package de.yaacc.upnp.model.types;
+/*
 * Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
