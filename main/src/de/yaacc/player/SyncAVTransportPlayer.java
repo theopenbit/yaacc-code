@@ -16,10 +16,12 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.player;
-import java.net.URI;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Device;
@@ -30,22 +32,22 @@ import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
 import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.model.DIDLContent;
-import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.DescMeta;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.item.Item;
 
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
+import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+
 import de.yaacc.upnp.UpnpClient;
+
 /**
- * A Player for playing on a remote avtransport device
+ * A Player for playing on a remote avtransport device which supports syncplay
  * @author Tobias Schoene (openbit)
  *
  */
-public class AVTransportPlayer extends AbstractPlayer {
+//FIXME to be completed
+public class SyncAVTransportPlayer extends AbstractPlayer {
     public static final String PLAYER_ID = "PlayerId";
     private String deviceId="";
     private int id;
@@ -54,7 +56,7 @@ public class AVTransportPlayer extends AbstractPlayer {
      * @param name playerName
      *
      */
-    public AVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name) {
+    public SyncAVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name) {
         this(upnpClient);
         deviceId = receiverDevice.getIdentity().getUdn().getIdentifierString();
         setName(name);
@@ -66,8 +68,9 @@ public class AVTransportPlayer extends AbstractPlayer {
     /**
      * @param context
      */
-    public AVTransportPlayer(UpnpClient upnpClient) {
+    public SyncAVTransportPlayer(UpnpClient upnpClient) {
         super(upnpClient);
+
     }
     /* (non-Javadoc)
     * @see de.yaacc.player.AbstractPlayer#stopItem(de.yaacc.player.PlayableItem)

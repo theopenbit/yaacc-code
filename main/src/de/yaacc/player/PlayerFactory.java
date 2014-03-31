@@ -98,10 +98,17 @@ public class PlayerFactory {
             } else if (!video && !image && music) {
                 contentType ="music";
             }
-            result = new AVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
-                    .getString(R.string.playerNameAvTransport)
-                    + "-" + contentType + "@"
-                    + deviceName);
+            if(receiverDevice.getType().getVersion() == 3){
+                result = new SyncAVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
+                        .getString(R.string.playerNameAvTransport)
+                        + "-" + contentType + "@"
+                        + deviceName);
+            }else {
+                result = new AVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
+                        .getString(R.string.playerNameAvTransport)
+                        + "-" + contentType + "@"
+                        + deviceName);
+            }
         } else {
             if (video && !image && !music) {
 // use videoplayer

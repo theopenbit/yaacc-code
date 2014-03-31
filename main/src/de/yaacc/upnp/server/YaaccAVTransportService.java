@@ -26,6 +26,7 @@ import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.avtransport.impl.AVTransportService;
 import org.fourthline.cling.support.avtransport.impl.AVTransportStateMachine;
 import org.fourthline.cling.support.model.AVTransport;
+import org.fourthline.cling.support.model.TransportSettings;
 import org.seamless.statemachine.StateMachineBuilder;
 
 import de.yaacc.upnp.UpnpClient;
@@ -35,6 +36,7 @@ import de.yaacc.upnp.model.types.SyncOffset;
 /**
  * @author Tobias Schöne (openbit)
  */
+@org.fourthline.cling.binding.annotations.UpnpService(serviceId = @org.fourthline.cling.binding.annotations.UpnpServiceId("AVTransport"), serviceType = @org.fourthline.cling.binding.annotations.UpnpServiceType(value = "AVTransport", version = 3), stringConvertibleTypes = {org.fourthline.cling.support.lastchange.LastChange.class})
 public class YaaccAVTransportService extends AVTransportService<AVTransport> {
 
     private final UpnpClient upnpClient;
@@ -77,6 +79,32 @@ public class YaaccAVTransportService extends AVTransportService<AVTransport> {
     public void adjustSyncOffset(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                               @UpnpInputArgument(name = "Adjustment", stateVariable = "SyncOffset") String offset) throws AVTransportException {
         upnpClient.setOffset(upnpClient.getOffset().add(new SyncOffset(offset)));
+    }
+
+
+    @UpnpAction(name = "SyncPlay")
+    public void syncPlay(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
+                                 @UpnpInputArgument(name = "Speed", stateVariable = "TransportPlaySpeed") String speed,
+                                 @UpnpInputArgument(name = "ReferencePositionUnits", stateVariable = "A_ARG_TYPE_SeekMode") String referencedPositionUnits,
+                                 @UpnpInputArgument(name = "ReferencePosition",  stateVariable = "A_ARG_TYPE_SeekTarget") String referencedPosition,
+                                 @UpnpInputArgument(name = "ReferencePresentationTime", stateVariable = "A_ARG_TYPE_PresentationTime") String referencedPresentationTime,
+                                 @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId){
+            //TODO Fill me
+    }
+
+
+    @UpnpAction(name = "SyncStop")
+    public void syncStop(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
+                         @UpnpInputArgument(name = "StopTime", stateVariable = "A_ARG_TYPE_PresentationTime") String referencedPresentationTime,
+                         @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId){
+            //TODO Fill me
+    }
+
+    @UpnpAction(name = "SyncPause")
+    public void syncPause(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
+                         @UpnpInputArgument(name = "PauseTime", stateVariable = "A_ARG_TYPE_PresentationTime") String referencedPresentationTime,
+                         @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId){
+        //TODO Fill me
     }
 
 
