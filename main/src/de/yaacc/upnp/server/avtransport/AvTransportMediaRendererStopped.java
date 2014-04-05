@@ -17,16 +17,19 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.upnp.server.avtransport;
-import java.net.URI;
-import java.util.List;
+
+import android.util.Log;
+
 import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
 import org.fourthline.cling.support.avtransport.impl.state.Stopped;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
-import org.fourthline.cling.support.model.AVTransport;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.SeekMode;
-import android.util.Log;
+
+import java.net.URI;
+import java.util.List;
+
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 /**
@@ -34,7 +37,7 @@ import de.yaacc.upnp.UpnpClient;
  * @author Tobias Schoene (openbit)
  *
  */
-public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
+public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implements YaaccState{
     private UpnpClient upnpClient;
     /**
      * Constructor.
@@ -44,7 +47,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
      * @param upnpClient
      * the upnpclient to use
      */
-    public AvTransportMediaRendererStopped(AVTransport transport,
+    public AvTransportMediaRendererStopped(AvTransport transport,
                                            UpnpClient upnpClient) {
         super(transport);
         this.upnpClient = upnpClient;
@@ -58,7 +61,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     public void onEntry() {
         Log.d(this.getClass().getName(), "On Entry");
         super.onEntry();
-        List<Player> players = upnpClient.getCurrentPlayers(getTransport());
+        List<Player> players = upnpClient.getCurrentPlayers((AvTransport)getTransport());
         for (Player player : players) {
             if(player != null ){
                 player.stop();
@@ -153,5 +156,42 @@ public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
         Log.d(this.getClass().getName(), "seek");
 // Implement seeking with the stream in stopped state!
         return AvTransportMediaRendererStopped.class;
+    }
+
+    @Override
+    public Class<? extends AbstractState>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
+        ((AvTransport)getTransport()).getSynchronizationInfo().setSpeed(speed);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPositionUnits(referencedPositionUnits);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPosition(referencedPosition);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        return AvTransportMediaRendererPlaying.class;
+    }
+
+    @Override
+    public Class<? extends AbstractState>  syncPause(String referencedPresentationTime, String referencedClockId) {
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        return AvTransportMediaRendererPaused.class;
+    }
+
+    @Override
+    public Class<? extends AbstractState>  syncStop(String referencedPresentationTime, String referencedClockId) {
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        return AvTransportMediaRendererStopped.class;
+    }
+
+    public TransportAction[] getPossibleTransportActions(){
+        return new TransportAction[] {
+                TransportAction.Stop,
+                TransportAction.Play,
+                TransportAction.Next,
+                TransportAction.Previous,
+                TransportAction.Seek,
+                TransportAction.SyncPause,
+                TransportAction.SyncPlay,
+                TransportAction.SyncStop
+        };
     }
 } 

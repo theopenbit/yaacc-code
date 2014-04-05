@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.upnp.SynchronizationInfo;
 import de.yaacc.upnp.UpnpClient;
 /**
  * Factory for creating player instances-
@@ -34,6 +35,24 @@ import de.yaacc.upnp.UpnpClient;
  */
 public class PlayerFactory {
     private static List<Player> currentPlayers = new ArrayList<Player>();
+
+    /**
+     * Creates a player for the given content. Based on the configuration
+     * settings in the upnpClient the player may be a player to play on a remote
+     * device.
+     *
+     * @param upnpClient
+     * the upnpClient
+     * @param items
+     * the items to be played
+     * @return the player
+     */
+    public static List<Player> createPlayer(UpnpClient upnpClient,SynchronizationInfo syncInfo,
+                                            List<PlayableItem> items) {
+        //FIXME to be completed
+        return createPlayer(upnpClient,items);
+    }
+
     /**
      * Creates a player for the given content. Based on the configuration
      * settings in the upnpClient the player may be a player to play on a remote
@@ -171,6 +190,20 @@ public class PlayerFactory {
     public static List<Player> getCurrentPlayers() {
         return Collections.unmodifiableList(currentPlayers);
     }
+
+    /**
+     * returns all current players of the given type.
+     *
+     * @param typeClazz
+     * the requested type
+     * @return the currentPlayer
+     */
+    public static List<Player> getCurrentPlayersOfType(Class typeClazz, SynchronizationInfo syncInfo) {
+        //FixMe to be completed
+        return getCurrentPlayersOfType(typeClazz);
+    }
+
+
     /**
      * returns all current players of the given type.
      *

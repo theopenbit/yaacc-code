@@ -35,7 +35,7 @@ import de.yaacc.upnp.UpnpClient;
  * 
  */
 public class AvTransportMediaRendererNoMediaPresent extends
-		NoMediaPresent<AVTransport> {
+		NoMediaPresent<AvTransport> implements YaaccState {
 
 	private UpnpClient upnpClient;
 
@@ -47,7 +47,7 @@ public class AvTransportMediaRendererNoMediaPresent extends
 	 * @param upnpClient
 	 *            the upnpClient to use
 	 */
-	public AvTransportMediaRendererNoMediaPresent(AVTransport transport,
+	public AvTransportMediaRendererNoMediaPresent(AvTransport transport,
 			UpnpClient upnpClient) {
 		super(transport);
 		this.upnpClient = upnpClient;
@@ -75,4 +75,41 @@ public class AvTransportMediaRendererNoMediaPresent extends
 
 		return AvTransportMediaRendererStopped.class;
 	}
+
+    @Override
+    public Class<? extends AbstractState>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
+        ((AvTransport)getTransport()).getSynchronizationInfo().setSpeed(speed);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPositionUnits(referencedPositionUnits);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPosition(referencedPosition);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        return AvTransportMediaRendererPlaying.class;
+    }
+
+    @Override
+    public Class<? extends AbstractState>  syncPause(String referencedPresentationTime, String referencedClockId) {
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        return AvTransportMediaRendererPaused.class;
+    }
+
+    @Override
+    public Class<? extends AbstractState>  syncStop(String referencedPresentationTime, String referencedClockId) {
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
+        ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        return AvTransportMediaRendererStopped.class;
+    }
+
+    public TransportAction[] getPossibleTransportActions(){
+        return new TransportAction[] {
+                TransportAction.Stop,
+                TransportAction.Play,
+                TransportAction.Next,
+                TransportAction.Previous,
+                TransportAction.Seek,
+                TransportAction.SyncPause,
+                TransportAction.SyncPlay,
+                TransportAction.SyncStop
+        };
+    }
 }

@@ -92,6 +92,7 @@ import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseActionCallback;
 import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
+import de.yaacc.upnp.server.avtransport.AvTransport;
 
 /**
  * A client facade to the upnp lookup and access framework. This class provides
@@ -109,7 +110,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	private Context context;
 	SharedPreferences preferences;
 	private boolean mute = false;
-    private SyncOffset offset;
+
 
 	public UpnpClient() {
 	}
@@ -770,7 +771,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
-	public List<Player> initializePlayers(AVTransport transport) {
+	public List<Player> initializePlayers(AvTransport transport) {
 		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null) {
@@ -818,7 +819,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		Log.d(getClass().getName(), "Current duration: " + positionInfo.getTrackDuration());
 		Log.d(getClass().getName(), "TrackMetaData: " + positionInfo.getTrackMetaData());
 		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
-		return PlayerFactory.createPlayer(this, items);
+		return PlayerFactory.createPlayer(this, transport.getSynchronizationInfo(),items);
 	}
 
 	/**
@@ -828,7 +829,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 *            the object which describes the content to be played
 	 * @return the player
 	 */
-	public List<Player> getCurrentPlayers(AVTransport transport) {
+	public List<Player> getCurrentPlayers(AvTransport transport) {
 		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null)
@@ -866,7 +867,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		playableItem.setMimeType(mimeType);
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
 		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
-		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType));
+		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType),transport.getSynchronizationInfo());
 		return avTransportPlayers;
 	}
 
@@ -1138,21 +1139,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		return volume;
 	}
 
-    /**
-     * returns the currrent sync play offset
-     * @return syncoffset
-     */
-    public SyncOffset getOffset() {
-        return offset;
-    }
 
-    /**
-     * set the SyncOffset to the given offset
-     * @param offset the new  offset
-     */
-    public void setOffset(SyncOffset offset) {
-        this.offset = offset;
-    }
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private class LocalDummyDevice extends Device {
