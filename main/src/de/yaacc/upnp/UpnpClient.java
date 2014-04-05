@@ -19,11 +19,8 @@
 package de.yaacc.upnp;
 
 import java.net.URI;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,6 +88,8 @@ import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
 import android.media.AudioManager;
 
+import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
+import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseActionCallback;
 import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 
@@ -579,7 +578,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	/**
 	 * Browse ContenDirctory synchronous
 	 * 
-	 * @param Position
+	 * @param pos Position
 	 *            the device and object to be browsed
 	 * @return the browsing result
 	 */

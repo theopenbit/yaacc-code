@@ -81,6 +81,10 @@ public class SyncOffset {
 
     }
 
+    public SyncOffset(){
+
+    }
+
     public SyncOffset(long nanos) {
         if(nanos < 0) {
             positive = false;

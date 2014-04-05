@@ -1,4 +1,4 @@
-package de.yaacc.upnp.server.avtransport.callback;/*
+package de.yaacc.upnp.callback.avtransport;/*
 * Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
@@ -26,17 +26,15 @@ import java.util.logging.Logger;
 /**
  * @author Tobias Schoene (TheOpenBit)
  */
-public abstract class SyncPlay extends ActionCallback {
+public abstract class SetSyncOffset extends ActionCallback {
 
-    private static Logger log = Logger.getLogger(SyncPlay.class.getName());
+    private static Logger log = Logger.getLogger(SetSyncOffset.class.getName());
 
-    public SyncPlay(UnsignedIntegerFourBytes instanceId, Service service, String referencePositionUnits, String referencePosition, String referencePresentationTime, String referenceClockId) {
-        super(new ActionInvocation(service.getAction("SyncPlay")));
+    public SetSyncOffset(UnsignedIntegerFourBytes instanceId, Service service, String syncOffset) {
+        super(new ActionInvocation(service.getAction("SetSyncOffset")));
         getActionInvocation().setInput("InstanceID", instanceId);
-        getActionInvocation().setInput("ReferencePositionUnits", referencePositionUnits);
-        getActionInvocation().setInput("ReferencePosition", referencePosition);
-        getActionInvocation().setInput("ReferencePresentationTime",referencePresentationTime);
-        getActionInvocation().setInput("ReferenceClockId", referenceClockId);
+        getActionInvocation().setInput("NewSyncOffset", syncOffset);
+
     }
 
     @Override

@@ -1,4 +1,4 @@
-package de.yaacc.upnp.server.avtransport.callback;/*
+package de.yaacc.upnp.callback.avtransport;/*
 * Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or

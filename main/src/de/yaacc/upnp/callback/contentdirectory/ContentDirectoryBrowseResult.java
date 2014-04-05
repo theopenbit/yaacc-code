@@ -16,10 +16,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc.upnp;
+package de.yaacc.upnp.callback.contentdirectory;
 
 import org.fourthline.cling.support.contentdirectory.callback.Browse.Status;
 import org.fourthline.cling.support.model.DIDLContent;
+
+import de.yaacc.upnp.UpnpFailure;
 
 /**
  * Result of a content directory browsing.

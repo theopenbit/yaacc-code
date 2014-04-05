@@ -16,7 +16,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
-package de.yaacc.upnp.server;
+package de.yaacc.upnp.server.avtransport;
 import java.net.URI;
 import java.util.List;
 import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
@@ -26,6 +26,8 @@ import org.fourthline.cling.support.model.AVTransport;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.SeekMode;
+import org.fourthline.cling.support.model.TransportAction;
+
 import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
@@ -140,4 +142,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AVTransport> {
         Log.d(this.getClass().getName(), "seek");
         return null;
     }
+
+
+
 } 

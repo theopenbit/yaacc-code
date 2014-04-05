@@ -16,24 +16,25 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
-package de.yaacc.upnp.server;
+package de.yaacc.upnp.server.avtransport;
 import java.net.URI;
 import java.util.List;
 import org.fourthline.cling.support.avtransport.impl.state.AbstractState;
-import org.fourthline.cling.support.avtransport.impl.state.PausedPlay;
+import org.fourthline.cling.support.avtransport.impl.state.Stopped;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.fourthline.cling.support.model.AVTransport;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.model.SeekMode;
 import android.util.Log;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 /**
- * State Paused.
+ * State stopped
  * @author Tobias Schoene (openbit)
  *
  */
-public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
+public class AvTransportMediaRendererStopped extends Stopped<AVTransport> {
     private UpnpClient upnpClient;
     /**
      * Constructor.
@@ -43,24 +44,37 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
      * @param upnpClient
      * the upnpclient to use
      */
-    public AvTransportMediaRendererPaused(AVTransport transport,
-                                          UpnpClient upnpClient) {
+    public AvTransportMediaRendererStopped(AVTransport transport,
+                                           UpnpClient upnpClient) {
         super(transport);
         this.upnpClient = upnpClient;
     }
-    /* (non-Javadoc)
-    * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#play(java.lang.String)
+    /*
+    * (non-Javadoc)
+    *
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#onEntry()
     */
     @Override
-    public Class<? extends AbstractState> play(String arg0) {
-        Log.d(this.getClass().getName(), "play");
-        return AvTransportMediaRendererPlaying.class;
+    public void onEntry() {
+        Log.d(this.getClass().getName(), "On Entry");
+        super.onEntry();
+        List<Player> players = upnpClient.getCurrentPlayers(getTransport());
+        for (Player player : players) {
+            if(player != null ){
+                player.stop();
+            }
+        }
     }
-    /* (non-Javadoc)
-    * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#setTransportURI(java.net.URI, java.lang.String)
+    /*
+    * (non-Javadoc)
+    *
+    * @see
+    * org.fourthline.cling.support.avtransport.impl.state.Stopped#setTransportURI
+    * (java.net.URI, java.lang.String)
     */
     @Override
-    public Class<? extends AbstractState> setTransportURI(URI uri, String metaData) {
+    public Class<? extends AbstractState> setTransportURI(URI uri,
+                                                          String metaData) {
         Log.d(this.getClass().getName(), "setTransportURI");
         Log.d(this.getClass().getName(), "uri: " + uri);
         Log.d(this.getClass().getName(), "metaData: " + metaData);
@@ -82,27 +96,62 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AVTransport> {
 // prefer stopping first?
         return AvTransportMediaRendererStopped.class;
     }
-    /* (non-Javadoc)
-    * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#stop()
+    /*
+    * (non-Javadoc)
+    *
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#stop()
     */
     @Override
     public Class<? extends AbstractState> stop() {
         Log.d(this.getClass().getName(), "stop");
+// / Same here, if you are stopped already and someone calls STOP,
+// well...
         return AvTransportMediaRendererStopped.class;
     }
     /*
     * (non-Javadoc)
-    * @see org.fourthline.cling.support.avtransport.impl.state.Playing#onEntry()
+    *
+    * @see
+    * org.fourthline.cling.support.avtransport.impl.state.Stopped#play(java.lang
+    * .String)
     */
     @Override
-    public void onEntry() {
-        Log.d(this.getClass().getName(), "On Entry");
-        super.onEntry();
-        List<Player> players = upnpClient.getCurrentPlayers(getTransport());
-        for (Player player : players) {
-            if(player != null ){
-                player.pause();
-            }
-        }
+    public Class<? extends AbstractState> play(String speed) {
+        Log.d(this.getClass().getName(), "play");
+// It's easier to let this classes' onEntry() method do the work
+        return AvTransportMediaRendererPlaying.class;
+    }
+    /*
+    * (non-Javadoc)
+    *
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#next()
+    */
+    @Override
+    public Class<? extends AbstractState> next() {
+        Log.d(this.getClass().getName(), "next");
+        return AvTransportMediaRendererStopped.class;
+    }
+    /*
+    * (non-Javadoc)
+    *
+    * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#previous()
+    */
+    @Override
+    public Class<? extends AbstractState> previous() {
+        Log.d(this.getClass().getName(), "previous");
+        return AvTransportMediaRendererStopped.class;
+    }
+    /*
+    * (non-Javadoc)
+    *
+    * @see
+    * org.fourthline.cling.support.avtransport.impl.state.Stopped#seek(org.fourthline
+    * .cling.support.model.SeekMode, java.lang.String)
+    */
+    @Override
+    public Class<? extends AbstractState> seek(SeekMode unit, String target) {
+        Log.d(this.getClass().getName(), "seek");
+// Implement seeking with the stream in stopped state!
+        return AvTransportMediaRendererStopped.class;
     }
 } 

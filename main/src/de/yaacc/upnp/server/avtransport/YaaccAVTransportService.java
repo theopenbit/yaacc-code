@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc.upnp.server;
+package de.yaacc.upnp.server.avtransport;
 
 import org.fourthline.cling.binding.annotations.UpnpAction;
 import org.fourthline.cling.binding.annotations.UpnpInputArgument;
@@ -26,11 +26,12 @@ import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.avtransport.impl.AVTransportService;
 import org.fourthline.cling.support.avtransport.impl.AVTransportStateMachine;
 import org.fourthline.cling.support.model.AVTransport;
-import org.fourthline.cling.support.model.TransportSettings;
 import org.seamless.statemachine.StateMachineBuilder;
 
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.model.types.SyncOffset;
+import de.yaacc.upnp.server.avtransport.AvTransportMediaRendererNoMediaPresent;
+import de.yaacc.upnp.server.avtransport.AvTransportStateMachine;
 
 
 /**

@@ -50,7 +50,7 @@ public class AVTransportPlayer extends AbstractPlayer {
     private String deviceId="";
     private int id;
     /**
-     * @param context
+     * @param upnpClient the client
      * @param name playerName
      *
      */
@@ -64,7 +64,7 @@ public class AVTransportPlayer extends AbstractPlayer {
         return getUpnpClient().getDevice(deviceId);
     }
     /**
-     * @param context
+     * @param upnpClient the client
      */
     public AVTransportPlayer(UpnpClient upnpClient) {
         super(upnpClient);
