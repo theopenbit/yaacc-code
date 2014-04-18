@@ -99,18 +99,18 @@ import de.yaacc.upnp.server.avtransport.AvTransport;
  * all services to manage devices.
  * 
  * 
- * @author Tobias Schoene (openbit)
+ * @author Tobias Schoene (TheOpenBit)
  * 
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
 	public static String LOCAL_UID = "LOCAL_UID";
-	private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
-	private Set<Device> knownDevices = new HashSet<Device>();
-	private AndroidUpnpService androidUpnpService;
-	private Context context;
-	SharedPreferences preferences;
-	private boolean mute = false;
-
+    public static SyncOffset ACTION_EXECUTION_DELAY = new SyncOffset("P00:00:01");
+    private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
+    private Set<Device> knownDevices = new HashSet<Device>();
+    private AndroidUpnpService androidUpnpService;
+    private Context context;
+    SharedPreferences preferences;
+    private boolean mute = false;
 
 	public UpnpClient() {
 	}
@@ -329,8 +329,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * 
 	 * @param uris
 	 *            the uri to start
-	 * @param backround
-	 *            starts a background activity
+	 * @param mime
+	 *            mime type
 	 */
 	protected void intentView(String mime, Uri... uris) {
 		if (uris == null || uris.length == 0)
@@ -760,8 +760,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
             PlayableItem playableItem = new PlayableItem(currentItem, getDefaultDuration());
             playableItems.add(playableItem);
         }
-
-		return PlayerFactory.createPlayer(this, playableItems);
+        SynchronizationInfo synchronizationInfo = new SynchronizationInfo();
+        synchronizationInfo.setOffset(ACTION_EXECUTION_DELAY);
+        return PlayerFactory.createPlayer(this, synchronizationInfo, playableItems);
 	}
 
 	/**
@@ -775,13 +776,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null) {
-			return PlayerFactory.createPlayer(this, items);
+			return PlayerFactory.createPlayer(this,transport.getSynchronizationInfo(), items);
 		}
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
 		Log.d(getClass().getName(), "positionInfo: " + positionInfo);
 		if (positionInfo == null) {
-			return PlayerFactory.createPlayer(this, items);
+			return PlayerFactory.createPlayer(this,transport.getSynchronizationInfo(), items);
 		}
 		DIDLContent metadata = null;
 		try {
@@ -833,11 +834,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null)
-			return PlayerFactory.createPlayer(this, items);
+			return PlayerFactory.createPlayer(this, transport.getSynchronizationInfo(), items);
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
 		if (positionInfo == null) {
-			return PlayerFactory.createPlayer(this, items);
+			return PlayerFactory.createPlayer(this, transport.getSynchronizationInfo(), items);
 		}
 		DIDLContent metadata = null;
 		try {
@@ -980,8 +981,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	}
 
 	/**
-	 * 
-	 * @param receiver
+	 *  set the receiverDevices to the devices in the given collection.
+	 * @param receiverDevices the devices
 	 */
 	public void setReceiverDevices(Collection<Device> receiverDevices) {
 		assert (receiverDevices != null);

@@ -52,14 +52,12 @@ import de.yaacc.upnp.callback.avtransport.SyncStop;
  * @author Tobias Schoene (openbit)
  *
  */
-//FIXME to be completed
 public class SyncAVTransportPlayer extends AbstractPlayer {
     public static final String PLAYER_ID = "PlayerId";
     private String deviceId="";
     private int id;
-    private String referenceClockId;
-    private SyncOffset offset = new SyncOffset();
-    private SyncOffset actionExecutionDelay = new SyncOffset("P00:00:01");
+
+
 
     /**
      * @param receiverDevice the receiver device
@@ -106,9 +104,8 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 // Now start Stopping
         Log.d(getClass().getName(), "Action SyncStop");
         actionState.actionFinished = false;
-        referenceClockId = "0";
-        actionExecutionDelay = new SyncOffset("-P00:00:02");
-        SyncStop actionCallback = new SyncStop(new UnsignedIntegerFourBytes(id),service, actionExecutionDelay.add(offset).toString(), referenceClockId) {
+
+        SyncStop actionCallback = new SyncStop(new UnsignedIntegerFourBytes(id),service, getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -173,7 +170,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 // Now start Playing
         Log.d(getClass().getName(), "Action SyncPlay");
         actionState.actionFinished = false;
-        SyncPlay actionCallback = new SyncPlay(new UnsignedIntegerFourBytes(id),service, "","", actionExecutionDelay.add(offset).toString(), referenceClockId) {
+        SyncPlay actionCallback = new SyncPlay(new UnsignedIntegerFourBytes(id),service, "","", getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -291,7 +288,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action SyncPause ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        SyncPause actionCallback = new SyncPause(new UnsignedIntegerFourBytes(id),service, actionExecutionDelay.add(offset).toString(), referenceClockId) {
+        SyncPause actionCallback = new SyncPause(new UnsignedIntegerFourBytes(id),service, getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -318,7 +315,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     }
 
     public void getSyncOffset() {
-        offset = new SyncOffset();
+
         if(getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
@@ -357,12 +354,12 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Future callbackFuture = getUpnpClient().getControlPoint().execute(actionCallback);
         while (  !callbackFuture.isDone() || !callbackFuture.isCancelled());
         if(callbackFuture.isDone()){
-            offset =  new SyncOffset(result);
+            getSyncInfo().setOffset(new SyncOffset(result));
         }
     }
 
     public void setSyncOffset(SyncOffset offset) {
-        this.offset =  offset;
+        getSyncInfo().setOffset(offset);
         if(getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
@@ -401,7 +398,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     }
 
     public void adjustSyncOffset(SyncOffset offset) {
-        this.offset.add(offset);
+        getSyncInfo().getOffset().add(offset);
         if(getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "

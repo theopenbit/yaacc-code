@@ -40,6 +40,7 @@ import android.widget.Toast;
 import org.fourthline.cling.support.model.DIDLObject;
 
 import de.yaacc.R;
+import de.yaacc.upnp.SynchronizationInfo;
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -58,12 +59,13 @@ public abstract class AbstractPlayer implements Player {
 	private UpnpClient upnpClient;
 	private String name;
 
-    private URI albumArtUri;
+
 
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private SynchronizationInfo syncInfo;
 
-	/**
-	 * @param context
+    /**
+	 * @param upnpClient
 	 */
 	public AbstractPlayer(UpnpClient upnpClient) {
 		super();
@@ -511,7 +513,23 @@ public abstract class AbstractPlayer implements Player {
 		return "";
 	}
 
-    public URI getAlbumArtUri(){
-        return albumArtUri;
+
+
+    @Override
+    public URI getAlbumArt() {
+        return null;
+    }
+
+    @Override
+    public void setSyncInfo(SynchronizationInfo syncInfo) {
+        if(syncInfo == null) {
+            syncInfo = new SynchronizationInfo();
+        }
+        this.syncInfo = syncInfo;
+    }
+
+    @Override
+    public SynchronizationInfo getSyncInfo() {
+        return syncInfo;
     }
 }

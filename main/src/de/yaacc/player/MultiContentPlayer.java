@@ -49,7 +49,7 @@ public class MultiContentPlayer extends AbstractPlayer {
 	private int appPid;
 
 	/**
-	 * @param context
+	 * @param upnpClient
 	 * @param name
 	 *            playerName
 	 * 
@@ -60,7 +60,7 @@ public class MultiContentPlayer extends AbstractPlayer {
 	}
 
 	/**
-	 * @param context
+	 * @param upnpClient
 	 */
 	public MultiContentPlayer(UpnpClient upnpClient) {
 		super(upnpClient);

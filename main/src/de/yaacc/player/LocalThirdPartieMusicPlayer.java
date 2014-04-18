@@ -50,7 +50,7 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	private int musicAppPid=0; 
 	
 	/**
-	 * @param context
+	 * @param upnpClient
 	 * @param name playerName
 	 * 
 	 */
@@ -61,7 +61,7 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 	
 	
 	/**
-	 * @param context
+	 * @param upnpClient
 	 */
 	public LocalThirdPartieMusicPlayer(UpnpClient upnpClient) {
 		super(upnpClient);

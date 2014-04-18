@@ -22,6 +22,8 @@ import org.fourthline.cling.support.model.DIDLObject;
 import java.beans.PropertyChangeListener;
 import java.net.URI;
 
+import de.yaacc.upnp.SynchronizationInfo;
+
 
 /**
  * A Player is able to play stop a couple of MediaObjects  
@@ -143,5 +145,17 @@ public interface Player {
      *
      */
     URI getAlbumArt();
+
+    /**
+     * Set the synchronization information
+     * @param syncInfo the info object
+     */
+    void setSyncInfo(SynchronizationInfo syncInfo);
+
+    /**
+     * Get the synchronization information
+     * @return the info object
+     */
+    SynchronizationInfo  getSyncInfo();
 
 }

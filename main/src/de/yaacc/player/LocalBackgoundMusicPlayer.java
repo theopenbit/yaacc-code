@@ -114,7 +114,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 				getContext().sendBroadcast(intent);
 
 			}
-		}, 600L);
+		}, getExecutionTime());
 	}
 
 	/*
@@ -141,7 +141,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 				getContext().sendBroadcast(intent);
 
 			}
-		}, 600L);
+		}, getExecutionTime());
 	}
 
 	/*
@@ -198,14 +198,18 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 				intent.setAction(BackgroundMusicBroadcastReceiver.ACTION_PLAY);
 				getContext().sendBroadcast(intent);
 			}
-		}, 600L);
+		}, getExecutionTime());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
-	 */
+    private long getExecutionTime() {
+        return getSyncInfo().getOffset().toNanos()/ 1000000 +  600L;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
+     */
 	@Override
 	protected PendingIntent getNotificationIntent() {
 		Intent notificationIntent = new Intent(getContext(), MusicPlayerActivity.class);

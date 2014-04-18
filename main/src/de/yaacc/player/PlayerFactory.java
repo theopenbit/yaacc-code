@@ -36,22 +36,6 @@ import de.yaacc.upnp.UpnpClient;
 public class PlayerFactory {
     private static List<Player> currentPlayers = new ArrayList<Player>();
 
-    /**
-     * Creates a player for the given content. Based on the configuration
-     * settings in the upnpClient the player may be a player to play on a remote
-     * device.
-     *
-     * @param upnpClient
-     * the upnpClient
-     * @param items
-     * the items to be played
-     * @return the player
-     */
-    public static List<Player> createPlayer(UpnpClient upnpClient,SynchronizationInfo syncInfo,
-                                            List<PlayableItem> items) {
-        //FIXME to be completed
-        return createPlayer(upnpClient,items);
-    }
 
     /**
      * Creates a player for the given content. Based on the configuration
@@ -65,7 +49,7 @@ public class PlayerFactory {
      * @return the player
      */
     public static List<Player> createPlayer(UpnpClient upnpClient,
-                                            List<PlayableItem> items) {
+                                            SynchronizationInfo syncInfo,List<PlayableItem> items) {
         List<Player> resultList = new ArrayList<Player>();
         Player result = null;
         boolean video = false;
@@ -78,7 +62,7 @@ public class PlayerFactory {
         }
         Log.d(PlayerFactory.class.getName(), "video:" + video + " image: " + image + "audio:" + music );
         for (Device device : upnpClient.getReceiverDevices()) {
-            result = createPlayer(upnpClient,device, video, image, music);
+            result = createPlayer(upnpClient,device, video, image, music,syncInfo);
             if (result != null) {
                 currentPlayers.add(result);
                 result.setItems(items.toArray(new PlayableItem[items.size()]));
@@ -97,7 +81,7 @@ public class PlayerFactory {
      * @return the player or null if no device is present
      */
     private static Player createPlayer(UpnpClient upnpClient,Device receiverDevice,
-                                       boolean video, boolean image, boolean music) {
+                                       boolean video, boolean image, boolean music, SynchronizationInfo syncInfo) {
         if( receiverDevice == null){
             Toast toast = Toast.makeText(upnpClient.getContext(), upnpClient.getContext().getString(R.string.error_no_receiver_device_found), Toast.LENGTH_SHORT);
             toast.show();
@@ -151,6 +135,7 @@ public class PlayerFactory {
                         .getString(R.string.playerNameMultiContent));
             }
         }
+        result.setSyncInfo(syncInfo);
         return result;
     }
     private static Player createImagePlayer(UpnpClient upnpClient) {
