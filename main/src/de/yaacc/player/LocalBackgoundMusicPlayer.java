@@ -186,7 +186,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 		// if we send an broadcast event to early the activity won't be up
 		// because there is no known way to query the activity state
 		// we are sending the command delayed
-        DIDLObject.Property<URI> albumArtUriProperty = playableItem.getItem().getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+        DIDLObject.Property<URI> albumArtUriProperty = playableItem.getItem() == null? null : playableItem.getItem().getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
         albumArtUri = (albumArtUriProperty==null) ? null: albumArtUriProperty.getValue();
 
 		commandExecutionTimer = new Timer();

@@ -826,7 +826,6 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 * @return the player
 	 */
 	public List<Player> getCurrentPlayers(AVTransport transport) {
-		PlayableItem playableItem = new PlayableItem();
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
 		if (transport == null)
 			return PlayerFactory.createPlayer(this, items);
@@ -842,9 +841,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 			Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
 		}
 		String mimeType = "";
+        PlayableItem playableItem = null;
 		if (metadata != null) {
 			List<Item> metadataItems = metadata.getItems();
 			for (Item item : metadataItems) {
+                playableItem = new PlayableItem(item,getDefaultDuration());
 				playableItem.setTitle(item.getTitle());
 				List<Res> metadataResources = item.getResources();
 				for (Res res : metadataResources) {
@@ -856,6 +857,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 				break;
 			}
 		} else {
+            playableItem = new PlayableItem(null,getDefaultDuration());
 			playableItem.setTitle(positionInfo.getTrackURI().toString());
 			String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
 			mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
