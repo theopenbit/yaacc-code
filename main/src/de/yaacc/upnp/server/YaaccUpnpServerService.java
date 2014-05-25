@@ -476,11 +476,11 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the service
 	 */
 	@SuppressWarnings("unchecked")
-	private LocalService<AbstractAVTransportService> createAVTransportService() {
-		LocalService<AbstractAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(AbstractAVTransportService.class);
-		avTransportService.setManager(new DefaultServiceManager<AbstractAVTransportService>(avTransportService, null) {
+	private LocalService<YaaccAVTransportService> createAVTransportService() {
+		LocalService<YaaccAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(AbstractAVTransportService.class);
+		avTransportService.setManager(new DefaultServiceManager<YaaccAVTransportService>(avTransportService, null) {
 			@Override
-			protected AbstractAVTransportService createServiceInstance() throws Exception {
+			protected YaaccAVTransportService createServiceInstance() throws Exception {
 				return new YaaccAVTransportService(getUpnpClient());
 			}
 		});
