@@ -18,6 +18,9 @@ package de.yaacc.upnp.model.types;/*
 
 import android.util.Log;
 
+import org.fourthline.cling.model.types.Datatype;
+import org.fourthline.cling.model.types.InvalidValueException;
+
 /**
  * Representation of the upnp type SyncOffset.
  * Format of the upnp type:
@@ -32,7 +35,7 @@ import android.util.Log;
  *
  * @author Tobias Schoene (TheOpenBit)
  */
-public class SyncOffset {
+public class SyncOffset implements Datatype{
 
 
     private int hour = 0;
@@ -286,5 +289,45 @@ public class SyncOffset {
     }
 
 
+    @Override
+    public boolean isHandlingJavaType(Class aClass) {
+        if (aClass == null) {
+            return false;
+        }
+        return aClass.isAssignableFrom(getClass());
+    }
+
+    @Override
+    public Builtin getBuiltin() {
+        return null;
+    }
+
+    @Override
+    public boolean isValid(Object o) {
+        if(o == null || ! (o instanceof SyncOffset)) {
+            return false;
+        }
+        //TODO to be implemented
+
+        return true;
+    }
+
+    @Override
+    public String getString(Object o) throws InvalidValueException {
+        if(o == null || ! (o instanceof SyncOffset)) {
+            return "";
+        }
+        return o.toString();
+    }
+
+    @Override
+    public Object valueOf(String s) throws InvalidValueException {
+        return new SyncOffset(s);
+    }
+
+    @Override
+    public String getDisplayString() {
+        return toString();
+    }
 }
 

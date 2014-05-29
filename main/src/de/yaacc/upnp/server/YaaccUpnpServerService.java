@@ -49,6 +49,7 @@ import org.apache.http.protocol.ResponseServer;
 
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.DefaultServiceManager;
+import org.fourthline.cling.model.ValidationError;
 import org.fourthline.cling.model.ValidationException;
 import org.fourthline.cling.model.meta.DeviceDetails;
 import org.fourthline.cling.model.meta.DeviceIdentity;
@@ -57,6 +58,7 @@ import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
 import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
+import org.fourthline.cling.model.meta.UDAVersion;
 import org.fourthline.cling.model.types.DLNACaps;
 import org.fourthline.cling.model.types.DLNADoc;
 import org.fourthline.cling.model.types.UDADeviceType;
@@ -347,11 +349,14 @@ public class YaaccUpnpServerService extends Service {
                         		new DLNADoc("DMS", DLNADoc.Version.V1_5),
                         		new DLNADoc("M-DMS", DLNADoc.Version.V1_5)
 							},
-							new DLNACaps(new String[] {"av-upload", "image-upload", "audio-upload"})), createDeviceIcons(), createMediaRendererServices());
+							new DLNACaps(new String[] {"av-upload", "image-upload", "audio-upload"})), createDeviceIcons(), createMediaRendererServices(),null);
 
 			return device;
 		} catch (ValidationException e) {
-			throw new IllegalStateException("Exception during device creation", e);
+            for (ValidationError validationError : e.getErrors()) {
+                Log.d(getClass().getCanonicalName(), validationError.toString());
+            }
+                throw new IllegalStateException("Exception during device creation", e);
 		}
 
 	}
@@ -477,7 +482,7 @@ public class YaaccUpnpServerService extends Service {
 	 */
 	@SuppressWarnings("unchecked")
 	private LocalService<YaaccAVTransportService> createAVTransportService() {
-		LocalService<YaaccAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(AbstractAVTransportService.class);
+		LocalService<YaaccAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(YaaccAVTransportService.class);
 		avTransportService.setManager(new DefaultServiceManager<YaaccAVTransportService>(avTransportService, null) {
 			@Override
 			protected YaaccAVTransportService createServiceInstance() throws Exception {

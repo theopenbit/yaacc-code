@@ -209,7 +209,12 @@ import de.yaacc.upnp.server.avtransport.AvTransportStateMachine;
         @UpnpStateVariable(
                 name = "A_ARG_TYPE_InstanceID",
                 sendEvents = false,
-                datatype = "ui4")
+                datatype = "ui4"),
+        @UpnpStateVariable(
+                name = "SyncOffset",
+                sendEvents = false,
+                datatype = "SyncOffset.class")
+
 })
 public class YaaccAVTransportService implements LastChangeDelegator {
 
@@ -233,6 +238,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     protected YaaccAVTransportService() {
         this.propertyChangeSupport = new PropertyChangeSupport(this);
         this.lastChange = new LastChange(new AVTransportLastChangeParser());
+
     }
 
     protected YaaccAVTransportService(LastChange lastChange) {
