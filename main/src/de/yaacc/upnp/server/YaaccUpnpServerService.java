@@ -339,7 +339,7 @@ public class YaaccUpnpServerService extends Service {
 			versionName = "??";
 		}
 		try {
-			device = new LocalDevice(new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)), new UDADeviceType("MediaRenderer"),
+			device = new LocalDevice(new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)), new UDADeviceType("MediaRenderer",3),
 			// Used for shown name: first part of ManufactDet, first
 			// part of ModelDet and version number
 					new DeviceDetails("YAACC - MediaRenderer (" + getLocalServerName() + ")",

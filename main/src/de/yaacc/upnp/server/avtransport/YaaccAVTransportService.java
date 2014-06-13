@@ -68,6 +68,7 @@ import de.yaacc.upnp.server.avtransport.AvTransportStateMachine;
 
 /**
  * Implementation of an avtransport service version 3 mainly copied from cling example implementation.
+ *
  * @author Tobias Schöne (openbit)
  */
 @UpnpService(
@@ -213,26 +214,42 @@ import de.yaacc.upnp.server.avtransport.AvTransportStateMachine;
         @UpnpStateVariable(
                 name = "SyncOffset",
                 sendEvents = false,
-                datatype = "SyncOffset.class")
+                datatype = "string"),
+        @UpnpStateVariable(
+                name = "PauseTime",
+                sendEvents = false,
+                datatype = "string"),
+        @UpnpStateVariable(
+                name = "ReferenceClockId",
+                sendEvents = false,
+                datatype = "string"),
+        @UpnpStateVariable(
+                name = "ReferencePresentationTime",
+                sendEvents = false,
+                datatype = "string"),
+        @UpnpStateVariable(
+                name = "StopTime",
+                sendEvents = false,
+                datatype = "string")
 
 })
 public class YaaccAVTransportService implements LastChangeDelegator {
 
-    private UpnpClient upnpClient=null;
+    private UpnpClient upnpClient = null;
     private AvTransport avTransport;
 
     final private static Logger log = Logger.getLogger(AVTransportService.class.getName());
 
-     private Map<Long, AVTransportStateMachine> stateMachines = new ConcurrentHashMap();
+    private Map<Long, AVTransportStateMachine> stateMachines = new ConcurrentHashMap();
 
-     Class<? extends AVTransportStateMachine> stateMachineDefinition = null;
-     Class<? extends AbstractState> initialState= null;
-     Class<? extends AVTransport> transportClass= null;
+    Class<? extends AVTransportStateMachine> stateMachineDefinition = null;
+    Class<? extends AbstractState> initialState = null;
+    Class<? extends AVTransport> transportClass = null;
 
 
     @UpnpStateVariable(eventMaximumRateMilliseconds = 200)
-     private LastChange lastChange= null;
-     protected PropertyChangeSupport propertyChangeSupport= null;
+    private LastChange lastChange = null;
+    protected PropertyChangeSupport propertyChangeSupport = null;
 
 
     protected YaaccAVTransportService() {
@@ -258,19 +275,19 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
 
     protected YaaccAVTransportService(Class<? extends AVTransportStateMachine> stateMachineDefinition,
-                              Class<? extends AbstractState> initialState) {
-        this(stateMachineDefinition, initialState, (Class<? extends AVTransport>)AVTransport.class);
+                                      Class<? extends AbstractState> initialState) {
+        this(stateMachineDefinition, initialState, (Class<? extends AVTransport>) AVTransport.class);
     }
 
     protected YaaccAVTransportService(Class<? extends AVTransportStateMachine> stateMachineDefinition,
-                              Class<? extends AbstractState> initialState,
-                              Class<? extends AVTransport> transportClass) {
+                                      Class<? extends AbstractState> initialState,
+                                      Class<? extends AVTransport> transportClass) {
         this.stateMachineDefinition = stateMachineDefinition;
         this.initialState = initialState;
         this.transportClass = transportClass;
     }
 
-   /**
+    /**
      *
      */
     public YaaccAVTransportService(UpnpClient upnpClient) {
@@ -278,8 +295,6 @@ public class YaaccAVTransportService implements LastChangeDelegator {
                 AvTransportMediaRendererNoMediaPresent.class);
         this.upnpClient = upnpClient;
     }
-
-
 
 
     @Override
@@ -366,11 +381,11 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     public void syncPlay(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                          @UpnpInputArgument(name = "Speed", stateVariable = "TransportPlaySpeed") String speed,
                          @UpnpInputArgument(name = "ReferencePositionUnits", stateVariable = "A_ARG_TYPE_SeekMode") String referencedPositionUnits,
-                         @UpnpInputArgument(name = "ReferencePosition",  stateVariable = "A_ARG_TYPE_SeekTarget") String referencedPosition,
+                         @UpnpInputArgument(name = "ReferencePosition", stateVariable = "A_ARG_TYPE_SeekTarget") String referencedPosition,
                          @UpnpInputArgument(name = "ReferencePresentationTime", stateVariable = "A_ARG_TYPE_PresentationTime") String referencedPresentationTime,
-                         @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId) throws  AVTransportException{
+                         @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId) throws AVTransportException {
         try {
-            ((AvTransportStateMachine)findStateMachine(instanceId)).syncPlay(speed, referencedPositionUnits, referencedPosition, referencedPresentationTime, referencedClockId);
+            ((AvTransportStateMachine) findStateMachine(instanceId)).syncPlay(speed, referencedPositionUnits, referencedPosition, referencedPresentationTime, referencedClockId);
         } catch (TransitionException ex) {
             throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, ex.getMessage());
         }
@@ -380,9 +395,9 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     @UpnpAction(name = "SyncStop")
     public void syncStop(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                          @UpnpInputArgument(name = "StopTime", stateVariable = "A_ARG_TYPE_PresentationTime") String referencedPresentationTime,
-                         @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId) throws  AVTransportException {
+                         @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId) throws AVTransportException {
         try {
-            ((AvTransportStateMachine)findStateMachine(instanceId)).syncStop(referencedPresentationTime, referencedClockId);
+            ((AvTransportStateMachine) findStateMachine(instanceId)).syncStop(referencedPresentationTime, referencedClockId);
         } catch (TransitionException ex) {
             throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, ex.getMessage());
         }
@@ -391,9 +406,9 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     @UpnpAction(name = "SyncPause")
     public void syncPause(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                           @UpnpInputArgument(name = "PauseTime", stateVariable = "A_ARG_TYPE_PresentationTime") String referencedPresentationTime,
-                          @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId) throws  AVTransportException {
+                          @UpnpInputArgument(name = "ReferenceClockId", stateVariable = "A_ARG_TYPE_ClockId") String referencedClockId) throws AVTransportException {
         try {
-            ((AvTransportStateMachine)findStateMachine(instanceId)).syncStop(referencedPresentationTime,referencedClockId);
+            ((AvTransportStateMachine) findStateMachine(instanceId)).syncStop(referencedPresentationTime, referencedClockId);
         } catch (TransitionException ex) {
             throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, ex.getMessage());
         }
@@ -411,12 +426,10 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     }
 
 
-
-
-    protected TransportAction[] getPossibleTransportActions(UnsignedIntegerFourBytes instanceId) throws Exception{
+    protected TransportAction[] getPossibleTransportActions(UnsignedIntegerFourBytes instanceId) throws Exception {
         AVTransportStateMachine stateMachine = findStateMachine(instanceId);
         try {
-            return ((YaaccState)stateMachine.getCurrentState()).getPossibleTransportActions();
+            return ((YaaccState) stateMachine.getCurrentState()).getPossibleTransportActions();
         } catch (TransitionException ex) {
             return new TransportAction[0];
         }
@@ -430,8 +443,8 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @UpnpAction
     public void setAVTransportURI(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
-                                           @UpnpInputArgument(name = "CurrentURI", stateVariable = "AVTransportURI") String currentURI,
-                                           @UpnpInputArgument(name = "CurrentURIMetaData", stateVariable = "AVTransportURIMetaData") String currentURIMetaData) throws AVTransportException{
+                                  @UpnpInputArgument(name = "CurrentURI", stateVariable = "AVTransportURI") String currentURI,
+                                  @UpnpInputArgument(name = "CurrentURIMetaData", stateVariable = "AVTransportURIMetaData") String currentURIMetaData) throws AVTransportException {
 
 
         URI uri;
@@ -453,9 +466,9 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @UpnpAction
     public void setNextAVTransportURI(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
-                                               @UpnpInputArgument(name = "NextURI", stateVariable = "AVTransportURI") String nextURI,
-                                               @UpnpInputArgument(name = "NextURIMetaData", stateVariable = "AVTransportURIMetaData") String nextURIMetaData)
-            throws AVTransportException{
+                                      @UpnpInputArgument(name = "NextURI", stateVariable = "AVTransportURI") String nextURI,
+                                      @UpnpInputArgument(name = "NextURIMetaData", stateVariable = "AVTransportURIMetaData") String nextURIMetaData)
+            throws AVTransportException {
 
         URI uri;
         try {
@@ -477,7 +490,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     @UpnpAction
     public void setPlayMode(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                             @UpnpInputArgument(name = "NewPlayMode", stateVariable = "CurrentPlayMode") String newPlayMode)
-            throws AVTransportException{
+            throws AVTransportException {
         AVTransport transport = findStateMachine(instanceId).getCurrentState().getTransport();
         try {
             transport.setTransportSettings(
@@ -496,7 +509,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     @UpnpAction
     public void setRecordQualityMode(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                                      @UpnpInputArgument(name = "NewRecordQualityMode", stateVariable = "CurrentRecordQualityMode") String newRecordQualityMode)
-            throws AVTransportException{
+            throws AVTransportException {
         AVTransport transport = findStateMachine(instanceId).getCurrentState().getTransport();
         try {
             transport.setTransportSettings(
@@ -523,8 +536,8 @@ public class YaaccAVTransportService implements LastChangeDelegator {
             @UpnpOutputArgument(name = "RecordMedium", stateVariable = "RecordStorageMedium", getterName = "getRecordMedium"),
             @UpnpOutputArgument(name = "WriteStatus", stateVariable = "RecordMediumWriteStatus", getterName = "getWriteStatus")
     })
-    public  MediaInfo getMediaInfo(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
-            throws AVTransportException{
+    public MediaInfo getMediaInfo(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
+            throws AVTransportException {
         return findStateMachine(instanceId).getCurrentState().getTransport().getMediaInfo();
     }
 
@@ -534,7 +547,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
             @UpnpOutputArgument(name = "CurrentSpeed", stateVariable = "TransportPlaySpeed", getterName = "getCurrentSpeed")
     })
     public TransportInfo getTransportInfo(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
-            throws AVTransportException{
+            throws AVTransportException {
         return findStateMachine(instanceId).getCurrentState().getTransport().getTransportInfo();
     }
 
@@ -574,7 +587,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @UpnpAction
     public void stop(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
-            throws AVTransportException{
+            throws AVTransportException {
         try {
             findStateMachine(instanceId).stop();
         } catch (TransitionException ex) {
@@ -585,7 +598,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     @UpnpAction
     public void play(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                      @UpnpInputArgument(name = "Speed", stateVariable = "TransportPlaySpeed") String speed)
-            throws AVTransportException{
+            throws AVTransportException {
         try {
             findStateMachine(instanceId).play(speed);
         } catch (TransitionException ex) {
@@ -595,7 +608,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @UpnpAction
     public void pause(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
-            throws AVTransportException{
+            throws AVTransportException {
         try {
             findStateMachine(instanceId).pause();
         } catch (TransitionException ex) {
@@ -617,7 +630,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     public void seek(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                      @UpnpInputArgument(name = "Unit", stateVariable = "A_ARG_TYPE_SeekMode") String unit,
                      @UpnpInputArgument(name = "Target", stateVariable = "A_ARG_TYPE_SeekTarget") String target)
-            throws AVTransportException{
+            throws AVTransportException {
         SeekMode seekMode;
         try {
             seekMode = SeekMode.valueOrExceptionOf(unit);
@@ -636,7 +649,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @UpnpAction
     public void next(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
-            throws AVTransportException{
+            throws AVTransportException {
         try {
             findStateMachine(instanceId).next();
         } catch (TransitionException ex) {
@@ -646,7 +659,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @UpnpAction
     public void previous(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
-            throws AVTransportException{
+            throws AVTransportException {
         try {
             findStateMachine(instanceId).previous();
         } catch (TransitionException ex) {
