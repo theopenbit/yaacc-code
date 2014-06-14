@@ -29,3 +29,5 @@ local.properties
 *.log
 *.orig
 .directory
+*.gradle
+*/build

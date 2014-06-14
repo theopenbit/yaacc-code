@@ -153,10 +153,12 @@ fi
 if [ ! -f "/usr/local/android-sdk/platform-tools/adb" ];
 then
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t build-tools-18.1.1)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t build-tools-19.0.3)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t tool)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t platform-tool)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-15)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-17)
+  echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-19)
   echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u --all -t system-image)
 else
 echo "Android Debug Bridge already detected."
@@ -364,5 +366,18 @@ fi
 # install qgit
 ############################################
 apt-get install qgit -y
+
+############################################
+# install  gradle
+############################################
+cd /home/$developerName/
+if [ ! -d "./gradle-1.12" ] 
+then
+  sudo -n -u $developerName wget https://services.gradle.org/distributions/gradle-1.12-all.zip
+  sudo -n -u $developerName unzip /home/$developerName/gradle-1.12-all.zip  
+  sudo -n -u $developerName echo "PATH=\$PATH:/home/$developerName/gradle-1.12/bin/" >> /home/$developerName/.bashrc   
+fi  
+
+
 
 echo ready enjoy developing!
