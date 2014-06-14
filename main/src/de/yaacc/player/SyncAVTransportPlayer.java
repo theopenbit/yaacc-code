@@ -69,7 +69,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         this(upnpClient);
         deviceId = receiverDevice.getIdentity().getUdn().getIdentifierString();
         setName(name);
-        id = UUID.randomUUID().hashCode();
+        id = Math.abs(UUID.randomUUID().hashCode());
     }
     private Device<?, ?, ?> getDevice(){
         return getUpnpClient().getDevice(deviceId);
