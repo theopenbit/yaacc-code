@@ -27,6 +27,7 @@ def configTemplate
         configTemplate=configTemplate+"##             Developer setup                      ##\n"
         configTemplate=configTemplate+"######################################################\n"
         configTemplate=configTemplate+"developerName=\""+$YOURNAME+"\"\n"
+        configTemplate=configTemplate+"developerEmail=\"<enter your email here>\"\n"        
         configTemplate=configTemplate+"developerPrivateRSAKeyName=\"id_rsa\"\n"
         configTemplate=configTemplate+"developerPublicRSAKeyName=\"id_rsa.pub\"\n"
         configTemplate=configTemplate+"######################################################\n"
@@ -44,7 +45,7 @@ def configTemplate
         configTemplate=configTemplate+"##            Froid                              ##\n"
         configTemplate=configTemplate+"###################################################\n"
         configTemplate=configTemplate+"fdroidServerRepo=\"git://gitorious.org/f-droid/fdroidserver.git\"\n"
-        configTemplate=configTemplate+"fdroidDataRepo=\"git://gitorious.org/f-droid/"+$YOURNAME+"-fdroiddata.git\"\n"
+        configTemplate=configTemplate+"fdroidDataRepo=\"git://gitorious.org/f-droid/"+$YOURNAME+"s-fdroiddata.git\"\n"
 	return configTemplate
 end
 
@@ -200,6 +201,12 @@ if ARGV[0] == "up"
 	 config.vm.network :bridged, guest: 5555, host: 5555
 	 config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
 	 config.vm.provision :shell, :path => "bootstrap.sh"
+         config.vm.forward_port 49153, 49153
+         config.vm.forward_port 43411, 43411
+         config.vm.forward_port 4711, 4711
+         config.vm.forward_port 5555, 5555
+         config.vm.forward_port 80, 80
+	 #config.vm.network :bridged, :bridge => 'eth0'
 
 	end
 
@@ -214,6 +221,12 @@ Vagrant::Config.run do |config|
  config.vm.network :bridged, guest: 5555, host: 5555
  config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
  config.vm.provision :shell, :path => "bootstrap.sh"
+ config.vm.forward_port 49153, 49153
+ config.vm.forward_port 43411, 43411
+ config.vm.forward_port 4711, 4711
+ config.vm.forward_port 5555, 5555
+ config.vm.forward_port 80, 80
+ #config.vm.network :bridged, :bridge => 'eth0'
 
 end
 

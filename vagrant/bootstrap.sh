@@ -194,6 +194,9 @@ sudo -n -u $developerName ssh-keyscan -H git.code.sf.net >>  /home/$developerNam
 
 #install git
 apt-get install git  -y
+sudo -n -u $developerName echo "[user]
+  email = $developerEmail
+  name = $developerCommitName" >> /home/$developerName/.gitconfig
 
 #clone git repo
 
@@ -326,16 +329,16 @@ sudo -n -u $developerName /home/$developerName/fdroidserver.git/fdroid build -p 
 ###############################################
 # create  AVD
 ##############################################
-if [ -z $(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu) ]
-then
- sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
-fi
+#if [ -z "$(/usr/local/android-sdk/tools/android list avd | grep yaacc-emu)" ]
+#then
+# sudo -n -u $developerName  echo "n" | (/usr/local/android-sdk/tools/android create avd -n yaacc-emu -t android-17)
+#fi
 
 ############################################
 # start avd and install yaacc on it
 ###########################################
- /usr/local/android-sdk/tools/emulator -avd yaacc-emu
- /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
+# /usr/local/android-sdk/tools/emulator -avd yaacc-emu
+# /usr/local/android-sdk/platform-tools/adb install /root/yaacc-code/main/bin/YAACC-debug.apk
 #
 ############################################
 # install eclipse
