@@ -104,7 +104,7 @@ import de.yaacc.upnp.server.avtransport.AvTransport;
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
 	public static String LOCAL_UID = "LOCAL_UID";
-    public static SyncOffset ACTION_EXECUTION_DELAY = new SyncOffset("P00:00:01");
+    public static SyncOffset ACTION_EXECUTION_DELAY = new SyncOffset("P00:00:05");
     private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
     private Set<Device> knownDevices = new HashSet<Device>();
     private AndroidUpnpService androidUpnpService;
@@ -761,6 +761,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
             playableItems.add(playableItem);
         }
         SynchronizationInfo synchronizationInfo = new SynchronizationInfo();
+        synchronizationInfo.setReferencedPresentationTime(ACTION_EXECUTION_DELAY.toString());
         synchronizationInfo.setOffset(ACTION_EXECUTION_DELAY);
         return PlayerFactory.createPlayer(this, synchronizationInfo, playableItems);
 	}
@@ -832,12 +833,14 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 	 */
 	public List<Player> getCurrentPlayers(AvTransport transport) {
 		List<PlayableItem> items = new ArrayList<PlayableItem>();
-		if (transport == null)
-			return PlayerFactory.createPlayer(this, transport.getSynchronizationInfo(), items);
+        SynchronizationInfo synchronizationInfo = transport.getSynchronizationInfo();
+        synchronizationInfo.setOffset(ACTION_EXECUTION_DELAY);
+        if (transport == null)
+			return PlayerFactory.createPlayer(this, synchronizationInfo, items);
 		Log.d(getClass().getName(), "TransportId: " + transport.getInstanceId());
 		PositionInfo positionInfo = transport.getPositionInfo();
 		if (positionInfo == null) {
-			return PlayerFactory.createPlayer(this, transport.getSynchronizationInfo(), items);
+			return PlayerFactory.createPlayer(this, synchronizationInfo, items);
 		}
 		DIDLContent metadata = null;
 		try {
@@ -870,7 +873,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
 		playableItem.setMimeType(mimeType);
 		playableItem.setUri(Uri.parse(positionInfo.getTrackURI()));
 		Log.d(getClass().getName(), "MimeType: " + playableItem.getMimeType());
-		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType),transport.getSynchronizationInfo());
+		List<Player> avTransportPlayers = PlayerFactory.getCurrentPlayersOfType(PlayerFactory.getPlayerClassForMimeType(mimeType), synchronizationInfo);
 		return avTransportPlayers;
 	}
 

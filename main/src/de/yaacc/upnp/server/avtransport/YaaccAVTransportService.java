@@ -62,8 +62,6 @@ import java.util.logging.Logger;
 
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.model.types.SyncOffset;
-import de.yaacc.upnp.server.avtransport.AvTransportMediaRendererNoMediaPresent;
-import de.yaacc.upnp.server.avtransport.AvTransportStateMachine;
 
 
 /**
@@ -248,24 +246,24 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
 
     @UpnpStateVariable(eventMaximumRateMilliseconds = 200)
-    private LastChange lastChange = null;
+    private LastChange lastChange = new LastChange(new AVTransportLastChangeParser());
     protected PropertyChangeSupport propertyChangeSupport = null;
 
 
     protected YaaccAVTransportService() {
         this.propertyChangeSupport = new PropertyChangeSupport(this);
-        this.lastChange = new LastChange(new AVTransportLastChangeParser());
+
 
     }
 
     protected YaaccAVTransportService(LastChange lastChange) {
         this.propertyChangeSupport = new PropertyChangeSupport(this);
-        this.lastChange = lastChange;
+        this.lastChange = lastChange ;
     }
 
     protected YaaccAVTransportService(PropertyChangeSupport propertyChangeSupport) {
         this.propertyChangeSupport = propertyChangeSupport;
-        this.lastChange = new LastChange(new AVTransportLastChangeParser());
+
     }
 
     protected YaaccAVTransportService(PropertyChangeSupport propertyChangeSupport, LastChange lastChange) {
@@ -299,6 +297,9 @@ public class YaaccAVTransportService implements LastChangeDelegator {
 
     @Override
     public LastChange getLastChange() {
+        if(lastChange == null){
+            lastChange = new LastChange(new AVTransportLastChangeParser());
+        }
         return lastChange;
     }
 
@@ -346,7 +347,8 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     }
 
     /**
-     * Create a
+     * Create a StateMachine for AVTransport
+     *
      */
     protected AVTransportStateMachine createStateMachine(
             UnsignedIntegerFourBytes instanceId) {
@@ -698,8 +700,8 @@ public class YaaccAVTransportService implements LastChangeDelegator {
         synchronized (stateMachines) {
             long id = instanceId.getValue();
             AVTransportStateMachine stateMachine = stateMachines.get(id);
-            if (stateMachine == null && id == 0 && createDefaultTransport) {
-                log.fine("Creating default transport instance with ID '0'");
+            if (stateMachine == null && createDefaultTransport) {
+                log.fine("Creating stateMachine instance with ID '"+id+"'");
                 stateMachine = createStateMachine(instanceId);
                 stateMachines.put(id, stateMachine);
             } else if (stateMachine == null) {

@@ -101,16 +101,29 @@ public class PlayerFactory {
             } else if (!video && !image && music) {
                 contentType ="music";
             }
+
             if(receiverDevice.getType().getVersion() == 3){
+                for (Player player : getCurrentPlayersOfType(SyncAVTransportPlayer.class)) {
+                    if(((SyncAVTransportPlayer) player).getDeviceId().equals(receiverDevice.getIdentity().getUdn().getIdentifierString())
+                            &&((SyncAVTransportPlayer) player).getContentType().equals(contentType)){
+                        shutdown(player);
+                    }
+                }
                 result = new SyncAVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
                         .getString(R.string.playerNameAvTransport)
                         + "-" + contentType + "@"
-                        + deviceName);
+                        + deviceName, contentType);
             }else {
+                for (Player player : getCurrentPlayersOfType(AVTransportPlayer.class)) {
+                    if(((AVTransportPlayer) player).getDeviceId().equals(receiverDevice.getIdentity().getUdn().getIdentifierString())
+                            && ((AVTransportPlayer) player).getContentType().equals(contentType)){
+                        shutdown(player);
+                    }
+                }
                 result = new AVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
                         .getString(R.string.playerNameAvTransport)
                         + "-" + contentType + "@"
-                        + deviceName);
+                        + deviceName,contentType);
             }
         } else {
             if (video && !image && !music) {
@@ -184,8 +197,12 @@ public class PlayerFactory {
      * @return the currentPlayer
      */
     public static List<Player> getCurrentPlayersOfType(Class typeClazz, SynchronizationInfo syncInfo) {
-        //FixMe to be completed
-        return getCurrentPlayersOfType(typeClazz);
+
+        List<Player> players = getCurrentPlayersOfType(typeClazz);
+        for (Player player : players) {
+                player.setSyncInfo(syncInfo);
+        }
+        return players;
     }
 
 

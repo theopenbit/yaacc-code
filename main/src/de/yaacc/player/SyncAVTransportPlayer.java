@@ -56,6 +56,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     public static final String PLAYER_ID = "PlayerId";
     private String deviceId="";
     private int id;
+    private String contentType;
 
 
 
@@ -65,15 +66,19 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
      * @param name playerName
      *
      */
-    public SyncAVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name) {
+    public SyncAVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name, String contentType) {
         this(upnpClient);
         deviceId = receiverDevice.getIdentity().getUdn().getIdentifierString();
         setName(name);
+        this.contentType = contentType;
         id = Math.abs(UUID.randomUUID().hashCode());
     }
     private Device<?, ?, ?> getDevice(){
         return getUpnpClient().getDevice(deviceId);
     }
+
+
+
     /**
      * @param upnpClient the client
      */
@@ -81,9 +86,19 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         super(upnpClient);
 
     }
+
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
     /* (non-Javadoc)
-    * @see de.yaacc.player.AbstractPlayer#stopItem(de.yaacc.player.PlayableItem)
-    */
+            * @see de.yaacc.player.AbstractPlayer#stopItem(de.yaacc.player.PlayableItem)
+            */
     @Override
     protected void stopItem(PlayableItem playableItem) {
         if(getDevice() == null) {
@@ -162,7 +177,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 			 Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
 			 metadata = ""; 
 		}
-        SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
+        SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(new UnsignedIntegerFourBytes(id),
                 service, playableItem.getUri().toString(), actionState, metadata);
         getUpnpClient().getControlPoint().execute(setAVTransportURI);        
         waitForActionComplete(actionState);
@@ -213,9 +228,9 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     }
     private static class InternalSetAVTransportURI extends SetAVTransportURI {
         ActionState actionState = null;
-        private InternalSetAVTransportURI(Service service, String uri,
+        private InternalSetAVTransportURI(UnsignedIntegerFourBytes instanceId ,Service service, String uri,
                                           ActionState actionState, String metadata) {
-            super(service, uri, metadata);
+            super(instanceId, service, uri, metadata);
             this.actionState = actionState;
         }
         @Override

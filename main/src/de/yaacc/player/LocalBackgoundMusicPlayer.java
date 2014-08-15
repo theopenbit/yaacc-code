@@ -202,7 +202,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 	}
 
     private long getExecutionTime() {
-        return getSyncInfo().getOffset().toNanos()/ 1000000 +  600L;
+        return (getSyncInfo().getReferencedPresentationTimeOffset().toNanos() + getSyncInfo().getOffset().toNanos())/ 1000000 +  600L;
     }
 
     /*

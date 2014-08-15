@@ -82,6 +82,10 @@ public class SynchronizationInfo {
         this.referencedPresentationTime = referencedPresentationTime;
     }
 
+    public SyncOffset getReferencedPresentationTimeOffset() {
+        return new SyncOffset(referencedPresentationTime);
+    }
+
     public SyncOffset getOffset() {
         return offset;
     }
