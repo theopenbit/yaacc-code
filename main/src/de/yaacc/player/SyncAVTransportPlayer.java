@@ -17,10 +17,13 @@
 */
 package de.yaacc.player;
 
+import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
@@ -38,6 +41,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
+import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.callback.avtransport.AdjustSyncOffset;
@@ -49,22 +53,20 @@ import de.yaacc.upnp.callback.avtransport.SyncStop;
 
 /**
  * A Player for playing on a remote avtransport device which supports syncplay
- * @author Tobias Schoene (openbit)
  *
+ * @author Tobias Schoene (openbit)
  */
 public class SyncAVTransportPlayer extends AbstractPlayer {
     public static final String PLAYER_ID = "PlayerId";
-    private String deviceId="";
+    private String deviceId = "";
     private int id;
     private String contentType;
 
 
-
     /**
      * @param receiverDevice the receiver device
-     * @param upnpClient the client
-     * @param name playerName
-     *
+     * @param upnpClient     the client
+     * @param name           playerName
      */
     public SyncAVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name, String contentType) {
         this(upnpClient);
@@ -73,10 +75,10 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         this.contentType = contentType;
         id = Math.abs(UUID.randomUUID().hashCode());
     }
-    private Device<?, ?, ?> getDevice(){
+
+    private Device<?, ?, ?> getDevice() {
         return getUpnpClient().getDevice(deviceId);
     }
-
 
 
     /**
@@ -101,7 +103,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
             */
     @Override
     protected void stopItem(PlayableItem playableItem) {
-        if(getDevice() == null) {
+        if (getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
                             + deviceId);
@@ -120,7 +122,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action SyncStop");
         actionState.actionFinished = false;
 
-        SyncStop actionCallback = new SyncStop(new UnsignedIntegerFourBytes(id),service, getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
+        SyncStop actionCallback = new SyncStop(new UnsignedIntegerFourBytes(id), service, getSyncInfo().getReferencedPresentationTime(), getSyncInfo().getReferencedClockId()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -132,6 +134,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(), "s: " + s);
                 actionState.actionFinished = true;
             }
+
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
@@ -140,6 +143,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         };
         getUpnpClient().getControlPoint().execute(actionCallback);
     }
+
     /* (non-Javadoc)
     * @see de.yaacc.player.AbstractPlayer#loadItem(de.yaacc.player.PlayableItem)
     */
@@ -147,6 +151,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     protected Object loadItem(PlayableItem playableItem) {
         return playableItem;
     }
+
     /* (non-Javadoc)
     * @see de.yaacc.player.AbstractPlayer#startItem(de.yaacc.player.PlayableItem, java.lang.Object)
     */
@@ -169,23 +174,23 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action SetAVTransportURI ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        Item item = playableItem.getItem();        
+        Item item = playableItem.getItem();
         String metadata;
-		try {
-			metadata = (item == null)? "" : new DIDLParser().generate(new DIDLContent().addItem(item), false);
-		} catch (Exception e) {
-			 Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
-			 metadata = ""; 
-		}
+        try {
+            metadata = (item == null) ? "" : new DIDLParser().generate(new DIDLContent().addItem(item), false);
+        } catch (Exception e) {
+            Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
+            metadata = "";
+        }
         SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(new UnsignedIntegerFourBytes(id),
                 service, playableItem.getUri().toString(), actionState, metadata);
-        getUpnpClient().getControlPoint().execute(setAVTransportURI);        
+        getUpnpClient().getControlPoint().execute(setAVTransportURI);
         waitForActionComplete(actionState);
-        
+
 // Now start Playing
         Log.d(getClass().getName(), "Action SyncPlay");
         actionState.actionFinished = false;
-        SyncPlay actionCallback = new SyncPlay(new UnsignedIntegerFourBytes(id),service, "","", getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
+        SyncPlay actionCallback = new SyncPlay(new UnsignedIntegerFourBytes(id), service, "", "", getSyncInfo().getReferencedPresentationTime(), getSyncInfo().getReferencedClockId()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -197,6 +202,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(), "s: " + s);
                 actionState.actionFinished = true;
             }
+
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
@@ -205,6 +211,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         };
         getUpnpClient().getControlPoint().execute(actionCallback);
     }
+
     /**
      * Watchdog for async calls to complete
      */
@@ -226,13 +233,16 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
             Log.d(getClass().getName(), "Action completed!");
         }
     }
+
     private static class InternalSetAVTransportURI extends SetAVTransportURI {
         ActionState actionState = null;
-        private InternalSetAVTransportURI(UnsignedIntegerFourBytes instanceId ,Service service, String uri,
+
+        private InternalSetAVTransportURI(UnsignedIntegerFourBytes instanceId, Service service, String uri,
                                           ActionState actionState, String metadata) {
             super(instanceId, service, uri, metadata);
             this.actionState = actionState;
         }
+
         @Override
         public void failure(ActionInvocation actioninvocation,
                             UpnpResponse upnpresponse, String s) {
@@ -248,31 +258,35 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
             Log.d(getClass().getName(), "s: " + s);
             actionState.actionFinished = true;
         }
+
         @Override
         public void success(ActionInvocation actioninvocation) {
             super.success(actioninvocation);
             actionState.actionFinished = true;
         }
     }
+
     private static class ActionState {
         public boolean actionFinished = false;
         public boolean watchdogFlag = false;
     }
+
     /*
     * (non-Javadoc)
     * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
     */
     @Override
-    protected PendingIntent getNotificationIntent(){
+    protected PendingIntent getNotificationIntent() {
         Intent notificationIntent = new Intent(getContext(),
                 AVTransportPlayerActivity.class);
         Log.d(getClass().getName(), "Put id into intent: " + getId());
-        notificationIntent.setData(Uri.parse("http://0.0.0.0/"+getId()+"")); //just for making the intents different http://stackoverflow.com/questions/10561419/scheduling-more-than-one-pendingintent-to-same-activity-using-alarmmanager
+        notificationIntent.setData(Uri.parse("http://0.0.0.0/" + getId() + "")); //just for making the intents different http://stackoverflow.com/questions/10561419/scheduling-more-than-one-pendingintent-to-same-activity-using-alarmmanager
         notificationIntent.putExtra(PLAYER_ID, getId());
-        PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0 ,
+        PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
                 notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         return contentIntent;
     }
+
     /*
     * (non-Javadoc)
     * @see de.yaacc.player.AbstractPlayer#getNotificationId()
@@ -281,13 +295,10 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     protected int getNotificationId() {
         return id;
     }
-    /* (non-Javadoc)
-    * @see de.yaacc.player.AbstractPlayer#pause()
-    */
-    @Override
-    public void pause() {
-        super.pause();
-        if(getDevice() == null) {
+
+    public void callPause() {
+
+        if (getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
                             + deviceId);
@@ -297,13 +308,13 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
-                            +getDevice().getDisplayString());
+                            + getDevice().getDisplayString());
             return;
         }
         Log.d(getClass().getName(), "Action SyncPause ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        SyncPause actionCallback = new SyncPause(new UnsignedIntegerFourBytes(id),service, getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
+        SyncPause actionCallback = new SyncPause(new UnsignedIntegerFourBytes(id), service, getSyncInfo().getOffset().toString(), getSyncInfo().getReferencedClockId()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -315,6 +326,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(), "s: " + s);
                 actionState.actionFinished = true;
             }
+
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
@@ -331,7 +343,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 
     public void getSyncOffset() {
 
-        if(getDevice() == null) {
+        if (getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
                             + deviceId);
@@ -341,14 +353,14 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
-                            +getDevice().getDisplayString());
+                            + getDevice().getDisplayString());
             return;
         }
         Log.d(getClass().getName(), "Action GetSyncOffset ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        String result ="";
-        GetSyncOffset actionCallback = new GetSyncOffset(new UnsignedIntegerFourBytes(id),service, result) {
+        String result = "";
+        GetSyncOffset actionCallback = new GetSyncOffset(new UnsignedIntegerFourBytes(id), service, result) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -360,6 +372,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(), "s: " + s);
                 actionState.actionFinished = true;
             }
+
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
@@ -367,15 +380,15 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
             }
         };
         Future callbackFuture = getUpnpClient().getControlPoint().execute(actionCallback);
-        while (  !callbackFuture.isDone() || !callbackFuture.isCancelled());
-        if(callbackFuture.isDone()){
+        while (!callbackFuture.isDone() || !callbackFuture.isCancelled()) ;
+        if (callbackFuture.isDone()) {
             getSyncInfo().setOffset(new SyncOffset(result));
         }
     }
 
     public void setSyncOffset(SyncOffset offset) {
         getSyncInfo().setOffset(offset);
-        if(getDevice() == null) {
+        if (getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
                             + deviceId);
@@ -385,13 +398,13 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
-                            +getDevice().getDisplayString());
-            return ;
+                            + getDevice().getDisplayString());
+            return;
         }
         Log.d(getClass().getName(), "Action SetSyncOffset ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        SetSyncOffset actionCallback = new SetSyncOffset(new UnsignedIntegerFourBytes(id),service, offset.toString()) {
+        SetSyncOffset actionCallback = new SetSyncOffset(new UnsignedIntegerFourBytes(id), service, offset.toString()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -403,6 +416,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(), "s: " + s);
                 actionState.actionFinished = true;
             }
+
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
@@ -414,7 +428,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 
     public void adjustSyncOffset(SyncOffset offset) {
         getSyncInfo().getOffset().add(offset);
-        if(getDevice() == null) {
+        if (getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
                             + deviceId);
@@ -424,13 +438,13 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
-                            +getDevice().getDisplayString());
-            return ;
+                            + getDevice().getDisplayString());
+            return;
         }
         Log.d(getClass().getName(), "Action AdjustSyncOffset ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        AdjustSyncOffset actionCallback = new AdjustSyncOffset(new UnsignedIntegerFourBytes(id),service, offset.toString()) {
+        AdjustSyncOffset actionCallback = new AdjustSyncOffset(new UnsignedIntegerFourBytes(id), service, offset.toString()) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -442,6 +456,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(), "s: " + s);
                 actionState.actionFinished = true;
             }
+
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
@@ -450,4 +465,113 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         };
         getUpnpClient().getControlPoint().execute(actionCallback);
     }
-} 
+
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.yaacc.player.Player#pause()
+     */
+    @Override
+    public void pause() {
+        if (isProcessingCommand())
+            return;
+        setProcessingCommand(true);
+        executeCommand(new TimerTask() {
+            @Override
+            public void run() {
+                cancelTimer();
+                Context context = getUpnpClient().getContext();
+                if (context instanceof Activity) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast toast = Toast.makeText(getContext(), getContext()
+                                    .getResources().getString(R.string.pause)
+                                    + getPositionString(), Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+                }
+                setPlaying(false);
+                setProcessingCommand(false);
+
+            }
+        }, getExecutionTime());
+        callPause();
+
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.yaacc.player.Player#start()
+     */
+    @Override
+    public void play() {
+        if (isProcessingCommand())
+            return;
+        setProcessingCommand(true);
+        executeCommand(new TimerTask() {
+            @Override
+            public void run() {
+                if (getCurrentIndex() < getItems().size()) {
+                    Context context = getUpnpClient().getContext();
+                    if (context instanceof Activity) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast toast = Toast.makeText(getContext(), getContext()
+                                        .getResources().getString(R.string.play)
+                                        + getPositionString(), Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        });
+                    }
+                    // Start the pictureShow
+                    setPlaying(true);
+                    setProcessingCommand(false);
+                }
+
+            }
+        }, getExecutionTime());
+        loadItem(getCurrentIndex(), getCurrentIndex());
+
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see de.yaacc.player.Player#stop()
+     */
+    @Override
+    public void stop() {
+        if (isProcessingCommand())
+            return;
+        setProcessingCommand(true);
+        executeCommand(new TimerTask() {
+            @Override
+            public void run() {
+                cancelTimer();
+                setCurrentIndex(0);
+                Context context = getUpnpClient().getContext();
+                if (context instanceof Activity) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast toast = Toast.makeText(getContext(), getContext()
+                                    .getResources().getString(R.string.stop)
+                                    + getPositionString(), Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+                }
+                setPlaying(false);
+                setProcessingCommand(false);
+            }
+        }, getExecutionTime());
+
+
+        stopItem(getItems().get(getCurrentIndex()));
+
+    }
+
+}
+

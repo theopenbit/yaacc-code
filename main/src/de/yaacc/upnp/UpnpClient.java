@@ -20,7 +20,9 @@ package de.yaacc.upnp;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -104,7 +106,8 @@ import de.yaacc.upnp.server.avtransport.AvTransport;
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
 	public static String LOCAL_UID = "LOCAL_UID";
-    public static SyncOffset ACTION_EXECUTION_DELAY = new SyncOffset("P00:00:05");
+    public static SyncOffset ACTION_EXECUTION_DELAY = new SyncOffset("P00:00:00");
+    public static int ACTION_DELAY = 10;
     private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
     private Set<Device> knownDevices = new HashSet<Device>();
     private AndroidUpnpService androidUpnpService;
@@ -112,7 +115,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     SharedPreferences preferences;
     private boolean mute = false;
 
-	public UpnpClient() {
+    public UpnpClient() {
 	}
 
 
@@ -761,8 +764,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
             playableItems.add(playableItem);
         }
         SynchronizationInfo synchronizationInfo = new SynchronizationInfo();
-        synchronizationInfo.setReferencedPresentationTime(ACTION_EXECUTION_DELAY.toString());
-        synchronizationInfo.setOffset(ACTION_EXECUTION_DELAY);
+        Calendar now = Calendar.getInstance();
+
+        now.add(Calendar.SECOND, ACTION_DELAY);
+        synchronizationInfo.setReferencedPresentationTime(new SyncOffset(true, now.get(Calendar.HOUR), now.get(Calendar.MINUTE), now.get(Calendar.SECOND), now.get(Calendar.MILLISECOND), 0, 0).toString());
+        //FIXME wrong position to set local offset synchronizationInfo.setOffset(ACTION_EXECUTION_DELAY);
         return PlayerFactory.createPlayer(this, synchronizationInfo, playableItems);
 	}
 
