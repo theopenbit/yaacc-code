@@ -20,6 +20,7 @@
 <resources>
     <string-array
         name="duration_entries">
+        <item>"0 sec"</item>
         <item>"1 sec"</item>
         <item>"2 sec"</item>
         <item>"3 sec"</item>
@@ -34,6 +35,7 @@
         <item>"60 sec"</item>
     </string-array>
     <string-array name="duration_values" translatable="false">
+        <item>"0"</item>
         <item>"1000"</item>
         <item>"2000"</item>
         <item>"3000"</item>

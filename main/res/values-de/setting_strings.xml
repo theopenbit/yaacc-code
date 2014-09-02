@@ -85,4 +85,10 @@
     <string name="settings_browse_thumbnails_off">Zeige keine Vorschaubilder</string>
     <string name="settings_browse_thumbnails_coverlookup_on">Verwendet Cover aus Bildern in Musikverzeichnissen </string>
     <string name="settings_browse_thumbnails_coverlookup_off">Bilder in Verzeichnissen werden nicht als Cover verwendet</string>
+    <string name="settings_category_synchronization">Synchronization settings</string>
+    <string name="settings_default_playback_delay">Wartezeit vor dem Abspielen</string>
+    <string name="settings_default_playback_delay_key">settings_default_playback_delay_key</string>
+    <string name="settings_device_playback_offset">Gerätespezifischer Abspielversatz</string>
+    <string name ="settings_device_playback_offset_summ">Versatz in ms</string>
+    <string name="settings_device_playback_offset_key">settings_device_playback_offset_key</string>
 </resources>

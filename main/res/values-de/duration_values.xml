@@ -20,6 +20,7 @@
 <resources>
     <string-array
         name="duration_entries">
+        <item>"0 Sek"</item>
         <item>"1 Sek"</item>
         <item>"2 Sek"</item>
         <item>"3 Sek"</item>
