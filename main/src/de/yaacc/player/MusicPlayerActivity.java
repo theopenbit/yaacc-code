@@ -41,223 +41,226 @@ import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
+import de.yaacc.util.YaaccLogActivity;
 import de.yaacc.util.image.ImageDownloadTask;
 
 /**
  * A music player activity based on a background music service.
- * 
+ *
  * @author Tobias Schoene (openbit)
- * 
  */
 public class MusicPlayerActivity extends Activity {
 
-	protected boolean updateTime = false;
+    protected boolean updateTime = false;
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		updateTime = false;
-	}
+    @Override
+    protected void onPause() {
+        super.onPause();
+        updateTime = false;
+    }
 
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-		updateTime = true;
-	}
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateTime = true;
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		setTrackInfo();
-		updateTime = true;
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTrackInfo();
+        updateTime = true;
+    }
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		updateTime = false;
-	}
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        updateTime = false;
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_music_player);
-		// initialize buttons
-		Player player = getPlayer();
-		ImageButton btnPrev = (ImageButton) findViewById(R.id.musicActivityControlPrev);
-		ImageButton btnNext = (ImageButton) findViewById(R.id.musicActivityControlNext);
-		ImageButton btnStop = (ImageButton) findViewById(R.id.musicActivityControlStop);
-		ImageButton btnPlay = (ImageButton) findViewById(R.id.musicActivityControlPlay);
-		ImageButton btnPause = (ImageButton) findViewById(R.id.musicActivityControlPause);
-		ImageButton btnExit = (ImageButton) findViewById(R.id.musicActivityControlExit);
-		if (player == null) {
-			btnPrev.setActivated(false);
-			btnNext.setActivated(false);
-			btnStop.setActivated(false);
-			btnPlay.setActivated(false);
-			btnPause.setActivated(false);
-			btnExit.setActivated(false);
-		} else {
-			player.addPropertyChangeListener(new PropertyChangeListener() {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_music_player);
+        // initialize buttons
+        Player player = getPlayer();
+        ImageButton btnPrev = (ImageButton) findViewById(R.id.musicActivityControlPrev);
+        ImageButton btnNext = (ImageButton) findViewById(R.id.musicActivityControlNext);
+        ImageButton btnStop = (ImageButton) findViewById(R.id.musicActivityControlStop);
+        ImageButton btnPlay = (ImageButton) findViewById(R.id.musicActivityControlPlay);
+        ImageButton btnPause = (ImageButton) findViewById(R.id.musicActivityControlPause);
+        ImageButton btnExit = (ImageButton) findViewById(R.id.musicActivityControlExit);
+        if (player == null) {
+            btnPrev.setActivated(false);
+            btnNext.setActivated(false);
+            btnStop.setActivated(false);
+            btnPlay.setActivated(false);
+            btnPause.setActivated(false);
+            btnExit.setActivated(false);
+        } else {
+            player.addPropertyChangeListener(new PropertyChangeListener() {
 
-				@Override
-				public void propertyChange(PropertyChangeEvent event) {
-					if (LocalBackgoundMusicPlayer.PROPERTY_ITEM.equals(event.getPropertyName())) {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								setTrackInfo();
-							}
-						});
+                @Override
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (LocalBackgoundMusicPlayer.PROPERTY_ITEM.equals(event.getPropertyName())) {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                setTrackInfo();
+                            }
+                        });
 
-					}
+                    }
 
-				}
-			});
-			setTrackInfo();
-			btnPrev.setActivated(true);
-			btnNext.setActivated(true);
-			btnStop.setActivated(true);
-			btnPlay.setActivated(true);
-			btnPause.setActivated(true);
-			btnExit.setActivated(true);
-		}
-		btnPrev.setOnClickListener(new OnClickListener() {
+                }
+            });
+            setTrackInfo();
+            btnPrev.setActivated(true);
+            btnNext.setActivated(true);
+            btnStop.setActivated(true);
+            btnPlay.setActivated(true);
+            btnPause.setActivated(true);
+            btnExit.setActivated(true);
+        }
+        btnPrev.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.previous();
-				}
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.previous();
+                }
 
-			}
-		});
-		btnNext.setOnClickListener(new OnClickListener() {
+            }
+        });
+        btnNext.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.next();
-				}
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.next();
+                }
 
-			}
-		});
-		btnPlay.setOnClickListener(new OnClickListener() {
+            }
+        });
+        btnPlay.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.play();
-				}
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.play();
+                }
 
-			}
-		});
-		btnPause.setOnClickListener(new OnClickListener() {
+            }
+        });
+        btnPause.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.pause();
-				}
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.pause();
+                }
 
-			}
-		});
-		btnStop.setOnClickListener(new OnClickListener() {
+            }
+        });
+        btnStop.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.stop();
-				}
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.stop();
+                }
 
-			}
-		});
-		btnExit.setOnClickListener(new OnClickListener() {
+            }
+        });
+        btnExit.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.exit();
-				}
-				finish();
-			}
-		});
-	}
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.exit();
+                }
+                finish();
+            }
+        });
+    }
 
-	private Player getPlayer() {
-		return PlayerFactory.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);
-	}
+    private Player getPlayer() {
+        return PlayerFactory.getFirstCurrentPlayerOfType(LocalBackgoundMusicPlayer.class);
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_music_player, menu);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_music_player, menu);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_settings:
-			Intent i = new Intent(this, SettingsActivity.class);
-			startActivity(i);
-			return true;
-		case R.id.yaacc_about:
-			AboutActivity.showAbout(this);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
+            case R.id.yaacc_about:
+                AboutActivity.showAbout(this);
+                return true;
+            case R.id.yaacc_log:
+                YaaccLogActivity.showLog(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-	private void setTrackInfo() {
-		if (getPlayer() == null)
-			return;
-		TextView current = (TextView) findViewById(R.id.musicActivityCurrentItem);
-		current.setText(getPlayer().getCurrentItemTitle());
-		TextView position = (TextView) findViewById(R.id.musicActivityPosition);
-		position.setText(getPlayer().getPositionString());
-		TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
-		next.setText(getPlayer().getNextItemTitle());
-		updateTime();
+    private void setTrackInfo() {
+        if (getPlayer() == null)
+            return;
+        TextView current = (TextView) findViewById(R.id.musicActivityCurrentItem);
+        current.setText(getPlayer().getCurrentItemTitle());
+        TextView position = (TextView) findViewById(R.id.musicActivityPosition);
+        position.setText(getPlayer().getPositionString());
+        TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
+        next.setText(getPlayer().getNextItemTitle());
+        updateTime();
         ImageView albumArtView = (ImageView) findViewById(R.id.musicActivityImageView);
         URI albumArtUri = getPlayer().getAlbumArt();
-        if (null != albumArtUri){
+        if (null != albumArtUri) {
             ImageDownloadTask imageDownloadTask = new ImageDownloadTask(albumArtView);
             imageDownloadTask.execute(Uri.parse(albumArtUri.toString()));
         }
 
-	}
+    }
 
-	private void updateTime() {
-		Timer commandExecutionTimer = new Timer();
-		commandExecutionTimer.schedule(new TimerTask() {
+    private void updateTime() {
+        Timer commandExecutionTimer = new Timer();
+        commandExecutionTimer.schedule(new TimerTask() {
 
-			@Override
-			public void run() {
-				runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
 
-					@Override
-					public void run() {
-						if (getPlayer() != null) {
-							TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
-							duration.setText(getPlayer().getDuration());
-							TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
-							elapsedTime.setText(getPlayer().getElapsedTime());
-						}
-						if (updateTime) {
-							updateTime();
-						}
-					}
-				});
-			}
-		}, 1000L);
+                    @Override
+                    public void run() {
+                        if (getPlayer() != null) {
+                            TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
+                            duration.setText(getPlayer().getDuration());
+                            TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
+                            elapsedTime.setText(getPlayer().getElapsedTime());
+                        }
+                        if (updateTime) {
+                            updateTime();
+                        }
+                    }
+                });
+            }
+        }, 1000L);
 
-	}
+    }
 }

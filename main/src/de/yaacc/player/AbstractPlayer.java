@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -62,6 +63,9 @@ public abstract class AbstractPlayer implements Player {
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private SynchronizationInfo syncInfo;
+    private boolean paused;
+    private Object loadedItem=null;
+    private int currentLoadedIndex=-1;
 
     /**
      * @param upnpClient
@@ -92,39 +96,51 @@ public abstract class AbstractPlayer implements Player {
      */
     @Override
     public void next() {
-        int previousIndex = currentIndex;
-        if (isProcessingCommand())
+        if (isProcessingCommand()) {
             return;
+        }
         setProcessingCommand(true);
-        cancelTimer();
-        currentIndex++;
-        if (currentIndex > items.size() - 1) {
-            currentIndex = 0;
-            SharedPreferences preferences = PreferenceManager
-                    .getDefaultSharedPreferences(getContext());
-            boolean replay = preferences.getBoolean(
-                    getContext().getString(
-                            R.string.settings_replay_playlist_chkbx), true);
-            if (!replay) {
-                stop();
-                return;
-            }
-
+        int possibleNextIndex = currentIndex + 1;
+        if(possibleNextIndex > items.size()) {
+            possibleNextIndex = 0;
         }
-        Context context = getUpnpClient().getContext();
-        if (context instanceof Activity) {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast toast = Toast.makeText(getContext(), getContext()
-                            .getResources().getString(R.string.next)
-                            + getPositionString(), Toast.LENGTH_SHORT);
+        loadItem(items.get(possibleNextIndex), possibleNextIndex);
+        executeCommand(new TimerTask() {
+            @Override
+            public void run() {
+                paused = false;
+                int previousIndex = currentIndex;
+                cancelTimer();
+                currentIndex++;
+                if (currentIndex > items.size() - 1) {
+                    currentIndex = 0;
+                    SharedPreferences preferences = PreferenceManager
+                            .getDefaultSharedPreferences(getContext());
+                    boolean replay = preferences.getBoolean(
+                            getContext().getString(
+                                    R.string.settings_replay_playlist_chkbx), true);
+                    if (!replay) {
+                        stop();
+                        return;
+                    }
 
-                    toast.show();
                 }
-            });
-        }
-        loadItem(previousIndex, currentIndex);
-        setProcessingCommand(false);
+                Context context = getUpnpClient().getContext();
+                if (context instanceof Activity) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast toast = Toast.makeText(getContext(), getContext()
+                                    .getResources().getString(R.string.next)
+                                    + getPositionString(), Toast.LENGTH_SHORT);
+
+                            toast.show();
+                        }
+                    });
+                }
+                loadItem(previousIndex, currentIndex);
+                setProcessingCommand(false);
+            }
+        }, getExecutionTime());
     }
 
     //
@@ -136,32 +152,49 @@ public abstract class AbstractPlayer implements Player {
      */
     @Override
     public void previous() {
-        int previousIndex = currentIndex;
-        if (isProcessingCommand())
+        if (isProcessingCommand()) {
             return;
+        }
         setProcessingCommand(true);
-        cancelTimer();
-        currentIndex--;
-        if (currentIndex < 0) {
+        int possibleNextIndex = currentIndex - 1;
+        if(possibleNextIndex < 0) {
             if (items.size() > 0) {
-                currentIndex = items.size() - 1;
+                possibleNextIndex = items.size() - 1;
             } else {
-                currentIndex = 0;
+                possibleNextIndex = 0;
             }
         }
-        Context context = getUpnpClient().getContext();
-        if (context instanceof Activity) {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast toast = Toast.makeText(getContext(), getContext()
-                            .getResources().getString(R.string.previous)
-                            + getPositionString(), Toast.LENGTH_SHORT);
-                    toast.show();
+        loadItem(items.get(possibleNextIndex), possibleNextIndex);
+        executeCommand(new TimerTask() {
+            @Override
+            public void run() {
+                paused = false;
+                int previousIndex = currentIndex;
+                cancelTimer();
+                currentIndex--;
+                if (currentIndex < 0) {
+                    if (items.size() > 0) {
+                        currentIndex = items.size() - 1;
+                    } else {
+                        currentIndex = 0;
+                    }
                 }
-            });
-        }
-        loadItem(previousIndex, currentIndex);
-        setProcessingCommand(false);
+                Context context = getUpnpClient().getContext();
+                if (context instanceof Activity) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast toast = Toast.makeText(getContext(), getContext()
+                                    .getResources().getString(R.string.previous)
+                                    + getPositionString(), Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+                }
+                loadItem(previousIndex, currentIndex);
+                setProcessingCommand(false);
+            }
+        }, getExecutionTime());
+
 
     }
 
@@ -191,9 +224,11 @@ public abstract class AbstractPlayer implements Player {
                     });
                 }
                 isPlaying = false;
+                paused = true;
+                doPause();
                 setProcessingCommand(false);
             }
-        },getExecutionTime());
+        }, getExecutionTime());
     }
 
     /*
@@ -206,6 +241,10 @@ public abstract class AbstractPlayer implements Player {
         if (isProcessingCommand())
             return;
         setProcessingCommand(true);
+        int possibleNextIndex = currentIndex;
+        if(possibleNextIndex < items.size()) {
+            loadItem(items.get(possibleNextIndex), possibleNextIndex);
+        }
         executeCommand(new TimerTask() {
             @Override
             public void run() {
@@ -221,9 +260,13 @@ public abstract class AbstractPlayer implements Player {
                             }
                         });
                     }
-                    // Start the pictureShow
                     isPlaying = true;
-                    loadItem(currentIndex, currentIndex);
+                    if (paused) {
+                        doResume();
+                    } else {
+                        paused = false;
+                        loadItem(currentIndex, currentIndex);
+                    }
                     setProcessingCommand(false);
                 }
             }
@@ -242,6 +285,8 @@ public abstract class AbstractPlayer implements Player {
         if (isProcessingCommand())
             return;
         setProcessingCommand(true);
+        currentLoadedIndex=-1;
+        loadedItem = null;
         executeCommand(new TimerTask() {
             @Override
             public void run() {
@@ -260,6 +305,7 @@ public abstract class AbstractPlayer implements Player {
                 }
                 stopItem(items.get(currentIndex));
                 isPlaying = false;
+                paused = false;
                 setProcessingCommand(false);
             }
         }, getExecutionTime());
@@ -365,17 +411,38 @@ public abstract class AbstractPlayer implements Player {
         return result;
     }
 
+    //TODO refactor
+    protected Object loadItem(PlayableItem item, int toLoadIndex){
+        if(toLoadIndex == currentLoadedIndex){
+            Log.d(getClass().getName(), "returning already loaded item");
+            return loadedItem;
+        }
+        Log.d(getClass().getName(), "loaded item");
+        currentLoadedIndex = toLoadIndex;
+        return loadItem(item);
+    }
+
     protected void loadItem(int previousIndex, int nextIndex) {
         if (items == null || items.size() == 0)
             return;
         firePropertyChange(PROPERTY_ITEM, items.get(previousIndex),
                 items.get(nextIndex));
         PlayableItem playableItem = items.get(nextIndex);
-        Object loadedItem = loadItem(playableItem);
+        loadedItem = loadItem(playableItem, nextIndex);
         startItem(playableItem, loadedItem);
         if (isPlaying() && items.size() > 1) {
             startTimer(playableItem.getDuration() + getSilenceDuration());
         }
+    }
+
+    protected void doPause() {
+        //default do nothing
+    }
+
+    protected void doResume() {
+        //default replay current item
+        paused = false;
+        loadItem(currentIndex, currentIndex);
     }
 
     /**
@@ -393,7 +460,9 @@ public abstract class AbstractPlayer implements Player {
      * @param duration in millis
      */
     public void startTimer(final long duration) {
-
+        if(playerTimer != null){
+            cancelTimer();
+        }
         playerTimer = new Timer();
         playerTimer.schedule(new TimerTask() {
 
@@ -572,16 +641,17 @@ public abstract class AbstractPlayer implements Player {
     }
 
     protected Date getExecutionTime() {
-        Calendar execTime = Calendar.getInstance();
-        execTime.set(Calendar.HOUR,getSyncInfo().getReferencedPresentationTimeOffset().getHour() );
-        execTime.set(Calendar.MINUTE,getSyncInfo().getReferencedPresentationTimeOffset().getMinute() );
-        execTime.set(Calendar.SECOND,getSyncInfo().getReferencedPresentationTimeOffset().getSecond() );
-        execTime.set(Calendar.MILLISECOND,getSyncInfo().getReferencedPresentationTimeOffset().getMillis() );
-        execTime.add(Calendar.HOUR,getSyncInfo().getOffset().getHour() );
-        execTime.add(Calendar.MINUTE,getSyncInfo().getOffset().getMinute() );
-        execTime.add(Calendar.SECOND,getSyncInfo().getOffset().getSecond() );
-        execTime.add(Calendar.MILLISECOND,getSyncInfo().getOffset().getMillis() );
-        Log.d(getClass().getName(), "get execution time: " + execTime.toString());
+        Calendar execTime = Calendar.getInstance(Locale.getDefault());
+        execTime.set(Calendar.HOUR_OF_DAY, getSyncInfo().getReferencedPresentationTimeOffset().getHour());
+        execTime.set(Calendar.MINUTE, getSyncInfo().getReferencedPresentationTimeOffset().getMinute());
+        execTime.set(Calendar.SECOND, getSyncInfo().getReferencedPresentationTimeOffset().getSecond());
+        execTime.set(Calendar.MILLISECOND, getSyncInfo().getReferencedPresentationTimeOffset().getMillis());
+        execTime.add(Calendar.HOUR, getSyncInfo().getOffset().getHour());
+        execTime.add(Calendar.MINUTE, getSyncInfo().getOffset().getMinute());
+        execTime.add(Calendar.SECOND, getSyncInfo().getOffset().getSecond());
+        execTime.add(Calendar.MILLISECOND, getSyncInfo().getOffset().getMillis());
+        Log.d(getClass().getName(), "ReferencedRepresentationTimeOffset: " + getSyncInfo().getReferencedPresentationTimeOffset());
+        Log.d(getClass().getName(),"current time: " + new Date().toString() +  " get execution time: " + execTime.getTime().toString());
         return execTime.getTime();
     }
 

@@ -25,140 +25,143 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
+import de.yaacc.util.YaaccLogActivity;
 
 /**
  * A music player activity based on a background music service.
- * 
+ *
  * @author Tobias Schoene (openbit)
- * 
  */
 public class ThirdPartieMusicPlayerActivity extends Activity {
 
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_third_partie_music_player);
+        // initialize buttons
+        Player player = getPlayer();
+        ImageButton btnPrev = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPrev);
+        ImageButton btnNext = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlNext);
+        ImageButton btnStop = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlStop);
+        ImageButton btnPlay = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPlay);
+        ImageButton btnPause = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPause);
+        ImageButton btnExit = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlExit);
+        if (player == null) {
+            btnPrev.setActivated(false);
+            btnNext.setActivated(false);
+            btnStop.setActivated(false);
+            btnPlay.setActivated(false);
+            btnPause.setActivated(false);
+            btnExit.setActivated(false);
+        } else {
+            btnPrev.setActivated(true);
+            btnNext.setActivated(true);
+            btnStop.setActivated(true);
+            btnPlay.setActivated(true);
+            btnPause.setActivated(true);
+            btnExit.setActivated(true);
+        }
+        btnPrev.setOnClickListener(new OnClickListener() {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_third_partie_music_player);
-		// initialize buttons
-		Player player = getPlayer();
-		ImageButton btnPrev = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPrev);
-		ImageButton btnNext = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlNext);
-		ImageButton btnStop = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlStop);
-		ImageButton btnPlay = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPlay);
-		ImageButton btnPause = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlPause);
-		ImageButton btnExit = (ImageButton) findViewById(R.id.thirdPratieMusicActivityControlExit);
-		if (player == null) {
-			btnPrev.setActivated(false);
-			btnNext.setActivated(false);
-			btnStop.setActivated(false);
-			btnPlay.setActivated(false);
-			btnPause.setActivated(false);
-			btnExit.setActivated(false);
-		} else {
-			btnPrev.setActivated(true);
-			btnNext.setActivated(true);
-			btnStop.setActivated(true);
-			btnPlay.setActivated(true);
-			btnPause.setActivated(true);
-			btnExit.setActivated(true);
-		}
-		btnPrev.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.previous();
+                }
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.previous();
-				}
+            }
+        });
+        btnNext.setOnClickListener(new OnClickListener() {
 
-			}
-		});
-		btnNext.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.next();
+                }
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.next();
-				}
+            }
+        });
+        btnPlay.setOnClickListener(new OnClickListener() {
 
-			}
-		});
-		btnPlay.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.play();
+                }
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.play();
-				}
+            }
+        });
+        btnPause.setOnClickListener(new OnClickListener() {
 
-			}
-		});
-		btnPause.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.pause();
+                }
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.pause();
-				}
+            }
+        });
+        btnStop.setOnClickListener(new OnClickListener() {
 
-			}
-		});
-		btnStop.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.stop();
+                }
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.stop();
-				}
+            }
+        });
+        btnExit.setOnClickListener(new OnClickListener() {
 
-			}
-		});
-		btnExit.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Player player = getPlayer();
+                if (player != null) {
+                    player.exit();
+                }
+                finish();
+            }
+        });
+    }
 
-			@Override
-			public void onClick(View v) {
-				Player player = getPlayer();
-				if (player != null) {
-					player.exit();					
-				}
-				finish();
-			}
-		});
-	}
+    private Player getPlayer() {
+        return PlayerFactory
+                .getFirstCurrentPlayerOfType(LocalThirdPartieMusicPlayer.class);
+    }
 
-	private Player getPlayer() {		
-		return PlayerFactory
-				.getFirstCurrentPlayerOfType(LocalThirdPartieMusicPlayer.class);		
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_third_partie_music_player, menu);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_third_partie_music_player, menu);
+        return true;
+    }
 
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_settings:
-			Intent i = new Intent(this, SettingsActivity.class);
-			startActivity(i);
-			return true;
-		case R.id.yaacc_about:
-			AboutActivity.showAbout(this);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
+            case R.id.yaacc_about:
+                AboutActivity.showAbout(this);
+                return true;
+            case R.id.yaacc_log:
+                YaaccLogActivity.showLog(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
