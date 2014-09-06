@@ -74,6 +74,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         setName(name);
         this.contentType = contentType;
         id = Math.abs(UUID.randomUUID().hashCode());
+
     }
 
     private Device<?, ?, ?> getDevice() {
@@ -178,6 +179,9 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         String metadata;
         try {
             metadata = (item == null) ? "" : new DIDLParser().generate(new DIDLContent().addItem(item), false);
+            if ("NOT_IMPLEMENTED".equals(metadata)){
+                metadata="";
+            }
         } catch (Exception e) {
             Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
             metadata = "";

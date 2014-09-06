@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -40,11 +41,14 @@ public class YaaccLogActivity extends Activity {
             StringBuilder log = new StringBuilder();
             String line = "";
             while ((line = bufferedReader.readLine()) != null) {
-                log.append(line);
-                log.append("\n");
+                log.insert(0,"\n");
+                log.insert(0,line);
             }
 
             textView.setText(log.toString());
+            textView.setTextIsSelectable(true);
+
+
         } catch (IOException e) {
             textView.setText("Error while reading log: " + e.getMessage());
         }

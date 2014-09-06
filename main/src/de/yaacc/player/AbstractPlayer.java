@@ -64,8 +64,8 @@ public abstract class AbstractPlayer implements Player {
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private SynchronizationInfo syncInfo;
     private boolean paused;
-    private Object loadedItem=null;
-    private int currentLoadedIndex=-1;
+    private Object loadedItem = null;
+    private int currentLoadedIndex = -1;
 
     /**
      * @param upnpClient
@@ -100,47 +100,40 @@ public abstract class AbstractPlayer implements Player {
             return;
         }
         setProcessingCommand(true);
-        int possibleNextIndex = currentIndex + 1;
-        if(possibleNextIndex > items.size()) {
-            possibleNextIndex = 0;
-        }
-        loadItem(items.get(possibleNextIndex), possibleNextIndex);
-        executeCommand(new TimerTask() {
-            @Override
-            public void run() {
-                paused = false;
-                int previousIndex = currentIndex;
-                cancelTimer();
-                currentIndex++;
-                if (currentIndex > items.size() - 1) {
-                    currentIndex = 0;
-                    SharedPreferences preferences = PreferenceManager
-                            .getDefaultSharedPreferences(getContext());
-                    boolean replay = preferences.getBoolean(
-                            getContext().getString(
-                                    R.string.settings_replay_playlist_chkbx), true);
-                    if (!replay) {
-                        stop();
-                        return;
-                    }
 
-                }
-                Context context = getUpnpClient().getContext();
-                if (context instanceof Activity) {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast toast = Toast.makeText(getContext(), getContext()
-                                    .getResources().getString(R.string.next)
-                                    + getPositionString(), Toast.LENGTH_SHORT);
 
-                            toast.show();
-                        }
-                    });
-                }
-                loadItem(previousIndex, currentIndex);
-                setProcessingCommand(false);
+        paused = false;
+        //int previousIndex = currentIndex;
+        cancelTimer();
+        currentIndex++;
+        if (currentIndex > items.size() - 1) {
+            currentIndex = 0;
+            SharedPreferences preferences = PreferenceManager
+                    .getDefaultSharedPreferences(getContext());
+            boolean replay = preferences.getBoolean(
+                    getContext().getString(
+                            R.string.settings_replay_playlist_chkbx), true);
+            if (!replay) {
+                stop();
+                return;
             }
-        }, getExecutionTime());
+
+        }
+        Context context = getUpnpClient().getContext();
+        if (context instanceof Activity) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast toast = Toast.makeText(getContext(), getContext()
+                            .getResources().getString(R.string.next)
+                            + getPositionString(), Toast.LENGTH_SHORT);
+
+                    toast.show();
+                }
+            });
+        }
+        setProcessingCommand(false);
+        play();
+
     }
 
     //
@@ -156,45 +149,31 @@ public abstract class AbstractPlayer implements Player {
             return;
         }
         setProcessingCommand(true);
-        int possibleNextIndex = currentIndex - 1;
-        if(possibleNextIndex < 0) {
+
+        paused = false;
+        int previousIndex = currentIndex;
+        cancelTimer();
+        currentIndex--;
+        if (currentIndex < 0) {
             if (items.size() > 0) {
-                possibleNextIndex = items.size() - 1;
+                currentIndex = items.size() - 1;
             } else {
-                possibleNextIndex = 0;
+                currentIndex = 0;
             }
         }
-        loadItem(items.get(possibleNextIndex), possibleNextIndex);
-        executeCommand(new TimerTask() {
-            @Override
-            public void run() {
-                paused = false;
-                int previousIndex = currentIndex;
-                cancelTimer();
-                currentIndex--;
-                if (currentIndex < 0) {
-                    if (items.size() > 0) {
-                        currentIndex = items.size() - 1;
-                    } else {
-                        currentIndex = 0;
-                    }
+        Context context = getUpnpClient().getContext();
+        if (context instanceof Activity) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast toast = Toast.makeText(getContext(), getContext()
+                            .getResources().getString(R.string.previous)
+                            + getPositionString(), Toast.LENGTH_SHORT);
+                    toast.show();
                 }
-                Context context = getUpnpClient().getContext();
-                if (context instanceof Activity) {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast toast = Toast.makeText(getContext(), getContext()
-                                    .getResources().getString(R.string.previous)
-                                    + getPositionString(), Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    });
-                }
-                loadItem(previousIndex, currentIndex);
-                setProcessingCommand(false);
-            }
-        }, getExecutionTime());
-
+            });
+        }
+        setProcessingCommand(false);
+        play();
 
     }
 
@@ -242,7 +221,7 @@ public abstract class AbstractPlayer implements Player {
             return;
         setProcessingCommand(true);
         int possibleNextIndex = currentIndex;
-        if(possibleNextIndex < items.size()) {
+        if (possibleNextIndex >= 0 && possibleNextIndex < items.size()) {
             loadItem(items.get(possibleNextIndex), possibleNextIndex);
         }
         executeCommand(new TimerTask() {
@@ -285,7 +264,7 @@ public abstract class AbstractPlayer implements Player {
         if (isProcessingCommand())
             return;
         setProcessingCommand(true);
-        currentLoadedIndex=-1;
+        currentLoadedIndex = -1;
         loadedItem = null;
         executeCommand(new TimerTask() {
             @Override
@@ -303,7 +282,9 @@ public abstract class AbstractPlayer implements Player {
                         }
                     });
                 }
-                stopItem(items.get(currentIndex));
+                if( items.size()>0){
+                  stopItem(items.get(currentIndex));
+                }
                 isPlaying = false;
                 paused = false;
                 setProcessingCommand(false);
@@ -319,6 +300,7 @@ public abstract class AbstractPlayer implements Player {
     @Override
     public void setItems(PlayableItem... playableItems) {
         List<PlayableItem> itemsList = Arrays.asList(playableItems);
+
         if (isShufflePlay()) {
             Collections.shuffle(itemsList);
         }
@@ -412,14 +394,15 @@ public abstract class AbstractPlayer implements Player {
     }
 
     //TODO refactor
-    protected Object loadItem(PlayableItem item, int toLoadIndex){
-        if(toLoadIndex == currentLoadedIndex){
+    protected Object loadItem(PlayableItem item, int toLoadIndex) {
+        if (toLoadIndex == currentLoadedIndex && loadedItem != null) {
             Log.d(getClass().getName(), "returning already loaded item");
             return loadedItem;
         }
         Log.d(getClass().getName(), "loaded item");
         currentLoadedIndex = toLoadIndex;
-        return loadItem(item);
+        loadedItem = loadItem(item);
+        return loadedItem;
     }
 
     protected void loadItem(int previousIndex, int nextIndex) {
@@ -428,7 +411,7 @@ public abstract class AbstractPlayer implements Player {
         firePropertyChange(PROPERTY_ITEM, items.get(previousIndex),
                 items.get(nextIndex));
         PlayableItem playableItem = items.get(nextIndex);
-        loadedItem = loadItem(playableItem, nextIndex);
+        Object loadedItem = loadItem(playableItem, nextIndex);
         startItem(playableItem, loadedItem);
         if (isPlaying() && items.size() > 1) {
             startTimer(playableItem.getDuration() + getSilenceDuration());
@@ -460,7 +443,7 @@ public abstract class AbstractPlayer implements Player {
      * @param duration in millis
      */
     public void startTimer(final long duration) {
-        if(playerTimer != null){
+        if (playerTimer != null) {
             cancelTimer();
         }
         playerTimer = new Timer();
@@ -582,7 +565,7 @@ public abstract class AbstractPlayer implements Player {
      */
     @Override
     public void onDestroy() {
-        cancelTimer();
+        stop();
         cancleNotification();
         items.clear();
 
@@ -651,7 +634,7 @@ public abstract class AbstractPlayer implements Player {
         execTime.add(Calendar.SECOND, getSyncInfo().getOffset().getSecond());
         execTime.add(Calendar.MILLISECOND, getSyncInfo().getOffset().getMillis());
         Log.d(getClass().getName(), "ReferencedRepresentationTimeOffset: " + getSyncInfo().getReferencedPresentationTimeOffset());
-        Log.d(getClass().getName(),"current time: " + new Date().toString() +  " get execution time: " + execTime.getTime().toString());
+        Log.d(getClass().getName(), "current time: " + new Date().toString() + " get execution time: " + execTime.getTime().toString());
         return execTime.getTime();
     }
 
