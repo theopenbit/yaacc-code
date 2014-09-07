@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -145,8 +146,11 @@ public class AVTransportPlayerActivity extends Activity {
 
     private Player getPlayer() {
         Player result = null;
-        List<Player> players = PlayerFactory
-                .getCurrentPlayersOfType(AVTransportPlayer.class);
+        List<Player> players = new ArrayList<Player>();
+        players.addAll(PlayerFactory
+                .getCurrentPlayersOfType(AVTransportPlayer.class));
+        players.addAll(PlayerFactory
+                .getCurrentPlayersOfType(SyncAVTransportPlayer.class));
         if (players != null) { // assume that there
             for (Player player : players) {
                 Log.d(getClass().getName(), "Found networkplayer: " + player.getId() + " Searched  for id: " + playerId);

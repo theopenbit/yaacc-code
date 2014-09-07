@@ -784,9 +784,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         }
         DIDLContent metadata = null;
         try {
-            metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
+            if(positionInfo.getTrackMetaData().indexOf("NOT_IMPLEMENTED") == -1){
+                metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
+            }else{
+                Log.d(getClass().getName(), "Warning unparsable TackMetaData: " + positionInfo.getTrackMetaData());
+            }
         } catch (Exception e) {
-            Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
+           Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
         }
         String mimeType = "";
         if (metadata != null) {

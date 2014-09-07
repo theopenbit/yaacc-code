@@ -20,11 +20,15 @@ package de.yaacc.musicplayer;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple service for playing music in background.
@@ -37,6 +41,7 @@ public class BackgroundMusicService extends Service {
     private MediaPlayer player;
     private IBinder binder = new BackgroundMusicServiceBinder();
     private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
+    //private boolean prepared  = false;
 
     public BackgroundMusicService() {
         super();
@@ -100,20 +105,11 @@ public class BackgroundMusicService extends Service {
     private void initialize(Intent intent) {
         backgroundMusicBroadcastReceiver = new BackgroundMusicBroadcastReceiver(this);
         backgroundMusicBroadcastReceiver.registerReceiver();
-        if (player == null) {
-            player = new MediaPlayer();
-            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-                    mediaPlayer.reset();
-                    return true;
-                }
-            }
-            );
-
-        } else {
+        if (player != null) {
             player.stop();
+            player.release();
         }
+        player = new MediaPlayer();
         try {
             if (intent != null && intent.getData() != null) {
                 player.setDataSource(this, intent.getData());
@@ -141,8 +137,23 @@ public class BackgroundMusicService extends Service {
      * start current music play
      */
     public void play() {
-        if (player != null && !player.isPlaying()) {
-            player.start();
+        //final ActionState actionState = new ActionState();
+        if (player != null && !player.isPlaying() ) {
+            /*new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    actionState.watchdogFlag = true;
+                }
+            }, 30000L); // 30sec. Watchdog
+            while (!(actionState.actionFinished || actionState.watchdogFlag)) {
+                // wait for player preparation
+                actionState.actionFinished = prepared;
+            }*/
+            //if(actionState.actionFinished){
+                player.start();
+            /*}else {
+                Log.d(getClass().getName(),"Preparation of music player failed!");
+            }*/
         }
     }
 
@@ -166,13 +177,19 @@ public class BackgroundMusicService extends Service {
             player.release();
         }
         player = new MediaPlayer();
-        //player.reset();
+        player.setVolume(100, 100);
+        //prepared= false;
         try {
-            //if (player.isPlaying()) {
-            //    stop();
-            //}
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setDataSource(this, uri);
             player.prepare();
+            //player.prepareAsync();
+          /*  player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    prepared = true;
+                }
+            });*/
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
@@ -188,7 +205,7 @@ public class BackgroundMusicService extends Service {
     public int getDuration() {
         int duration = 0;
 
-        if (player != null) {
+        if (player != null && player.isPlaying()) {
             try {
                 duration = player.getDuration();
             } catch (Exception ex) {
@@ -217,4 +234,9 @@ public class BackgroundMusicService extends Service {
         return currentPosition;
     }
 
+
+    private static class ActionState {
+        public boolean actionFinished = false;
+        public boolean watchdogFlag = false;
+    }
 }

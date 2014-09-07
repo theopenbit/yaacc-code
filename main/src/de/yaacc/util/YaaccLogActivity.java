@@ -31,6 +31,22 @@ public class YaaccLogActivity extends Activity {
         setContentView(R.layout.activity_yaacc_log);
 
 
+        displayLog();
+    }
+
+
+    /*
+  * (non-Javadoc)
+  *
+  * @see android.app.Activity#onResume()
+  */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayLog();
+    }
+
+    private void displayLog() {
         TextView textView = (TextView) findViewById(R.id.yaaccLog_content);
 
         try {
@@ -53,7 +69,6 @@ public class YaaccLogActivity extends Activity {
             textView.setText("Error while reading log: " + e.getMessage());
         }
     }
-
 
 
 }

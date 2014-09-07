@@ -51,6 +51,7 @@ public abstract class AbstractPlayer implements Player {
 
     public static final String PROPERTY_ITEM = "item";
     private List<PlayableItem> items = new ArrayList<PlayableItem>();
+    private int previousIndex = 0;
     private int currentIndex = 0;
     private Timer playerTimer;
     private Timer execTimer;
@@ -103,7 +104,7 @@ public abstract class AbstractPlayer implements Player {
 
 
         paused = false;
-        //int previousIndex = currentIndex;
+        previousIndex = currentIndex;
         cancelTimer();
         currentIndex++;
         if (currentIndex > items.size() - 1) {
@@ -151,7 +152,7 @@ public abstract class AbstractPlayer implements Player {
         setProcessingCommand(true);
 
         paused = false;
-        int previousIndex = currentIndex;
+        previousIndex = currentIndex;
         cancelTimer();
         currentIndex--;
         if (currentIndex < 0) {
@@ -222,7 +223,7 @@ public abstract class AbstractPlayer implements Player {
         setProcessingCommand(true);
         int possibleNextIndex = currentIndex;
         if (possibleNextIndex >= 0 && possibleNextIndex < items.size()) {
-            loadItem(items.get(possibleNextIndex), possibleNextIndex);
+            loadItem(possibleNextIndex);
         }
         executeCommand(new TimerTask() {
             @Override
@@ -244,7 +245,7 @@ public abstract class AbstractPlayer implements Player {
                         doResume();
                     } else {
                         paused = false;
-                        loadItem(currentIndex, currentIndex);
+                        loadItem(previousIndex, currentIndex);
                     }
                     setProcessingCommand(false);
                 }
@@ -282,8 +283,8 @@ public abstract class AbstractPlayer implements Player {
                         }
                     });
                 }
-                if( items.size()>0){
-                  stopItem(items.get(currentIndex));
+                if (items.size() > 0) {
+                    stopItem(items.get(currentIndex));
                 }
                 isPlaying = false;
                 paused = false;
@@ -393,25 +394,28 @@ public abstract class AbstractPlayer implements Player {
         return result;
     }
 
-    //TODO refactor
-    protected Object loadItem(PlayableItem item, int toLoadIndex) {
+
+    protected Object loadItem(int toLoadIndex) {
         if (toLoadIndex == currentLoadedIndex && loadedItem != null) {
             Log.d(getClass().getName(), "returning already loaded item");
             return loadedItem;
         }
-        Log.d(getClass().getName(), "loaded item");
-        currentLoadedIndex = toLoadIndex;
-        loadedItem = loadItem(item);
-        return loadedItem;
+        if (toLoadIndex >= 0 && toLoadIndex <= items.size()) {
+            Log.d(getClass().getName(), "loaded item");
+            currentLoadedIndex = toLoadIndex;
+            loadedItem = loadItem(items.get(toLoadIndex));
+            return loadedItem;
+        }
+        return null;
     }
 
     protected void loadItem(int previousIndex, int nextIndex) {
         if (items == null || items.size() == 0)
             return;
+        PlayableItem playableItem = items.get(nextIndex);
+        Object loadedItem = loadItem(nextIndex);
         firePropertyChange(PROPERTY_ITEM, items.get(previousIndex),
                 items.get(nextIndex));
-        PlayableItem playableItem = items.get(nextIndex);
-        Object loadedItem = loadItem(playableItem, nextIndex);
         startItem(playableItem, loadedItem);
         if (isPlaying() && items.size() > 1) {
             startTimer(playableItem.getDuration() + getSilenceDuration());
@@ -527,6 +531,7 @@ public abstract class AbstractPlayer implements Player {
         NotificationManager mNotificationManager = (NotificationManager) getContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
+        Log.d(getClass().getName(), "Cancle Notification with ID: " + getNotificationId());
         mNotificationManager.cancel(getNotificationId());
 
     }
@@ -635,6 +640,12 @@ public abstract class AbstractPlayer implements Player {
         execTime.add(Calendar.MILLISECOND, getSyncInfo().getOffset().getMillis());
         Log.d(getClass().getName(), "ReferencedRepresentationTimeOffset: " + getSyncInfo().getReferencedPresentationTimeOffset());
         Log.d(getClass().getName(), "current time: " + new Date().toString() + " get execution time: " + execTime.getTime().toString());
+        if (execTime.getTime().getTime() <= System.currentTimeMillis()){
+            Log.d(getClass().getName(), "ExecutionTime is in past!! We will start immediately");
+            execTime = Calendar.getInstance(Locale.getDefault());
+            execTime.add(Calendar.MILLISECOND, 100);
+
+        }
         return execTime.getTime();
     }
 

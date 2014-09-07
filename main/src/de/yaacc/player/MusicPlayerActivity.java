@@ -220,6 +220,10 @@ public class MusicPlayerActivity extends Activity {
     }
 
     private void setTrackInfo() {
+        doSetTrackInfo();
+        updateTime();
+    }
+    private void doSetTrackInfo() {
         if (getPlayer() == null)
             return;
         TextView current = (TextView) findViewById(R.id.musicActivityCurrentItem);
@@ -228,13 +232,16 @@ public class MusicPlayerActivity extends Activity {
         position.setText(getPlayer().getPositionString());
         TextView next = (TextView) findViewById(R.id.musicActivityNextItem);
         next.setText(getPlayer().getNextItemTitle());
-        updateTime();
         ImageView albumArtView = (ImageView) findViewById(R.id.musicActivityImageView);
         URI albumArtUri = getPlayer().getAlbumArt();
         if (null != albumArtUri) {
             ImageDownloadTask imageDownloadTask = new ImageDownloadTask(albumArtView);
             imageDownloadTask.execute(Uri.parse(albumArtUri.toString()));
         }
+        TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
+        duration.setText(getPlayer().getDuration());
+        TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
+        elapsedTime.setText(getPlayer().getElapsedTime());
 
     }
 
@@ -248,12 +255,7 @@ public class MusicPlayerActivity extends Activity {
 
                     @Override
                     public void run() {
-                        if (getPlayer() != null) {
-                            TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
-                            duration.setText(getPlayer().getDuration());
-                            TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
-                            elapsedTime.setText(getPlayer().getElapsedTime());
-                        }
+                        doSetTrackInfo();
                         if (updateTime) {
                             updateTime();
                         }
