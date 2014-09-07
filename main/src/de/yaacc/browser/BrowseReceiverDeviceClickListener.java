@@ -48,12 +48,12 @@ public class BrowseReceiverDeviceClickListener implements OnItemClickListener {
         if (checkBox.isChecked()) {
             Log.d(getClass().getName(), "isChecked:" + device.getDisplayString());
             adapter.removeSelectedDevice(device);
-            BrowseActivity.uClient.removeReceiverDevice(device);
+            BrowseActivity.getUpnpClient().removeReceiverDevice(device);
             checkBox.setChecked(false);
         } else {
             Log.d(getClass().getName(), "isNotChecked:" + device.getDisplayString());
             adapter.addSelectedDevice(device);
-            BrowseActivity.uClient.addReceiverDevice(device);
+            BrowseActivity.getUpnpClient().addReceiverDevice(device);
             checkBox.setChecked(true);
         }
     }

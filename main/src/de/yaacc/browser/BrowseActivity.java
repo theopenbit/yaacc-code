@@ -57,7 +57,7 @@ import de.yaacc.util.image.IconDownloadCacheHandler;
  */
 public class BrowseActivity extends Activity implements OnClickListener,
         UpnpClientListener {
-    public static UpnpClient uClient = null;
+    private static UpnpClient uClient = null;
     private BrowseItemAdapter bItemAdapter;
     BrowseItemClickListener bItemClickListener = null;
     BrowseDeviceClickListener bDeviceClickListener = null;
@@ -67,6 +67,13 @@ public class BrowseActivity extends Activity implements OnClickListener,
     private Intent serverService = null;
     protected ListView contentList;
     private static Navigator navigator = null;
+
+    public static UpnpClient getUpnpClient(){
+        if(uClient == null){
+            uClient = new UpnpClient();
+        }
+        return uClient;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

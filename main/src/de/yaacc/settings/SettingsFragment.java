@@ -42,8 +42,8 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 		addPreferencesFromResource(R.xml.preference);
 		
 		populateDeviceLists();
-		
-		BrowseActivity.uClient.addUpnpClientListener(this);
+        BrowseActivity.getUpnpClient().addUpnpClientListener(this);
+
 	}
 	
 	public void addDevice(){
@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragment implements UpnpClientLi
 		LinkedList<Device> devices = new LinkedList<Device>();
 		// TODO: populate with found devices
 
-		UpnpClient upnpClient = BrowseActivity.uClient;
+		UpnpClient upnpClient = BrowseActivity.getUpnpClient();
 
 		if (upnpClient != null) {
 			if (upnpClient.isInitialized()) {

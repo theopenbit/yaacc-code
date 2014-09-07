@@ -59,7 +59,7 @@ public class BrowseItemAdapter extends BaseAdapter {
 
 	public BrowseItemAdapter(Context ctx, String objectId) {
 		Position pos = new Position(objectId,
-				BrowseActivity.uClient.getProviderDevice());
+				BrowseActivity.getUpnpClient().getProviderDevice());
 		initialize(ctx, pos);
 		this.context = ctx;
 	}
@@ -70,7 +70,7 @@ public class BrowseItemAdapter extends BaseAdapter {
 
 	private void initialize(Context ctx, Position pos) {
 		inflator = LayoutInflater.from(ctx);
-		ContentDirectoryBrowseResult result = BrowseActivity.uClient
+		ContentDirectoryBrowseResult result = BrowseActivity.getUpnpClient()
 				.browseSync(pos);
 		if (result == null)
 			return;

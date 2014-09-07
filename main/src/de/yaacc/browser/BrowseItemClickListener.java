@@ -52,14 +52,14 @@ public class BrowseItemClickListener implements OnItemClickListener{
             // if the current id is null, go back to the top level
             String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID: adapter
                     .getFolder(position).getId();
-            BrowseActivity.getNavigator().pushPosition(new Position(newObjectId, BrowseActivity.uClient.getProviderDevice()));
+            BrowseActivity.getNavigator().pushPosition(new Position(newObjectId, BrowseActivity.getUpnpClient().getProviderDevice()));
             BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
                     listView.getContext(), newObjectId);
             a.setAdapter(bItemAdapter);
             BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
             a.setOnItemClickListener(bItemClickListener);
         } else {
-            List<Player> players = BrowseActivity.uClient.initializePlayers(currentObject);
+            List<Player> players = BrowseActivity.getUpnpClient().initializePlayers(currentObject);
             for (Player player : players) {
                 if(player != null){
                     player.play();
@@ -89,7 +89,7 @@ public class BrowseItemClickListener implements OnItemClickListener{
      */
     public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
         if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
-            List<Player> players = BrowseActivity.uClient.initializePlayers(selectedDIDLObject);
+            List<Player> players = BrowseActivity.getUpnpClient().initializePlayers(selectedDIDLObject);
             for (Player player : players) {
                 if(player != null){
                     player.play();

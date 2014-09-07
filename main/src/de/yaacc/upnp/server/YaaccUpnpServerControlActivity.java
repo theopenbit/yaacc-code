@@ -53,6 +53,9 @@ public class YaaccUpnpServerControlActivity extends Activity {
 			public void onClick(View v) {
 				YaaccUpnpServerControlActivity.this.startService(new Intent(getApplicationContext(),
 					YaaccUpnpServerService.class));
+                SharedPreferences preferences = PreferenceManager
+                        .getDefaultSharedPreferences(getApplicationContext());
+                preferences.edit().putBoolean(getString(R.string.settings_local_server_chkbx), true);
 
 			}
 		});
@@ -63,6 +66,9 @@ public class YaaccUpnpServerControlActivity extends Activity {
 			public void onClick(View v) {
 				YaaccUpnpServerControlActivity.this.stopService(new Intent(getApplicationContext(),
 					YaaccUpnpServerService.class));
+                SharedPreferences preferences = PreferenceManager
+                        .getDefaultSharedPreferences(getApplicationContext());
+                preferences.edit().putBoolean(getString(R.string.settings_local_server_chkbx), false);
 
 			}
 		});
