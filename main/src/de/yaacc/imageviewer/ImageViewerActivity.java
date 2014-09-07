@@ -46,6 +46,8 @@ import de.yaacc.settings.SettingsActivity;
 import de.yaacc.util.AboutActivity;
 import de.yaacc.util.ActivitySwipeDetector;
 import de.yaacc.util.SwipeReceiver;
+import de.yaacc.util.YaaccLogActivity;
+
 /**
  * a simple ImageViewer based on the android ImageView component;
  *
@@ -201,6 +203,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
                 return true;
             case R.id.menu_stop:
                 stop();
+                return true;
+            case R.id.yaacc_log:
+                YaaccLogActivity.showLog(this);
                 return true;
             case R.id.yaacc_about:
                 AboutActivity.showAbout(this);

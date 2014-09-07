@@ -50,6 +50,8 @@ import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
 
 import android.util.Log;
 
+import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
+
 
 /**
  * Special test cases only working in openbits network
@@ -904,7 +906,7 @@ public class OpenbitTestCases extends UpnpClientTest {
 		UpnpClient upnpClient = getInitializedUpnpClientWithYaaccUpnpServer();
 		Device<?, ?, ?> device = upnpClient.getDevice(OPENBIT_MEDIA_SERVER);
 					
-		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0"); 
+		ContentDirectoryBrowseResult result = upnpClient.browseSync(device,"0");
 		assertNotNull(result);
 		assertNotNull(result.getResult());
 		Log.d(getClass().getName(), "DidlContent: " + new DIDLParser().generate(result.getResult()));

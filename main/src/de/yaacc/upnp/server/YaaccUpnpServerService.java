@@ -22,11 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.BindException;
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -35,7 +32,6 @@ import java.util.TimerTask;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpServerConnection;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.DefaultHttpServerConnection;
@@ -53,6 +49,7 @@ import org.apache.http.protocol.ResponseServer;
 
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.DefaultServiceManager;
+import org.fourthline.cling.model.ValidationError;
 import org.fourthline.cling.model.ValidationException;
 import org.fourthline.cling.model.meta.DeviceDetails;
 import org.fourthline.cling.model.meta.DeviceIdentity;
@@ -61,6 +58,7 @@ import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
 import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
+import org.fourthline.cling.model.meta.UDAVersion;
 import org.fourthline.cling.model.types.DLNACaps;
 import org.fourthline.cling.model.types.DLNADoc;
 import org.fourthline.cling.model.types.UDADeviceType;
@@ -68,15 +66,12 @@ import org.fourthline.cling.model.types.UDN;
 import org.fourthline.cling.protocol.async.SendingNotificationAlive;
 import org.fourthline.cling.support.avtransport.AbstractAVTransportService;
 import org.fourthline.cling.support.connectionmanager.ConnectionManagerService;
-import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService;
 import org.fourthline.cling.support.model.Protocol;
 import org.fourthline.cling.support.model.ProtocolInfo;
 import org.fourthline.cling.support.model.ProtocolInfos;
 import org.fourthline.cling.support.renderingcontrol.AbstractAudioRenderingControl;
 import org.fourthline.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarService;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -94,6 +89,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.upnp.server.avtransport.YaaccAVTransportService;
 import de.yaacc.upnp.server.contentdirectory.YaaccContentDirectory;
 import de.yaacc.util.NotificationId;
 
@@ -343,7 +339,7 @@ public class YaaccUpnpServerService extends Service {
 			versionName = "??";
 		}
 		try {
-			device = new LocalDevice(new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)), new UDADeviceType("MediaRenderer"),
+			device = new LocalDevice(new DeviceIdentity(new UDN(MEDIA_RENDERER_UDN_ID)), new UDADeviceType("MediaRenderer",3),
 			// Used for shown name: first part of ManufactDet, first
 			// part of ModelDet and version number
 					new DeviceDetails("YAACC - MediaRenderer (" + getLocalServerName() + ")",
@@ -353,11 +349,14 @@ public class YaaccUpnpServerService extends Service {
                         		new DLNADoc("DMS", DLNADoc.Version.V1_5),
                         		new DLNADoc("M-DMS", DLNADoc.Version.V1_5)
 							},
-							new DLNACaps(new String[] {"av-upload", "image-upload", "audio-upload"})), createDeviceIcons(), createMediaRendererServices());
+							new DLNACaps(new String[] {"av-upload", "image-upload", "audio-upload"})), createDeviceIcons(), createMediaRendererServices(),null);
 
 			return device;
 		} catch (ValidationException e) {
-			throw new IllegalStateException("Exception during device creation", e);
+            for (ValidationError validationError : e.getErrors()) {
+                Log.d(getClass().getCanonicalName(), validationError.toString());
+            }
+                throw new IllegalStateException("Exception during device creation", e);
 		}
 
 	}
@@ -482,11 +481,11 @@ public class YaaccUpnpServerService extends Service {
 	 * @return the service
 	 */
 	@SuppressWarnings("unchecked")
-	private LocalService<AbstractAVTransportService> createAVTransportService() {
-		LocalService<AbstractAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(AbstractAVTransportService.class);
-		avTransportService.setManager(new DefaultServiceManager<AbstractAVTransportService>(avTransportService, null) {
+	private LocalService<YaaccAVTransportService> createAVTransportService() {
+		LocalService<YaaccAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(YaaccAVTransportService.class);
+		avTransportService.setManager(new DefaultServiceManager<YaaccAVTransportService>(avTransportService, null) {
 			@Override
-			protected AbstractAVTransportService createServiceInstance() throws Exception {
+			protected YaaccAVTransportService createServiceInstance() throws Exception {
 				return new YaaccAVTransportService(getUpnpClient());
 			}
 		});

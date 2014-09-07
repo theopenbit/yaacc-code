@@ -51,5 +51,14 @@
 		<ListPreference android:title="@string/settings_sending_upnp_alive_interval"    android:key="@string/settings_sending_upnp_alive_interval_key"       android:entries="@array/duration_entries_with_never"   android:entryValues="@array/duration_values_with_never" />      
         <EditTextPreference android:title="@string/settings_local_server_name" android:key="@string/settings_local_server_name_key"/>
     </PreferenceScreen>
-
+    <PreferenceScreen android:title="@string/settings_category_synchronization">
+        <ListPreference android:title="@string/settings_default_playback_delay"    android:key="@string/settings_default_playback_delay_key"       android:entries="@array/duration_entries"   android:entryValues="@array/duration_values" />
+        <EditTextPreference
+        android:defaultValue="0"
+        android:dialogTitle="@string/settings_device_playback_offset"
+        android:inputType="number"
+        android:key="@string/settings_device_playback_offset_key"
+        android:summary="@string/settings_device_playback_offset_summ"
+        android:title="@string/settings_device_playback_offset" />
+    </PreferenceScreen>
 </PreferenceScreen>

@@ -89,4 +89,11 @@
     <string name="settings_music_player_shuffle_chkbx">settings_music_player_chkbx</string>
     <string name="settings_music_player_shuffle_on">Shuffled music play</string>
     <string name="settings_music_player_shuffle_off">Ordered music play</string>
+    <string name="settings_category_synchronization">Synchronization settings</string>
+    <string name="settings_default_playback_delay">Playback delay</string>
+    <string name="settings_default_playback_delay_key">settings_default_playback_delay_key</string>
+    <string name="settings_device_playback_offset">Device offset</string>
+    <string name ="settings_device_playback_offset_summ">offset in ms</string>
+    <string name="settings_device_playback_offset_key">settings_device_playback_offset_key</string>
+
 </resources>

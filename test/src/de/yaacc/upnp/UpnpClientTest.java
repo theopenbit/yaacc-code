@@ -68,6 +68,7 @@ import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.player.Player;
+import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.server.LocalUpnpServer;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 

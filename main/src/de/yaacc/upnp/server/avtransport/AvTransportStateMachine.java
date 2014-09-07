@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.yaacc.upnp.server;
+package de.yaacc.upnp.server.avtransport;
 
 import org.fourthline.cling.support.avtransport.impl.AVTransportStateMachine;
 import org.seamless.statemachine.States;
@@ -32,5 +32,8 @@ import org.seamless.statemachine.States;
 	AvTransportMediaRendererPaused.class
 })
 public interface AvTransportStateMachine extends AVTransportStateMachine {
+    public abstract void syncPlay(String speed, String referencedPositionUnits, String referencedPosition,String referencedPresentationTime,String referencedClockId);
+    public abstract void syncPause(String referencedPresentationTime,String referencedClockId);
+    public abstract void syncStop(String referencedPresentationTime,String referencedClockId);
 
 }

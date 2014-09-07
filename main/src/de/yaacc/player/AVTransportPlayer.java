@@ -30,9 +30,6 @@ import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
 import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.model.DIDLContent;
-import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.DescMeta;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.item.Item;
 
 import android.app.PendingIntent;
@@ -49,30 +46,40 @@ public class AVTransportPlayer extends AbstractPlayer {
     public static final String PLAYER_ID = "PlayerId";
     private String deviceId="";
     private int id;
+    private String contentType;
     /**
-     * @param context
+     * @param upnpClient the client
      * @param name playerName
      *
      */
-    public AVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name) {
+    public AVTransportPlayer(UpnpClient upnpClient, Device receiverDevice, String name, String contentType) {
         this(upnpClient);
         deviceId = receiverDevice.getIdentity().getUdn().getIdentifierString();
         setName(name);
-        id = UUID.randomUUID().hashCode();
+        this.contentType = contentType;
+        id =  Math.abs(UUID.randomUUID().hashCode());
     }
     private Device<?, ?, ?> getDevice(){
         return getUpnpClient().getDevice(deviceId);
     }
     /**
-     * @param context
+     * @param upnpClient the client
      */
     public AVTransportPlayer(UpnpClient upnpClient) {
         super(upnpClient);
-// TODO Auto-generated constructor stub
     }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
     /* (non-Javadoc)
-    * @see de.yaacc.player.AbstractPlayer#stopItem(de.yaacc.player.PlayableItem)
-    */
+        * @see de.yaacc.player.AbstractPlayer#stopItem(de.yaacc.player.PlayableItem)
+        */
     @Override
     protected void stopItem(PlayableItem playableItem) {
         if(getDevice() == null) {

@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.upnp.SynchronizationInfo;
 import de.yaacc.upnp.UpnpClient;
 /**
  * Factory for creating player instances-
@@ -34,6 +35,8 @@ import de.yaacc.upnp.UpnpClient;
  */
 public class PlayerFactory {
     private static List<Player> currentPlayers = new ArrayList<Player>();
+
+
     /**
      * Creates a player for the given content. Based on the configuration
      * settings in the upnpClient the player may be a player to play on a remote
@@ -46,7 +49,7 @@ public class PlayerFactory {
      * @return the player
      */
     public static List<Player> createPlayer(UpnpClient upnpClient,
-                                            List<PlayableItem> items) {
+                                            SynchronizationInfo syncInfo,List<PlayableItem> items) {
         List<Player> resultList = new ArrayList<Player>();
         Player result = null;
         boolean video = false;
@@ -59,7 +62,7 @@ public class PlayerFactory {
         }
         Log.d(PlayerFactory.class.getName(), "video:" + video + " image: " + image + "audio:" + music );
         for (Device device : upnpClient.getReceiverDevices()) {
-            result = createPlayer(upnpClient,device, video, image, music);
+            result = createPlayer(upnpClient,device, video, image, music,syncInfo);
             if (result != null) {
                 currentPlayers.add(result);
                 result.setItems(items.toArray(new PlayableItem[items.size()]));
@@ -78,7 +81,7 @@ public class PlayerFactory {
      * @return the player or null if no device is present
      */
     private static Player createPlayer(UpnpClient upnpClient,Device receiverDevice,
-                                       boolean video, boolean image, boolean music) {
+                                       boolean video, boolean image, boolean music, SynchronizationInfo syncInfo) {
         if( receiverDevice == null){
             Toast toast = Toast.makeText(upnpClient.getContext(), upnpClient.getContext().getString(R.string.error_no_receiver_device_found), Toast.LENGTH_SHORT);
             toast.show();
@@ -98,10 +101,30 @@ public class PlayerFactory {
             } else if (!video && !image && music) {
                 contentType ="music";
             }
-            result = new AVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
-                    .getString(R.string.playerNameAvTransport)
-                    + "-" + contentType + "@"
-                    + deviceName);
+
+            if(receiverDevice.getType().getVersion() == 3){
+                for (Player player : getCurrentPlayersOfType(SyncAVTransportPlayer.class)) {
+                    if(((SyncAVTransportPlayer) player).getDeviceId().equals(receiverDevice.getIdentity().getUdn().getIdentifierString())
+                            &&((SyncAVTransportPlayer) player).getContentType().equals(contentType)){
+                        shutdown(player);
+                    }
+                }
+                result = new SyncAVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
+                        .getString(R.string.playerNameAvTransport)
+                        + "-" + contentType + "@"
+                        + deviceName, contentType);
+            }else {
+                for (Player player : getCurrentPlayersOfType(AVTransportPlayer.class)) {
+                    if(((AVTransportPlayer) player).getDeviceId().equals(receiverDevice.getIdentity().getUdn().getIdentifierString())
+                            && ((AVTransportPlayer) player).getContentType().equals(contentType)){
+                        shutdown(player);
+                    }
+                }
+                result = new AVTransportPlayer(upnpClient,receiverDevice, upnpClient.getContext()
+                        .getString(R.string.playerNameAvTransport)
+                        + "-" + contentType + "@"
+                        + deviceName,contentType);
+            }
         } else {
             if (video && !image && !music) {
 // use videoplayer
@@ -125,6 +148,7 @@ public class PlayerFactory {
                         .getString(R.string.playerNameMultiContent));
             }
         }
+        result.setSyncInfo(syncInfo);
         return result;
     }
     private static Player createImagePlayer(UpnpClient upnpClient) {
@@ -164,6 +188,24 @@ public class PlayerFactory {
     public static List<Player> getCurrentPlayers() {
         return Collections.unmodifiableList(currentPlayers);
     }
+
+    /**
+     * returns all current players of the given type.
+     *
+     * @param typeClazz
+     * the requested type
+     * @return the currentPlayer
+     */
+    public static List<Player> getCurrentPlayersOfType(Class typeClazz, SynchronizationInfo syncInfo) {
+
+        List<Player> players = getCurrentPlayersOfType(typeClazz);
+        for (Player player : players) {
+                player.setSyncInfo(syncInfo);
+        }
+        return players;
+    }
+
+
     /**
      * returns all current players of the given type.
      *

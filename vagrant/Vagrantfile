@@ -198,6 +198,7 @@ if ARGV[0] == "up"
 	 config.vm.box = "yaacc-dev" 
 	 config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 	 config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
+	 config.vm.network :bridged, guest: 5555, host: 5555
 	 config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
 	 config.vm.provision :shell, :path => "bootstrap.sh"
          config.vm.forward_port 49153, 49153
@@ -217,6 +218,7 @@ Vagrant::Config.run do |config|
  config.vm.box = "yaacc-dev" 
  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
  config.vm.share_folder "yaacc-secret", "/mnt/yaacc-secret/" , $yaaccSecretPath , :create => false
+ config.vm.network :bridged, guest: 5555, host: 5555
  config.vm.provision :shell, :inline => "echo '" + motdTemplate + "' > /etc/motd.tail"
  config.vm.provision :shell, :path => "bootstrap.sh"
  config.vm.forward_port 49153, 49153

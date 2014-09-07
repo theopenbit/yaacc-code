@@ -35,7 +35,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
 
     <application
@@ -153,13 +153,20 @@
             android:label="@string/yaacc_about" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
             android:name="de.yaacc.upnp.server.YaaccUpnpServerControlActivity"
             android:label="@string/title_activity_yaacc_upnp_server_control" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="de.yaacc.util.YaaccLogActivity"
+            android:label="@string/title_activity_yaacc_log"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

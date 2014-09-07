@@ -25,7 +25,6 @@ import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.AudioItem;
 import org.fourthline.cling.support.model.item.ImageItem;
-import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.PlaylistItem;
 import org.fourthline.cling.support.model.item.TextItem;
 import org.fourthline.cling.support.model.item.VideoItem;
@@ -44,7 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
-import de.yaacc.upnp.ContentDirectoryBrowseResult;
+import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.util.image.IconDownloadTask;
 import de.yaacc.util.image.ImageDownloader;
 

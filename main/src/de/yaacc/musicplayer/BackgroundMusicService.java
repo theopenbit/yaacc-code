@@ -20,193 +20,223 @@ package de.yaacc.musicplayer;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * A simple service for playing music in background.
- * 
+ *
  * @author Tobias Schoene (openbit)
- * 
  */
 public class BackgroundMusicService extends Service {
 
-	public static final String URIS = "URIS_PARAM"; // String Intent parameter
-	private MediaPlayer player;
-	private IBinder binder = new BackgroundMusicServiceBinder();
-	private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
+    public static final String URIS = "URIS_PARAM"; // String Intent parameter
+    private MediaPlayer player;
+    private IBinder binder = new BackgroundMusicServiceBinder();
+    private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
+    //private boolean prepared  = false;
 
-	public BackgroundMusicService() {
-		super();
-	}
+    public BackgroundMusicService() {
+        super();
+    }
 
-	public class BackgroundMusicServiceBinder extends Binder {
-		public BackgroundMusicService getService() {
-			return BackgroundMusicService.this;
-		}
-	}
+    public class BackgroundMusicServiceBinder extends Binder {
+        public BackgroundMusicService getService() {
+            return BackgroundMusicService.this;
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onCreate()
-	 */
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		Log.d(this.getClass().getName(), "On Create");
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.app.Service#onCreate()
+     */
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(this.getClass().getName(), "On Create");
 
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onDestroy()
-	 */
-	@Override
-	public void onDestroy() {
-		Log.d(this.getClass().getName(), "On Destroy");
-		if (player != null) {
-			player.stop();
-			player.release();
-		}
-		unregisterReceiver(backgroundMusicBroadcastReceiver);
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.app.Service#onDestroy()
+     */
+    @Override
+    public void onDestroy() {
+        Log.d(this.getClass().getName(), "On Destroy");
+        if (player != null) {
+            player.stop();
+            player.release();
+        }
+        unregisterReceiver(backgroundMusicBroadcastReceiver);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onBind(android.content.Intent)
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		Log.d(this.getClass().getName(), "On Bind");
-		return binder;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.app.Service#onBind(android.content.Intent)
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(this.getClass().getName(), "On Bind");
+        return binder;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onStart(android.content.Intent, int)
-	 */
-	@Override
-	public void onStart(Intent intent, int startid) {
-		Log.d(this.getClass().getName(), "On Start");
-		initialize(intent);
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.app.Service#onStart(android.content.Intent, int)
+     */
+    @Override
+    public void onStart(Intent intent, int startid) {
+        Log.d(this.getClass().getName(), "On Start");
+        initialize(intent);
+    }
 
-	private void initialize(Intent intent) {
-		backgroundMusicBroadcastReceiver = new BackgroundMusicBroadcastReceiver(this);
-		backgroundMusicBroadcastReceiver.registerReceiver();
-		if (player == null) {
-			player = new MediaPlayer();
+    private void initialize(Intent intent) {
+        backgroundMusicBroadcastReceiver = new BackgroundMusicBroadcastReceiver(this);
+        backgroundMusicBroadcastReceiver.registerReceiver();
+        if (player != null) {
+            player.stop();
+            player.release();
+        }
+        player = new MediaPlayer();
+        try {
+            if (intent != null && intent.getData() != null) {
+                player.setDataSource(this, intent.getData());
+            }
+        } catch (Exception e) {
+            Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
-		} else {
-			player.stop();
-		}
-		try {
-			if (intent != null && intent.getData() != null) {
-				player.setDataSource(this, intent.getData());
-			}
-		} catch (Exception e) {
-			Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
+        }
+        if (player != null) {
+            player.setVolume(100, 100);
+            Log.i(this.getClass().getName(), "is Playing:" + player.isPlaying());
+        }
+    }
 
-		}
-		if (player != null) {
-			player.setVolume(100, 100);
-			Log.i(this.getClass().getName(), "is Playing:" + player.isPlaying());
-		}
-	}
+    /**
+     * stop current music play
+     */
+    public void stop() {
+        if (player != null) {
+            player.stop();
+        }
+    }
 
-	/**
-	 * stop current music play
-	 */
-	public void stop() {
-		if (player != null) {
-			player.stop();
-		}
-	}
+    /**
+     * start current music play
+     */
+    public void play() {
+        //final ActionState actionState = new ActionState();
+        if (player != null && !player.isPlaying() ) {
+            /*new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    actionState.watchdogFlag = true;
+                }
+            }, 30000L); // 30sec. Watchdog
+            while (!(actionState.actionFinished || actionState.watchdogFlag)) {
+                // wait for player preparation
+                actionState.actionFinished = prepared;
+            }*/
+            //if(actionState.actionFinished){
+                player.start();
+            /*}else {
+                Log.d(getClass().getName(),"Preparation of music player failed!");
+            }*/
+        }
+    }
 
-	/**
-	 * start current music play
-	 */
-	public void play() {
-		if (player != null && !player.isPlaying()) {
-			player.start();
-		}
-	}
+    /**
+     * pause current music play
+     */
+    public void pause() {
+        if (player != null) {
+            player.pause();
+        }
+    }
 
-	/**
-	 * pause current music play
-	 */
-	public void pause() {
-		if (player != null) {
-			player.pause();
-		}
-	}
+    /**
+     * change music uri
+     *
+     * @param uri
+     */
+    public void setMusicUri(Uri uri) {
+        Log.d(this.getClass().getName(), "changing datasource uri to:" + uri.toString());
+        if (player != null) {
+            player.release();
+        }
+        player = new MediaPlayer();
+        player.setVolume(100, 100);
+        //prepared= false;
+        try {
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            player.setDataSource(this, uri);
+            player.prepare();
+            //player.prepareAsync();
+          /*  player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    prepared = true;
+                }
+            });*/
+        } catch (Exception e) {
+            Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
-	/**
-	 * change music uri
-	 * 
-	 * @param uri
-	 */
-	public void setMusicUri(Uri uri) {
-		Log.d(this.getClass().getName(), "changing datasource uri to:" + uri.toString());
-		if (player != null) {
-			player.release();
-		}
-		player = new MediaPlayer();
-		try {
-			if (player.isPlaying()) {
-				stop();
-			}
-			player.setDataSource(this, uri);
-			player.prepare();
-		} catch (Exception e) {
-			Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
+        }
 
-		}
+    }
 
-	}
+    /**
+     * returns the duration of the current track
+     *
+     * @return the duration
+     */
+    public int getDuration() {
+        int duration = 0;
 
-	/**
-	 * returns the duration of the current track
-	 * 
-	 * @return the duration
-	 */
-	public int getDuration() {
-		int duration = 0;
+        if (player != null && player.isPlaying()) {
+            try {
+                duration = player.getDuration();
+            } catch (Exception ex) {
+                Log.d(getClass().getName(), "Caught player exception", ex);
+            }
+        }
 
-		if (player != null) {
-			try {
-				duration = player.getDuration();
-			} catch (Exception ex) {
-				Log.d(getClass().getName(), "Caught player exception", ex);
-			}
-		}
+        return duration;
+    }
 
-		return duration;
-	}
+    /**
+     * return the current position in the playing track
+     *
+     * @return the position
+     */
+    public int getCurrentPosition() {
+        int currentPosition = 0;
+        if (player != null) {
+            try {
+                currentPosition = player.getCurrentPosition();
+            } catch (Exception ex) {
+                Log.d(getClass().getName(), "Caught player exception", ex);
+            }
+        }
 
-	/**
-	 * return the current position in the playing track
-	 * 
-	 * @return the position
-	 */
-	public int getCurrentPosition() {
-		int currentPosition = 0;
-		if (player != null) {
-			try {
-				currentPosition = player.getCurrentPosition();
-			} catch (Exception ex) {
-				Log.d(getClass().getName(), "Caught player exception", ex);
-			}
-		}
+        return currentPosition;
+    }
 
-		return currentPosition;
-	}
 
+    private static class ActionState {
+        public boolean actionFinished = false;
+        public boolean watchdogFlag = false;
+    }
 }

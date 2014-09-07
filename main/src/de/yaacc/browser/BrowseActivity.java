@@ -47,6 +47,7 @@ import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.util.AboutActivity;
+import de.yaacc.util.YaaccLogActivity;
 import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
@@ -226,6 +227,9 @@ public class BrowseActivity extends Activity implements OnClickListener,
                 return true;
             case R.id.yaacc_about:
                 AboutActivity.showAbout(this);
+                return true;
+            case R.id.yaacc_log:
+                YaaccLogActivity.showLog(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

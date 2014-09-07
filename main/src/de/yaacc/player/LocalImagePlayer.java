@@ -37,6 +37,7 @@ import org.fourthline.cling.support.model.DIDLObject;
 import de.yaacc.R;
 import de.yaacc.imageviewer.ImageViewerActivity;
 import de.yaacc.imageviewer.ImageViewerBroadcastReceiver;
+import de.yaacc.upnp.SynchronizationInfo;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.NotificationId;
 
@@ -51,9 +52,10 @@ public class LocalImagePlayer implements Player {
 	private Context context;
 	private Timer commandExecutionTimer;
 	private String name;
+    private SynchronizationInfo syncInfo;
 
-	/**
-	 * @param context
+    /**
+	 * @param upnpClient
 	 * @param name
 	 *            playerName
 	 * 
@@ -64,7 +66,7 @@ public class LocalImagePlayer implements Player {
 	}
 
 	/**
-	 * @param context
+	 * @param upnpClient
 	 */
 	public LocalImagePlayer(UpnpClient upnpClient) {
 		this.context = upnpClient.getContext();
@@ -144,7 +146,7 @@ public class LocalImagePlayer implements Player {
 				context.sendBroadcast(intent);
 
 			}
-		}, 500L);
+		}, getExecutionTime());
 
 	}
 
@@ -171,7 +173,7 @@ public class LocalImagePlayer implements Player {
 				context.sendBroadcast(intent);
 
 			}
-		}, 500L);
+		}, getExecutionTime());
 
 	}
 
@@ -197,7 +199,7 @@ public class LocalImagePlayer implements Player {
 				context.sendBroadcast(intent);
 
 			}
-		}, 500L);
+		}, getExecutionTime());
 
 	}
 
@@ -412,6 +414,23 @@ public class LocalImagePlayer implements Player {
     @Override
     public URI getAlbumArt() {
         return null;
+    }
+
+    @Override
+    public void setSyncInfo(SynchronizationInfo syncInfo) {
+        if(syncInfo == null) {
+            syncInfo = new SynchronizationInfo();
+        }
+        this.syncInfo = syncInfo;
+    }
+
+    @Override
+    public SynchronizationInfo getSyncInfo() {
+        return syncInfo;
+    }
+
+    private long getExecutionTime() {
+        return getSyncInfo().getOffset().toNanos()/ 1000000 +  600L;
     }
 
 }
