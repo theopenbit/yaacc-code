@@ -85,10 +85,8 @@
     <string name="music">Music</string>
     <string name="title_activity_yaacc_log">View log</string>
     <string name="logContent">Content of system log should be shown here</string>
-
-
-
-
+    <string name="activity_remote_player_mute">Mute</string>
+    <string name="activity_remote_player_volume">Volume</string>
 
 
 </resources>

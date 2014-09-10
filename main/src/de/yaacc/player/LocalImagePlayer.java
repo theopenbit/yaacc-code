@@ -50,6 +50,7 @@ import de.yaacc.util.NotificationId;
 public class LocalImagePlayer implements Player {
 
 	private Context context;
+    private UpnpClient upnpClient;
 	private Timer commandExecutionTimer;
 	private String name;
     private SynchronizationInfo syncInfo;
@@ -431,6 +432,24 @@ public class LocalImagePlayer implements Player {
 
     private long getExecutionTime() {
         return getSyncInfo().getOffset().toNanos()/ 1000000 +  600L;
+    }
+
+    //TODO Refactor not every player has a volume control
+    public boolean getMute(){
+        return upnpClient.isMute();
+    }
+
+
+    public void setMute(boolean mute){
+        upnpClient.setMute(mute);
+    }
+
+    public void setVolume(int volume){
+        upnpClient.setVolume(volume);
+    }
+
+    public int getVolume(){
+        return upnpClient.getVolume();
     }
 
 }

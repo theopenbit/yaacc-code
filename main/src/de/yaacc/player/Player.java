@@ -158,4 +158,13 @@ public interface Player {
      */
     SynchronizationInfo  getSyncInfo();
 
+    boolean getMute();
+
+
+    void setMute(boolean mute);
+
+    void setVolume(int volume);
+
+    public int getVolume();
+
 }

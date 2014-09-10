@@ -656,4 +656,21 @@ public abstract class AbstractPlayer implements Player {
         Timer execTimer = new Timer();
         execTimer.schedule(command, executionTime);
     }
+
+    public boolean getMute(){
+        return upnpClient.isMute();
+    }
+
+
+    public void setMute(boolean mute){
+        upnpClient.setMute(mute);
+    }
+
+    public void setVolume(int volume){
+        upnpClient.setVolume(volume);
+    }
+
+    public int getVolume(){
+        return upnpClient.getVolume();
+    }
 }

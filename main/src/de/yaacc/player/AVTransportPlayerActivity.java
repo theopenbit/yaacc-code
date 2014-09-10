@@ -28,7 +28,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
 
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
@@ -141,6 +144,34 @@ public class AVTransportPlayerActivity extends Activity {
 
             }
         });
+
+        Switch muteSwitch = (Switch)findViewById(R.id.avtransportPlayerActivityControlMuteSwitch);
+        muteSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                getPlayer().setMute(isChecked);
+            }
+        });
+        SeekBar volumeSeekBar = (SeekBar) findViewById(R.id.avtransportPlayerActivityControlVolumeSeekBar);
+        volumeSeekBar.setMax(100);
+        volumeSeekBar.setProgress(getPlayer().getVolume());
+        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                getPlayer().setVolume(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
     }
 
 

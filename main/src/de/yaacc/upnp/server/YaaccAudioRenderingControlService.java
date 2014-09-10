@@ -75,13 +75,13 @@ public class YaaccAudioRenderingControlService extends
 
 	@Override
 	public UnsignedIntegerFourBytes[] getCurrentInstanceIds() {
-		Log.d(getClass().getName(), "getVolume() - not yet implemented");
+		Log.d(getClass().getName(), " getCurrentInstanceIds() - not yet implemented");
 		return null;
 	}
 
 	@Override
 	protected Channel[] getCurrentChannels() {
-		Log.d(getClass().getName(), "getVolume() - not yet implemented");
+		Log.d(getClass().getName(), " getCurrentChannels() - not yet implemented");
 		return null;
 	}
 

@@ -83,5 +83,7 @@
     <string name="genres">Genres</string>
     <string name="videos">Videos</string>
     <string name="music">Musik</string>
-    
+    <string name="activity_remote_player_mute">Mute</string>
+    <string name="activity_remote_player_volume">Volume</string>
+
 </resources>
