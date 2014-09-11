@@ -339,6 +339,25 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     }
 
     /**
+     * Returns a Service of type RenderingControl
+     *
+     * @param device the device which provides the service
+     * @return the service of null
+     */
+    public Service getRenderingControlService(Device<?, ?, ?> device) {
+        if (device == null) {
+            Log.d(getClass().getName(), "Device is null!");
+            return null;
+        }
+        ServiceId serviceId = new UDAServiceId("RenderingControl");
+        Service service = device.findService(serviceId);
+        if (service != null) {
+            Log.d(getClass().getName(), "Service found: " + service.getServiceId() + " Type: " + service.getServiceType());
+        }
+        return service;
+    }
+
+    /**
      * Start an intent with Action.View;
      *
      * @param uris the uri to start

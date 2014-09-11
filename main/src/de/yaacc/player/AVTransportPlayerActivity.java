@@ -17,9 +17,6 @@
  */
 package de.yaacc.player;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,6 +29,9 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
@@ -145,20 +145,29 @@ public class AVTransportPlayerActivity extends Activity {
             }
         });
 
-        Switch muteSwitch = (Switch)findViewById(R.id.avtransportPlayerActivityControlMuteSwitch);
-        muteSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+        Switch muteSwitch = (Switch) findViewById(R.id.avtransportPlayerActivityControlMuteSwitch);
+        muteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                getPlayer().setMute(isChecked);
+                if (getPlayer() != null) {
+                    getPlayer().setMute(isChecked);
+                }
             }
         });
         SeekBar volumeSeekBar = (SeekBar) findViewById(R.id.avtransportPlayerActivityControlVolumeSeekBar);
         volumeSeekBar.setMax(100);
-        volumeSeekBar.setProgress(getPlayer().getVolume());
+        if (getPlayer() != null) {
+          Log.d(getClass().getName(),"Volumne:" + getPlayer().getVolume());
+          volumeSeekBar.setProgress(getPlayer().getVolume());
+        }else{
+            volumeSeekBar.setProgress(100);
+        }
         volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                getPlayer().setVolume(progress);
+                if (getPlayer() != null) {
+                    getPlayer().setVolume(progress);
+                }
             }
 
             @Override

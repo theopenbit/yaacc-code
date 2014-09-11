@@ -100,25 +100,28 @@
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/muteSwitch"
+        android:id="@+id/avtransportPlayerActivityControlMuteSwitch"
         android:layout_alignParentTop="true"
         android:text="@string/activity_remote_player_mute" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/activity_remote_player_volume"
+        android:layout_below="@+id/avtransportPlayerActivityControlMuteSwitch"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/avtransportPlayerActivityControlVolumeTextView"
+        android:labelFor="@+id/avtransportPlayerActivityControlVolumeSeekBar"
+        />
 
     <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/avtransportPlayerActivityControlMuteSwitch"
         android:id="@+id/avtransportPlayerActivityControlVolumeSeekBar"
-        android:layout_below="@+id/muteSwitch"
+        android:layout_toRightOf="@+id/avtransportPlayerActivityControlVolumeTextView"
         android:layout_alignParentRight="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/activity_remote_player_volume"
-        android:layout_below="@+id/avtransportPlayerActivityControlMuteSwitch"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/volumeTextView"
-        android:labelFor="@+id/volumeSeekBar"
-        android:layout_alignBottom="@+id/volumeSeekBar" />
+
 
 </RelativeLayout>

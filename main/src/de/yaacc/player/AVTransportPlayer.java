@@ -46,6 +46,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import de.yaacc.upnp.UpnpClient;
+import de.yaacc.util.Watchdog;
+
 /**
  * A Player for playing on a remote avtransport device
  * @author Tobias Schoene (openbit)
@@ -326,14 +328,14 @@ public class AVTransportPlayer extends AbstractPlayer {
                             + deviceId);
             return false;
         }
-        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
+        Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
                             +getDevice().getDisplayString());
             return false;
         }
-        Log.d(getClass().getName(), "Action set Mute ");
+        Log.d(getClass().getName(), "Action get Mute ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
         GetMute actionCallback = new GetMute(service) {
@@ -360,18 +362,17 @@ public class AVTransportPlayer extends AbstractPlayer {
 
             }
         };
-        Future result = getUpnpClient().getControlPoint().execute(actionCallback);
-        try {
-            result.get(30000L, TimeUnit.MILLISECONDS);
-            return (Boolean) actionState.result;
-        } catch (InterruptedException e) {
-            Log.d(getClass().getName(),"Exception while get mute state from remote renderer", e);
-        } catch (ExecutionException e) {
-            Log.d(getClass().getName(), "Exception while get mute state from remote renderer", e);
-        } catch (TimeoutException e) {
-            Log.d(getClass().getName(), "Exception while get mute state from remote renderer", e);
+       getUpnpClient().getControlPoint().execute(actionCallback);
+        Watchdog watchdog = Watchdog.createWatchdog(10000L);
+        watchdog.start();
+
+        while (!actionState.actionFinished && !watchdog.hasTimeout()) {
+            //active wait
         }
-        return false;
+        if (watchdog.hasTimeout()) {
+            Log.d(getClass().getName(),"Timeout occurred");
+        }
+        return actionState.result == null ? false : (Boolean) actionState.result;
     } 
     public void setMute(boolean mute){
         if(getDevice() == null) {
@@ -380,7 +381,7 @@ public class AVTransportPlayer extends AbstractPlayer {
                             + deviceId);
             return;
         }
-        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
+        Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
@@ -418,14 +419,14 @@ public class AVTransportPlayer extends AbstractPlayer {
                             + deviceId);
             return;
         }
-        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
+        Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
                             +getDevice().getDisplayString());
             return;
         }
-        Log.d(getClass().getName(), "Action set Mute ");
+        Log.d(getClass().getName(), "Action set Volume ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
         SetVolume actionCallback = new SetVolume(service, volume) {
@@ -456,14 +457,14 @@ public class AVTransportPlayer extends AbstractPlayer {
                             + deviceId);
             return 0;
         }
-        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
+        Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "
                             +getDevice().getDisplayString());
             return 0;
         }
-        Log.d(getClass().getName(), "Action set Mute ");
+        Log.d(getClass().getName(), "Action get Volume ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
         GetVolume actionCallback = new GetVolume(service) {
@@ -490,17 +491,18 @@ public class AVTransportPlayer extends AbstractPlayer {
 
             }
         };
-        Future result = getUpnpClient().getControlPoint().execute(actionCallback);
-        try {
-            result.get(30000L, TimeUnit.MILLISECONDS);
-            return (Integer) actionState.result;
-        } catch (InterruptedException e) {
-            Log.d(getClass().getName(),"Exception while get volume from remote renderer", e);
-        } catch (ExecutionException e) {
-            Log.d(getClass().getName(), "Exception while get volume from remote renderer", e);
-        } catch (TimeoutException e) {
-            Log.d(getClass().getName(), "Exception while get volume from remote renderer", e);
+
+        getUpnpClient().getControlPoint().execute(actionCallback);
+        Watchdog watchdog = Watchdog.createWatchdog(10000L);
+        watchdog.start();
+
+        while (!actionState.actionFinished && !watchdog.hasTimeout()) {
+            //active wait
         }
-        return 0;
+        if (watchdog.hasTimeout()) {
+            Log.d(getClass().getName(),"Timeout occurred");
+        }
+        return actionState.result == null ? 0 : (Integer) actionState.result;
+
     }
 }
