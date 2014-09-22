@@ -190,7 +190,7 @@ if ARGV[0] == "up"
 	#  puts instructions
 	#  exit
 
-	else
+	end
 
 	puts "Now starting vagrant box..."
 
@@ -208,7 +208,7 @@ if ARGV[0] == "up"
          config.vm.forward_port 80, 80
 	 #config.vm.network :bridged, :bridge => 'eth0'
 
-	end
+	
 
 	end
 
