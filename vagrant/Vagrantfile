@@ -124,8 +124,8 @@ if ARGV[0] == "up"
 	  else
 	
 		puts "No private key found at all, did you create it ?\n\n"
-	  	puts instructions
-	  	exit
+	  #	puts instructions
+	  #	exit
 	  
 	  end
 
@@ -147,8 +147,8 @@ if ARGV[0] == "up"
 	  else
 	
 		puts "No public key found at all, did you create it ?\n\n"
-	  	puts instructions
-	  	exit
+	  #	puts instructions
+	  #	exit
 
 	  end
 
@@ -170,8 +170,8 @@ if ARGV[0] == "up"
 	  else
 	
 		puts "No debug keystore found at all, did you create it ?\n\n"
-	  	puts instructions
-	  	exit
+	 # 	puts instructions
+	 # 	exit
 
 	  end
 
@@ -179,8 +179,8 @@ if ARGV[0] == "up"
 
 	  puts "Your release key is missing !!!\n\n"
 
-	  puts instructions
-	  exit
+	#  puts instructions
+	#  exit
 
 	# TODO: Checking the keystore is still needed
 	#
