@@ -18,7 +18,16 @@
  */
 package de.yaacc.upnp;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -66,6 +75,7 @@ import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.AudioItem;
 import org.fourthline.cling.support.model.item.ImageItem;
 import org.fourthline.cling.support.model.item.Item;
+import org.seamless.util.MimeType;
 
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -76,6 +86,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -97,6 +109,7 @@ import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseActionCallb
 import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.upnp.server.avtransport.AvTransport;
+import de.yaacc.util.FileDownLoader;
 
 /**
  * A client facade to the upnp lookup and access framework. This class provides
@@ -803,13 +816,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         }
         DIDLContent metadata = null;
         try {
-            if(positionInfo.getTrackMetaData().indexOf("NOT_IMPLEMENTED") == -1){
+            if (positionInfo.getTrackMetaData().indexOf("NOT_IMPLEMENTED") == -1) {
                 metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
-            }else{
+            } else {
                 Log.d(getClass().getName(), "Warning unparsable TackMetaData: " + positionInfo.getTrackMetaData());
             }
         } catch (Exception e) {
-           Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
+            Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
         }
         String mimeType = "";
         if (metadata != null) {
@@ -903,7 +916,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
      * @param didlObject the content
      * @return the list of cling items
      */
-    private List<Item> toItemList(DIDLObject didlObject) {
+    public List<Item> toItemList(DIDLObject didlObject) {
         List<Item> items = new ArrayList<Item>();
         if (didlObject instanceof Container) {
             DIDLContent content = loadContainer((Container) didlObject);
@@ -1158,6 +1171,12 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         int volume = currentVolume * 100 / maxVolume;
         return volume;
     }
+
+    public void downloadItem(DIDLObject selectedDIDLObject) {
+        AsyncTask<DIDLObject,Void,Void> fileDownloader = new FileDownLoader(this).execute(selectedDIDLObject);
+    }
+
+
 
 
     @SuppressWarnings({"unchecked", "rawtypes"})

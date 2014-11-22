@@ -300,8 +300,7 @@ public class BrowseActivity extends Activity implements OnClickListener,
         if (!currentlyShowingDevices()){
             menuItems.add(v.getContext().getString(R.string.browse_context_play));
         }
-        menuItems.add(v.getContext().getString(
-                R.string.browse_context_add_to_playplist));
+        //menuItems.add(v.getContext().getString( R.string.browse_context_add_to_playplist));
         menuItems.add(v.getContext()
                 .getString(R.string.browse_context_download));
 // TODO: Check via bytecode whether listsize is calculated every loop or

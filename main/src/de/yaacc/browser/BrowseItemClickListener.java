@@ -99,11 +99,15 @@ public class BrowseItemClickListener implements OnItemClickListener{
             Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);
             toast.show();
         } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))){
-            Toast toast2 = Toast.makeText(applicationContext, "download pressed (Not yet implemented)", Toast.LENGTH_SHORT);
-            toast2.show();
+            try {
+                BrowseActivity.getUpnpClient().downloadItem(selectedDIDLObject);
+            }catch (Exception ex){
+                Toast toast = Toast.makeText(applicationContext, "Can't download item: " + ex.getMessage(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
         } else {
-            Toast toast3 = Toast.makeText(applicationContext, "Magic key pressed (Neither implemented nor defined ;))", Toast.LENGTH_SHORT);
-            toast3.show();
+            Toast toast = Toast.makeText(applicationContext, "Magic key pressed (Neither implemented nor defined ;))", Toast.LENGTH_SHORT);
+            toast.show();
         }
         return true;
     }
