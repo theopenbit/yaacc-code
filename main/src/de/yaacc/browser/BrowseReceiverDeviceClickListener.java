@@ -31,6 +31,10 @@ import de.yaacc.R;
  */
 public class BrowseReceiverDeviceClickListener implements OnItemClickListener {
     private BrowseActivity activity;
+
+    public BrowseReceiverDeviceClickListener() {
+    }
+
     public BrowseReceiverDeviceClickListener(BrowseActivity activity) {
         this.activity = activity;
     }

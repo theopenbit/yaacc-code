@@ -16,14 +16,15 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
+import java.io.Serializable;
 import java.util.LinkedList;
 import android.util.Log;
 /**
  * Manages navigation path inside device and folder hierarchy.
  *
- * @author Christoph H채hnel (eyeless)
+ * @author Christoph Hähnel (eyeless)
  */
-public class Navigator {
+public class Navigator implements Serializable{
     public final static String DEVICE_OVERVIEW_OBJECT_ID = "-1";
     public final static String PROVIDER_DEVICE_SELECT_LIST_OBJECT_ID = "-2";
     public final static String RECEIVER_DEVICE_SELECT_LIST_OBJECT_ID = "-3";

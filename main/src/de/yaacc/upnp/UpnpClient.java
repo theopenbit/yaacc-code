@@ -119,6 +119,7 @@ import de.yaacc.util.FileDownLoader;
  */
 public class UpnpClient implements RegistryListener, ServiceConnection {
     public static String LOCAL_UID = "LOCAL_UID";
+    private static UpnpClient instance;
 
 
     private List<UpnpClientListener> listeners = new ArrayList<UpnpClientListener>();
@@ -131,6 +132,13 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     public UpnpClient() {
     }
 
+    public static UpnpClient getInstance(Context context){
+        if(instance == null){
+            instance = new UpnpClient();
+            instance.initialize(context);
+        }
+        return instance;
+    }
 
     /**
      * Initialize the Object.
