@@ -107,7 +107,7 @@ public class BrowseDeviceAdapter extends BaseAdapter {
 			holder.icon.setImageResource(R.drawable.yaacc48_24_png);
 		}
 
-		holder.name.setText(device.getDetails().getFriendlyName() +  "-(" + device.getDisplayString() + ")");
+		holder.name.setText(device.getDetails().getFriendlyName());
 
 		return convertView;
 	}

@@ -1257,6 +1257,11 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
             return android.os.Build.MODEL;
         }
 
+        @Override
+        public DeviceDetails getDetails(){
+            return new DeviceDetails(android.os.Build.MODEL);
+        }
+
 
     }
 }

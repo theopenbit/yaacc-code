@@ -102,7 +102,7 @@ public class BrowseReceiverDeviceAdapter extends BaseAdapter {
 			//We know our icon
 			holder.icon.setImageResource(R.drawable.yaacc48_24_png);
 		}
-        holder.name.setText(device.getDisplayString());
+        holder.name.setText(device.getDetails().getFriendlyName());
         holder.checkBox.setChecked(selectedDevices.contains(device));
         Log.d(getClass().getName(), "checkBox isChecked (" + device.getDisplayString()+"):" + holder.checkBox.isChecked());
         return convertView;

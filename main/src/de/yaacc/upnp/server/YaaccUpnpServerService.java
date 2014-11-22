@@ -382,7 +382,8 @@ public class YaaccUpnpServerService extends Service {
 			// Yaacc Details
 			// Used for shown name: first part of ManufactDet, first
 			// part of ModelDet and version number
-			DeviceDetails yaaccDetails = new DeviceDetails("YAACC - MediaServer(" + getLocalServerName() + ")", new ManufacturerDetails("yaacc.de",
+			DeviceDetails yaaccDetails = new DeviceDetails(
+                    "YAACC - MediaServer(" + getLocalServerName() + ")", new ManufacturerDetails("yaacc.de",
 					"http://www.yaacc.de"), new ModelDetails(getLocalServerName() + "-MediaServer", "Free Android UPnP AV MediaServer, GNU GPL",
 					versionName));
 
