@@ -19,10 +19,12 @@ package de.yaacc.browser;
 
 import org.fourthline.cling.model.meta.Device;
 
+import java.io.Serializable;
+
 /**
  * @author Christoph Hähnel (eyeless)
  */
-public class Position {
+public class Position implements Serializable{
 
 	private String objectId;
 	private Device device;

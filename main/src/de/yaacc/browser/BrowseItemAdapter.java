@@ -43,6 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.util.image.IconDownloadTask;
 import de.yaacc.util.image.ImageDownloader;
@@ -57,7 +58,15 @@ public class BrowseItemAdapter extends BaseAdapter {
 	private List<DIDLObject> objects;
 	private Context context;
 
-	public BrowseItemAdapter(Context ctx, String objectId) {
+    public BrowseItemAdapter(UpnpClient upnpClient, String objectId) {
+        Position pos = new Position(objectId,
+                upnpClient.getProviderDevice());
+        initialize(upnpClient.getContext(), pos);
+        this.context = upnpClient.getContext();
+    }
+
+
+    public BrowseItemAdapter(Context ctx, String objectId) {
 		Position pos = new Position(objectId,
 				BrowseActivity.getUpnpClient().getProviderDevice());
 		initialize(ctx, pos);
@@ -70,8 +79,8 @@ public class BrowseItemAdapter extends BaseAdapter {
 
 	private void initialize(Context ctx, Position pos) {
 		inflator = LayoutInflater.from(ctx);
-		ContentDirectoryBrowseResult result = BrowseActivity.getUpnpClient()
-				.browseSync(pos);
+		ContentDirectoryBrowseResult result = UpnpClient.getInstance(null)
+                .browseSync(pos);
 		if (result == null)
 			return;
 		DIDLContent a = result.getResult();

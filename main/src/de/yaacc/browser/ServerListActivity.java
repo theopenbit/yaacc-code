@@ -18,13 +18,10 @@
 package de.yaacc.browser;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ListView;
 
 import org.fourthline.cling.model.meta.Device;
@@ -32,12 +29,8 @@ import org.fourthline.cling.model.meta.Device;
 import java.util.LinkedList;
 
 import de.yaacc.R;
-import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
-import de.yaacc.util.AboutActivity;
-import de.yaacc.util.YaaccLogActivity;
 import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
@@ -48,14 +41,7 @@ import de.yaacc.util.image.IconDownloadCacheHandler;
 public class ServerListActivity extends Activity implements
         UpnpClientListener {
     private UpnpClient upnpClient = null;
-
-
-    BrowseDeviceClickListener bDeviceClickListener = null;
-
-
-    private SharedPreferences preferences = null;
-    private Intent serverService = null;
-    protected ListView contentList;
+    private ListView contentList;
 
 
     @Override
@@ -64,14 +50,8 @@ public class ServerListActivity extends Activity implements
 
         setContentView(R.layout.activity_server_list);
 // local server startup
-        upnpClient = new UpnpClient();
-        upnpClient.initialize(getApplicationContext());
-// load preferences
-        preferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
+        upnpClient = UpnpClient.getInstance(getApplicationContext());
 
-// initialize click listener
-        bDeviceClickListener = new BrowseDeviceClickListener();
 
 // Define where to show the folder contents for media
         contentList = (ListView) findViewById(R.id.serverList);
@@ -79,11 +59,9 @@ public class ServerListActivity extends Activity implements
 
 // add ourself as listener
         upnpClient.addUpnpClientListener(this);
-        if (upnpClient.getProviderDevice() != null) {
-            //Fixme navigate to content tab
-        } else {
-            populateDeviceList();
-        }
+
+        populateDeviceList();
+        
     }
 
     /**
@@ -91,67 +69,10 @@ public class ServerListActivity extends Activity implements
      *
      * @return app preferences
      */
-    private SharedPreferences getPrefereces() {
-        if (preferences == null) {
-            preferences = PreferenceManager
-                    .getDefaultSharedPreferences(getApplicationContext());
-        }
-        return preferences;
-    }
+    private SharedPreferences getPreferences() {
+        return PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
 
-    @Override
-    public void onResume() {
-// Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
-        if (preferences.getBoolean(
-                getString(R.string.settings_local_server_chkbx), false)) {
-// Start upnpserver service for avtransport
-            getApplicationContext().startService(getYaaccUpnpServerService());
-            Log.d(this.getClass().getName(), "Starting local service");
-        } else {
-            getApplicationContext().stopService(getYaaccUpnpServerService());
-            Log.d(this.getClass().getName(), "Stopping local service");
-        }
-        super.onResume();
-    }
-
-    /**
-     * Singleton to avoid multiple instances when switch
-     *
-     * @return
-     */
-    private Intent getYaaccUpnpServerService() {
-        if (serverService == null) {
-            serverService = new Intent(getApplicationContext(),
-                    YaaccUpnpServerService.class);
-        }
-        return serverService;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-
-    @Override
-/**
- * Navigation in option menu
- */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
-                return true;
-            case R.id.yaacc_about:
-                AboutActivity.showAbout(this);
-                return true;
-            case R.id.yaacc_log:
-                YaaccLogActivity.showLog(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
 
@@ -172,12 +93,11 @@ public class ServerListActivity extends Activity implements
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
-// Define where to show the folder contents
                 ListView deviceList = (ListView) findViewById(R.id.serverList);
                 deviceList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                 BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(upnpClient.getDevicesProvidingContentDirectoryService()));
                 deviceList.setAdapter(bDeviceAdapter);
-                deviceList.setOnItemClickListener(bDeviceClickListener);
+                deviceList.setOnItemClickListener(new ServerListClickListener(upnpClient, ServerListActivity.this));
             }
         });
     }
@@ -188,9 +108,13 @@ public class ServerListActivity extends Activity implements
      */
     @Override
     public void deviceAdded(Device<?, ?, ?> device) {
-
         populateDeviceList();
 
+        if (upnpClient.getProviderDevice().equals(device)) {
+            if (getParent() instanceof TabBrowserActivity) {
+                ((TabBrowserActivity) getParent()).setCurrentTab(TabBrowserActivity.Tabs.CONTENT);
+            }
+        }
     }
 
     /**
@@ -210,4 +134,4 @@ public class ServerListActivity extends Activity implements
     }
 
 
-} 
+}

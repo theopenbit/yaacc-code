@@ -57,10 +57,10 @@ public class ContentListActivity extends Activity implements OnClickListener,
     public static final String CONTENT_LIST_NAVIGATOR = "CONTENT_LIST_NAVIGATOR";
     private UpnpClient upnpClient = null;
     private BrowseItemAdapter bItemAdapter;
-    BrowseItemClickListener bItemClickListener = null;
+    ContentListClickListener bItemClickListener = null;
 
     private DIDLObject selectedDIDLObject;
-    private SharedPreferences preferences = null;
+
     private Intent serverService = null;
     protected ListView contentList;
     private Navigator navigator = null;
@@ -72,8 +72,8 @@ public class ContentListActivity extends Activity implements OnClickListener,
         init( savedInstanceState);
     }
     private void init(Bundle savedInstanceState) {
-        if(savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null){
-        navigator = new Navigator();
+        if(savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null){
+            navigator = new Navigator();
         } else{
             navigator = (Navigator)savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR);
         }
@@ -81,11 +81,9 @@ public class ContentListActivity extends Activity implements OnClickListener,
 // local server startup
         upnpClient = UpnpClient.getInstance(getApplicationContext());
 
-// load preferences
-        preferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
+
 // initialize click listener
-        bItemClickListener = new BrowseItemClickListener();
+        bItemClickListener = new ContentListClickListener(upnpClient,getNavigator());
 // Define where to show the folder contents for media
         contentList = (ListView) findViewById(R.id.contentList);
         registerForContextMenu(contentList);
@@ -103,7 +101,8 @@ public class ContentListActivity extends Activity implements OnClickListener,
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(CONTENT_LIST_NAVIGATOR,navigator);
+        //FIXME Posion isn't serializable
+        //outState.putSerializable(CONTENT_LIST_NAVIGATOR,navigator);
     }
 
 
@@ -111,38 +110,12 @@ public class ContentListActivity extends Activity implements OnClickListener,
      * load app preferences
      * @return app preferences
      */
-    private SharedPreferences getPrefereces(){
-        if (preferences == null){
-            preferences = PreferenceManager
+    private SharedPreferences getPreferences(){
+return  PreferenceManager
                     .getDefaultSharedPreferences(getApplicationContext());
-        }
-        return preferences;
+
     }
-    @Override
-    public void onResume() {
-// Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
-        if (preferences.getBoolean(
-                getString(R.string.settings_local_server_chkbx), false)) {
-// Start upnpserver service for avtransport
-            getApplicationContext().startService(getYaaccUpnpServerService());
-            Log.d(this.getClass().getName(), "Starting local service");
-        } else {
-            getApplicationContext().stopService(getYaaccUpnpServerService());
-            Log.d(this.getClass().getName(), "Stopping local service");
-        }
-        super.onResume();
-    }
-    /**
-     * Singleton to avoid multiple instances when switch
-     * @return
-     */
-    private Intent getYaaccUpnpServerService(){
-        if (serverService == null){
-            serverService = new Intent(getApplicationContext(),
-                    YaaccUpnpServerService.class);
-        }
-        return serverService;
-    }
+
     /**
      * Tries to populate the browsing area if a providing device is configured
      */
@@ -159,31 +132,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
             });
         }
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-    @Override
-/**
- * Navigation in option menu
- */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
-                return true;
-            case R.id.yaacc_about:
-                AboutActivity.showAbout(this);
-                return true;
-            case R.id.yaacc_log:
-                YaaccLogActivity.showLog(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+
     @Override
     public void onClick(View v) {
         Device providerDevice = upnpClient.getProviderDevice();
@@ -202,11 +151,10 @@ public class ContentListActivity extends Activity implements OnClickListener,
         Log.d(ContentListActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
         String currentObjectId = navigator.getCurrentPosition().getObjectId();
         if (Navigator.ITEM_ROOT_OBJECT_ID.equals(currentObjectId)) {
-            navigator.pushPosition(Navigator.DEVICE_LIST_POSITION);
-            clearItemList();
-        } else if (Navigator.DEVICE_OVERVIEW_OBJECT_ID.equals(currentObjectId)){
-            upnpClient.shutdown();
-            super.finish();
+            if (getParent() instanceof TabBrowserActivity) {
+                ((TabBrowserActivity) getParent()).setCurrentTab(TabBrowserActivity.Tabs.SERVER);
+            }
+
         } else {
             //Fixme: Cache should store information for different folders....
             IconDownloadCacheHandler.getInstance().resetCache();
@@ -216,14 +164,15 @@ public class ContentListActivity extends Activity implements OnClickListener,
             bItemAdapter = new BrowseItemAdapter(this,
                     navigator.getCurrentPosition());
             itemList.setAdapter(bItemAdapter);
-            BrowseItemClickListener bItemClickListener = new BrowseItemClickListener();
+            ContentListClickListener bItemClickListener = new ContentListClickListener(upnpClient, getNavigator());
             itemList.setOnItemClickListener(bItemClickListener);
         }
     }
+
+    /**
+     * Creates context menu for certain actions on a specific item.
+     */
     @Override
-/**
- * Creates context menu for certain actions on a specific item.
- */
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenuInfo menuInfo) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -258,7 +207,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
-// Load adapter if selected device is configured and found
+            // Load adapter if selected device is configured and found
                 Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, upnpClient.getProviderDevice());
                 navigator.pushPosition(pos);
                 bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
@@ -279,23 +228,26 @@ public class ContentListActivity extends Activity implements OnClickListener,
     }
 
 
+
+    /**
+     * Refreshes the shown devices when device is added.
+     */
     @Override
-/**
- * Refreshes the shown devices when device is added.
- */
     public void deviceAdded(Device<?, ?, ?> device) {
 
     }
+
+   /**
+    * Refreshes the shown devices when device is removed.
+    */
     @Override
-/**
- * Refreshes the shown devices when device is removed.
- */
     public void deviceRemoved(Device<?, ?, ?> device) {
         Log.d(this.getClass().toString(), "device removal called");
         if ( !device.equals(upnpClient.getProviderDevice())) {
             clearItemList();
         }
     }
+
     @Override
     public void deviceUpdated(Device<?, ?, ?> device) {
 

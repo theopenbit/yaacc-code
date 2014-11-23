@@ -26,6 +26,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TabHost;
@@ -33,9 +35,12 @@ import android.widget.TabHost;
 import org.fourthline.cling.model.meta.Device;
 
 import de.yaacc.R;
+import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
+import de.yaacc.util.AboutActivity;
+import de.yaacc.util.YaaccLogActivity;
 
 /**
  * Activity for browsing devices and folders. Represents the entrypoint for the whole application.
@@ -44,12 +49,23 @@ import de.yaacc.upnp.server.YaaccUpnpServerService;
  */
 public class TabBrowserActivity extends ActivityGroup implements OnClickListener,
         UpnpClientListener {
+    private TabHost tabHost;
+
+    public enum Tabs{
+        SERVER,
+        CONTENT,
+        RECEIVER,
+        PLAYER
+    }
+
     private UpnpClient upnpClient = null;
 
-    private SharedPreferences preferences = null;
+
     private Intent serverService = null;
-
-
+    private TabHost.TabSpec serverTab;
+    private TabHost.TabSpec contentTab;
+    private TabHost.TabSpec receiverTab;
+    private TabHost.TabSpec playerTab;
 
 
     @Override
@@ -59,40 +75,71 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
         // local server startup
         upnpClient = UpnpClient.getInstance(getApplicationContext());
 
-        // load preferences
-        preferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-        TabHost tabHost =(TabHost) findViewById(R.id.browserTabHost);
+
+        tabHost = (TabHost) findViewById(R.id.browserTabHost);
         tabHost.setup(this.getLocalActivityManager());
-        tabHost.addTab(tabHost.newTabSpec("server").setIndicator(getResources().getString(R.string.title_activity_server_list), getResources().getDrawable(R.drawable.device_48_48)).setContent(new Intent(this,ServerListActivity.class)));
-        tabHost.addTab(tabHost.newTabSpec("content").setIndicator(getResources().getString(R.string.title_activity_content_list), getResources().getDrawable(R.drawable.cdtrack)).setContent(new Intent(this,ContentListActivity.class)));
-        tabHost.addTab(tabHost.newTabSpec("receiver").setIndicator(getResources().getString(R.string.title_activity_receiver_list), getResources().getDrawable(R.drawable.laptop_48_48)).setContent(new Intent(this,ReceiverListActivity.class)));
-        tabHost.addTab(tabHost.newTabSpec("player").setIndicator(getResources().getString(R.string.title_activity_player_list), getResources().getDrawable(R.drawable.player_play)).setContent(new Intent(this,PlayerListActivity.class)));
- 
+        serverTab = tabHost.newTabSpec("server").setIndicator(getResources().getString(R.string.title_activity_server_list), getResources().getDrawable(R.drawable.device_48_48)).setContent(new Intent(this, ServerListActivity.class));
+        tabHost.addTab(serverTab);
+        contentTab = tabHost.newTabSpec("content").setIndicator(getResources().getString(R.string.title_activity_content_list), getResources().getDrawable(R.drawable.cdtrack)).setContent(new Intent(this, ContentListActivity.class));
+        tabHost.addTab(contentTab);
+        receiverTab = tabHost.newTabSpec("receiver").setIndicator(getResources().getString(R.string.title_activity_receiver_list), getResources().getDrawable(R.drawable.laptop_48_48)).setContent(new Intent(this, ReceiverListActivity.class));
+        tabHost.addTab(receiverTab);
+        playerTab = tabHost.newTabSpec("player").setIndicator(getResources().getString(R.string.title_activity_player_list), getResources().getDrawable(R.drawable.player_play)).setContent(new Intent(this, PlayerListActivity.class));
+        tabHost.addTab(playerTab);
+
 
         // add ourself as listener
         upnpClient.addUpnpClientListener(this);
-        if (upnpClient.getProviderDevice() !=null) {
-            //setCurrentTab
-           // startActivity(new Intent(this,ContentListActivity.class));
+        if (upnpClient.getProviderDevice() != null) {
+            setCurrentTab(Tabs.CONTENT);
+
         } else {
-           // startActivity(new Intent(this,ServerListActivity.class));
+            // startActivity(new Intent(this,ServerListActivity.class));
         }
     }
+
+    public void setCurrentTab(final Tabs content) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (content){
+                    case CONTENT: {
+                        tabHost.setCurrentTab(Tabs.CONTENT.ordinal());
+                        break;
+                    }
+                    case SERVER: {
+                        tabHost.setCurrentTab(Tabs.SERVER.ordinal());
+                        break;
+                    }
+                    case PLAYER: {
+                        tabHost.setCurrentTab(Tabs.PLAYER.ordinal());
+                        break;
+                    }
+                    case RECEIVER: {
+                        tabHost.setCurrentTab(Tabs.RECEIVER.ordinal());
+                        break;
+                    }
+                }
+            }
+        });
+
+    }
+
     /**
      * load app preferences
+     *
      * @return app preferences
      */
-    private SharedPreferences getPrefereces(){
-        if (preferences == null){
-            preferences = PreferenceManager
-                    .getDefaultSharedPreferences(getApplicationContext());
-        }
-        return preferences;
+    private SharedPreferences getPreferences() {
+        return PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+
     }
+
+
     @Override
     public void onResume() {
-        if (preferences.getBoolean(
+        if (getPreferences().getBoolean(
                 getString(R.string.settings_local_server_chkbx), false)) {
             // Start upnpserver service for avtransport
             getApplicationContext().startService(getYaaccUpnpServerService());
@@ -103,12 +150,14 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
         }
         super.onResume();
     }
+
     /**
      * Singleton to avoid multiple instances when switch
+     *
      * @return
      */
-    private Intent getYaaccUpnpServerService(){
-        if (serverService == null){
+    private Intent getYaaccUpnpServerService() {
+        if (serverService == null) {
             serverService = new Intent(getApplicationContext(),
                     YaaccUpnpServerService.class);
         }
@@ -117,13 +166,42 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
 
     @Override
     public void onBackPressed() {
-        Log.d(TabBrowserActivity.class.getName(), "onBackPressed() " );
+        Log.d(TabBrowserActivity.class.getName(), "onBackPressed() ");
 
     }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenuInfo menuInfo) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+
+
+    /**
+     * Navigation in option menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
+            case R.id.yaacc_about:
+                AboutActivity.showAbout(this);
+                return true;
+            case R.id.yaacc_log:
+                YaaccLogActivity.showLog(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -135,6 +213,7 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
     public void deviceRemoved(Device<?, ?, ?> device) {
 
     }
+
     @Override
     public void deviceUpdated(Device<?, ?, ?> device) {
 

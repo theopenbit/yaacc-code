@@ -18,15 +18,10 @@
 package de.yaacc.browser;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ListView;
 
 import org.fourthline.cling.model.meta.Device;
@@ -34,12 +29,8 @@ import org.fourthline.cling.model.meta.Device;
 import java.util.LinkedList;
 
 import de.yaacc.R;
-import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
-import de.yaacc.util.AboutActivity;
-import de.yaacc.util.YaaccLogActivity;
 import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
@@ -47,25 +38,13 @@ import de.yaacc.util.image.IconDownloadCacheHandler;
  *
  * @author Tobias Schoene (the openbit)
  */
-public class ReceiverListActivity extends Activity implements OnClickListener,
+public class ReceiverListActivity extends Activity implements
         UpnpClientListener {
     private static final String RECEIVER_LIST_NAVIGATOR = "RECEIVER_LIST_NAVIGATOR";
     private UpnpClient upnpClient = null;
-
-
     BrowseReceiverDeviceClickListener bReceiverDeviceClickListener = null;
-
-    private SharedPreferences preferences = null;
-    private Intent serverService = null;
     protected ListView contentList;
-    private static Navigator navigator = null;
 
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(RECEIVER_LIST_NAVIGATOR, navigator);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,24 +53,11 @@ public class ReceiverListActivity extends Activity implements OnClickListener,
     }
 
     private void init(Bundle savedInstanceState) {
-        if (savedInstanceState.getSerializable(RECEIVER_LIST_NAVIGATOR) == null) {
-            navigator = new Navigator();
-        } else {
-            navigator = (Navigator) savedInstanceState.getSerializable(RECEIVER_LIST_NAVIGATOR);
-        }
-        setContentView(R.layout.activity_browse);
-// local server startup
+        setContentView(R.layout.activity_receiver_list);
         upnpClient = UpnpClient.getInstance(getApplicationContext());
-
-// load preferences
-        preferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-// initialize click listener
         bReceiverDeviceClickListener = new BrowseReceiverDeviceClickListener();
-// Define where to show the folder contents for media
         contentList = (ListView) findViewById(R.id.receiverList);
         registerForContextMenu(contentList);
-// add ourself as listener
         upnpClient.addUpnpClientListener(this);
         populateReceiverDeviceList();
     }
@@ -101,85 +67,20 @@ public class ReceiverListActivity extends Activity implements OnClickListener,
      *
      * @return app preferences
      */
-    private SharedPreferences getPrefereces() {
-        if (preferences == null) {
-            preferences = PreferenceManager
-                    .getDefaultSharedPreferences(getApplicationContext());
-        }
-        return preferences;
-    }
-
-    @Override
-    public void onResume() {
-// Intent svc = new Intent(getApplicationContext(), YaaccUpnpServerService.class);
-        if (preferences.getBoolean(
-                getString(R.string.settings_local_server_chkbx), false)) {
-// Start upnpserver service for avtransport
-            getApplicationContext().startService(getYaaccUpnpServerService());
-            Log.d(this.getClass().getName(), "Starting local service");
-        } else {
-            getApplicationContext().stopService(getYaaccUpnpServerService());
-            Log.d(this.getClass().getName(), "Stopping local service");
-        }
-        super.onResume();
-    }
-
-    /**
-     * Singleton to avoid multiple instances when switch
-     *
-     * @return
-     */
-    private Intent getYaaccUpnpServerService() {
-        if (serverService == null) {
-            serverService = new Intent(getApplicationContext(),
-                    YaaccUpnpServerService.class);
-        }
-        return serverService;
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-
-    @Override
-/**
- * Navigation in option menu
- */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
-                return true;
-            case R.id.yaacc_about:
-                AboutActivity.showAbout(this);
-                return true;
-            case R.id.yaacc_log:
-                YaaccLogActivity.showLog(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-
+    private SharedPreferences getPreferences() {
+        return PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
 
     }
 
 
-    /**
-     * Stepps 'up' in the folder hierarchy or closes App if on device level.
-     */
     @Override
     public void onBackPressed() {
-        Log.d(ReceiverListActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
+        Log.d(ReceiverListActivity.class.getName(), "onBackPressed() CurrentPosition");
 
-       //Fixme navigation to previous tab
+        if (getParent() instanceof TabBrowserActivity) {
+            ((TabBrowserActivity) getParent()).setCurrentTab(TabBrowserActivity.Tabs.CONTENT);
+        }
 
     }
 
