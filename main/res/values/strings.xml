@@ -87,6 +87,10 @@
     <string name="logContent">Content of system log should be shown here</string>
     <string name="activity_remote_player_mute">Mute</string>
     <string name="activity_remote_player_volume">Volume</string>
+    <string name="title_activity_server_list">Server</string>
+    <string name="title_activity_content_list">Content</string>
+    <string name="title_activity_receiver_list">Receiver</string>
+    <string name="title_activity_player_list">Player</string>
 
 
 </resources>

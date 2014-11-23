@@ -173,7 +173,7 @@ public class ServerListActivity extends Activity implements
         this.runOnUiThread(new Runnable() {
             public void run() {
 // Define where to show the folder contents
-                ListView deviceList = (ListView) findViewById(R.id.itemList);
+                ListView deviceList = (ListView) findViewById(R.id.serverList);
                 deviceList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                 BrowseDeviceAdapter bDeviceAdapter = new BrowseDeviceAdapter(getApplicationContext(), new LinkedList<Device>(upnpClient.getDevicesProvidingContentDirectoryService()));
                 deviceList.setAdapter(bDeviceAdapter);

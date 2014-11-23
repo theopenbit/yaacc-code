@@ -89,7 +89,7 @@ public class ReceiverListActivity extends Activity implements OnClickListener,
 // initialize click listener
         bReceiverDeviceClickListener = new BrowseReceiverDeviceClickListener();
 // Define where to show the folder contents for media
-        contentList = (ListView) findViewById(R.id.itemList);
+        contentList = (ListView) findViewById(R.id.receiverList);
         registerForContextMenu(contentList);
 // add ourself as listener
         upnpClient.addUpnpClientListener(this);

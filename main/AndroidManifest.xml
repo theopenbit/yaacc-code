@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  *
  * Copyright (C) 2013 www.yaacc.de 
  *
@@ -21,7 +20,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.yaacc"
     android:versionCode="9"
-    android:versionName="1.1.5-SNAPSHOT" >
+    android:versionName="1.1.5-SNAPSHOT">
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -43,12 +42,62 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="de.yaacc.browser.ServerListActivity"
+            android:label="@string/title_activity_server_list">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="de.yaacc.browser.ContentListActivity"
+            android:label="@string/title_activity_content_list">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="de.yaacc.browser.ReceiverListActivity"
+            android:label="@string/title_activity_receiver_list">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="de.yaacc.browser.PlayerListActivity"
+            android:label="@string/title_activity_player_list">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="de.yaacc.browser.TabBrowserActivity"
+            android:label="@string/title_activity_main">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="de.yaacc.browser.BrowseActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <!--action android:name="android.intent.action.MAIN" /-->
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -67,7 +116,7 @@
         <activity
             android:name="de.yaacc.imageviewer.ImageViewerActivity"
             android:label="@string/title_activity_image_viewer"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -79,7 +128,7 @@
         </activity>
         <activity
             android:name="de.yaacc.settings.SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_settings">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -88,7 +137,7 @@
         </activity>
         <activity
             android:name="de.yaacc.settings.ImageViewerSettingsActivity"
-            android:label="@string/title_activity_image_viewer_settings" >
+            android:label="@string/title_activity_image_viewer_settings">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -96,8 +145,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="de.yaacc.imageviewer.ImageViewerBroadcastReceiver" >
-        </receiver>
+        <receiver android:name="de.yaacc.imageviewer.ImageViewerBroadcastReceiver"></receiver>
 
         <receiver
             android:name="de.yaacc.upnp.server.ServerAutostart"
@@ -111,7 +159,7 @@
 
         <activity
             android:name="de.yaacc.player.MusicPlayerActivity"
-            android:label="@string/title_activity_music_player" >
+            android:label="@string/title_activity_music_player">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -119,9 +167,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-	<activity
+        <activity
             android:name="de.yaacc.player.ThirdPartieMusicPlayerActivity"
-            android:label="@string/title_activity_music_player" >
+            android:label="@string/title_activity_music_player">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -131,7 +179,7 @@
         </activity>
         <activity
             android:name="de.yaacc.player.AVTransportPlayerActivity"
-            android:label="@string/title_activity_avtransport_player" >
+            android:label="@string/title_activity_avtransport_player">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -141,7 +189,7 @@
         </activity>
         <activity
             android:name="de.yaacc.player.MultiContentPlayerActivity"
-            android:label="@string/title_activity_multi_content_player" >
+            android:label="@string/title_activity_multi_content_player">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -151,7 +199,7 @@
         </activity>
         <activity
             android:name="de.yaacc.util.AboutActivity"
-            android:label="@string/yaacc_about" >
+            android:label="@string/yaacc_about">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -159,15 +207,15 @@
         </activity>
         <activity
             android:name="de.yaacc.upnp.server.YaaccUpnpServerControlActivity"
-            android:label="@string/title_activity_yaacc_upnp_server_control" >
+            android:label="@string/title_activity_yaacc_upnp_server_control">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="de.yaacc.util.YaaccLogActivity"
-            android:label="@string/title_activity_yaacc_log"
-            >
+        <activity
+            android:name="de.yaacc.util.YaaccLogActivity"
+            android:label="@string/title_activity_yaacc_log">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

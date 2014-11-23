@@ -210,7 +210,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
         } else {
             //Fixme: Cache should store information for different folders....
             IconDownloadCacheHandler.getInstance().resetCache();
-            final ListView itemList = (ListView) findViewById(R.id.itemList);
+            final ListView itemList = (ListView) findViewById(R.id.contentList);
             Position pos = navigator.popPosition(); // First pop is our
             // currentPosition
             bItemAdapter = new BrowseItemAdapter(this,
@@ -310,27 +310,3 @@ public class ContentListActivity extends Activity implements OnClickListener,
     }
 }
 
-/*
-   @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-
-        TabHost tabHost = getTabHost();
-
-        String label1 = getResources().getString(R.string.label1);
-        TabSpec spec1 = tabHost.newTabSpec(label1);
-        spec1.setIndicator(label1);
-        Intent intent1 = new Intent(this, Tab1Activity.class);
-        spec1.setContent(intent1);
-        tabHost.addTab(spec1);
-
-        String label2 = getResources().getString(R.string.label2);
-        TabSpec spec2 = tabHost.newTabSpec(label2);
-        spec2.setIndicator(label2);
-        Intent intent2 = new Intent(this, Tab2Activity.class);
-        spec2.setContent(intent2);
-        tabHost.addTab(spec2);
-
-    }
- */
