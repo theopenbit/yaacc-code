@@ -91,6 +91,7 @@
     <string name="title_activity_content_list">Content</string>
     <string name="title_activity_receiver_list">Receiver</string>
     <string name="title_activity_player_list">Player</string>
+    <string name="browse_context_play_all">Play all items</string>
 
 
 </resources>

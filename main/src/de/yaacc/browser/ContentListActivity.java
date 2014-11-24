@@ -39,12 +39,8 @@ import org.fourthline.cling.support.model.DIDLObject;
 import java.util.ArrayList;
 
 import de.yaacc.R;
-import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
-import de.yaacc.upnp.server.YaaccUpnpServerService;
-import de.yaacc.util.AboutActivity;
-import de.yaacc.util.YaaccLogActivity;
 import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
@@ -69,29 +65,22 @@ public class ContentListActivity extends Activity implements OnClickListener,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        init( savedInstanceState);
+        init(savedInstanceState);
     }
+
     private void init(Bundle savedInstanceState) {
-        if(savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null){
+        if (savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null) {
             navigator = new Navigator();
-        } else{
-            navigator = (Navigator)savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR);
+        } else {
+            navigator = (Navigator) savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR);
         }
         setContentView(R.layout.activity_content_list);
-// local server startup
         upnpClient = UpnpClient.getInstance(getApplicationContext());
-
-
-// initialize click listener
-        bItemClickListener = new ContentListClickListener(upnpClient,getNavigator());
-// Define where to show the folder contents for media
+        bItemClickListener = new ContentListClickListener(upnpClient, getNavigator());
         contentList = (ListView) findViewById(R.id.contentList);
         registerForContextMenu(contentList);
-
-
-// add ourself as listener
         upnpClient.addUpnpClientListener(this);
-        if (upnpClient.getProviderDevice() !=null) {
+        if (upnpClient.getProviderDevice() != null) {
             showMainFolder();
         } else {
             clearItemList();
@@ -108,11 +97,12 @@ public class ContentListActivity extends Activity implements OnClickListener,
 
     /**
      * load app preferences
+     *
      * @return app preferences
      */
-    private SharedPreferences getPreferences(){
-return  PreferenceManager
-                    .getDefaultSharedPreferences(getApplicationContext());
+    private SharedPreferences getPreferences() {
+        return PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
 
     }
 
@@ -138,15 +128,18 @@ return  PreferenceManager
         Device providerDevice = upnpClient.getProviderDevice();
         populateItemList(providerDevice);
     }
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         return bItemClickListener.onContextItemSelected(selectedDIDLObject,
                 item, getApplicationContext());
     }
+
+
+    /**
+     * Stepps 'up' in the folder hierarchy or closes App if on device level.
+     */
     @Override
-/**
- * Stepps 'up' in the folder hierarchy or closes App if on device level.
- */
     public void onBackPressed() {
         Log.d(ContentListActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
         String currentObjectId = navigator.getCurrentPosition().getObjectId();
@@ -186,8 +179,9 @@ return  PreferenceManager
         menu.setHeaderTitle(v.getContext().getString(
                 R.string.browse_context_title));
         ArrayList<String> menuItems = new ArrayList<String>();
+        menuItems.add(v.getContext().getString(R.string.browse_context_play_all));
         menuItems.add(v.getContext().getString(R.string.browse_context_play));
-           //menuItems.add(v.getContext().getString( R.string.browse_context_add_to_playplist));
+        //menuItems.add(v.getContext().getString( R.string.browse_context_add_to_playplist));
         menuItems.add(v.getContext()
                 .getString(R.string.browse_context_download));
         for (int i = 0; i < menuItems.size(); i++) {
@@ -199,15 +193,14 @@ return  PreferenceManager
      * Selects the place in the UI where the items are shown and renders the
      * content directory
      *
-     * @param providerDevice
-     * device to access
+     * @param providerDevice device to access
      */
     private void populateItemList(Device providerDevice) {
 
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
-            // Load adapter if selected device is configured and found
+                // Load adapter if selected device is configured and found
                 Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, upnpClient.getProviderDevice());
                 navigator.pushPosition(pos);
                 bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
@@ -219,14 +212,13 @@ return  PreferenceManager
         });
     }
 
-    private void clearItemList(){
+    private void clearItemList() {
         this.runOnUiThread(new Runnable() {
             public void run() {
-                contentList.setAdapter(new BrowseItemAdapter(getApplicationContext(),new Position(Navigator.ITEM_ROOT_OBJECT_ID,null)));
+                contentList.setAdapter(new BrowseItemAdapter(getApplicationContext(), new Position(Navigator.ITEM_ROOT_OBJECT_ID, null)));
             }
         });
     }
-
 
 
     /**
@@ -237,13 +229,13 @@ return  PreferenceManager
 
     }
 
-   /**
-    * Refreshes the shown devices when device is removed.
-    */
+    /**
+     * Refreshes the shown devices when device is removed.
+     */
     @Override
     public void deviceRemoved(Device<?, ?, ?> device) {
         Log.d(this.getClass().toString(), "device removal called");
-        if ( !device.equals(upnpClient.getProviderDevice())) {
+        if (!device.equals(upnpClient.getProviderDevice())) {
             clearItemList();
         }
     }
@@ -255,9 +247,10 @@ return  PreferenceManager
 
     /**
      * Returns Object containing about the current navigation way
+     *
      * @return information about current navigation
      */
-    public Navigator getNavigator(){
+    public Navigator getNavigator() {
         return navigator;
     }
 }

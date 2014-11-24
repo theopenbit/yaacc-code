@@ -61,7 +61,7 @@ public class ServerListActivity extends Activity implements
         upnpClient.addUpnpClientListener(this);
 
         populateDeviceList();
-        
+
     }
 
     /**

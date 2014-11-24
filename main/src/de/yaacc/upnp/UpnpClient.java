@@ -18,25 +18,22 @@
  */
 package de.yaacc.upnp;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
+import android.media.AudioManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
@@ -75,24 +72,17 @@ import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.AudioItem;
 import org.fourthline.cling.support.model.item.ImageItem;
 import org.fourthline.cling.support.model.item.Item;
-import org.seamless.util.MimeType;
 
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
-import android.widget.Toast;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import de.yaacc.R;
 import de.yaacc.browser.Position;
@@ -101,11 +91,8 @@ import de.yaacc.musicplayer.BackgroundMusicService;
 import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
-
-import android.media.AudioManager;
-
-import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseActionCallback;
+import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.upnp.server.avtransport.AvTransport;
@@ -132,8 +119,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     public UpnpClient() {
     }
 
-    public static UpnpClient getInstance(Context context){
-        if(instance == null){
+    public static UpnpClient getInstance(Context context) {
+        if (instance == null) {
             instance = new UpnpClient();
             instance.initialize(context);
         }
@@ -786,9 +773,19 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
      * @return the player
      */
     public List<Player> initializePlayers(DIDLObject didlObject) {
+        return initializePlayers(toItemList(didlObject));
+    }
+
+    /**
+     * Returns all player instances initialized with the given didl object
+     *
+     * @param items the items to be played
+     * @return the player
+     */
+    public List<Player> initializePlayers(List<Item> items) {
         LinkedList<PlayableItem> playableItems = new LinkedList<PlayableItem>();
 
-        for (Item currentItem : toItemList(didlObject)) {
+        for (Item currentItem : items) {
             PlayableItem playableItem = new PlayableItem(currentItem, getDefaultDuration());
             playableItems.add(playableItem);
         }
@@ -1181,10 +1178,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     }
 
     public void downloadItem(DIDLObject selectedDIDLObject) {
-        AsyncTask<DIDLObject,Void,Void> fileDownloader = new FileDownLoader(this).execute(selectedDIDLObject);
+        AsyncTask<DIDLObject, Void, Void> fileDownloader = new FileDownLoader(this).execute(selectedDIDLObject);
     }
-
-
 
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -1266,7 +1261,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         }
 
         @Override
-        public DeviceDetails getDetails(){
+        public DeviceDetails getDetails() {
             return new DeviceDetails(android.os.Build.MODEL);
         }
 
