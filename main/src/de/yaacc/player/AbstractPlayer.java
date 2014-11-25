@@ -552,7 +552,7 @@ public abstract class AbstractPlayer implements Player {
      *
      * @return the peneding intent
      */
-    protected PendingIntent getNotificationIntent() {
+    public PendingIntent getNotificationIntent() {
         return null;
     }
 
@@ -672,5 +672,14 @@ public abstract class AbstractPlayer implements Player {
 
     public int getVolume(){
         return upnpClient.getVolume();
+    }
+
+    public int getIconResourceId(){
+
+        return R.drawable.ic_launcher;
+    }
+
+    public String getDeviceId() {
+        return UpnpClient.LOCAL_UID;
     }
 }

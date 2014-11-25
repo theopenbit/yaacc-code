@@ -863,6 +863,14 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     }
 
     /**
+     * Returns all current player instances
+     * @return the player
+     */
+    public List<Player> getCurrentPlayers(){
+        return PlayerFactory.getCurrentPlayers();
+    }
+
+    /**
      * Returns all current player instances for the given transport object
      *
      * @param transport the object which describes the content to be played

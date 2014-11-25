@@ -179,7 +179,7 @@ public class MultiContentPlayer extends AbstractPlayer {
      * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
      */
 	@Override
-	protected PendingIntent getNotificationIntent() {
+	public PendingIntent getNotificationIntent() {
 		Intent notificationIntent = new Intent(getContext(),
 				MultiContentPlayerActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(getContext(),

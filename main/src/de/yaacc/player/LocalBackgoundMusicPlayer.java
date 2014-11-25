@@ -17,11 +17,6 @@
  */
 package de.yaacc.player;
 
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,12 +24,16 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.fourthline.cling.support.model.DIDLObject;
+
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.yaacc.R;
 import de.yaacc.musicplayer.BackgroundMusicBroadcastReceiver;
@@ -221,7 +220,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
      * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
      */
     @Override
-    protected PendingIntent getNotificationIntent() {
+    public PendingIntent getNotificationIntent() {
         Intent notificationIntent = new Intent(getContext(), MusicPlayerActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0, notificationIntent, 0);
         return contentIntent;
@@ -304,4 +303,8 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
         return backgroundMusicService;
     }
 
+    @Override
+    public int getIconResourceId() {
+        return R.drawable.cdtrack;
+    }
 }

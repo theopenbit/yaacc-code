@@ -17,7 +17,10 @@
 */
 package de.yaacc.browser;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -29,49 +32,40 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.container.Container;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.yaacc.R;
 import de.yaacc.player.Player;
-import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
- * Clicklistener when browsing folders.
+ * Clicklistener when browsing players.
+ *
  * @author Tobias Schöne (the openbit)
  */
-public class PlayerListItemClickListener implements OnItemClickListener{
-    //FIXME: just for easter egg to play all items on prev button
-    public static DIDLObject currentObject;
+public class PlayerListItemClickListener implements OnItemClickListener {
+
     @Override
     public void onItemClick(AdapterView<?> listView, View arg1, int position,
                             long id) {
-        ListView a = (ListView) listView.findViewById(R.id.itemList);
-        BrowseItemAdapter adapter = (BrowseItemAdapter) listView.getAdapter();
-        currentObject = adapter.getFolder(position);
-        if (currentObject instanceof Container) {
-            //Fixme: Cache should store information for different folders....
-            IconDownloadCacheHandler.getInstance().resetCache();
-            // if the current id is null, go back to the top level
-            String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID: adapter
-                    .getFolder(position).getId();
-            BrowseActivity.getNavigator().pushPosition(new Position(newObjectId, BrowseActivity.getUpnpClient().getProviderDevice()));
-            BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
-                    listView.getContext(), newObjectId);
-            a.setAdapter(bItemAdapter);
-            PlayerListItemClickListener bItemClickListener = new PlayerListItemClickListener();
-            a.setOnItemClickListener(bItemClickListener);
-        } else {
-            List<Player> players = BrowseActivity.getUpnpClient().initializePlayers(currentObject);
-            for (Player player : players) {
-                if(player != null){
-                    player.play();
-                }
+        ListView a = (ListView) listView.findViewById(R.id.playerList);
+        PlayerListItemAdapter adapter = (PlayerListItemAdapter) listView.getAdapter();
+        Player player = (Player) adapter.getItem(position);
+        if (player.getNotificationIntent() != null) {
+            Intent intent = new Intent();
+            try {
+                player.getNotificationIntent().send(a.getContext(), 0, intent);
+
+            } catch (PendingIntent.CanceledException e) {
+                // the stack trace isn't very helpful here.  Just log the exception message.
+                Log.e(this.getClass().getName(), "Sending contentIntent failed", e);
             }
+
         }
+
     }
+
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenuInfo menuInfo) {
         menu.setHeaderTitle(v.getContext().getString(R.string.browse_context_title));
@@ -81,14 +75,16 @@ public class PlayerListItemClickListener implements OnItemClickListener{
         menuItems.add(v.getContext().getString(R.string.browse_context_add_to_playplist));
         menuItems.add(v.getContext().getString(R.string.browse_context_download));
         //TODO: Check via bytecode whether listsize is calculated every loop or just once, if do calculation before calling the loop
-        for (int i = 0; i<menuItems.toArray(new String[menuItems.size()]).length; i++) {
+        for (int i = 0; i < menuItems.toArray(new String[menuItems.size()]).length; i++) {
             menu.add(Menu.NONE, i, i, menuItems.get(i));
         }
     }
+
     /**
      * Reacts on selecting an entry in the context menu.
-     *
+     * <p/>
      * Since this is the onContextClickListener also the reaction on clicking something in the context menu resides in this class
+     *
      * @param item
      * @return
      */
@@ -96,17 +92,17 @@ public class PlayerListItemClickListener implements OnItemClickListener{
         if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
             List<Player> players = BrowseActivity.getUpnpClient().initializePlayers(selectedDIDLObject);
             for (Player player : players) {
-                if(player != null){
+                if (player != null) {
                     player.play();
                 }
             }
-        } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
+        } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))) {
             Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);
             toast.show();
-        } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))){
+        } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))) {
             try {
                 BrowseActivity.getUpnpClient().downloadItem(selectedDIDLObject);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 Toast toast = Toast.makeText(applicationContext, "Can't download item: " + ex.getMessage(), Toast.LENGTH_SHORT);
                 toast.show();
             }

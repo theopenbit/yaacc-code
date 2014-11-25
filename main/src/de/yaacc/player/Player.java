@@ -17,6 +17,8 @@
  */
 package de.yaacc.player;
 
+import android.app.PendingIntent;
+
 import org.fourthline.cling.support.model.DIDLObject;
 
 import java.beans.PropertyChangeListener;
@@ -167,4 +169,15 @@ public interface Player {
 
     public int getVolume();
 
+    int getIconResourceId();
+
+    String getDeviceId();
+
+    /**
+     * Returns the intent which is to be started by pushing the notification
+     * entry
+     *
+     * @return the peneding intent
+     */
+    PendingIntent getNotificationIntent();
 }

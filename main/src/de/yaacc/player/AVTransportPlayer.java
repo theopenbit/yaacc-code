@@ -45,6 +45,8 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+
+import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.Watchdog;
 
@@ -255,7 +257,7 @@ public class AVTransportPlayer extends AbstractPlayer {
     * @see de.yaacc.player.AbstractPlayer#getNotificationIntent()
     */
     @Override
-    protected PendingIntent getNotificationIntent(){
+    public PendingIntent getNotificationIntent(){
         Intent notificationIntent = new Intent(getContext(),
                 AVTransportPlayerActivity.class);
         Log.d(getClass().getName(), "Put id into intent: " + getId());
@@ -505,4 +507,11 @@ public class AVTransportPlayer extends AbstractPlayer {
         return actionState.result == null ? 0 : (Integer) actionState.result;
 
     }
+
+    @Override
+    public int getIconResourceId(){
+        return R.drawable.device_48_48;
+    }
+
+
 }

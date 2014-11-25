@@ -57,14 +57,39 @@ public class PlayerListActivity extends Activity implements
         contentList = (ListView) findViewById(R.id.playerList);
         registerForContextMenu(contentList);
         upnpClient.addUpnpClientListener(this);
+        populatePlayerList();
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        init(null);
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+    }
+
+    /**
+     * Selects the place in the UI where the items are shown and renders the
+     * content directory
+     *
+     *
+     */
+    private void populatePlayerList() {
+
+
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                itemAdapter = new PlayerListItemAdapter(upnpClient);
+                contentList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                contentList.setAdapter(itemAdapter);
+                contentList.setOnItemClickListener(itemClickListener);
+            }
+        });
     }
 
     /**
