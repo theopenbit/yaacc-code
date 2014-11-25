@@ -49,6 +49,8 @@ import de.yaacc.util.YaaccLogActivity;
 public class TabBrowserActivity extends ActivityGroup implements OnClickListener,
         UpnpClientListener {
     private TabHost tabHost;
+    //FIXME dirty
+    public static boolean leftSettings=false;
 
     public enum Tabs {
         SERVER,
@@ -136,17 +138,24 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
 
     @Override
     public void onResume() {
-        if (getPreferences().getBoolean(
-                getString(R.string.settings_local_server_chkbx), false)) {
-            // Start upnpserver service for avtransport
+        boolean serverOn = getPreferences().getBoolean(
+                getString(R.string.settings_local_server_chkbx), false);
+        if (serverOn) {
+            // (Re)Start upnpserver service for avtransport
+            if(leftSettings){
+                getApplicationContext().stopService(getYaaccUpnpServerService());
+            }
             getApplicationContext().startService(getYaaccUpnpServerService());
             Log.d(this.getClass().getName(), "Starting local service");
         } else {
             getApplicationContext().stopService(getYaaccUpnpServerService());
             Log.d(this.getClass().getName(), "Stopping local service");
         }
+        leftSettings = false;
         super.onResume();
     }
+
+
 
     /**
      * Singleton to avoid multiple instances when switch

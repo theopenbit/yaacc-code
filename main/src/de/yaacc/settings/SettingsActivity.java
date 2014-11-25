@@ -20,6 +20,8 @@ package de.yaacc.settings;
 import android.app.Activity;
 import android.os.Bundle;
 
+import de.yaacc.browser.TabBrowserActivity;
+
 /**
  * @author Christoph Hähnel (eyeless)
  */
@@ -34,4 +36,9 @@ public class SettingsActivity extends Activity {
 
 	}
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        TabBrowserActivity.leftSettings=true;
+    }
 }
