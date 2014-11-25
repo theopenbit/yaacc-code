@@ -16,49 +16,59 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
+
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.LinkedList;
-import android.util.Log;
+
 /**
  * Manages navigation path inside device and folder hierarchy.
  *
  * @author Christoph Hähnel (eyeless)
  */
-public class Navigator implements Serializable{
+public class Navigator implements Serializable {
     public final static String DEVICE_OVERVIEW_OBJECT_ID = "-1";
     public final static String PROVIDER_DEVICE_SELECT_LIST_OBJECT_ID = "-2";
     public final static String RECEIVER_DEVICE_SELECT_LIST_OBJECT_ID = "-3";
     public final static String ITEM_ROOT_OBJECT_ID = "0";
     public final static Position DEVICE_LIST_POSITION = new Position(DEVICE_OVERVIEW_OBJECT_ID, null);
-    public Navigator(){
+
+    public Navigator() {
         navigationPath = new LinkedList<Position>();
         Log.d(getClass().getName(), "pushNavigation: " + DEVICE_LIST_POSITION.getObjectId());
         navigationPath.add(DEVICE_LIST_POSITION);
     }
+
     private LinkedList<Position> navigationPath;
+
     /**
      * Provides information about the current position.
+     *
      * @return current position or DEVICE_LIST_POSITION if on device level
      */
-    public Position getCurrentPosition(){
-        if (navigationPath.isEmpty()){
+    public Position getCurrentPosition() {
+        if (navigationPath.isEmpty()) {
             return DEVICE_LIST_POSITION;
         }
         return navigationPath.peekLast();
     }
-    public void pushPosition(Position pos){
+
+    public void pushPosition(Position pos) {
         Log.d(getClass().getName(), "pushNavigation: " + pos.getObjectId());
         navigationPath.add(pos);
     }
+
     /**
      * Provides information about the current position and removes it from the navigation path.
+     *
      * @return current position or DEVICE_LIST_POSITION if on device level
      */
-    public Position popPosition(){
+    public Position popPosition() {
         Position result = null;
-        if (navigationPath.isEmpty()){
+        if (navigationPath.isEmpty()) {
             result = DEVICE_LIST_POSITION;
-        }else{
+        } else {
             result = navigationPath.removeLast();
         }
         Log.d(getClass().getName(), "popNavigation: " + result.getObjectId());

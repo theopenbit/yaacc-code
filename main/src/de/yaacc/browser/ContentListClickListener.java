@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@ import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.util.image.IconDownloadCacheHandler;
 
 /**
- * Clicklistener when browsing folders.
+ * ClickListener when browsing folders.
  *
  * @author Tobias Schoene (the openbit)
  */

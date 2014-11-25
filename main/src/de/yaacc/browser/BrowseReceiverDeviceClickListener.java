@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -16,35 +16,31 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
-import org.fourthline.cling.model.meta.Device;
+
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
+
+import org.fourthline.cling.model.meta.Device;
+
 import de.yaacc.R;
+import de.yaacc.upnp.UpnpClient;
 
 /**
- * @author Christoph Hähnel (eyeless)
+ * @author Tobias Schoene (the openbit)
  */
 public class BrowseReceiverDeviceClickListener implements OnItemClickListener {
-    private BrowseActivity activity;
 
-    public BrowseReceiverDeviceClickListener() {
-    }
 
-    public BrowseReceiverDeviceClickListener(BrowseActivity activity) {
-        this.activity = activity;
-    }
     @Override
     public void onItemClick(AdapterView<?> listView, View itemView,
                             int position, long id) {
         ListView a = (ListView) listView.findViewById(R.id.itemList);
         BrowseReceiverDeviceAdapter adapter = (BrowseReceiverDeviceAdapter) listView
                 .getAdapter();
-        SparseBooleanArray checked = a.getCheckedItemPositions();
         Log.d(getClass().getName(), "position: " + position);
         CheckBox checkBox = (CheckBox) itemView
                 .findViewById(R.id.browseItemCheckbox);
@@ -52,12 +48,12 @@ public class BrowseReceiverDeviceClickListener implements OnItemClickListener {
         if (checkBox.isChecked()) {
             Log.d(getClass().getName(), "isChecked:" + device.getDisplayString());
             adapter.removeSelectedDevice(device);
-            BrowseActivity.getUpnpClient().removeReceiverDevice(device);
+            UpnpClient.getInstance(null).removeReceiverDevice(device);
             checkBox.setChecked(false);
         } else {
             Log.d(getClass().getName(), "isNotChecked:" + device.getDisplayString());
             adapter.addSelectedDevice(device);
-            BrowseActivity.getUpnpClient().addReceiverDevice(device);
+            UpnpClient.getInstance(null).addReceiverDevice(device);
             checkBox.setChecked(true);
         }
     }

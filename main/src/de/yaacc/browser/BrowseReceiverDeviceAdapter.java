@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -16,14 +16,6 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.browser;
-import java.net.URL;
-import java.util.Collection;
-import java.util.LinkedList;
-
-import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.model.meta.Icon;
-import org.fourthline.cling.model.meta.LocalDevice;
-import org.fourthline.cling.model.meta.RemoteDevice;
 
 import android.content.Context;
 import android.net.Uri;
@@ -36,6 +28,16 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Icon;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.RemoteDevice;
+
+import java.net.URL;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import de.yaacc.R;
 import de.yaacc.util.image.IconDownloadTask;
 
@@ -46,25 +48,30 @@ public class BrowseReceiverDeviceAdapter extends BaseAdapter {
     LinkedList<Device> devices;
     private LayoutInflater inflator;
     private LinkedList<Device> selectedDevices;
+
     public BrowseReceiverDeviceAdapter(Context ctx, Collection<Device> devices, Collection<Device> selectedDevices) {
         super();
         this.devices = new LinkedList<Device>(devices);
         this.selectedDevices = new LinkedList<Device>(selectedDevices);
         inflator = LayoutInflater.from(ctx);
     }
+
     @Override
     public int getCount() {
         return devices.size();
     }
+
     @Override
     public Object getItem(int position) {
         return devices.get(position);
     }
+
     @Override
     public long getItemId(int position) {
 // TODO Auto-generated method stub
         return 0;
     }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -76,7 +83,7 @@ public class BrowseReceiverDeviceAdapter extends BaseAdapter {
                     .findViewById(R.id.browseItemIcon);
             holder.name = (TextView) convertView
                     .findViewById(R.id.browseItemName);
-            holder.checkBox= (CheckBox) convertView
+            holder.checkBox = (CheckBox) convertView
                     .findViewById(R.id.browseItemCheckbox);
             convertView.setTag(holder);
         } else {
@@ -85,43 +92,44 @@ public class BrowseReceiverDeviceAdapter extends BaseAdapter {
         }
         holder.icon.setImageResource(R.drawable.device);
         Device device = (Device) getItem(position);
-        if ( device instanceof RemoteDevice && device.hasIcons()) {
-			Icon[] icons = device.getIcons();
-			for (int i = 0; i < icons.length; i++) {
-				if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())) {					
-					URL iconUri = ((RemoteDevice)device).normalizeURI(icons[i].getUri());
-					if (iconUri != null) {
-						Log.d(getClass().getName(),"Device icon uri:" + iconUri);
-						new IconDownloadTask((ListView) parent, position).execute(Uri.parse(iconUri.toString()));
-						break;
-						
-					}
-				}
-			}
-		}else if (device instanceof LocalDevice){
-			//We know our icon
-			holder.icon.setImageResource(R.drawable.yaacc48_24_png);
-		}
+        if (device instanceof RemoteDevice && device.hasIcons()) {
+            Icon[] icons = device.getIcons();
+            for (int i = 0; i < icons.length; i++) {
+                if (48 == icons[i].getHeight() && 48 == icons[i].getWidth() && "image/png".equals(icons[i].getMimeType().toString())) {
+                    URL iconUri = ((RemoteDevice) device).normalizeURI(icons[i].getUri());
+                    if (iconUri != null) {
+                        Log.d(getClass().getName(), "Device icon uri:" + iconUri);
+                        new IconDownloadTask((ListView) parent, position).execute(Uri.parse(iconUri.toString()));
+                        break;
+
+                    }
+                }
+            }
+        } else if (device instanceof LocalDevice) {
+            //We know our icon
+            holder.icon.setImageResource(R.drawable.yaacc48_24_png);
+        }
         holder.name.setText(device.getDetails().getFriendlyName());
         holder.checkBox.setChecked(selectedDevices.contains(device));
-        Log.d(getClass().getName(), "checkBox isChecked (" + device.getDisplayString()+"):" + holder.checkBox.isChecked());
+        Log.d(getClass().getName(), "checkBox isChecked (" + device.getDisplayString() + "):" + holder.checkBox.isChecked());
         return convertView;
     }
-    public void setDevices(Collection<Device<?,?,?>> devices) {
+
+    public void setDevices(Collection<Device<?, ?, ?>> devices) {
         this.devices = new LinkedList<Device>();
         this.devices.addAll(devices);
     }
-    public void setSelectedDevices(Collection<Device<?,?,?>> devices) {
-        this.selectedDevices = new LinkedList<Device>();
-        this.selectedDevices.addAll(devices);
-    }
-    public void addSelectedDevice(Device<?,?,?> device) {
+
+
+    public void addSelectedDevice(Device<?, ?, ?> device) {
         this.selectedDevices.add(device);
     }
-    public void removeSelectedDevice(Device<?,?,?> device) {
+
+    public void removeSelectedDevice(Device<?, ?, ?> device) {
         this.selectedDevices.remove(device);
     }
-    static class ViewHolder{
+
+    static class ViewHolder {
         ImageView icon;
         TextView name;
         CheckBox checkBox;

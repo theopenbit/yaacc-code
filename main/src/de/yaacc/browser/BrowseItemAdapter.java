@@ -17,17 +17,6 @@
  */
 package de.yaacc.browser;
 
-import java.net.URI;
-import java.util.LinkedList;
-import java.util.List;
-import org.fourthline.cling.support.model.DIDLContent;
-import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.item.AudioItem;
-import org.fourthline.cling.support.model.item.ImageItem;
-import org.fourthline.cling.support.model.item.PlaylistItem;
-import org.fourthline.cling.support.model.item.TextItem;
-import org.fourthline.cling.support.model.item.VideoItem;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -42,6 +31,20 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.DIDLObject;
+import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.AudioItem;
+import org.fourthline.cling.support.model.item.ImageItem;
+import org.fourthline.cling.support.model.item.PlaylistItem;
+import org.fourthline.cling.support.model.item.TextItem;
+import org.fourthline.cling.support.model.item.VideoItem;
+
+import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
@@ -50,13 +53,13 @@ import de.yaacc.util.image.ImageDownloader;
 
 /**
  * Adapter for browsing devices.
- * 
- * @author Christoph H��hnel (eyeless)
+ *
+ * @author Christoph Haehnel (eyeless)
  */
 public class BrowseItemAdapter extends BaseAdapter {
-	private LayoutInflater inflator;
-	private List<DIDLObject> objects;
-	private Context context;
+    private LayoutInflater inflator;
+    private List<DIDLObject> objects;
+    private Context context;
 
     public BrowseItemAdapter(UpnpClient upnpClient, String objectId) {
         Position pos = new Position(objectId,
@@ -66,144 +69,137 @@ public class BrowseItemAdapter extends BaseAdapter {
     }
 
 
-    public BrowseItemAdapter(Context ctx, String objectId) {
-		Position pos = new Position(objectId,
-				BrowseActivity.getUpnpClient().getProviderDevice());
-		initialize(ctx, pos);
-		this.context = ctx;
-	}
+    public BrowseItemAdapter(Context ctx, Position pos) {
+        initialize(ctx, pos);
+    }
 
-	public BrowseItemAdapter(Context ctx, Position pos) {
-		initialize(ctx, pos);
-	}
-
-	private void initialize(Context ctx, Position pos) {
-		inflator = LayoutInflater.from(ctx);
-		ContentDirectoryBrowseResult result = UpnpClient.getInstance(null)
+    private void initialize(Context ctx, Position pos) {
+        inflator = LayoutInflater.from(ctx);
+        ContentDirectoryBrowseResult result = UpnpClient.getInstance(null)
                 .browseSync(pos);
-		if (result == null)
-			return;
-		DIDLContent a = result.getResult();
-		if (a != null) {
-			objects = new LinkedList<DIDLObject>();
-			// Add all children in two steps to get containers first
-			objects.addAll(a.getContainers());
-			objects.addAll(a.getItems());
-		} else {
-			// If result is null it may be an empty result
-			// only in case of an UpnpFailure in the result it is really an
-			// failure
+        if (result == null)
+            return;
+        DIDLContent a = result.getResult();
+        if (a != null) {
+            objects = new LinkedList<DIDLObject>();
+            // Add all children in two steps to get containers first
+            objects.addAll(a.getContainers());
+            objects.addAll(a.getItems());
+        } else {
+            // If result is null it may be an empty result
+            // only in case of an UpnpFailure in the result it is really an
+            // failure
 
-			if (result.getUpnpFailure() != null) {
-				String text = ctx.getString(R.string.error_upnp_generic);
-				int duration = Toast.LENGTH_SHORT;
-				text = ctx.getString(R.string.error_upnp_specific) + " "
-						+ result.getUpnpFailure();
-				Log.e("ResolveError", text + "(" + pos.getObjectId() + ")");
-				Toast toast = Toast.makeText(ctx, text, duration);
-				toast.show();
-			}
+            if (result.getUpnpFailure() != null) {
+                String text = ctx.getString(R.string.error_upnp_generic);
+                int duration = Toast.LENGTH_SHORT;
+                text = ctx.getString(R.string.error_upnp_specific) + " "
+                        + result.getUpnpFailure();
+                Log.e("ResolveError", text + "(" + pos.getObjectId() + ")");
+                Toast toast = Toast.makeText(ctx, text, duration);
+                toast.show();
+            }
 
-		}
-	}
+        }
+    }
 
-	@Override
-	public int getCount() {
-		if (objects == null) {
-			return 0;
-		}
-		return objects.size();
-	}
+    @Override
+    public int getCount() {
+        if (objects == null) {
+            return 0;
+        }
+        return objects.size();
+    }
 
-	@Override
-	public Object getItem(int arg0) {
-		return objects.get(arg0);
-	}
+    @Override
+    public Object getItem(int arg0) {
+        return objects.get(arg0);
+    }
 
-	@Override
-	public long getItemId(int arg0) {
-		return arg0;
-		// return folders.get(arg0).getId();
-	}
+    @Override
+    public long getItemId(int arg0) {
+        return arg0;
+        // return folders.get(arg0).getId();
+    }
 
-	@Override
-	public View getView(int position, View arg1, ViewGroup parent) {
-		ViewHolder holder;
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(parent.getContext());
-		context = parent.getContext();
-		if (arg1 == null) {
-			arg1 = inflator.inflate(R.layout.browse_item, parent, false);
-			holder = new ViewHolder();
-			holder.icon = (ImageView) arg1.findViewById(R.id.browseItemIcon);
-			holder.name = (TextView) arg1.findViewById(R.id.browseItemName);
-			arg1.setTag(holder);
-		} else {
-			holder = (ViewHolder) arg1.getTag();
-		}
-		IconDownloadTask iconDownloadTask = new IconDownloadTask(
-				(ListView) parent, position);
-		DIDLObject currentObject = (DIDLObject) getItem(position);
-		holder.name.setText(currentObject.getTitle());
-		if (currentObject instanceof Container) {
-			holder.icon.setImageResource(R.drawable.folder);
-		} else if (currentObject instanceof AudioItem) {
-			holder.icon.setImageResource(R.drawable.cdtrack);
-			if (preferences.getBoolean(
-					context.getString(R.string.settings_thumbnails_chkbx),
-					false)) {
-				DIDLObject.Property<URI> albumArtProperties = ((AudioItem) currentObject)
-						.getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
-                if(null != albumArtProperties){
-				    iconDownloadTask.execute(Uri.parse(albumArtProperties
-						.getValue().toString()));
+    @Override
+    public View getView(int position, View arg1, ViewGroup parent) {
+        ViewHolder holder;
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(parent.getContext());
+        context = parent.getContext();
+        if (arg1 == null) {
+            arg1 = inflator.inflate(R.layout.browse_item, parent, false);
+            holder = new ViewHolder();
+            holder.icon = (ImageView) arg1.findViewById(R.id.browseItemIcon);
+            holder.name = (TextView) arg1.findViewById(R.id.browseItemName);
+            arg1.setTag(holder);
+        } else {
+            holder = (ViewHolder) arg1.getTag();
+        }
+        IconDownloadTask iconDownloadTask = new IconDownloadTask(
+                (ListView) parent, position);
+        DIDLObject currentObject = (DIDLObject) getItem(position);
+        holder.name.setText(currentObject.getTitle());
+        if (currentObject instanceof Container) {
+            holder.icon.setImageResource(R.drawable.folder);
+        } else if (currentObject instanceof AudioItem) {
+            holder.icon.setImageResource(R.drawable.cdtrack);
+            if (preferences.getBoolean(
+                    context.getString(R.string.settings_thumbnails_chkbx),
+                    false)) {
+                DIDLObject.Property<URI> albumArtProperties = ((AudioItem) currentObject)
+                        .getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+                if (null != albumArtProperties) {
+                    iconDownloadTask.execute(Uri.parse(albumArtProperties
+                            .getValue().toString()));
                 }
-			}
-		} else if (currentObject instanceof ImageItem) {
-			holder.icon.setImageResource(R.drawable.image);
-			if (preferences.getBoolean(
-					context.getString(R.string.settings_thumbnails_chkbx),
-					false))
-				iconDownloadTask.execute(Uri.parse(((ImageItem) currentObject)
-						.getFirstResource().getValue()));
-		} else if (currentObject instanceof VideoItem) {
-			holder.icon.setImageResource(R.drawable.video);
+            }
+        } else if (currentObject instanceof ImageItem) {
+            holder.icon.setImageResource(R.drawable.image);
+            if (preferences.getBoolean(
+                    context.getString(R.string.settings_thumbnails_chkbx),
+                    false))
+                iconDownloadTask.execute(Uri.parse(((ImageItem) currentObject)
+                        .getFirstResource().getValue()));
+        } else if (currentObject instanceof VideoItem) {
+            holder.icon.setImageResource(R.drawable.video);
             if (preferences.getBoolean(
                     context.getString(R.string.settings_thumbnails_chkbx),
                     false)) {
                 DIDLObject.Property<URI> albumArtProperties = ((VideoItem) currentObject)
                         .getFirstProperty(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
-                if(null != albumArtProperties){
+                if (null != albumArtProperties) {
                     iconDownloadTask.execute(Uri.parse(albumArtProperties
                             .getValue().toString()));
                 }
             }
-		} else if (currentObject instanceof PlaylistItem) {
-			holder.icon.setImageResource(R.drawable.playlist);
-		} else if (currentObject instanceof TextItem) {
-			holder.icon.setImageResource(R.drawable.txt);
-		} else {
-			holder.icon.setImageResource(R.drawable.unknown);
-		}
-		return arg1;
-	}
+        } else if (currentObject instanceof PlaylistItem) {
+            holder.icon.setImageResource(R.drawable.playlist);
+        } else if (currentObject instanceof TextItem) {
+            holder.icon.setImageResource(R.drawable.txt);
+        } else {
+            holder.icon.setImageResource(R.drawable.unknown);
+        }
+        return arg1;
+    }
 
-	static class ViewHolder {
-		ImageView icon;
-		TextView name;
-	}
+    static class ViewHolder {
+        ImageView icon;
+        TextView name;
+    }
 
-	public DIDLObject getFolder(int position) {
-		if (objects == null) {
-			return null;
-		}
-		return objects.get(position);
-	}
+    public DIDLObject getFolder(int position) {
+        if (objects == null) {
+            return null;
+        }
+        return objects.get(position);
+    }
 
-	private Bitmap getThumbnail(ImageItem image) {
-		ImageDownloader downloader = new ImageDownloader();
-		return downloader.retrieveIcon(Uri.parse(image.getFirstResource()
-				.getValue()));
-	}
+    private Bitmap getThumbnail(ImageItem image) {
+        ImageDownloader downloader = new ImageDownloader();
+        return downloader.retrieveIcon(Uri.parse(image.getFirstResource()
+                .getValue()));
+    }
 
 }

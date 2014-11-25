@@ -24,35 +24,35 @@ import java.io.Serializable;
 /**
  * @author Christoph Hähnel (eyeless)
  */
-public class Position implements Serializable{
+public class Position implements Serializable {
 
-	private String objectId;
-	private Device device;
-	
-	public Position(String objectId, Device device){
-			
-		this.device = device;
-		this.objectId = objectId; 
-	}
-	
-	
-	public String getObjectId() {
-		return objectId;
-	}
-	
-	public Device getDevice() {
-		return device;
-	}
+    private String objectId;
+    private Device device;
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Position ["
-				+ (objectId != null ? "objectId=" + objectId + ", " : "")
-				+ (device != null ? "device=" + device : "") + "]";
-	}
+    public Position(String objectId, Device device) {
 
-	
+        this.device = device;
+        this.objectId = objectId;
+    }
+
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "Position ["
+                + (objectId != null ? "objectId=" + objectId + ", " : "")
+                + (device != null ? "device=" + device : "") + "]";
+    }
+
+
 }

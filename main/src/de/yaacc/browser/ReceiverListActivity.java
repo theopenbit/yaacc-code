@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -46,10 +46,11 @@ public class ReceiverListActivity extends Activity implements
     protected ListView contentList;
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         populateReceiverDeviceList();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

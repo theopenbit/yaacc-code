@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 www.yaacc.de 
+ * Copyright (C) 2014 www.yaacc.de
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,15 +18,12 @@
 package de.yaacc.browser;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import org.fourthline.cling.model.meta.Device;
 
-import de.yaacc.R;
 import de.yaacc.upnp.UpnpClient;
 
 /**
@@ -43,12 +40,12 @@ public class ServerListClickListener implements OnItemClickListener {
     }
 
     @Override
-	public void onItemClick(AdapterView<?> listView, View arg1, int position, long id) {
-		BrowseDeviceAdapter adapter = (BrowseDeviceAdapter) listView.getAdapter();
+    public void onItemClick(AdapterView<?> listView, View arg1, int position, long id) {
+        BrowseDeviceAdapter adapter = (BrowseDeviceAdapter) listView.getAdapter();
         upnpClient.setProviderDevice((Device) adapter.getItem(position));
-        if(parent.getParent() instanceof TabBrowserActivity){
-            ((TabBrowserActivity)parent.getParent()).setCurrentTab(TabBrowserActivity.Tabs.CONTENT);
+        if (parent.getParent() instanceof TabBrowserActivity) {
+            ((TabBrowserActivity) parent.getParent()).setCurrentTab(TabBrowserActivity.Tabs.CONTENT);
         }
-	}
+    }
 
 }

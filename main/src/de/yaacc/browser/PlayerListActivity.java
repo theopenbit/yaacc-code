@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -28,7 +28,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.support.model.DIDLObject;
 
 import de.yaacc.R;
 import de.yaacc.player.Player;
@@ -83,8 +82,6 @@ public class PlayerListActivity extends Activity implements
     /**
      * Selects the place in the UI where the items are shown and renders the
      * content directory
-     *
-     *
      */
     private void populatePlayerList() {
 
@@ -129,7 +126,7 @@ public class PlayerListActivity extends Activity implements
                 selectedPlayer = (Player) item;
             }
         }
-        itemClickListener.onCreateContextMenu(menu,v,menuInfo);
+        itemClickListener.onCreateContextMenu(menu, v, menuInfo);
     }
 
 

@@ -1,20 +1,13 @@
 package de.yaacc.util.image;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import org.fourthline.cling.support.model.item.ImageItem;
-
-import java.io.IOException;
-
 import de.yaacc.R;
-import de.yaacc.browser.BrowseActivity;
 
 /**
  * AsyncTask fpr retrieving icons while browsing.

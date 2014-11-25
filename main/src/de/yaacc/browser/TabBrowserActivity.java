@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 */
 package de.yaacc.browser;
 
-import android.app.Activity;
 import android.app.ActivityGroup;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -51,7 +50,7 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
         UpnpClientListener {
     private TabHost tabHost;
 
-    public enum Tabs{
+    public enum Tabs {
         SERVER,
         CONTENT,
         RECEIVER,
@@ -93,8 +92,6 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
         if (upnpClient.getProviderDevice() != null) {
             setCurrentTab(Tabs.CONTENT);
 
-        } else {
-            // startActivity(new Intent(this,ServerListActivity.class));
         }
     }
 
@@ -102,7 +99,7 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                switch (content){
+                switch (content) {
                     case CONTENT: {
                         tabHost.setCurrentTab(Tabs.CONTENT.ordinal());
                         break;

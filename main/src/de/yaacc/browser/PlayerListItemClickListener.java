@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 www.yaacc.de
+* Copyright (C) 2014 www.yaacc.de
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -29,12 +29,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import org.fourthline.cling.support.model.DIDLObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.yaacc.R;
 import de.yaacc.player.Player;
@@ -85,9 +81,9 @@ public class PlayerListItemClickListener implements OnItemClickListener {
 
     public boolean onContextItemSelected(Player selectedPlayer, MenuItem item, Context applicationContext) {
         if (item.getTitle().equals(applicationContext.getString(R.string.open))) {
-              openIntent(applicationContext,selectedPlayer);
+            openIntent(applicationContext, selectedPlayer);
         } else if (item.getTitle().equals(applicationContext.getString(R.string.exitActivity))) {
-             selectedPlayer.exit();
+            selectedPlayer.exit();
 
         }
         return true;

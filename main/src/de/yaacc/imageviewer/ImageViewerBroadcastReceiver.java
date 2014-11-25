@@ -39,7 +39,10 @@ public class ImageViewerBroadcastReceiver extends BroadcastReceiver {
 	
 	private ImageViewerActivity imageViewer;
 
-	/**
+    public ImageViewerBroadcastReceiver() {
+    }
+
+    /**
 	 * 
 	 */
 	public ImageViewerBroadcastReceiver(ImageViewerActivity imageViewer) {
