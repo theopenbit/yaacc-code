@@ -45,7 +45,11 @@ public class ReceiverListActivity extends Activity implements
     BrowseReceiverDeviceClickListener bReceiverDeviceClickListener = null;
     protected ListView contentList;
 
-
+    @Override
+    public void onResume(){
+        super.onResume();
+        populateReceiverDeviceList();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

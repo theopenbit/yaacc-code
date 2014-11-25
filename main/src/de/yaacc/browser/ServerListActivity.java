@@ -110,7 +110,7 @@ public class ServerListActivity extends Activity implements
     public void deviceAdded(Device<?, ?, ?> device) {
         populateDeviceList();
 
-        if (upnpClient.getProviderDevice().equals(device)) {
+        if (upnpClient.getProviderDevice()!= null && upnpClient.getProviderDevice().equals(device)) {
             if (getParent() instanceof TabBrowserActivity) {
                 ((TabBrowserActivity) getParent()).setCurrentTab(TabBrowserActivity.Tabs.CONTENT);
             }

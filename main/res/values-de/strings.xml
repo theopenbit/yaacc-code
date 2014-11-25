@@ -90,5 +90,6 @@
     <string name="title_activity_receiver_list">Empfänger</string>
     <string name="title_activity_player_list">Spieler</string>
     <string name="browse_context_play_all">Spiele Einträge ab</string>
-
+    <string name="open">Öffnen</string>
+    <string name="exitActivity">Beenden</string>
 </resources>

@@ -21,11 +21,17 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.support.model.DIDLObject;
 
 import de.yaacc.R;
+import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.UpnpClientListener;
 
@@ -41,6 +47,7 @@ public class PlayerListActivity extends Activity implements
     private PlayerListItemAdapter itemAdapter;
     PlayerListItemClickListener itemClickListener = null;
     protected ListView contentList;
+    private Player selectedPlayer;
 
 
     @Override
@@ -64,7 +71,7 @@ public class PlayerListActivity extends Activity implements
     @Override
     protected void onResume() {
         super.onResume();
-        init(null);
+        populatePlayerList();
     }
 
     @Override
@@ -111,6 +118,28 @@ public class PlayerListActivity extends Activity implements
         }
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        if (v instanceof ListView) {
+            ListView listView = (ListView) v;
+            Object item = listView.getAdapter().getItem(info.position);
+            if (item instanceof Player) {
+                selectedPlayer = (Player) item;
+            }
+        }
+        itemClickListener.onCreateContextMenu(menu,v,menuInfo);
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        boolean result = itemClickListener.onContextItemSelected(selectedPlayer,
+                item, getApplicationContext());
+        populatePlayerList();
+        return result;
+    }
 
     @Override
     public void deviceAdded(Device<?, ?, ?> device) {

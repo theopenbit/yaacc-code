@@ -68,6 +68,16 @@ public class ContentListActivity extends Activity implements OnClickListener,
         init(savedInstanceState);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (upnpClient.getProviderDevice() != null) {
+            showMainFolder();
+        } else {
+            clearItemList();
+        }
+    }
+
     private void init(Bundle savedInstanceState) {
         if (savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null) {
             navigator = new Navigator();

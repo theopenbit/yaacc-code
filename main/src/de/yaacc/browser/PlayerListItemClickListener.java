@@ -52,10 +52,15 @@ public class PlayerListItemClickListener implements OnItemClickListener {
         ListView a = (ListView) listView.findViewById(R.id.playerList);
         PlayerListItemAdapter adapter = (PlayerListItemAdapter) listView.getAdapter();
         Player player = (Player) adapter.getItem(position);
+        openIntent(a.getContext(), player);
+
+    }
+
+    private void openIntent(Context context, Player player) {
         if (player.getNotificationIntent() != null) {
             Intent intent = new Intent();
             try {
-                player.getNotificationIntent().send(a.getContext(), 0, intent);
+                player.getNotificationIntent().send(context, 0, intent);
 
             } catch (PendingIntent.CanceledException e) {
                 // the stack trace isn't very helpful here.  Just log the exception message.
@@ -63,52 +68,27 @@ public class PlayerListItemClickListener implements OnItemClickListener {
             }
 
         }
-
     }
 
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenuInfo menuInfo) {
         menu.setHeaderTitle(v.getContext().getString(R.string.browse_context_title));
         ArrayList<String> menuItems = new ArrayList<String>();
-        //TODO: I think there might be some item dependent actions in the future, so this is designed as a dynamic list
-        menuItems.add(v.getContext().getString(R.string.browse_context_play));
-        menuItems.add(v.getContext().getString(R.string.browse_context_add_to_playplist));
-        menuItems.add(v.getContext().getString(R.string.browse_context_download));
-        //TODO: Check via bytecode whether listsize is calculated every loop or just once, if do calculation before calling the loop
-        for (int i = 0; i < menuItems.toArray(new String[menuItems.size()]).length; i++) {
+        menuItems.add(v.getContext().getString(R.string.open));
+        menuItems.add(v.getContext().getString(R.string.exitActivity));
+
+        for (int i = 0; i < menuItems.size(); i++) {
             menu.add(Menu.NONE, i, i, menuItems.get(i));
         }
     }
 
-    /**
-     * Reacts on selecting an entry in the context menu.
-     * <p/>
-     * Since this is the onContextClickListener also the reaction on clicking something in the context menu resides in this class
-     *
-     * @param item
-     * @return
-     */
-    public boolean onContextItemSelected(DIDLObject selectedDIDLObject, MenuItem item, Context applicationContext) {
-        if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play))) {
-            List<Player> players = BrowseActivity.getUpnpClient().initializePlayers(selectedDIDLObject);
-            for (Player player : players) {
-                if (player != null) {
-                    player.play();
-                }
-            }
-        } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))) {
-            Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);
-            toast.show();
-        } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))) {
-            try {
-                BrowseActivity.getUpnpClient().downloadItem(selectedDIDLObject);
-            } catch (Exception ex) {
-                Toast toast = Toast.makeText(applicationContext, "Can't download item: " + ex.getMessage(), Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        } else {
-            Toast toast = Toast.makeText(applicationContext, "Magic key pressed (Neither implemented nor defined ;))", Toast.LENGTH_SHORT);
-            toast.show();
+
+    public boolean onContextItemSelected(Player selectedPlayer, MenuItem item, Context applicationContext) {
+        if (item.getTitle().equals(applicationContext.getString(R.string.open))) {
+              openIntent(applicationContext,selectedPlayer);
+        } else if (item.getTitle().equals(applicationContext.getString(R.string.exitActivity))) {
+             selectedPlayer.exit();
+
         }
         return true;
     }
