@@ -67,16 +67,21 @@ public class ContentListActivity extends Activity implements OnClickListener,
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
     }
-
+/*
     @Override
     public void onResume() {
         super.onResume();
         if (upnpClient.getProviderDevice() != null) {
-            showMainFolder();
+            if(navigator != null){
+                populateItemList(upnpClient.getProviderDevice());
+            }else {
+                showMainFolder();
+            }
         } else {
             clearItemList();
         }
     }
+    */
 
     private void init(Bundle savedInstanceState) {
         if (savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null) {
@@ -91,7 +96,11 @@ public class ContentListActivity extends Activity implements OnClickListener,
         registerForContextMenu(contentList);
         upnpClient.addUpnpClientListener(this);
         if (upnpClient.getProviderDevice() != null) {
-            showMainFolder();
+            if(navigator != null){
+                populateItemList(upnpClient.getProviderDevice());
+            }else {
+                showMainFolder();
+            }
         } else {
             clearItemList();
         }
@@ -100,8 +109,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //FIXME Posion isn't serializable
-        //outState.putSerializable(CONTENT_LIST_NAVIGATOR,navigator);
+        outState.putSerializable(CONTENT_LIST_NAVIGATOR,navigator);
     }
 
 
@@ -211,7 +219,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
         this.runOnUiThread(new Runnable() {
             public void run() {
                 // Load adapter if selected device is configured and found
-                Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, upnpClient.getProviderDevice());
+                Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString());
                 navigator.pushPosition(pos);
                 bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
                         pos);

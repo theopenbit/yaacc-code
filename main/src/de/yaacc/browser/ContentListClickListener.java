@@ -27,7 +27,9 @@ import android.widget.Toast;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
+import org.fourthline.cling.support.model.item.Item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.yaacc.R;
@@ -64,7 +66,7 @@ public class ContentListClickListener implements OnItemClickListener {
             // if the current id is null, go back to the top level
             String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID : adapter
                     .getFolder(position).getId();
-            navigator.pushPosition(new Position(newObjectId, upnpClient.getProviderDevice()));
+            navigator.pushPosition(new Position(newObjectId, upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString()));
             BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
                     upnpClient, newObjectId);
             a.setAdapter(bItemAdapter);
@@ -76,11 +78,20 @@ public class ContentListClickListener implements OnItemClickListener {
     }
 
     private void playAll() {
-        ContentDirectoryBrowseResult result = upnpClient.browseSync(new Position(currentObject.getParentID(), upnpClient.getProviderDevice()));
+        ContentDirectoryBrowseResult result = upnpClient.browseSync(new Position(currentObject.getParentID(), upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString()));
         if (result == null) {
             play(upnpClient.initializePlayers(currentObject));
         } else {
-            play(upnpClient.initializePlayers(result.getResult().getItems()));
+            List<Item> items = result.getResult().getItems();
+            int index = items.indexOf(currentObject);
+            if(index > 0){
+                //sort selected item to the beginning
+                List<Item> tempItems = new ArrayList<Item>(items.subList(index,items.size()-1));
+                tempItems.addAll(items.subList(0,index-1));
+                items = tempItems;
+            }
+
+            play(upnpClient.initializePlayers(items));
         }
     }
 

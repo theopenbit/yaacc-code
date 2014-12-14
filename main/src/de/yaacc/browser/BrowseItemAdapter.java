@@ -63,7 +63,7 @@ public class BrowseItemAdapter extends BaseAdapter {
 
     public BrowseItemAdapter(UpnpClient upnpClient, String objectId) {
         Position pos = new Position(objectId,
-                upnpClient.getProviderDevice());
+                upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString());
         initialize(upnpClient.getContext(), pos);
         this.context = upnpClient.getContext();
     }

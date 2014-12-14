@@ -27,11 +27,11 @@ import java.io.Serializable;
 public class Position implements Serializable {
 
     private String objectId;
-    private Device device;
+    private String deviceId;
 
-    public Position(String objectId, Device device) {
+    public Position(String objectId, String deviceId) {
 
-        this.device = device;
+        this.deviceId = deviceId;
         this.objectId = objectId;
     }
 
@@ -40,8 +40,8 @@ public class Position implements Serializable {
         return objectId;
     }
 
-    public Device getDevice() {
-        return device;
+    public String getDeviceId() {
+        return deviceId;
     }
 
     /* (non-Javadoc)
@@ -51,7 +51,7 @@ public class Position implements Serializable {
     public String toString() {
         return "Position ["
                 + (objectId != null ? "objectId=" + objectId + ", " : "")
-                + (device != null ? "device=" + device : "") + "]";
+                + (deviceId != null ? "device=" + deviceId : "") + "]";
     }
 
 

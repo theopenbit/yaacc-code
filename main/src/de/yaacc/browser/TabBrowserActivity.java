@@ -51,12 +51,24 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
     private TabHost tabHost;
     //FIXME dirty
     public static boolean leftSettings=false;
+    private static String CURRENT_TAB_KEY="currentTab";
 
     public enum Tabs {
         SERVER,
         CONTENT,
         RECEIVER,
-        PLAYER
+        PLAYER;
+
+        public static Tabs valueOf(int ordinal){
+            for( Tabs tab : values()){
+                if(tab.ordinal() == ordinal){
+                    return tab;
+
+                }
+            }
+            return null;
+        }
+
     }
 
     private UpnpClient upnpClient = null;
@@ -68,6 +80,11 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
     private TabHost.TabSpec receiverTab;
     private TabHost.TabSpec playerTab;
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_TAB_KEY, tabHost.getCurrentTab());
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +108,9 @@ public class TabBrowserActivity extends ActivityGroup implements OnClickListener
 
         // add ourself as listener
         upnpClient.addUpnpClientListener(this);
-        if (upnpClient.getProviderDevice() != null) {
+        if(savedInstanceState != null){
+            setCurrentTab(Tabs.valueOf(savedInstanceState.getInt(CURRENT_TAB_KEY, Tabs.CONTENT.ordinal())));
+        }else if (upnpClient.getProviderDevice() != null) {
             setCurrentTab(Tabs.CONTENT);
 
         }
