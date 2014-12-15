@@ -43,7 +43,7 @@
     <string name="settings_browse_video_off">Show no video files</string>
     <string name="settings_browse_image_on">Show image files</string>
     <string name="settings_browse_image_off">Show no image files</string>
-    <string name="settings_thumbnails_chkbx" translateable="false">thumbnails_chkbx</string>
+    <string name="settings_thumbnails_chkbx">thumbnails_chkbx</string>
     <string name="settings_browse_thumbnails_on">Show image thumbnails</string>
     <string name="settings_browse_thumbnails_off">Show no image thumbnails</string>
     <string name="settings_browse_thumbnails_coverlookup_on">Images in directories are used as music covers</string>
