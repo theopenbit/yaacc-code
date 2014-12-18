@@ -67,43 +67,56 @@ public class ContentListActivity extends Activity implements OnClickListener,
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
     }
-/*
+
     @Override
     public void onResume() {
         super.onResume();
         if (upnpClient.getProviderDevice() != null) {
             if(navigator != null){
-                populateItemList(upnpClient.getProviderDevice());
+                populateItemList();
             }else {
                 showMainFolder();
             }
         } else {
+
             clearItemList();
         }
     }
-    */
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (upnpClient.getProviderDevice() != null) {
+            if(navigator != null){
+                populateItemList();
+            }else {
+                showMainFolder();
+            }
+        } else {
+
+            clearItemList();
+        }
+    }
 
     private void init(Bundle savedInstanceState) {
-        if (savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null) {
-            navigator = new Navigator();
-        } else {
-            navigator = (Navigator) savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR);
-        }
         setContentView(R.layout.activity_content_list);
         upnpClient = UpnpClient.getInstance(getApplicationContext());
-        bItemClickListener = new ContentListClickListener(upnpClient, getNavigator());
         contentList = (ListView) findViewById(R.id.contentList);
         registerForContextMenu(contentList);
         upnpClient.addUpnpClientListener(this);
         if (upnpClient.getProviderDevice() != null) {
-            if(navigator != null){
-                populateItemList(upnpClient.getProviderDevice());
-            }else {
+            if(savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null){
+
                 showMainFolder();
+            }else {
+                navigator = (Navigator) savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR);
+                populateItemList();
             }
         } else {
+
             clearItemList();
         }
+        bItemClickListener = new ContentListClickListener(upnpClient, getNavigator());
     }
 
     @Override
@@ -129,22 +142,15 @@ public class ContentListActivity extends Activity implements OnClickListener,
      */
     private void showMainFolder() {
         Device providerDevice = upnpClient.getProviderDevice();
-        if (providerDevice != null) {
-            populateItemList(providerDevice);
-        } else {
-            this.runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.browse_no_content_found), Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            });
-        }
+        navigator = new Navigator();
+        Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString());
+        navigator.pushPosition(pos);
+        populateItemList();
     }
 
     @Override
     public void onClick(View v) {
-        Device providerDevice = upnpClient.getProviderDevice();
-        populateItemList(providerDevice);
+        populateItemList();
     }
 
     @Override
@@ -211,18 +217,15 @@ public class ContentListActivity extends Activity implements OnClickListener,
      * Selects the place in the UI where the items are shown and renders the
      * content directory
      *
-     * @param providerDevice device to access
      */
-    private void populateItemList(Device providerDevice) {
+    private void populateItemList() {
 
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
-                // Load adapter if selected device is configured and found
-                Position pos = new Position(Navigator.ITEM_ROOT_OBJECT_ID, upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString());
-                navigator.pushPosition(pos);
+
                 bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
-                        pos);
+                        navigator.getCurrentPosition());
                 contentList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                 contentList.setAdapter(bItemAdapter);
                 contentList.setOnItemClickListener(bItemClickListener);
@@ -233,7 +236,9 @@ public class ContentListActivity extends Activity implements OnClickListener,
     private void clearItemList() {
         this.runOnUiThread(new Runnable() {
             public void run() {
-                contentList.setAdapter(new BrowseItemAdapter(getApplicationContext(), new Position(Navigator.ITEM_ROOT_OBJECT_ID, null)));
+                navigator = new Navigator();
+                Position pos =  new Position(Navigator.ITEM_ROOT_OBJECT_ID, null);
+                contentList.setAdapter(new BrowseItemAdapter(getApplicationContext(),pos));
             }
         });
     }

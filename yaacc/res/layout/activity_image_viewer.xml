@@ -31,8 +31,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/yaacc192_32" />
 
-   
+
 
 </RelativeLayout>

@@ -28,16 +28,11 @@ import java.util.LinkedList;
  * @author Christoph Hähnel (eyeless)
  */
 public class Navigator implements Serializable {
-    public final static String DEVICE_OVERVIEW_OBJECT_ID = "-1";
-    public final static String PROVIDER_DEVICE_SELECT_LIST_OBJECT_ID = "-2";
-    public final static String RECEIVER_DEVICE_SELECT_LIST_OBJECT_ID = "-3";
+
     public final static String ITEM_ROOT_OBJECT_ID = "0";
-    public final static Position DEVICE_LIST_POSITION = new Position(DEVICE_OVERVIEW_OBJECT_ID, null);
 
     public Navigator() {
         navigationPath = new LinkedList<Position>();
-        Log.d(getClass().getName(), "pushNavigation: " + DEVICE_LIST_POSITION.getObjectId());
-        navigationPath.add(DEVICE_LIST_POSITION);
     }
 
     private LinkedList<Position> navigationPath;
@@ -45,11 +40,11 @@ public class Navigator implements Serializable {
     /**
      * Provides information about the current position.
      *
-     * @return current position or DEVICE_LIST_POSITION if on device level
+     * @return current position or null
      */
     public Position getCurrentPosition() {
         if (navigationPath.isEmpty()) {
-            return DEVICE_LIST_POSITION;
+            return null;
         }
         return navigationPath.peekLast();
     }
@@ -62,13 +57,11 @@ public class Navigator implements Serializable {
     /**
      * Provides information about the current position and removes it from the navigation path.
      *
-     * @return current position or DEVICE_LIST_POSITION if on device level
+     * @return current position or null
      */
     public Position popPosition() {
         Position result = null;
-        if (navigationPath.isEmpty()) {
-            result = DEVICE_LIST_POSITION;
-        } else {
+        if (!navigationPath.isEmpty()) {
             result = navigationPath.removeLast();
         }
         Log.d(getClass().getName(), "popNavigation: " + result.getObjectId());

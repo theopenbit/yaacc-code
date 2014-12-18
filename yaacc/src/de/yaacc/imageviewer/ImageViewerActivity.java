@@ -211,6 +211,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
             case R.id.yaacc_about:
                 AboutActivity.showAbout(this);
                 return true;
+            case R.id.menu_exit:
+                finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -481,6 +484,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
             Log.d(getClass().getName(), "menuBarsHide ActionBar is null");
             return;
         }
+
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -494,7 +498,7 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
         Log.d(getClass().getName(), "menuBarsShow");
         ActionBar actionBar = getActionBar();
         if (actionBar == null) {
-            Log.d(getClass().getName(), "menuBarsShowr ActionBar is null");
+            Log.d(getClass().getName(), "menuBarsShow ActionBar is null");
             return;
         }
         actionBar.setDisplayShowTitleEnabled(false);
@@ -507,5 +511,9 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
         actionBar.show();
     }
 
-
-} 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+}

@@ -66,7 +66,7 @@ public class ContentListClickListener implements OnItemClickListener {
             // if the current id is null, go back to the top level
             String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID : adapter
                     .getFolder(position).getId();
-            navigator.pushPosition(new Position(newObjectId, upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString()));
+            navigator.pushPosition(new Position(newObjectId, upnpClient.getProviderDeviceId()));
             BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
                     upnpClient, newObjectId);
             a.setAdapter(bItemAdapter);

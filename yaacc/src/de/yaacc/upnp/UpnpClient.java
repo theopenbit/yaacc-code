@@ -619,10 +619,19 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
      * @return the browsing result
      */
     public ContentDirectoryBrowseResult browseSync(Position pos) {
-        if (pos == null || pos.getDeviceId() == null) {
-            return null;
+        if(getProviderDevice() == null){
+            return  null;
         }
-
+        if (pos == null || pos.getDeviceId() == null ) {
+            if(getProviderDevice() != null){
+                return browseSync(getProviderDevice(),"0" , BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
+            }else{
+                return null;
+            }
+        }
+        if (getProviderDevice() != null && !pos.getDeviceId().equals(getProviderDevice().getIdentity().getUdn().getIdentifierString())){
+            return browseSync(getProviderDevice(),"0" , BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
+        }
         return browseSync(getDevice(pos.getDeviceId()), pos.getObjectId(), BrowseFlag.DIRECT_CHILDREN, "*", 0L, null, new SortCriterion[0]);
     }
 

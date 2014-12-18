@@ -75,6 +75,7 @@ public class BrowseItemAdapter extends BaseAdapter {
 
     private void initialize(Context ctx, Position pos) {
         inflator = LayoutInflater.from(ctx);
+
         ContentDirectoryBrowseResult result = UpnpClient.getInstance(null)
                 .browseSync(pos);
         if (result == null)
@@ -98,10 +99,14 @@ public class BrowseItemAdapter extends BaseAdapter {
                 Log.e("ResolveError", text + "(" + pos.getObjectId() + ")");
                 Toast toast = Toast.makeText(ctx, text, duration);
                 toast.show();
+            }else{
+                objects = new LinkedList<DIDLObject>();
             }
 
         }
     }
+
+
 
     @Override
     public int getCount() {
