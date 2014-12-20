@@ -103,6 +103,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
         contentList = (ListView) findViewById(R.id.contentList);
         registerForContextMenu(contentList);
         upnpClient.addUpnpClientListener(this);
+        bItemClickListener = new ContentListClickListener(upnpClient, this);
         if (upnpClient.getProviderDevice() != null) {
             if(savedInstanceState == null || savedInstanceState.getSerializable(CONTENT_LIST_NAVIGATOR) == null){
 
@@ -115,7 +116,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
 
             clearItemList();
         }
-        bItemClickListener = new ContentListClickListener(upnpClient, this);
+
     }
 
     @Override
@@ -280,6 +281,10 @@ public class ContentListActivity extends Activity implements OnClickListener,
      */
     public Navigator getNavigator() {
         return navigator;
+    }
+
+    public void setNavigator(Navigator navigator) {
+        this.navigator = navigator;
     }
 }
 

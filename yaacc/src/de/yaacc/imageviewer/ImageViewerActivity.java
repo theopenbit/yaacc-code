@@ -41,6 +41,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import de.yaacc.R;
+import de.yaacc.player.LocalImagePlayer;
+import de.yaacc.player.Player;
+import de.yaacc.player.PlayerFactory;
 import de.yaacc.settings.ImageViewerSettingsActivity;
 import de.yaacc.settings.SettingsActivity;
 import de.yaacc.upnp.UpnpClient;
@@ -212,12 +215,22 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
                 AboutActivity.showAbout(this);
                 return true;
             case R.id.menu_exit:
-                finish();
+                exit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private void exit() {
+        Player player = PlayerFactory.getFirstCurrentPlayerOfType(LocalImagePlayer.class);
+        if(player != null){
+        player.exit();
+        }else{
+            finish();
+        }
+    }
+
     /**
      * In case of device rotation the activity will be restarted. In this case
      * the original intent which where used to start the activity won't change.
@@ -514,6 +527,6 @@ public class ImageViewerActivity extends Activity implements SwipeReceiver {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        exit();
     }
 }

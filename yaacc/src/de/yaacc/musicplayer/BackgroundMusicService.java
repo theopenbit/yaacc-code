@@ -27,8 +27,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.IOException;
 
 /**
  * A simple service for playing music in background.
@@ -41,6 +40,7 @@ public class BackgroundMusicService extends Service {
     private MediaPlayer player;
     private IBinder binder = new BackgroundMusicServiceBinder();
     private BackgroundMusicBroadcastReceiver backgroundMusicBroadcastReceiver;
+    private int duration = 0;
     //private boolean prepared  = false;
 
     public BackgroundMusicService() {
@@ -109,19 +109,15 @@ public class BackgroundMusicService extends Service {
             player.stop();
             player.release();
         }
-        player = new MediaPlayer();
         try {
             if (intent != null && intent.getData() != null) {
-                player.setDataSource(this, intent.getData());
+                setMusicUri(intent.getData());
             }
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
         }
-        if (player != null) {
-            player.setVolume(100, 100);
-            Log.i(this.getClass().getName(), "is Playing:" + player.isPlaying());
-        }
+
     }
 
     /**
@@ -130,6 +126,11 @@ public class BackgroundMusicService extends Service {
     public void stop() {
         if (player != null) {
             player.stop();
+            try {
+                player.prepare();
+            } catch (IOException e) {
+                Log.e(this.getClass().getName(), "Error while preparing media player after stop", e);
+            }
         }
     }
 
@@ -138,22 +139,10 @@ public class BackgroundMusicService extends Service {
      */
     public void play() {
         //final ActionState actionState = new ActionState();
-        if (player != null && !player.isPlaying() ) {
-            /*new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    actionState.watchdogFlag = true;
-                }
-            }, 30000L); // 30sec. Watchdog
-            while (!(actionState.actionFinished || actionState.watchdogFlag)) {
-                // wait for player preparation
-                actionState.actionFinished = prepared;
-            }*/
-            //if(actionState.actionFinished){
-                player.start();
-            /*}else {
-                Log.d(getClass().getName(),"Preparation of music player failed!");
-            }*/
+        if (player != null && !player.isPlaying()) {
+
+            player.start();
+
         }
     }
 
@@ -182,14 +171,15 @@ public class BackgroundMusicService extends Service {
         try {
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setDataSource(this, uri);
-            player.prepare();
             //player.prepareAsync();
-          /*  player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
-                    prepared = true;
+                    duration = player.getDuration();
                 }
-            });*/
+            });
+            player.prepare();
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
@@ -203,15 +193,6 @@ public class BackgroundMusicService extends Service {
      * @return the duration
      */
     public int getDuration() {
-        int duration = 0;
-
-        if (player != null && player.isPlaying()) {
-            try {
-                duration = player.getDuration();
-            } catch (Exception ex) {
-                Log.d(getClass().getName(), "Caught player exception", ex);
-            }
-        }
 
         return duration;
     }

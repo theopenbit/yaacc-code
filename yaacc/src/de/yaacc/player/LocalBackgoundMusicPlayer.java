@@ -126,6 +126,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
             }
         }, 600L);
         int timeLeft = getBackgroundService().getDuration() - getBackgroundService().getCurrentPosition();
+        Log.d(this.getClass().getName(), "TimeLeft after resume: " + timeLeft + " duration: " + getBackgroundService().getDuration() + " curPos: " + getBackgroundService().getCurrentPosition());
         startTimer(timeLeft + getSilenceDuration());
     }
 

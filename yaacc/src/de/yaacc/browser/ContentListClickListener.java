@@ -68,8 +68,13 @@ public class ContentListClickListener implements OnItemClickListener {
             //Fixme: Cache should store information for different folders....
             //IconDownloadCacheHandler.getInstance().resetCache();
             // if the current id is null, go back to the top level
-            String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID : adapter
-                    .getFolder(position).getId();
+            String newObjectId = Navigator.ITEM_ROOT_OBJECT_ID;
+            if (navigator == null || currentObject.getId() == null){
+                navigator = new Navigator();
+                contentListActivity.setNavigator(navigator);
+            }else {
+                newObjectId =  adapter.getFolder(position).getId();
+            }
             navigator.pushPosition(new Position(newObjectId, upnpClient.getProviderDeviceId()));
             contentListActivity.populateItemList();
         } else {
@@ -87,7 +92,7 @@ public class ContentListClickListener implements OnItemClickListener {
         if (result == null) {
             play(upnpClient.initializePlayers(currentObject));
         } else {
-            List<Item> items = result.getResult().getItems();
+            List<Item> items = result.getResult() == null ? new ArrayList<Item>(): result.getResult().getItems();
             int index = items.indexOf(currentObject);
             if(index > 0){
                 //sort selected item to the beginning
