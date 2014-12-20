@@ -43,11 +43,11 @@ import de.yaacc.upnp.UpnpClient;
 /**
  * @author Tobias Schoene (theopenbit)
  */
-public class FileDownLoader extends AsyncTask<DIDLObject, Void, Void> {
+public class FileDownloader extends AsyncTask<DIDLObject, Void, Void> {
 
     UpnpClient upnpClient;
 
-    public FileDownLoader(UpnpClient upnpClient) {
+    public FileDownloader(UpnpClient upnpClient) {
         this.upnpClient = upnpClient;
     }
 

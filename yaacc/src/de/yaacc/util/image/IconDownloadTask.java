@@ -59,7 +59,11 @@ public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
 		return result;
 	}
 
-	/**
+    public int getPosition() {
+        return position;
+    }
+
+    /**
 	 * Replaces the icon in the list with the recently loaded icon
 	 * 
 	 * @param result
@@ -74,4 +78,6 @@ public class IconDownloadTask extends AsyncTask<Uri, Integer, Bitmap> {
 			c.setImageBitmap(result);
 		}
 	}
+
+
 }

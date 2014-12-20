@@ -31,7 +31,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.support.model.DIDLObject;
@@ -116,7 +115,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
 
             clearItemList();
         }
-        bItemClickListener = new ContentListClickListener(upnpClient, getNavigator());
+        bItemClickListener = new ContentListClickListener(upnpClient, this);
     }
 
     @Override
@@ -166,7 +165,10 @@ public class ContentListActivity extends Activity implements OnClickListener,
     @Override
     public void onBackPressed() {
         Log.d(ContentListActivity.class.getName(), "onBackPressed() CurrentPosition: " + navigator.getCurrentPosition());
-        String currentObjectId = navigator.getCurrentPosition().getObjectId();
+        if(bItemAdapter != null){
+            bItemAdapter.cancelRunningTasks();
+        }
+        String currentObjectId = navigator.getCurrentPosition() == null ? Navigator.ITEM_ROOT_OBJECT_ID : navigator.getCurrentPosition().getObjectId();
         if (Navigator.ITEM_ROOT_OBJECT_ID.equals(currentObjectId)) {
             if (getParent() instanceof TabBrowserActivity) {
                 ((TabBrowserActivity) getParent()).setCurrentTab(TabBrowserActivity.Tabs.SERVER);
@@ -174,14 +176,14 @@ public class ContentListActivity extends Activity implements OnClickListener,
 
         } else {
             //Fixme: Cache should store information for different folders....
-            IconDownloadCacheHandler.getInstance().resetCache();
+            //IconDownloadCacheHandler.getInstance().resetCache();
             final ListView itemList = (ListView) findViewById(R.id.contentList);
             Position pos = navigator.popPosition(); // First pop is our
             // currentPosition
             bItemAdapter = new BrowseItemAdapter(this,
                     navigator.getCurrentPosition());
             itemList.setAdapter(bItemAdapter);
-            ContentListClickListener bItemClickListener = new ContentListClickListener(upnpClient, getNavigator());
+            ContentListClickListener bItemClickListener = new ContentListClickListener(upnpClient,this);
             itemList.setOnItemClickListener(bItemClickListener);
         }
     }
@@ -218,12 +220,15 @@ public class ContentListActivity extends Activity implements OnClickListener,
      * content directory
      *
      */
-    private void populateItemList() {
+    public void populateItemList() {
 
         IconDownloadCacheHandler.getInstance().resetCache();
         this.runOnUiThread(new Runnable() {
             public void run() {
+                if(bItemAdapter != null){
+                    bItemAdapter.cancelRunningTasks();
 
+                }
                 bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
                         navigator.getCurrentPosition());
                 contentList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);

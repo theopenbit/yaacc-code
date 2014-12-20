@@ -96,7 +96,7 @@ import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
 import de.yaacc.upnp.model.types.SyncOffset;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
 import de.yaacc.upnp.server.avtransport.AvTransport;
-import de.yaacc.util.FileDownLoader;
+import de.yaacc.util.FileDownloader;
 
 /**
  * A client facade to the upnp lookup and access framework. This class provides
@@ -1196,7 +1196,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     }
 
     public void downloadItem(DIDLObject selectedDIDLObject) {
-        AsyncTask<DIDLObject, Void, Void> fileDownloader = new FileDownLoader(this).execute(selectedDIDLObject);
+        AsyncTask<DIDLObject, Void, Void> fileDownloader = new FileDownloader(this).execute(selectedDIDLObject);
     }
 
 

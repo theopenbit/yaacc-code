@@ -42,6 +42,7 @@ import org.fourthline.cling.support.model.item.TextItem;
 import org.fourthline.cling.support.model.item.VideoItem;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,13 +61,7 @@ public class BrowseItemAdapter extends BaseAdapter {
     private LayoutInflater inflator;
     private List<DIDLObject> objects;
     private Context context;
-
-    public BrowseItemAdapter(UpnpClient upnpClient, String objectId) {
-        Position pos = new Position(objectId,
-                upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString());
-        initialize(upnpClient.getContext(), pos);
-        this.context = upnpClient.getContext();
-    }
+    private List <IconDownloadTask> iconDownloadTasks;
 
 
     public BrowseItemAdapter(Context ctx, Position pos) {
@@ -75,7 +70,8 @@ public class BrowseItemAdapter extends BaseAdapter {
 
     private void initialize(Context ctx, Position pos) {
         inflator = LayoutInflater.from(ctx);
-
+        context = ctx;
+        iconDownloadTasks = new ArrayList<IconDownloadTask>();
         ContentDirectoryBrowseResult result = UpnpClient.getInstance(null)
                 .browseSync(pos);
         if (result == null)
@@ -99,13 +95,12 @@ public class BrowseItemAdapter extends BaseAdapter {
                 Log.e("ResolveError", text + "(" + pos.getObjectId() + ")");
                 Toast toast = Toast.makeText(ctx, text, duration);
                 toast.show();
-            }else{
+            } else {
                 objects = new LinkedList<DIDLObject>();
             }
 
         }
     }
-
 
 
     @Override
@@ -142,8 +137,10 @@ public class BrowseItemAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) arg1.getTag();
         }
+
         IconDownloadTask iconDownloadTask = new IconDownloadTask(
                 (ListView) parent, position);
+        iconDownloadTasks.add(iconDownloadTask);
         DIDLObject currentObject = (DIDLObject) getItem(position);
         holder.name.setText(currentObject.getTitle());
         if (currentObject instanceof Container) {
@@ -187,6 +184,14 @@ public class BrowseItemAdapter extends BaseAdapter {
             holder.icon.setImageResource(R.drawable.unknown);
         }
         return arg1;
+    }
+
+    public void cancelRunningTasks() {
+        if(iconDownloadTasks != null){
+            for(IconDownloadTask iconDownloadTask : iconDownloadTasks){
+                iconDownloadTask.cancel(true);
+            }
+        }
     }
 
     static class ViewHolder {

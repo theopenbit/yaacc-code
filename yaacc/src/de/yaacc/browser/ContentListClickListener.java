@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.yaacc.R;
+import de.yaacc.player.PlayableItem;
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
 import de.yaacc.upnp.callback.contentdirectory.ContentDirectoryBrowseResult;
@@ -46,12 +47,15 @@ import de.yaacc.util.image.IconDownloadCacheHandler;
 public class ContentListClickListener implements OnItemClickListener {
     //FIXME: just for easter egg to play all items on prev button
     public static DIDLObject currentObject;
+    private final ContentListActivity contentListActivity;
     private UpnpClient upnpClient;
     private Navigator navigator;
 
-    public ContentListClickListener(UpnpClient upnpClient, Navigator navigator) {
+    public ContentListClickListener(UpnpClient upnpClient, ContentListActivity contentListActivity) {
         this.upnpClient = upnpClient;
-        this.navigator = navigator;
+        this.navigator = contentListActivity.getNavigator();
+        this.contentListActivity = contentListActivity;
+
     }
 
     @Override
@@ -62,18 +66,19 @@ public class ContentListClickListener implements OnItemClickListener {
         currentObject = adapter.getFolder(position);
         if (currentObject instanceof Container) {
             //Fixme: Cache should store information for different folders....
-            IconDownloadCacheHandler.getInstance().resetCache();
+            //IconDownloadCacheHandler.getInstance().resetCache();
             // if the current id is null, go back to the top level
             String newObjectId = currentObject.getId() == null ? Navigator.ITEM_ROOT_OBJECT_ID : adapter
                     .getFolder(position).getId();
             navigator.pushPosition(new Position(newObjectId, upnpClient.getProviderDeviceId()));
-            BrowseItemAdapter bItemAdapter = new BrowseItemAdapter(
-                    upnpClient, newObjectId);
-            a.setAdapter(bItemAdapter);
-            ContentListClickListener bItemClickListener = new ContentListClickListener(upnpClient, navigator);
-            a.setOnItemClickListener(bItemClickListener);
+            contentListActivity.populateItemList();
         } else {
-            playAll();
+            PlayableItem playableItem = new PlayableItem((Item)currentObject, 0);
+            if (playableItem.getMimeType().startsWith("video")){
+                play(upnpClient.initializePlayers(currentObject));
+            }else{
+                playAll();
+            }
         }
     }
 
