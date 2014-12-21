@@ -67,9 +67,10 @@ public class ContentListActivity extends Activity implements OnClickListener,
         init(savedInstanceState);
     }
 
-    @Override
+   @Override
     public void onResume() {
         super.onResume();
+       bItemClickListener = new ContentListClickListener(upnpClient, this);
         if (upnpClient.getProviderDevice() != null) {
             if(navigator != null){
                 populateItemList();
@@ -85,6 +86,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
     @Override
     protected void onRestart() {
         super.onRestart();
+        bItemClickListener = new ContentListClickListener(upnpClient, this);
         if (upnpClient.getProviderDevice() != null) {
             if(navigator != null){
                 populateItemList();
@@ -244,7 +246,12 @@ public class ContentListActivity extends Activity implements OnClickListener,
             public void run() {
                 navigator = new Navigator();
                 Position pos =  new Position(Navigator.ITEM_ROOT_OBJECT_ID, null);
-                contentList.setAdapter(new BrowseItemAdapter(getApplicationContext(),pos));
+                navigator.pushPosition(pos);
+                bItemAdapter = new BrowseItemAdapter(getApplicationContext(),
+                        navigator.getCurrentPosition());
+                contentList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                contentList.setAdapter(bItemAdapter);
+                contentList.setOnItemClickListener(bItemClickListener);
             }
         });
     }
@@ -265,7 +272,7 @@ public class ContentListActivity extends Activity implements OnClickListener,
     public void deviceRemoved(Device<?, ?, ?> device) {
         Log.d(this.getClass().toString(), "device removal called");
         if (!device.equals(upnpClient.getProviderDevice())) {
-            clearItemList();
+        //    clearItemList();
         }
     }
 
