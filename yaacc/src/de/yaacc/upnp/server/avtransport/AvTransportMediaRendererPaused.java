@@ -55,7 +55,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AvTransport> impl
     * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#play(java.lang.String)
     */
     @Override
-    public Class<? extends AbstractState> play(String arg0) {
+    public Class<? extends AbstractState<?>> play(String arg0) {
         Log.d(this.getClass().getName(), "play");
         return AvTransportMediaRendererPlaying.class;
     }
@@ -63,7 +63,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AvTransport> impl
     * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#setTransportURI(java.net.URI, java.lang.String)
     */
     @Override
-    public Class<? extends AbstractState> setTransportURI(URI uri, String metaData) {
+    public Class<? extends AbstractState<?>> setTransportURI(URI uri, String metaData) {
         Log.d(this.getClass().getName(), "setTransportURI");
         Log.d(this.getClass().getName(), "uri: " + uri);
         Log.d(this.getClass().getName(), "metaData: " + metaData);
@@ -89,7 +89,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AvTransport> impl
     * @see org.fourthline.cling.support.avtransport.impl.state.PausedPlay#stop()
     */
     @Override
-    public Class<? extends AbstractState> stop() {
+    public Class<? extends AbstractState<?>> stop() {
         Log.d(this.getClass().getName(), "stop");
         return AvTransportMediaRendererStopped.class;
     }
@@ -110,7 +110,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AvTransport> impl
     }
 
     @Override
-    public Class<? extends AbstractState>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setSpeed(speed);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPositionUnits(referencedPositionUnits);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPosition(referencedPosition);
@@ -120,14 +120,14 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AvTransport> impl
     }
 
     @Override
-    public Class<? extends AbstractState>  syncPause(String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncPause(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererPaused.class;
     }
 
     @Override
-    public Class<? extends AbstractState>  syncStop(String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncStop(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererStopped.class;

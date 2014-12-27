@@ -76,7 +76,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     * (java.net.URI, java.lang.String)
     */
     @Override
-    public Class<? extends AbstractState> setTransportURI(URI uri,
+    public Class<? extends AbstractState<?>> setTransportURI(URI uri,
                                                           String metaData) {
         Log.d(this.getClass().getName(), "setTransportURI");
         Log.d(this.getClass().getName(), "uri: " + uri);
@@ -105,7 +105,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#stop()
     */
     @Override
-    public Class<? extends AbstractState> stop() {
+    public Class<? extends AbstractState<?>> stop() {
         Log.d(this.getClass().getName(), "stop");
 // / Same here, if you are stopped already and someone calls STOP,
 // well...
@@ -119,7 +119,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     * .String)
     */
     @Override
-    public Class<? extends AbstractState> play(String speed) {
+    public Class<? extends AbstractState<?>> play(String speed) {
         Log.d(this.getClass().getName(), "play");
 // It's easier to let this classes' onEntry() method do the work
         return AvTransportMediaRendererPlaying.class;
@@ -130,7 +130,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#next()
     */
     @Override
-    public Class<? extends AbstractState> next() {
+    public Class<? extends AbstractState<?>> next() {
         Log.d(this.getClass().getName(), "next");
         return AvTransportMediaRendererStopped.class;
     }
@@ -140,7 +140,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     * @see org.fourthline.cling.support.avtransport.impl.state.Stopped#previous()
     */
     @Override
-    public Class<? extends AbstractState> previous() {
+    public Class<? extends AbstractState<?>> previous() {
         Log.d(this.getClass().getName(), "previous");
         return AvTransportMediaRendererStopped.class;
     }
@@ -152,14 +152,14 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     * .cling.support.model.SeekMode, java.lang.String)
     */
     @Override
-    public Class<? extends AbstractState> seek(SeekMode unit, String target) {
+    public Class<? extends AbstractState<?>> seek(SeekMode unit, String target) {
         Log.d(this.getClass().getName(), "seek");
 // Implement seeking with the stream in stopped state!
         return AvTransportMediaRendererStopped.class;
     }
 
     @Override
-    public Class<? extends AbstractState>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setSpeed(speed);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPositionUnits(referencedPositionUnits);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPosition(referencedPosition);
@@ -169,14 +169,14 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
     }
 
     @Override
-    public Class<? extends AbstractState>  syncPause(String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncPause(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererPaused.class;
     }
 
     @Override
-    public Class<? extends AbstractState>  syncStop(String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncStop(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererStopped.class;

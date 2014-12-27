@@ -58,7 +58,7 @@ public class AvTransportMediaRendererNoMediaPresent extends
 	 * @see org.fourthline.cling.support.avtransport.impl.state.NoMediaPresent#setTransportURI(java.net.URI, java.lang.String)
 	 */
 	@Override
-	public Class<? extends AbstractState> setTransportURI(URI uri,
+	public Class<? extends AbstractState<?>> setTransportURI(URI uri,
 			String metaData) {
 		Log.d(this.getClass().getName(), "set Transport: " + uri + " metaData: " + metaData);
 		getTransport().setMediaInfo(new MediaInfo(uri.toString(), metaData));		
@@ -77,7 +77,7 @@ public class AvTransportMediaRendererNoMediaPresent extends
 	}
 
     @Override
-    public Class<? extends AbstractState>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncPlay(String speed, String referencedPositionUnits, String referencedPosition, String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setSpeed(speed);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPositionUnits(referencedPositionUnits);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPosition(referencedPosition);
@@ -87,14 +87,14 @@ public class AvTransportMediaRendererNoMediaPresent extends
     }
 
     @Override
-    public Class<? extends AbstractState>  syncPause(String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncPause(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererPaused.class;
     }
 
     @Override
-    public Class<? extends AbstractState>  syncStop(String referencedPresentationTime, String referencedClockId) {
+    public Class<? extends AbstractState<?>>  syncStop(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererStopped.class;

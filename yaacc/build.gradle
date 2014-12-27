@@ -8,8 +8,25 @@ buildscript {
 }
 apply plugin: 'android'
 
+repositories {
+        def androidHome = System.getenv("ANDROID_HOME")
+        maven {
+            url "$androidHome/extras/android/m2repository/"
+        }
+        mavenCentral() 
+        maven {
+          url "http://4thline.org/m2"
+        }
+    }
+
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'com.android.support:support-v4:19.0.1'
+    compile 'org.fourthline.cling:cling-core:2.0.1'
+    compile 'org.fourthline.cling:cling-support:2.0.1'
+    compile 'org.eclipse.jetty:jetty-http:8.1.8.v20121106'
+    compile 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
+    compile 'org.eclipse.jetty:jetty-client:8.1.8.v20121106'
+    compile 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
 }
 
 android {
@@ -42,6 +59,7 @@ android {
 
     packagingOptions{
         exclude 'META-INF/beans.xml'
+
     }
 
     lintOptions {
