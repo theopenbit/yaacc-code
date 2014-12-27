@@ -151,6 +151,8 @@ then
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-17)
   echo -e "y" | (/usr/local/android-sdk/tools/android update sdk -u --all -t android-19)
   echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u --all -t system-image)
+  echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u --all -t extra-android-support)
+  echo -e "y" |  (/usr/local/android-sdk/tools/android update sdk -u --all -t extra-android-m2repository)
 else
 echo "Android Debug Bridge already detected."
 fi
