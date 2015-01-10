@@ -104,8 +104,8 @@ public class ImagesByBucketNamesFolderBrowser extends ContentBrowser {
 			mediaCursor.moveToFirst();
 			while (!mediaCursor.isAfterLast()) {
 				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_ID));
-				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));;
-				StorageFolder imageFolder = new StorageFolder(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId(), name, "yaacc", getBucketNameFolderSize(contentDirectory, name),90700L);
+                String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));;
+				StorageFolder imageFolder = new StorageFolder(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId(), name, "yaacc", getBucketNameFolderSize(contentDirectory, id),90700L);
 				result.add(imageFolder);			
 				Log.d(getClass().getName(), "image by bucket names folder: " + id + " Name: " + name);
 				mediaCursor.moveToNext();
