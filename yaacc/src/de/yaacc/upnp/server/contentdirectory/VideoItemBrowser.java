@@ -71,7 +71,7 @@ public class VideoItemBrowser extends ContentBrowser {
 			MimeType mimeType = MimeType.valueOf(mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Video.VideoColumns.MIME_TYPE)));
 			// file parameter only needed for media players which decide the
 			// ability of playing a file by the file extension
-			String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
+            String uri = getUriString(contentDirectory, id, mimeType);
 			Res resource = new Res(mimeType, size, uri);
 			resource.setDuration(duration);
 			result = new VideoItem(ContentDirectoryIDs.VIDEO_PREFIX.getId() +  id, ContentDirectoryIDs.VIDEOS_FOLDER.getId(), name, "", resource);

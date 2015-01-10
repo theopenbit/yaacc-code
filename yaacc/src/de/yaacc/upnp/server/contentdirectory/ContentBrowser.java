@@ -19,6 +19,8 @@
 package de.yaacc.upnp.server.contentdirectory;
 
 import android.content.Context;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,9 @@ import java.util.List;
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
+import org.seamless.util.MimeType;
+
+import de.yaacc.upnp.server.YaaccUpnpServerService;
 
 
 /**
@@ -60,4 +65,16 @@ public abstract class ContentBrowser {
 		result.addAll(browseItem(contentDirectory, myId));
 		return result;
 	}
+
+    public String getUriString(YaaccContentDirectory contentDirectory, String id, MimeType mimeType) {
+        String fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
+        if(fileExtension == null){
+            Log.d(getClass().getName(), "Can't lookup file extension from mimetype: " + mimeType);
+            //try subtype
+            fileExtension = mimeType.getSubtype();
+
+        }
+        return "http://" + contentDirectory.getIpAddress() + ":"
+                + YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + fileExtension;
+    }
 }

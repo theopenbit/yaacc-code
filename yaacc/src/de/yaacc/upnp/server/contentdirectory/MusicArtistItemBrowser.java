@@ -105,10 +105,8 @@ public class MusicArtistItemBrowser extends ContentBrowser {
 			// file parameter only needed for media players which decide
 			// the
 			// ability of playing a file by the file extension
-			
-			String uri = "http://" + contentDirectory.getIpAddress() + ":"
-					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file."
-							+ MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
+
+            String uri = getUriString(contentDirectory, id, mimeType);
 			URI albumArtUri = URI.create("http://"
 					+ contentDirectory.getIpAddress() + ":"
 					+ YaaccUpnpServerService.PORT + "/?album=" + albumId);

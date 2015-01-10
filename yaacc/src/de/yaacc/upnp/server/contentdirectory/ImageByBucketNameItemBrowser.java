@@ -84,8 +84,7 @@ public class ImageByBucketNameItemBrowser extends ContentBrowser {
 							.getColumnIndex(MediaStore.Images.Media.MIME_TYPE)));
 			// file parameter only needed for media players which decide the
 			// ability of playing a file by the file extension
-			String uri = "http://" + contentDirectory.getIpAddress() + ":"
-					+ YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
+			String uri = getUriString(contentDirectory, id, mimeType);
 			Res resource = new Res(mimeType, size, uri);
 			result = new Photo(ContentDirectoryIDs.IMAGE_BY_BUCKET_PREFIX.getId() + id,
 					ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId()+dateTaken, name, "", "",
@@ -105,7 +104,9 @@ public class ImageByBucketNameItemBrowser extends ContentBrowser {
 		return result;
 	}
 
-	@Override
+
+
+    @Override
 	public List<Container> browseContainer(
 			YaaccContentDirectory contentDirectory, String myId) {
 

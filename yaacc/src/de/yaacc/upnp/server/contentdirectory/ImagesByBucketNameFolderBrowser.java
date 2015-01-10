@@ -120,7 +120,7 @@ public class ImagesByBucketNameFolderBrowser extends ContentBrowser {
 				MimeType mimeType = MimeType.valueOf(mImageCursor.getString(mImageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
 				// file parameter only needed for media players which decide the
 				// ability of playing a file by the file extension
-				String uri = "http://" + contentDirectory.getIpAddress() + ":" + YaaccUpnpServerService.PORT + "/?id=" + id + "&f=file." + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType.toString());
+                String uri = getUriString(contentDirectory, id, mimeType);
 				Res resource = new Res(mimeType, size, uri);
 				
 				Photo photo = new Photo(ContentDirectoryIDs.IMAGE_BY_BUCKET_PREFIX.getId()+id, myId, name, "", "", resource);
