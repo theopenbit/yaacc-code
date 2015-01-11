@@ -115,6 +115,7 @@ public class ImageAllItemBrowser extends ContentBrowser {
 	public List<Item> browseItem(YaaccContentDirectory contentDirectory,
 			String myId) {
 		List<Item> result = new ArrayList<Item>();
+        result.add((Item)browseMeta(contentDirectory,myId));
 		return result;
 
 	}

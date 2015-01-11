@@ -51,6 +51,8 @@ import org.fourthline.cling.support.model.BrowseResult;
 import org.fourthline.cling.support.model.DIDLContent;
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.PersonWithRole;
+import org.fourthline.cling.support.model.Protocol;
+import org.fourthline.cling.support.model.ProtocolInfo;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
@@ -163,6 +165,14 @@ public class YaaccContentDirectory {
 		PersonWithRole artist = new PersonWithRole(creator, "");
 		MimeType mimeType = new MimeType("audio", "mpeg");
 		List<MusicTrack> result = new ArrayList<MusicTrack>();
+        Res res = new Res(
+                new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD),
+                123456l,
+                "00:02:33",
+                26752L,
+                "http://api.jamendo.com/get2/stream/track/redirect/?id=310355&streamencoding=mp31");
+        res.setSampleFrequency(44100L);
+        res.setNrAudioChannels(2L);
 		MusicTrack musicTrack = new MusicTrack(
 				"101",
 				parentId,
@@ -170,12 +180,7 @@ public class YaaccContentDirectory {
 				creator,
 				album,
 				artist,
-				new Res(
-						mimeType,
-						123456l,
-						"00:02:33",
-						8192L,
-						"http://api.jamendo.com/get2/stream/track/redirect/?id=310355&streamencoding=mp31"));
+				res);
 		musicTrack.setRestricted(true);
 		addContent(musicTrack.getId(), musicTrack);
 		result.add(musicTrack);
@@ -188,7 +193,7 @@ public class YaaccContentDirectory {
 				album,
 				artist,
 				new Res(
-						mimeType,
+                        new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD),
 						123456l,
 						"00:02:01",
 						8192L,
@@ -205,7 +210,7 @@ public class YaaccContentDirectory {
 				album,
 				artist,
 				new Res(
-						mimeType,
+                        new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD),
 						123456l,
 						"00:02:18",
 						8192L,
@@ -226,7 +231,7 @@ public class YaaccContentDirectory {
 		String url = "http://kde-look.org/CONTENT/content-files/156304-DSC_0089-2-1600.jpg";
 
 		Photo photo = new Photo("201", parentId, url, creator, album, new Res(
-				mimeType, 123456L, url));
+                new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD), 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		addContent(photo.getId(), photo);
@@ -235,7 +240,7 @@ public class YaaccContentDirectory {
 		url = "http://kde-look.org/CONTENT/content-files/156246-DSC_0021-1600.jpg";
 
 		photo = new Photo("202", parentId, url, creator, album, new Res(
-				mimeType, 123456L, url));
+                new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD), 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		addContent(photo.getId(), photo);
@@ -245,7 +250,7 @@ public class YaaccContentDirectory {
 
 		addContent(photo.getId(), photo);
 		photo = new Photo("203", parentId, url, creator, album, new Res(
-				mimeType, 123456L, url));
+                new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD), 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		result.add(photo);
@@ -253,7 +258,7 @@ public class YaaccContentDirectory {
 		url = "http://kde-look.org/CONTENT/content-files/156223-kungsleden1900x1200.JPG";
 
 		photo = new Photo("204", parentId, url, creator, album, new Res(
-				mimeType, 123456L, url));
+                new ProtocolInfo(Protocol.HTTP_GET, ProtocolInfo.WILDCARD, mimeType.toString(), ProtocolInfo.WILDCARD), 123456L, url));
 		photo.setRestricted(true);
 		photo.setClazz(new DIDLObject.Class("object.item.imageItem"));
 		addContent(photo.getId(), photo);
@@ -372,6 +377,7 @@ public class YaaccContentDirectory {
 			}
 			if (browseFlag == BrowseFlag.METADATA) {
 				didl.addObject(didlObject);
+                childCount = 1;
 			}else{
 				if (didlObject instanceof Container) {
 					Container container = (Container)didlObject;					
@@ -382,7 +388,10 @@ public class YaaccContentDirectory {
 					for (Container cont : container.getContainers()) {
 						didl.addContainer(cont);
 					}
-				}
+				}else{
+                    didl.addObject(didlObject);
+                    childCount = 1;
+                }
 			}
 			
 		} else {
