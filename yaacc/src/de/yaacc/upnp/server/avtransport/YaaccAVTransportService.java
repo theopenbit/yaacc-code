@@ -58,6 +58,7 @@ import java.beans.PropertyChangeSupport;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.yaacc.upnp.UpnpClient;
@@ -236,7 +237,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     private UpnpClient upnpClient = null;
     private AvTransport avTransport;
 
-    final private static Logger log = Logger.getLogger(AVTransportService.class.getName());
+    final private static Logger log = Logger.getLogger(YaaccAVTransportService.class.getName());
 
     private Map<Long, AVTransportStateMachine> stateMachines = new ConcurrentHashMap();
 
@@ -433,6 +434,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
         try {
             return ((YaaccState) stateMachine.getCurrentState()).getPossibleTransportActions();
         } catch (TransitionException ex) {
+            log.log(Level.SEVERE,"Exception in state transition ignoring it", ex);
             return new TransportAction[0];
         }
     }

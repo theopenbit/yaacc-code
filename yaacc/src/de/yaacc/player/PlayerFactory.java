@@ -56,9 +56,16 @@ public class PlayerFactory {
         boolean image = false;
         boolean music = false;
         for (PlayableItem playableItem : items) {
-            image = image || playableItem.getMimeType().startsWith("image");
-            video = video || playableItem.getMimeType().startsWith("video");
-            music = music || playableItem.getMimeType().startsWith("audio");
+            if(playableItem.getMimeType() != null){
+                image = image || playableItem.getMimeType().startsWith("image");
+                video = video || playableItem.getMimeType().startsWith("video");
+                music = music || playableItem.getMimeType().startsWith("audio");
+            }else{
+                //no mime type no knowlege about it
+                image = true;
+                music = true;
+                video = true;
+            }
         }
         Log.d(PlayerFactory.class.getName(), "video:" + video + " image: " + image + "audio:" + music );
         for (Device device : upnpClient.getReceiverDevices()) {
@@ -246,10 +253,11 @@ public class PlayerFactory {
      */
     public static Class getPlayerClassForMimeType(String mimeType) {
 // FIXME don't implement business logic twice
-        boolean image = mimeType.startsWith("image");
-        boolean video = mimeType.startsWith("video");
-        boolean music = mimeType.startsWith("audio");
         Class result = MultiContentPlayer.class;
+        if(mimeType != null){
+            boolean image = mimeType.startsWith("image");
+            boolean video = mimeType.startsWith("video");
+            boolean music = mimeType.startsWith("audio");
         if (video && !image && !music) {
 // use videoplayer
             result = MultiContentPlayer.class;
@@ -259,6 +267,7 @@ public class PlayerFactory {
         } else if (!video && !image && music) {
 // use musicplayer
             result = LocalBackgoundMusicPlayer.class;
+        }
         }
         return result;
     }

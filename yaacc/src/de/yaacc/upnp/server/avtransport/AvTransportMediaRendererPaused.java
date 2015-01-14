@@ -132,7 +132,7 @@ public class AvTransportMediaRendererPaused extends PausedPlay<AvTransport> impl
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererStopped.class;
     }
-
+    @Override
     public TransportAction[] getPossibleTransportActions(){
         return new TransportAction[] {
                 TransportAction.Stop,

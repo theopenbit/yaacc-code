@@ -831,7 +831,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         }
         DIDLContent metadata = null;
         try {
-            if (positionInfo.getTrackMetaData().indexOf("NOT_IMPLEMENTED") == -1) {
+            if (positionInfo.getTrackMetaData() != null && positionInfo.getTrackMetaData().indexOf("NOT_IMPLEMENTED") == -1) {
                 metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
             } else {
                 Log.d(getClass().getName(), "Warning unparsable TackMetaData: " + positionInfo.getTrackMetaData());
@@ -899,7 +899,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         }
         DIDLContent metadata = null;
         try {
-            metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
+            if(positionInfo.getTrackMetaData() != null){
+              metadata = new DIDLParser().parse(positionInfo.getTrackMetaData());
+            }
         } catch (Exception e) {
             Log.d(getClass().getName(), "Exception while parsing metadata: ", e);
         }
@@ -920,7 +922,8 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
                 break;
             }
         } else {
-            playableItem = new PlayableItem(null, getDefaultDuration());
+            playableItem = new PlayableItem();
+            playableItem.setDuration(getDefaultDuration());
             playableItem.setTitle(positionInfo.getTrackURI().toString());
             String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
             mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);

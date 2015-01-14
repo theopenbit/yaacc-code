@@ -167,7 +167,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
         return AvTransportMediaRendererStopped.class;
     }
-
+    @Override
     public TransportAction[] getPossibleTransportActions(){
         return new TransportAction[] {
                 TransportAction.Stop,

@@ -182,6 +182,7 @@ public class AvTransportMediaRendererStopped extends Stopped<AvTransport> implem
         return AvTransportMediaRendererStopped.class;
     }
 
+    @Override
     public TransportAction[] getPossibleTransportActions(){
         return new TransportAction[] {
                 TransportAction.Stop,
