@@ -116,6 +116,7 @@ public class BackgroundMusicService extends Service {
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
 
+
         }
 
     }
@@ -130,6 +131,7 @@ public class BackgroundMusicService extends Service {
                 player.prepare();
             } catch (IOException e) {
                 Log.e(this.getClass().getName(), "Error while preparing media player after stop", e);
+                player.reset();
             }
         }
     }
@@ -166,12 +168,19 @@ public class BackgroundMusicService extends Service {
             player.release();
         }
         player = new MediaPlayer();
+        player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mediaPlayer,  int what, int extra) {
+                Log.e(getClass().getName(),"Error in State  " + what + " extra: " + extra );
+                return true;
+            }
+        });
         player.setVolume(100, 100);
         //prepared= false;
         try {
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setDataSource(this, uri);
-            //player.prepareAsync();
+
 
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -179,6 +188,8 @@ public class BackgroundMusicService extends Service {
                     duration = player.getDuration();
                 }
             });
+            //player.prepareAsync();
+
             player.prepare();
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "Exception while changing datasource uri", e);
