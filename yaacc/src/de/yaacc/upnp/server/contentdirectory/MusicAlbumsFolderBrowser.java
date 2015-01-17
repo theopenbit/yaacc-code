@@ -18,10 +18,13 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
@@ -95,6 +98,7 @@ public class MusicAlbumsFolderBrowser extends ContentBrowser {
 		String[] projection = { MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM };
 		String selection = "";
 		String[] selectionArgs = null;
+        Map<String,MusicAlbum> folderMap= new HashMap<String,MusicAlbum>();
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, MediaStore.Audio.Albums.ALBUM + " ASC");
 
@@ -103,15 +107,21 @@ public class MusicAlbumsFolderBrowser extends ContentBrowser {
 			while (!mediaCursor.isAfterLast()) {
 				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Albums._ID));
 				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM));
-				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId(), name, "", getMusicTrackSize(contentDirectory, id));
-				result.add(musicAlbum);			
+				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_ALBUM_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_ALBUMS_FOLDER.getId(), name, "", 0);
+				folderMap.put(id,musicAlbum);
 				Log.d(getClass().getName(), "Album Folder: " + id + " Name: " + name);
 				mediaCursor.moveToNext();
 			}
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
-		mediaCursor.close();
+            mediaCursor.close();
+            //Fetch folder size
+
+            for(Map.Entry<String,MusicAlbum> entry : folderMap.entrySet()){
+                entry.getValue().setChildCount(getMusicTrackSize(contentDirectory, entry.getKey()));
+                result.add(entry.getValue());
+            }
+        } else {
+            Log.d(getClass().getName(), "System media store is empty.");
+        }
 		Collections.sort(result, new Comparator<Container>() {
 
 			@Override

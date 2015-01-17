@@ -21,7 +21,9 @@ package de.yaacc.upnp.server.contentdirectory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
@@ -95,6 +97,7 @@ public class MusicGenresFolderBrowser extends ContentBrowser {
 		String[] projection = { MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME };
 		String selection = "";
 		String[] selectionArgs = null;
+        Map<String,MusicAlbum> folderMap= new HashMap<String,MusicAlbum>();
 		Cursor mediaCursor = contentDirectory.getContext().getContentResolver().query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, projection, selection,
 				selectionArgs, MediaStore.Audio.Genres.NAME + " ASC");
 
@@ -103,15 +106,19 @@ public class MusicGenresFolderBrowser extends ContentBrowser {
 			while (!mediaCursor.isAfterLast()) {
 				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres._ID));
 				String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
-				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), name, "", getMusicTrackSize(contentDirectory, id));
-				result.add(musicAlbum);			
+				MusicAlbum musicAlbum = new MusicAlbum(ContentDirectoryIDs.MUSIC_GENRE_PREFIX.getId()+id, ContentDirectoryIDs.MUSIC_GENRES_FOLDER.getId(), name, "", 0);
+                folderMap.put(id, musicAlbum);
 				Log.d(getClass().getName(), "Genre Folder: " + id + " Name: " + name);
 				mediaCursor.moveToNext();
 			}
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
-		mediaCursor.close();
+            mediaCursor.close();
+            for(Map.Entry<String,MusicAlbum> entry : folderMap.entrySet()){
+                entry.getValue().setChildCount(getMusicTrackSize(contentDirectory, entry.getKey()));
+                result.add(entry.getValue());
+            }
+        } else {
+            Log.d(getClass().getName(), "System media store is empty.");
+        }
 		Collections.sort(result, new Comparator<Container>() {
 
 			@Override

@@ -18,28 +18,25 @@
  */
 package de.yaacc.upnp.server.contentdirectory;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import android.content.Context;
+import android.database.Cursor;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.DIDLObject.Property.UPNP;
+import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.container.MusicAlbum;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.MusicTrack;
 import org.seamless.util.MimeType;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import de.yaacc.R;
 import de.yaacc.upnp.server.YaaccUpnpServerService;
@@ -162,9 +159,10 @@ public class MusicAllTitlesFolderBrowser extends ContentBrowser {
 				mediaCursor.moveToNext();
 			}
 			mediaCursor.close();
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
+
+        } else {
+            Log.d(getClass().getName(), "System media store is empty.");
+        }
 		Collections.sort(result, new Comparator<Item>() {
 
 			@Override

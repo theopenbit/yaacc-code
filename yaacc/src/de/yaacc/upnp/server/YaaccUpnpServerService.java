@@ -825,6 +825,7 @@ public class YaaccUpnpServerService extends Service {
 				Log.d(getClass().getName(), "conn.isOpen(): " + conn.isOpen());
 				Log.d(getClass().getName(), "!Thread.interrupted(): " + !Thread.interrupted());
 				while (!Thread.interrupted() && conn.isOpen()) {
+                    conn.setSocketTimeout(500000); //not Timeout
 					HttpContext context = new BasicHttpContext();
 					httpservice.handleRequest(conn, context);
 				}

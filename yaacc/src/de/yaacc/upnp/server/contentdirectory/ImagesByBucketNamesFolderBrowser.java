@@ -21,7 +21,9 @@ package de.yaacc.upnp.server.contentdirectory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.container.Container;
@@ -95,6 +97,7 @@ public class ImagesByBucketNamesFolderBrowser extends ContentBrowser {
 	@Override
 	public List<Container> browseContainer(YaaccContentDirectory contentDirectory, String myId) {
 		List<Container> result = new ArrayList<Container>();
+        Map<String,StorageFolder> folderMap= new HashMap<String,StorageFolder>();
 		String[] projection = { MediaStore.Images.Media.BUCKET_ID, MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
 		String selection = "0 == 0 ) group by ( " + MediaStore.Images.Media.BUCKET_ID;
 		String[] selectionArgs = null;
@@ -105,16 +108,21 @@ public class ImagesByBucketNamesFolderBrowser extends ContentBrowser {
 			while (!mediaCursor.isAfterLast()) {
 				String id = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_ID));
                 String name = mediaCursor.getString(mediaCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));;
-				StorageFolder imageFolder = new StorageFolder(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId(), name, "yaacc", getBucketNameFolderSize(contentDirectory, id),90700L);
-				result.add(imageFolder);			
+				StorageFolder imageFolder = new StorageFolder(ContentDirectoryIDs.IMAGES_BY_BUCKET_NAME_PREFIX.getId()+id, ContentDirectoryIDs.IMAGES_BY_BUCKET_NAMES_FOLDER.getId(), name, "yaacc", 0,90700L);
+                folderMap.put(id, imageFolder);
 				Log.d(getClass().getName(), "image by bucket names folder: " + id + " Name: " + name);
-				mediaCursor.moveToNext();
-			}
-		} else {
-			Log.d(getClass().getName(), "System media store is empty.");
-		}
-		mediaCursor.close();
-		Collections.sort(result, new Comparator<Container>() {
+                mediaCursor.moveToNext();
+            }
+            mediaCursor.close();
+            //Fetch folder size
+            for(Map.Entry<String,StorageFolder> entry : folderMap.entrySet()){
+                entry.getValue().setChildCount(getBucketNameFolderSize(contentDirectory, entry.getKey()));
+                result.add(entry.getValue());
+            }
+        } else {
+            Log.d(getClass().getName(), "System media store is empty.");
+        }
+        Collections.sort(result, new Comparator<Container>() {
 
 			@Override
 			public int compare(Container lhs, Container rhs) {

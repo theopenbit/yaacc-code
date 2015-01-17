@@ -400,10 +400,17 @@ public class YaaccContentDirectory {
 				didl.addObject(didlObject);
 				childCount = 1;
 			}else {
+                childCount = 0;
 				List<DIDLObject> children = findBrowserFor(objectID).browseChildren(this, objectID);
-				childCount = children.size();
+
 				for (DIDLObject child : children) {
-					didl.addObject(child);
+                    if(childCount >= maxResults){
+                        break;
+                    }
+                    if(firstResult <= childCount){
+					    didl.addObject(child);
+                        childCount++;
+                    }
 				}
 			}
 		}
