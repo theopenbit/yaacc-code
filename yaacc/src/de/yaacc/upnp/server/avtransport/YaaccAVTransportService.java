@@ -72,7 +72,7 @@ import de.yaacc.upnp.model.types.SyncOffset;
  */
 @UpnpService(
         serviceId = @UpnpServiceId("AVTransport"),
-        serviceType = @UpnpServiceType(value = "AVTransport", version = 3),
+        serviceType = @UpnpServiceType(value = "AVTransport", version = 1), //needed for backward compatibility
         stringConvertibleTypes = LastChange.class
 )
 @UpnpStateVariables({

@@ -77,6 +77,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -166,7 +167,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     }
 
     private void fireDeviceAdded(Device<?, ?, ?> device) {
-        for (UpnpClientListener listener : listeners) {
+        for (UpnpClientListener listener : new ArrayList<UpnpClientListener>(listeners)) {
             listener.deviceAdded(device);
         }
     }
