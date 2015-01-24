@@ -468,6 +468,12 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<YaaccContentDirectory> createContentDirectoryService() {
 		LocalService<YaaccContentDirectory> contentDirectoryService = new AnnotationLocalServiceBinder().read(YaaccContentDirectory.class);
 		contentDirectoryService.setManager(new DefaultServiceManager<YaaccContentDirectory>(contentDirectoryService, null) {
+
+            @Override
+            protected int getLockTimeoutMillis() {
+                return 1000;
+            }
+
 			@Override
 			protected YaaccContentDirectory createServiceInstance() throws Exception {
 				return new YaaccContentDirectory(getApplicationContext());
@@ -485,7 +491,12 @@ public class YaaccUpnpServerService extends Service {
 	private LocalService<YaaccAVTransportService> createAVTransportService() {
 		LocalService<YaaccAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(YaaccAVTransportService.class);
  		avTransportService.setManager(new DefaultServiceManager<YaaccAVTransportService>(avTransportService, null) {
-			@Override
+            @Override
+            protected int getLockTimeoutMillis() {
+                return 1000;
+            }
+
+            @Override
 			protected YaaccAVTransportService createServiceInstance() throws Exception {
 				return new YaaccAVTransportService(getUpnpClient());
 			}
@@ -497,6 +508,11 @@ public class YaaccUpnpServerService extends Service {
 		LocalService<AbstractAudioRenderingControl> renderingControlService = new AnnotationLocalServiceBinder()
 				.read(AbstractAudioRenderingControl.class);
 		renderingControlService.setManager(new DefaultServiceManager<AbstractAudioRenderingControl>(renderingControlService, null) {
+            @Override
+            protected int getLockTimeoutMillis() {
+                return 1000;
+            }
+
 			@Override
 			protected AbstractAudioRenderingControl createServiceInstance() throws Exception {
 				return new YaaccAudioRenderingControlService(getUpnpClient());
@@ -509,6 +525,12 @@ public class YaaccUpnpServerService extends Service {
 		LocalService<AbstractMediaReceiverRegistrarService> service = new AnnotationLocalServiceBinder()
 				.read(AbstractMediaReceiverRegistrarService.class);
 		service.setManager(new DefaultServiceManager<AbstractMediaReceiverRegistrarService>(service, null) {
+
+            @Override
+            protected int getLockTimeoutMillis() {
+                return 1000;
+            }
+
 			@Override
 			protected AbstractMediaReceiverRegistrarService createServiceInstance() throws Exception {
 				return new YaaccMediaReceiverRegistrarService(getUpnpClient());
@@ -528,6 +550,12 @@ public class YaaccUpnpServerService extends Service {
 		final ProtocolInfos sourceProtocols = getSourceProtocolInfos();	
 		
 		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
+
+            @Override
+            protected int getLockTimeoutMillis() {
+                return 1000;
+            }
+
 			@Override
 			protected ConnectionManagerService createServiceInstance() throws Exception {
 				return new ConnectionManagerService(sourceProtocols, null);
@@ -547,6 +575,12 @@ public class YaaccUpnpServerService extends Service {
 		LocalService<ConnectionManagerService> service = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);		
 		final ProtocolInfos sinkProtocols = getSinkProtocolInfos();	
 		service.setManager(new DefaultServiceManager<ConnectionManagerService>(service, ConnectionManagerService.class) {
+
+            @Override
+            protected int getLockTimeoutMillis() {
+                return 1000;
+            }
+
 			@Override
 			protected ConnectionManagerService createServiceInstance() throws Exception {
 				return new ConnectionManagerService(null, sinkProtocols);
