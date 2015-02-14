@@ -215,16 +215,16 @@ fi
 
 cd /home/$developerName
 
-if [ ! -f "yaacc-code/main/local.properties" ];
+if [ ! -f "yaacc-code/yaacc/local.properties" ];
 then
-   sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/main/local.properties
-   chown -R  $developerName:$developerName yaacc-code/main/local.properties
+   sudo -n -u $developerName echo "sdk.dir=/usr/local/android-sdk" > yaacc-code/yaacc/local.properties
+   chown -R  $developerName:$developerName yaacc-code/yaacc/local.properties
 fi
 
-if [ ! -f "yaacc-code/main/project.properties" ];
+if [ ! -f "yaacc-code/yaacc/project.properties" ];
 then
-  sudo -n -u $developerName echo "target=android-15" > yaacc-code/main/project.properties
-  chown -R  $developerName:$developerName yaacc-code/main/project.properties
+  sudo -n -u $developerName echo "target=android-15" > yaacc-code/yaacc/project.properties
+  chown -R  $developerName:$developerName yaacc-code/yaacc/project.properties
 fi
 
 if [ ! -f "yaacc-code/test/local.properties" ];
