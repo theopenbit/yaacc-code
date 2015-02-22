@@ -1,0 +1,33 @@
+######################################################
+##  Yaacc - Vagrant - Configurationfile             ##
+##                                                  ##
+######################################################
+######################################################
+##             Developer setup                      ##
+######################################################
+developerName="enterYourLoginName"
+developerCommitName="enterYourName"
+developerEmail="enterYourEMail"
+# Put your ssh keys in the secret folder 
+# and setup there names here
+developerPrivateRSAKeyName="id_rsa"
+developerPublicRSAKeyName="id_rsa.pub"
+######################################################
+##            Yaacc - Keystore secrets              ##
+######################################################
+keypass="topSecret"
+keystorepass="topSecret"
+repokeyalias="topSecret"
+# Put your keystore files in the secret folder
+# and setup the name here
+keystoreName="keystoreName"
+debugKeyStoreName="debug.keystore"
+###################################################
+##            Yaacc - GitRepo                    ##
+###################################################
+yaaccRepo="YourGitRepoFork"
+###################################################
+##            Froid                              ##
+###################################################
+fdroidServerRepo="https://gitlab.com/fdroid/fdroidserver.git"
+fdroidDataRepo="YourFdroidGitRepoFork"
