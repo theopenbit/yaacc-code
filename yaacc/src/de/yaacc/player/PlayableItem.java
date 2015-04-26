@@ -24,6 +24,7 @@ import java.util.Date;
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.item.Item;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.util.Log;
 
@@ -39,8 +40,8 @@ public class PlayableItem {
 	private Uri uri;
 	private long duration;	
 	private Item item;
-	
-	
+
+    @SuppressLint("SimpleDateFormat")
 	public PlayableItem(Item item, int defaultDuration){
 		this.item =item;
 		setTitle(item.getTitle());		

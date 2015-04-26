@@ -74,7 +74,7 @@
     <string name="playerTimeDuration">Dauer</string>
     <string name="playerTimeSeparator"> / </string>
     <string name="playerTimeElapsed">Verstrichene Zeit</string>
-    <string name="bucket_names">Gallerien</string>
+    <string name="bucket_names">Galerien</string>
     <string name="all_images">Alle Bilder</string>
     <string name="images">Bilder</string>
     <string name="albums">Alben</string>
@@ -94,4 +94,5 @@
     <string name="exitActivity">Beenden</string>
     <string name="title_activity_yaacc_log">Zeige Log</string>
     <string name="logContent">Der Inhalt des Systemlogs sollte hier angezeigt werden</string>
+    <string name="icon">Icon</string>
 </resources>

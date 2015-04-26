@@ -22,7 +22,7 @@
     android:layout_height="wrap_content" >
     
     <ImageView android:id="@+id/browseItemIcon"
-        android:contentDescription="Mime-Type-Image"
+        android:contentDescription="@string/icon"
         android:layout_alignParentLeft="true"
     	android:layout_alignParentTop="true"
     	android:layout_width="70dp"

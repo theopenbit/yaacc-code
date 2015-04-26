@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -272,6 +273,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
         return albumArtUri;
     }
 
+    @SuppressLint("SimpleDateFormat")
     private String formatMillis(int millis) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
         return dateFormat.format(millis);

@@ -65,6 +65,9 @@ public class ActivitySwipeDetector implements OnTouchListener {
 
 	}
 
+
+
+
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		beginOnTouchProcessing(v, event);
@@ -118,6 +121,7 @@ public class ActivitySwipeDetector implements OnTouchListener {
 
 				return true;
 			}
+
 			}
 
 			return false;
@@ -126,4 +130,6 @@ public class ActivitySwipeDetector implements OnTouchListener {
 			endOnTouchProcessing(v, event);
 		}
 	}
+
+
 }

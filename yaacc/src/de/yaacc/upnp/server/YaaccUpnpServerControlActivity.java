@@ -55,7 +55,9 @@ public class YaaccUpnpServerControlActivity extends Activity {
 					YaaccUpnpServerService.class));
                 SharedPreferences preferences = PreferenceManager
                         .getDefaultSharedPreferences(getApplicationContext());
-                preferences.edit().putBoolean(getString(R.string.settings_local_server_chkbx), true);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(getString(R.string.settings_local_server_chkbx), true);
+                editor.commit();
 
 			}
 		});
@@ -68,7 +70,9 @@ public class YaaccUpnpServerControlActivity extends Activity {
 					YaaccUpnpServerService.class));
                 SharedPreferences preferences = PreferenceManager
                         .getDefaultSharedPreferences(getApplicationContext());
-                preferences.edit().putBoolean(getString(R.string.settings_local_server_chkbx), false);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(getString(R.string.settings_local_server_chkbx), false);
+                editor.commit();
 
 			}
 		});

@@ -17,11 +17,7 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package de.yaacc.imageviewer;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -40,13 +36,19 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import de.yaacc.R;
 import de.yaacc.player.LocalImagePlayer;
 import de.yaacc.player.Player;
 import de.yaacc.player.PlayerFactory;
 import de.yaacc.settings.ImageViewerSettingsActivity;
 import de.yaacc.settings.SettingsActivity;
-import de.yaacc.upnp.UpnpClient;
 import de.yaacc.util.AboutActivity;
 import de.yaacc.util.ActivitySwipeDetector;
 import de.yaacc.util.SwipeReceiver;

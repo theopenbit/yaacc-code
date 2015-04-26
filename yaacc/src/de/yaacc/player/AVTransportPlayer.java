@@ -360,7 +360,7 @@ public class AVTransportPlayer extends AbstractPlayer {
 
             @Override
             public void received(ActionInvocation actionInvocation, boolean currentMute) {
-                actionState.result=new Boolean(currentMute);
+                actionState.result=Boolean.valueOf(currentMute);
 
             }
         };
@@ -489,7 +489,7 @@ public class AVTransportPlayer extends AbstractPlayer {
 
             @Override
             public void received(ActionInvocation actionInvocation, int currentVolume) {
-                actionState.result=new Integer(currentVolume);
+                actionState.result=Integer.valueOf(currentVolume);
 
             }
         };
