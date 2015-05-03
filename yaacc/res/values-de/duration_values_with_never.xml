@@ -21,6 +21,7 @@
     <string-array
         name="duration_entries_with_never">
         <item>"Nie"</item>
+        <item>"0 Sek"</item>
         <item>"1 Sek"</item>
         <item>"2 Sek"</item>
         <item>"3 Sek"</item>

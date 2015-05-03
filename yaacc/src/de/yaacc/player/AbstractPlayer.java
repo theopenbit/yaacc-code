@@ -40,6 +40,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import javax.xml.datatype.Duration;
+
 import de.yaacc.R;
 import de.yaacc.upnp.SynchronizationInfo;
 import de.yaacc.upnp.UpnpClient;
@@ -418,7 +420,10 @@ public abstract class AbstractPlayer implements Player {
                 items.get(nextIndex));
         startItem(playableItem, loadedItem);
         if (isPlaying() && items.size() > 1) {
-            startTimer(playableItem.getDuration() + getSilenceDuration());
+            if(playableItem.getDuration() > -1) {
+                //Only start timer if automatic track change is active
+                startTimer(playableItem.getDuration() + getSilenceDuration());
+            }
         }
     }
 

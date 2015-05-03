@@ -21,6 +21,7 @@
     <string-array
         name="duration_entries_with_never">
         <item>"NEVER"</item>
+        <item>"0 sec"</item>
         <item>"1 sec"</item>
         <item>"2 sec"</item>
         <item>"3 sec"</item>
@@ -36,6 +37,7 @@
     </string-array>
     <string-array name="duration_values_with_never" translatable="false">
         <item>"-1"</item>
+        <item>"0"</item>
         <item>"1000"</item>
         <item>"2000"</item>
         <item>"3000"</item>
