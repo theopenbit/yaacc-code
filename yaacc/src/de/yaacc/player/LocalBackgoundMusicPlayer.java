@@ -310,4 +310,9 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
     public int getIconResourceId() {
         return R.drawable.cdtrack;
     }
+
+    public void seekTo(int millisecondsFromStart){
+        backgroundMusicService.seekTo(millisecondsFromStart);
+
+    }
 }

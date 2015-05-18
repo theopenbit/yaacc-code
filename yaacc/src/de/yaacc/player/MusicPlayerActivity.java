@@ -20,6 +20,9 @@ package de.yaacc.player;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,12 +30,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import org.fourthline.cling.support.model.DIDLObject;
@@ -52,6 +57,7 @@ import de.yaacc.util.image.ImageDownloadTask;
 public class MusicPlayerActivity extends Activity {
 
     protected boolean updateTime = false;
+    protected SeekBar seekBar = null;
 
     @Override
     protected void onPause() {
@@ -187,6 +193,39 @@ public class MusicPlayerActivity extends Activity {
                 finish();
             }
         });
+
+        seekBar = (SeekBar)findViewById(R.id.musicActivitySeekBar);
+        seekBar.setMax(100);
+        seekBar.setProgress(0);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
+            }
+
+            @Override
+            public  void onStartTrackingTouch(android.widget.SeekBar seekBar){
+
+            }
+
+            @Override
+            public  void onStopTrackingTouch(android.widget.SeekBar seekBar){
+                String durationString = getPlayer().getDuration();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+                try {
+                    Long durationTimeMillis = dateFormat.parse(durationString).getTime();
+
+                    int targetPosition = Double.valueOf(durationTimeMillis * (Double.valueOf(seekBar.getProgress()).doubleValue() / 100)).intValue();
+                    Log.d(getClass().getName(),"TargetPosition" + targetPosition);
+                    getPlayer().seekTo(targetPosition);
+                }catch(ParseException pex){
+                    Log.d(getClass().getName(),"Error while parsing time string" , pex);
+                }
+
+            }
+
+        });
+
     }
 
     private Player getPlayer() {
@@ -241,7 +280,23 @@ public class MusicPlayerActivity extends Activity {
         TextView duration = (TextView) findViewById(R.id.musicActivityDuration);
         duration.setText(getPlayer().getDuration());
         TextView elapsedTime = (TextView) findViewById(R.id.musicActivityElapsedTime);
-        elapsedTime.setText(getPlayer().getElapsedTime());
+        String elapsedTimeString = getPlayer().getElapsedTime();
+        elapsedTime.setText(elapsedTimeString);
+        String durationString = getPlayer().getDuration();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        try {
+            Long elapsedTimeMillis = dateFormat.parse(elapsedTimeString).getTime();
+            Long durationTimeMillis = dateFormat.parse(durationString).getTime();
+            int progress;
+            progress = Double.valueOf((elapsedTimeMillis.doubleValue()/  durationTimeMillis.doubleValue()) *100).intValue();
+            if(seekBar != null) {
+                seekBar.setProgress(progress);
+            }
+        }catch(ParseException pex){
+            Log.d(getClass().getName(),"Error while parsing time string" , pex);
+        }
+
 
     }
 

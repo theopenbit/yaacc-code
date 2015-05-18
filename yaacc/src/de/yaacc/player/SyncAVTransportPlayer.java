@@ -30,6 +30,7 @@ import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.support.avtransport.callback.Seek;
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.model.DIDLContent;
@@ -770,6 +771,45 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         public boolean actionFinished = false;
         public boolean watchdogFlag = false;
         public Object result = null;
+    }
+
+
+
+    @Override
+    public void seekTo(int millisecondsFromStart){
+        if(getDevice() == null) {
+            Log.d(getClass().getName(),
+                    "No receiver device found: "
+                            + deviceId);
+            return;
+        }
+        Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
+        if (service == null) {
+            Log.d(getClass().getName(),
+                    "No AVTransport-Service found on Device: "
+                            +getDevice().getDisplayString());
+            return;
+        }
+        Log.d(getClass().getName(), "Action seek ");
+        final ActionState actionState = new ActionState();
+        actionState.actionFinished = false;
+
+        String relativeTimeTarget =millisecondsFromStart+"";
+        Seek seekAction = new Seek(service, relativeTimeTarget) {
+            @Override
+            public void success(ActionInvocation invocation)
+            {
+                //super.success(invocation);
+                Log.d(getClass().getName(), "success seek");
+            }
+            @Override
+            public void failure(ActionInvocation arg0, UpnpResponse arg1, String arg2)
+            {
+                Log.d(getClass().getName(), "fail seek");
+            }
+        };
+        getUpnpClient().getControlPoint().execute(seekAction);
+
     }
 }
 

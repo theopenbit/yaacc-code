@@ -180,4 +180,6 @@ public interface Player {
      * @return the peneding intent
      */
     PendingIntent getNotificationIntent();
+
+    void seekTo(int millisecondsFromStart);
 }

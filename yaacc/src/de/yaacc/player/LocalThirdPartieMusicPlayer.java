@@ -185,4 +185,14 @@ public class LocalThirdPartieMusicPlayer extends AbstractPlayer {
 		return NotificationId.LOCAL_THIRD_PARTIE_MUSIC_PLAYER.getId();
 	}
 
+    @Override
+    public void seekTo(int millisecondsFromStart){
+        Resources res = getContext().getResources();
+        String text = String.format(
+                res.getString(R.string.not_yet_implemented));
+        Toast toast = Toast.makeText(getContext(), text,
+                Toast.LENGTH_LONG);
+        toast.show();
+    }
+
 }

@@ -35,6 +35,8 @@ public class BackgroundMusicBroadcastReceiver extends BroadcastReceiver {
 	public static String ACTION_PAUSE = "de.yaacc.musicplayer.ActionPause";
 	public static String ACTION_SET_DATA = "de.yaacc.musicplayer.ActionSetData";	
 	public static String ACTION_SET_DATA_URI_PARAM = "de.yaacc.musicplayer.ActionSetDataUriParam";
+    public static String ACTION_SEEK_TO = "de.yaacc.musicplayer.ActionSeekTo";
+    public static String ACTION_SEEK_TO_PARAM = "de.yaacc.musicplayer.ActionSeekToParam";
 	
 	
 	
@@ -66,7 +68,9 @@ public class BackgroundMusicBroadcastReceiver extends BroadcastReceiver {
 			backgroundMusicService.stop();
 		}else if(ACTION_SET_DATA.equals(intent.getAction())){
 			backgroundMusicService.setMusicUri((Uri)intent.getParcelableExtra(ACTION_SET_DATA_URI_PARAM));
-		}
+		}else if(ACTION_SEEK_TO.equals(intent.getAction())){
+            backgroundMusicService.seekTo(intent.getIntExtra(ACTION_SEEK_TO_PARAM,0));
+        }
 		
 			
 	}

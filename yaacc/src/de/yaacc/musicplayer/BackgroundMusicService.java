@@ -158,6 +158,17 @@ public class BackgroundMusicService extends Service {
     }
 
     /**
+     * Seeks to position
+     * @param pos
+     */
+    public void seekTo(int pos){
+        if (player != null) {
+            player.seekTo(pos);
+        }
+
+    }
+
+    /**
      * change music uri
      *
      * @param uri

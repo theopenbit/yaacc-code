@@ -465,4 +465,9 @@ public class LocalImagePlayer implements Player {
         return notificationIntent;
     }
 
+    @Override
+    public void seekTo(int millisecondsFromStart){
+    // Do nothing
+    }
+
 }

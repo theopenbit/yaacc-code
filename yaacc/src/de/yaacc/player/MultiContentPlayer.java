@@ -29,6 +29,7 @@ import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
@@ -197,4 +198,14 @@ public class MultiContentPlayer extends AbstractPlayer {
 
 		return NotificationId.MULTI_CONTENT_PLAYER.getId();
 	}
+
+    @Override
+    public void seekTo(int millisecondsFromStart){
+        Resources res = getContext().getResources();
+        String text = String.format(
+                res.getString(R.string.not_yet_implemented));
+        Toast toast = Toast.makeText(getContext(), text,
+                Toast.LENGTH_LONG);
+        toast.show();
+    }
 }

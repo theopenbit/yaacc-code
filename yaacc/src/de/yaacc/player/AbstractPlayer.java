@@ -687,4 +687,7 @@ public abstract class AbstractPlayer implements Player {
     public String getDeviceId() {
         return UpnpClient.LOCAL_UID;
     }
+
+    public abstract void seekTo(int millisecondsFromStart);
+
 }
