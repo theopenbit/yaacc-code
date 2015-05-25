@@ -248,7 +248,7 @@ public class AVTransportPlayerActivity extends Activity {
             @Override
             public  void onStopTrackingTouch(android.widget.SeekBar seekBar){
                 String durationString = getPlayer().getDuration();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                 dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
                 try {
                     Long durationTimeMillis = dateFormat.parse(durationString).getTime();
@@ -327,7 +327,7 @@ public class AVTransportPlayerActivity extends Activity {
         TextView elapsedTime = (TextView) findViewById(R.id.avtransportPlayerActivityElapsedTime);
         String elapsedTimeString = getPlayer().getElapsedTime();
         elapsedTime.setText(elapsedTimeString);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
             Long elapsedTimeMillis = dateFormat.parse(elapsedTimeString).getTime();

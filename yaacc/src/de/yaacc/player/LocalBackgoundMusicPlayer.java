@@ -311,7 +311,7 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
         return R.drawable.cdtrack;
     }
 
-    public void seekTo(int millisecondsFromStart){
+    public void seekTo(long millisecondsFromStart){
         backgroundMusicService.seekTo(millisecondsFromStart);
 
     }

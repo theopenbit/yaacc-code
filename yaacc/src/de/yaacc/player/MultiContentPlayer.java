@@ -200,7 +200,7 @@ public class MultiContentPlayer extends AbstractPlayer {
 	}
 
     @Override
-    public void seekTo(int millisecondsFromStart){
+    public void seekTo(long millisecondsFromStart){
         Resources res = getContext().getResources();
         String text = String.format(
                 res.getString(R.string.not_yet_implemented));

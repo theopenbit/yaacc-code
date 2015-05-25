@@ -161,9 +161,9 @@ public class BackgroundMusicService extends Service {
      * Seeks to position
      * @param pos
      */
-    public void seekTo(int pos){
+    public void seekTo(long pos){
         if (player != null) {
-            player.seekTo(pos);
+            player.seekTo(Long.valueOf(pos).intValue());
         }
 
     }

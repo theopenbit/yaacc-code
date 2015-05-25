@@ -181,5 +181,5 @@ public interface Player {
      */
     PendingIntent getNotificationIntent();
 
-    void seekTo(int millisecondsFromStart);
+    void seekTo(long millisecondsFromStart);
 }

@@ -41,6 +41,9 @@ import org.fourthline.cling.support.renderingcontrol.callback.SetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -776,7 +779,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 
 
     @Override
-    public void seekTo(int millisecondsFromStart){
+    public void seekTo(long millisecondsFromStart){
         if(getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
@@ -793,8 +796,9 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action seek ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-
-        String relativeTimeTarget =millisecondsFromStart+"";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String relativeTimeTarget =dateFormat.format(millisecondsFromStart);
         Seek seekAction = new Seek(service, relativeTimeTarget) {
             @Override
             public void success(ActionInvocation invocation)

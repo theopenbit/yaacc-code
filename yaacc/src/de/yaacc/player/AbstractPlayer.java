@@ -688,6 +688,6 @@ public abstract class AbstractPlayer implements Player {
         return UpnpClient.LOCAL_UID;
     }
 
-    public abstract void seekTo(int millisecondsFromStart);
+    public abstract void seekTo(long millisecondsFromStart);
 
 }

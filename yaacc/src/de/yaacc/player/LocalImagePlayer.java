@@ -466,7 +466,7 @@ public class LocalImagePlayer implements Player {
     }
 
     @Override
-    public void seekTo(int millisecondsFromStart){
+    public void seekTo(long millisecondsFromStart){
     // Do nothing
     }
 
