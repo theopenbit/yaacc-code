@@ -29,9 +29,17 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.yaacc.R;
 import de.yaacc.settings.SettingsActivity;
@@ -45,8 +53,35 @@ import de.yaacc.util.YaaccLogActivity;
  */
 public class AVTransportPlayerActivity extends Activity {
 
-    private Player player;
+
     private int playerId;
+    protected boolean updateTime = false;
+    protected SeekBar seekBar = null;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        updateTime = false;
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateTime = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTrackInfo();
+        updateTime = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        updateTime = false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +105,22 @@ public class AVTransportPlayerActivity extends Activity {
             btnPause.setActivated(false);
             btnExit.setActivated(false);
         } else {
+            player.addPropertyChangeListener(new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (AbstractPlayer.PROPERTY_ITEM.equals(event.getPropertyName())) {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                setTrackInfo();
+                            }
+                        });
+
+                    }
+
+                }
+            });
+            setTrackInfo();
             btnPrev.setActivated(true);
             btnNext.setActivated(true);
             btnStop.setActivated(true);
@@ -181,6 +232,39 @@ public class AVTransportPlayerActivity extends Activity {
             }
         });
 
+        seekBar = (SeekBar)findViewById(R.id.avtransportPlayerActivityControlSeekBar);
+        seekBar.setMax(100);
+        seekBar.setProgress(0);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
+            }
+
+            @Override
+            public  void onStartTrackingTouch(android.widget.SeekBar seekBar){
+
+            }
+
+            @Override
+            public  void onStopTrackingTouch(android.widget.SeekBar seekBar){
+                String durationString = getPlayer().getDuration();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+                try {
+                    Long durationTimeMillis = dateFormat.parse(durationString).getTime();
+
+                    int targetPosition = Double.valueOf(durationTimeMillis * (Double.valueOf(seekBar.getProgress()).doubleValue() / 100)).intValue();
+                    Log.d(getClass().getName(),"TargetPosition" + targetPosition);
+                    getPlayer().seekTo(targetPosition);
+                }catch(ParseException pex){
+                    Log.d(getClass().getName(),"Error while parsing time string" , pex);
+                }
+
+            }
+
+        });
+
+
     }
 
 
@@ -227,6 +311,55 @@ public class AVTransportPlayerActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setTrackInfo() {
+        doSetTrackInfo();
+        updateTime();
+    }
+
+    private void doSetTrackInfo() {
+        if (getPlayer() == null)
+            return;
+        TextView duration = (TextView) findViewById(R.id.avtransportPlayerActivityDuration);
+        String durationTimeString = getPlayer().getDuration();
+        duration.setText(durationTimeString);
+        TextView elapsedTime = (TextView) findViewById(R.id.avtransportPlayerActivityElapsedTime);
+        String elapsedTimeString = getPlayer().getElapsedTime();
+        elapsedTime.setText(elapsedTimeString);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        try {
+            Long elapsedTimeMillis = dateFormat.parse(elapsedTimeString).getTime();
+            Long durationTimeMillis = dateFormat.parse(durationTimeString).getTime();
+            int progress;
+            progress = Double.valueOf((elapsedTimeMillis.doubleValue()/  durationTimeMillis.doubleValue()) *100).intValue();
+            if(seekBar != null) {
+                seekBar.setProgress(progress);
+            }
+        }catch(ParseException pex){
+            Log.d(getClass().getName(),"Error while parsing time string" , pex);
+        }
+    }
+    private void updateTime() {
+        Timer commandExecutionTimer = new Timer();
+        commandExecutionTimer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        doSetTrackInfo();
+                        if (updateTime) {
+                            updateTime();
+                        }
+                    }
+                });
+            }
+        }, 1000L);
+
     }
 
 }

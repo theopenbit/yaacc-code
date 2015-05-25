@@ -29,6 +29,7 @@ import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
+import org.fourthline.cling.support.avtransport.callback.GetPositionInfo;
 import org.fourthline.cling.support.avtransport.callback.Pause;
 import org.fourthline.cling.support.avtransport.callback.Play;
 import org.fourthline.cling.support.avtransport.callback.Seek;
@@ -36,6 +37,7 @@ import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
 import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.renderingcontrol.callback.GetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
@@ -61,6 +63,7 @@ public class AVTransportPlayer extends AbstractPlayer {
     private String deviceId="";
     private int id;
     private String contentType;
+    private PositionInfo currentPositionInfo;
     /**
      * @param upnpClient the client
      * @param name playerName
@@ -425,7 +428,7 @@ public class AVTransportPlayer extends AbstractPlayer {
         Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
-                    "No AVTransport-Service found on Device: "
+                    "No RenderingControl-Service found on Device: "
                             +getDevice().getDisplayString());
             return;
         }
@@ -463,7 +466,7 @@ public class AVTransportPlayer extends AbstractPlayer {
         Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
-                    "No AVTransport-Service found on Device: "
+                    "No RenderingControl-Service found on Device: "
                             +getDevice().getDisplayString());
             return 0;
         }
@@ -509,6 +512,62 @@ public class AVTransportPlayer extends AbstractPlayer {
 
     }
 
+    protected void  getPositionInfo(){
+        if(getDevice() == null) {
+            Log.d(getClass().getName(),
+                    "No receiver device found: "
+                            + deviceId);
+            return;
+        }
+        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
+        if (service == null) {
+            Log.d(getClass().getName(),
+                    "No AVTransport-Service found on Device: "
+                            +getDevice().getDisplayString());
+            return;
+        }
+        Log.d(getClass().getName(), "Action get position info ");
+        final ActionState actionState = new ActionState();
+        actionState.actionFinished = false;
+        GetPositionInfo actionCallback = new GetPositionInfo(service) {
+            @Override
+            public void failure(ActionInvocation actioninvocation,
+                                UpnpResponse upnpresponse, String s) {
+                Log.d(getClass().getName(), "Failure UpnpResponse: "
+                        + upnpresponse);
+                Log.d(getClass().getName(),
+                        upnpresponse != null ? "UpnpResponse: "
+                                + upnpresponse.getResponseDetails() : "");
+                Log.d(getClass().getName(), "s: " + s);
+                actionState.actionFinished = true;
+            }
+            @Override
+            public void success(ActionInvocation actioninvocation) {
+                super.success(actioninvocation);
+                actionState.actionFinished = true;
+            }
+
+            @Override
+            public void received(ActionInvocation actionInvocation, PositionInfo positionInfo) {
+                actionState.result=positionInfo;
+
+            }
+        };
+
+        getUpnpClient().getControlPoint().execute(actionCallback);
+        Watchdog watchdog = Watchdog.createWatchdog(2000L);
+        watchdog.start();
+
+        while (!actionState.actionFinished && !watchdog.hasTimeout()) {
+            //active wait
+        }
+        if (watchdog.hasTimeout()) {
+            Log.d(getClass().getName(),"Timeout occurred");
+        }
+        currentPositionInfo = (PositionInfo)actionState.result;
+
+    }
+
     @Override
     public int getIconResourceId(){
         return R.drawable.device_48_48;
@@ -550,5 +609,27 @@ public class AVTransportPlayer extends AbstractPlayer {
         getUpnpClient().getControlPoint().execute(seekAction);
 
     }
+
+    @Override
+    public String getDuration() {
+        if(currentPositionInfo == null){
+            getPositionInfo();
+        }
+        if (currentPositionInfo != null){
+            return currentPositionInfo.getTrackDuration();
+        }
+        return "";
+    }
+
+    @Override
+    public String getElapsedTime() {
+         getPositionInfo();
+
+        if (currentPositionInfo != null){
+            return currentPositionInfo.getAbsTime();
+        }
+        return "";
+    }
+
 
 }
