@@ -20,6 +20,7 @@ package de.yaacc.player;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.item.Item;
@@ -27,6 +28,7 @@ import org.fourthline.cling.support.model.item.Item;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 /**
  * representation of an item which is to be played
@@ -48,15 +50,23 @@ public class PlayableItem {
 		Res resource = item.getFirstResource();
 		if (resource != null) {
 			setUri(Uri.parse(resource.getValue()));
-			setMimeType(resource.getProtocolInfo().getContentFormat());
-			
+            String mimeType =resource.getProtocolInfo().getContentFormat();
+            if(mimeType == null || mimeType.equals("")){
+                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(getUri().toString());
+                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+            }
+			setMimeType(mimeType);
+
 			// calculate duration
 			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 			long millis = defaultDuration;
 			if (resource.getDuration() != null) {
 				try {
 					Date date = dateFormat.parse(resource.getDuration());
-					millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
+					//millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
+                    millis = date.getTime();
+                    Log.d(getClass().getName(), "Duration date object: " + date);
 				} catch (ParseException e) {
 					Log.d(getClass().getName(), "bad duration format", e);
 				}

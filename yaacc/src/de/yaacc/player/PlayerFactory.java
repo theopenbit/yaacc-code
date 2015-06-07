@@ -66,6 +66,7 @@ public class PlayerFactory {
                 music = true;
                 video = true;
             }
+
         }
         Log.d(PlayerFactory.class.getName(), "video:" + video + " image: " + image + "audio:" + music );
         for (Device device : upnpClient.getReceiverDevices()) {

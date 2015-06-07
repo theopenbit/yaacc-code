@@ -33,6 +33,8 @@ import org.fourthline.cling.support.model.DIDLObject;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -275,8 +277,14 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
 
     @SuppressLint("SimpleDateFormat")
     private String formatMillis(int millis) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
-        return dateFormat.format(millis);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        //next don't work with this line dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return dateFormat.format(new Date(millis));
+
+        /*int minutes = (int) Math.floor(millis / 1000 / 60);
+        int seconds = (int) ((millis / 1000) - (minutes * 60));
+        return "00:"+minutes + ":" + String.format("%02d", seconds);
+        */
     }
 
     @Override

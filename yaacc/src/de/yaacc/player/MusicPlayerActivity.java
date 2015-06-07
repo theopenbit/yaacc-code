@@ -210,7 +210,7 @@ public class MusicPlayerActivity extends Activity {
             @Override
             public  void onStopTrackingTouch(android.widget.SeekBar seekBar){
                 String durationString = getPlayer().getDuration();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                 dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
                 try {
                     Long durationTimeMillis = dateFormat.parse(durationString).getTime();
@@ -283,7 +283,7 @@ public class MusicPlayerActivity extends Activity {
         String elapsedTimeString = getPlayer().getElapsedTime();
         elapsedTime.setText(elapsedTimeString);
         String durationString = getPlayer().getDuration();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
             Long elapsedTimeMillis = dateFormat.parse(elapsedTimeString).getTime();

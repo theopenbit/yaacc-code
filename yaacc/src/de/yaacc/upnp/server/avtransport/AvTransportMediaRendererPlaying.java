@@ -28,7 +28,12 @@ import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.SeekMode;
 
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.yaacc.player.Player;
 import de.yaacc.upnp.UpnpClient;
@@ -39,6 +44,9 @@ import de.yaacc.upnp.UpnpClient;
  */
 public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implements YaaccState{
     private UpnpClient upnpClient;
+    private boolean updateTime;
+    private List<Player> players = null;
+
     /**
      * Constructor.
      *
@@ -60,11 +68,14 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     public void onEntry() {
         Log.d(this.getClass().getName(), "On Entry");
         super.onEntry();
-// Start playing now!
-        List<Player> players = upnpClient.initializePlayers((AvTransport)getTransport());
+        players = upnpClient.initializePlayers((AvTransport)getTransport());
         for (Player player : players) {
             player.play();
         }
+// Start playing now!
+        updateTime = true;
+        setTrackInfo();
+
     }
     /*
     * (non-Javadoc)
@@ -80,6 +91,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
 // If you can, you should find and set the duration of the track here!
         getTransport().setPositionInfo(
                 new PositionInfo(1, metaData, uri.toString()));
+
 // It's up to you what "last changes" you want to announce to event
 // listeners
         getTransport().getLastChange().setEventedValue(
@@ -95,6 +107,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     @Override
     public Class<? extends AbstractState<?>> stop() {
         Log.d(this.getClass().getName(), "Stop");
+        updateTime = false;
 // Stop playing!
         return AvTransportMediaRendererStopped.class;
     }
@@ -105,6 +118,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     @Override
     public Class<? extends AbstractState<?>> play(String speed) {
         Log.d(this.getClass().getName(), "play");
+        updateTime = true;
         return AvTransportMediaRendererPlaying.class;
     }
     /*
@@ -114,6 +128,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     @Override
     public Class<? extends AbstractState<?>> pause() {
         Log.d(this.getClass().getName(), "pause");
+        updateTime = false;
         return AvTransportMediaRendererPaused.class;
     }
     /*
@@ -123,6 +138,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     @Override
     public Class<? extends AbstractState<?>> next() {
         Log.d(this.getClass().getName(), "next");
+        updateTime = false;
         return null;
     }
     /*
@@ -132,6 +148,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     @Override
     public Class<? extends AbstractState<?>> previous() {
         Log.d(this.getClass().getName(), "previous");
+        updateTime = false;
         return null;
     }
     /*
@@ -141,6 +158,21 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     @Override
     public Class<? extends AbstractState<?>> seek(SeekMode unit, String target) {
         Log.d(this.getClass().getName(), "seek");
+        if(SeekMode.REL_TIME.equals(unit)) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            try {
+                Long millisecondsFromStart = dateFormat.parse(target).getTime();
+                for (Player player : players) {
+                    if (player != null) {
+                        player.seekTo(millisecondsFromStart);
+                    }
+                }
+            }catch(ParseException pex){
+                Log.d(getClass().getName(), "unable to parse target time string", pex);
+            }
+        }
+        updateTime = true;
         return null;
     }
 
@@ -151,6 +183,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPosition(referencedPosition);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        updateTime = true;
         return AvTransportMediaRendererPlaying.class;
     }
 
@@ -158,6 +191,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     public Class<? extends AbstractState<?>>  syncPause(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        updateTime = false;
         return AvTransportMediaRendererPaused.class;
     }
 
@@ -165,6 +199,7 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     public Class<? extends AbstractState<?>>  syncStop(String referencedPresentationTime, String referencedClockId) {
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedPresentationTime(referencedPresentationTime);
         ((AvTransport)getTransport()).getSynchronizationInfo().setReferencedClockId(referencedClockId);
+        updateTime = false;
         return AvTransportMediaRendererStopped.class;
     }
     @Override
@@ -179,6 +214,40 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
                 TransportAction.SyncPlay,
                 TransportAction.SyncStop
         };
+    }
+
+    private void setTrackInfo() {
+        doSetTrackInfo();
+        updateTime();
+    }
+    private void doSetTrackInfo() {
+        for (Player player : players) {
+            if (player != null) {
+               getTransport().getPositionInfo().setTrackDuration(player.getDuration());
+               getTransport().getPositionInfo().setRelTime(player.getElapsedTime());
+                Log.d(getClass().getName(), "doSetTrackInfo: " +getTransport().getPositionInfo().getRelTime());
+               break;
+            }
+        }
+
+    }
+
+    private void updateTime() {
+        Timer commandExecutionTimer = new Timer();
+        commandExecutionTimer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+
+                        doSetTrackInfo();
+                        if (updateTime) {
+                            updateTime();
+                        }
+                    }
+
+
+        }, 1000L);
+
     }
 
 } 

@@ -189,6 +189,7 @@ public class AVTransportPlayerActivity extends Activity {
             public void onClick(View v) {
                 Player player = getPlayer();
                 if (player != null) {
+                    player.stop();
                     player.exit();
                 }
                 finish();
@@ -358,7 +359,7 @@ public class AVTransportPlayerActivity extends Activity {
                     }
                 });
             }
-        }, 1000L);
+        }, 10000L);
 
     }
 

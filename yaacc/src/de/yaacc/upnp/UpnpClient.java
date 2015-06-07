@@ -937,6 +937,22 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         return avTransportPlayers;
     }
 
+    /**
+     * returns a list of all items including items in containers for the given didlContent
+     * @param  didlContent the content
+     * @return all items included in the content
+     **/
+    public List<Item> toItemList(DIDLContent didlContent) {
+        List<Item> items = new ArrayList<Item>();
+        if(didlContent == null){
+            return items;
+        }
+        items.addAll(didlContent.getItems());
+        for(Container c : didlContent.getContainers()){
+            items.addAll(toItemList(c));
+        }
+        return items;
+    }
 
     /**
      * Converts the content of a didlObject into a list of cling items.

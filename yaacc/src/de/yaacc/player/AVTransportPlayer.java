@@ -67,6 +67,7 @@ public class AVTransportPlayer extends AbstractPlayer {
     private int id;
     private String contentType;
     private PositionInfo currentPositionInfo;
+    private ActionState positionActionState = null;
     /**
      * @param upnpClient the client
      * @param name playerName
@@ -169,7 +170,7 @@ public class AVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action SetAVTransportURI ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        Item item = playableItem.getItem();        
+        Item item = playableItem.getItem();
         String metadata;
 		try {
 			metadata = (item == null)? "" : new DIDLParser().generate(new DIDLContent().addItem(item), false);
@@ -380,6 +381,8 @@ public class AVTransportPlayer extends AbstractPlayer {
         }
         if (watchdog.hasTimeout()) {
             Log.d(getClass().getName(),"Timeout occurred");
+        }else{
+            watchdog.cancel();
         }
         return actionState.result == null ? false : (Boolean) actionState.result;
     } 
@@ -510,12 +513,19 @@ public class AVTransportPlayer extends AbstractPlayer {
         }
         if (watchdog.hasTimeout()) {
             Log.d(getClass().getName(),"Timeout occurred");
+        }else{
+            watchdog.cancel();
         }
         return actionState.result == null ? 0 : (Integer) actionState.result;
 
     }
 
     protected void  getPositionInfo(){
+        if(positionActionState != null && !positionActionState.actionFinished){
+            return;
+        }
+        Log.d(getClass().getName(),
+                "GetPositioninfo");
         if(getDevice() == null) {
             Log.d(getClass().getName(),
                     "No receiver device found: "
@@ -530,8 +540,8 @@ public class AVTransportPlayer extends AbstractPlayer {
             return;
         }
         Log.d(getClass().getName(), "Action get position info ");
-        final ActionState actionState = new ActionState();
-        actionState.actionFinished = false;
+        positionActionState = new ActionState();
+        positionActionState.actionFinished = false;
         GetPositionInfo actionCallback = new GetPositionInfo(service) {
             @Override
             public void failure(ActionInvocation actioninvocation,
@@ -542,32 +552,26 @@ public class AVTransportPlayer extends AbstractPlayer {
                         upnpresponse != null ? "UpnpResponse: "
                                 + upnpresponse.getResponseDetails() : "");
                 Log.d(getClass().getName(), "s: " + s);
-                actionState.actionFinished = true;
+                positionActionState.actionFinished = true;
             }
             @Override
             public void success(ActionInvocation actioninvocation) {
                 super.success(actioninvocation);
-                actionState.actionFinished = true;
+                positionActionState.actionFinished = true;
             }
 
             @Override
             public void received(ActionInvocation actionInvocation, PositionInfo positionInfo) {
-                actionState.result=positionInfo;
+                positionActionState.result=positionInfo;
+                currentPositionInfo = positionInfo;
+                Log.d(getClass().getName(), "received Positioninfo= RelTime: " + positionInfo.getRelTime());
 
             }
         };
 
         getUpnpClient().getControlPoint().execute(actionCallback);
-        Watchdog watchdog = Watchdog.createWatchdog(2000L);
-        watchdog.start();
 
-        while (!actionState.actionFinished && !watchdog.hasTimeout()) {
-            //active wait
-        }
-        if (watchdog.hasTimeout()) {
-            Log.d(getClass().getName(),"Timeout occurred");
-        }
-        currentPositionInfo = (PositionInfo)actionState.result;
+
 
     }
 
@@ -622,7 +626,7 @@ public class AVTransportPlayer extends AbstractPlayer {
         if (currentPositionInfo != null){
             return currentPositionInfo.getTrackDuration();
         }
-        return "";
+        return "00:00:00";
     }
 
     @Override
@@ -632,7 +636,7 @@ public class AVTransportPlayer extends AbstractPlayer {
         if (currentPositionInfo != null){
             return currentPositionInfo.getAbsTime();
         }
-        return "";
+        return "00:00:00";
     }
 
 

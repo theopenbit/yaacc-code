@@ -65,4 +65,8 @@ public class Watchdog {
 	public boolean hasTimeout(){
 		return watchdogFlag;
 	}
+
+    public  void cancel(){
+        watchdogTimer.cancel();
+    }
 }

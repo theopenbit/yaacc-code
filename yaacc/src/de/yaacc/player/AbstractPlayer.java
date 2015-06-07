@@ -505,6 +505,10 @@ public abstract class AbstractPlayer implements Player {
              */
     @Override
     public void exit() {
+        if(isPlaying()){
+
+            stop();
+        }
         PlayerFactory.shutdown(this);
 
     }
@@ -515,7 +519,7 @@ public abstract class AbstractPlayer implements Player {
     private void showNotification() {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                getContext()).setOngoing(true)
+                getContext()).setOngoing(false)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Yaacc player")
                 .setContentText(getName() == null ? "" : getName());

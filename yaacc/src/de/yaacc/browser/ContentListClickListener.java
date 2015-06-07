@@ -18,6 +18,7 @@
 package de.yaacc.browser;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -88,11 +89,20 @@ public class ContentListClickListener implements OnItemClickListener {
     }
 
     private void playAll() {
+        if(currentObject == null){
+            return;
+        }
         ContentDirectoryBrowseResult result = upnpClient.browseSync(new Position(currentObject.getParentID(), upnpClient.getProviderDevice().getIdentity().getUdn().getIdentifierString()));
-        if (result == null) {
-            play(upnpClient.initializePlayers(currentObject));
+        if (result == null || (result.getResult() != null && result.getResult().getItems().size() == 0)) {
+            Log.d(getClass().getName(), "Browse result of parent no direct items found...");
+            if(result.getResult() != null && result.getResult().getContainers().size() > 0){
+                play(upnpClient.initializePlayers(upnpClient.toItemList(result.getResult())));
+            }else {
+                play(upnpClient.initializePlayers(currentObject));
+            }
         } else {
             List<Item> items = result.getResult() == null ? new ArrayList<Item>(): result.getResult().getItems();
+            Log.d(getClass().getName(), "Browse result items: " + items.size());
             int index = items.indexOf(currentObject);
             if(index > 0){
                 //sort selected item to the beginning
@@ -119,10 +129,6 @@ public class ContentListClickListener implements OnItemClickListener {
             play(upnpClient.initializePlayers(currentObject));
         } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_play_all))) {
             playAll();
-         /*else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_add_to_playplist))){
-            Toast toast = Toast.makeText(applicationContext, "add to playlist pressed (Not yet implemented)", Toast.LENGTH_SHORT);
-            toast.show();
-        } */
         } else if (item.getTitle().equals(applicationContext.getString(R.string.browse_context_download))) {
             try {
                 upnpClient.downloadItem(selectedDIDLObject);

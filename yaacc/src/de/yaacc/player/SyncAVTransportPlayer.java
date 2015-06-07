@@ -30,10 +30,12 @@ import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.support.avtransport.callback.GetPositionInfo;
 import org.fourthline.cling.support.avtransport.callback.Seek;
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.contentdirectory.DIDLParser;
 import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.renderingcontrol.callback.GetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
@@ -70,6 +72,8 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
     private String deviceId = "";
     private int id;
     private String contentType;
+    private PositionInfo currentPositionInfo;
+    private ActionState positionActionState = null;
 
 
     /**
@@ -597,6 +601,8 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         }
         if (watchdog.hasTimeout()) {
             Log.d(getClass().getName(),"Timeout occurred");
+        }else{
+            watchdog.cancel();
         }
         return actionState.result == null ? false : (Boolean) actionState.result;
 
@@ -693,6 +699,8 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         }
         if (watchdog.hasTimeout()) {
             Log.d(getClass().getName(),"Timeout occurred");
+        }else{
+            watchdog.cancel();
         }
         return actionState.result == null ? 0 : (Integer) actionState.result;
 
@@ -814,6 +822,82 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         };
         getUpnpClient().getControlPoint().execute(seekAction);
 
+    }
+
+    protected void  getPositionInfo(){
+        if(positionActionState != null && !positionActionState.actionFinished){
+            return;
+        }
+        Log.d(getClass().getName(),
+                "GetPositioninfo");
+        if(getDevice() == null) {
+            Log.d(getClass().getName(),
+                    "No receiver device found: "
+                            + deviceId);
+            return;
+        }
+        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
+        if (service == null) {
+            Log.d(getClass().getName(),
+                    "No AVTransport-Service found on Device: "
+                            +getDevice().getDisplayString());
+            return;
+        }
+        Log.d(getClass().getName(), "Action get position info ");
+        positionActionState = new ActionState();
+        positionActionState.actionFinished = false;
+        GetPositionInfo actionCallback = new GetPositionInfo(service) {
+            @Override
+            public void failure(ActionInvocation actioninvocation,
+                                UpnpResponse upnpresponse, String s) {
+                Log.d(getClass().getName(), "Failure UpnpResponse: "
+                        + upnpresponse);
+                Log.d(getClass().getName(),
+                        upnpresponse != null ? "UpnpResponse: "
+                                + upnpresponse.getResponseDetails() : "");
+                Log.d(getClass().getName(), "s: " + s);
+                positionActionState.actionFinished = true;
+            }
+            @Override
+            public void success(ActionInvocation actioninvocation) {
+                super.success(actioninvocation);
+                positionActionState.actionFinished = true;
+            }
+
+            @Override
+            public void received(ActionInvocation actionInvocation, PositionInfo positionInfo) {
+                positionActionState.result=positionInfo;
+                currentPositionInfo = positionInfo;
+                Log.d(getClass().getName(), "received Positioninfo= RelTime: " + positionInfo.getRelTime());
+
+            }
+        };
+
+        getUpnpClient().getControlPoint().execute(actionCallback);
+
+
+
+    }
+
+    @Override
+    public String getDuration() {
+        if(currentPositionInfo == null){
+            getPositionInfo();
+        }
+        if (currentPositionInfo != null){
+            return currentPositionInfo.getTrackDuration();
+        }
+        return "00:00:00";
+    }
+
+    @Override
+    public String getElapsedTime() {
+        getPositionInfo();
+
+        if (currentPositionInfo != null){
+            return currentPositionInfo.getAbsTime();
+        }
+        return "00:00:00";
     }
 }
 
