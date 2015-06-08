@@ -133,5 +133,11 @@ public class ServerListActivity extends Activity implements
         populateDeviceList();
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        //refresh device list
+        populateDeviceList();
+    }
 
 }

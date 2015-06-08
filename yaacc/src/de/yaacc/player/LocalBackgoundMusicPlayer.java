@@ -276,15 +276,24 @@ public class LocalBackgoundMusicPlayer extends AbstractPlayer implements Service
     }
 
     @SuppressLint("SimpleDateFormat")
-    private String formatMillis(int millis) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        //next don't work with this line dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormat.format(new Date(millis));
+    private String formatMillis(long millis) {
 
-        /*int minutes = (int) Math.floor(millis / 1000 / 60);
-        int seconds = (int) ((millis / 1000) - (minutes * 60));
-        return "00:"+minutes + ":" + String.format("%02d", seconds);
-        */
+        StringBuffer buf = new StringBuffer();
+
+        int hours = (int) (millis / (1000 * 60 * 60));
+        int minutes = (int) ((millis % (1000 * 60 * 60)) / (1000 * 60));
+        int seconds = (int) (((millis % (1000 * 60 * 60)) % (1000 * 60)) / 1000);
+
+        buf
+                .append(String.format("%02d", hours))
+                .append(":")
+                .append(String.format("%02d", minutes))
+                .append(":")
+                .append(String.format("%02d", seconds));
+
+        return buf.toString();
+
+
     }
 
     @Override

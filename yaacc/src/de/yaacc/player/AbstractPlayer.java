@@ -452,6 +452,7 @@ public abstract class AbstractPlayer implements Player {
      * @param duration in millis
      */
     public void startTimer(final long duration) {
+        Log.d(getClass().getName(), "Start timer duration: " + duration);
         if (playerTimer != null) {
             cancelTimer();
         }

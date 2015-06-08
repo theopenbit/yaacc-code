@@ -58,16 +58,16 @@ public class PlayableItem {
 			setMimeType(mimeType);
 
 			// calculate duration
-			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
 			long millis = defaultDuration;
 			if (resource.getDuration() != null) {
-				try {
-					Date date = dateFormat.parse(resource.getDuration());
-					//millis = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) * 1000;
-                    millis = date.getTime();
-                    Log.d(getClass().getName(), "Duration date object: " + date);
-				} catch (ParseException e) {
+			    try{
+                    String[] tokens = resource.getDuration().split(":");
+					millis = (Long.valueOf(tokens[0]) * 3600 + Long.valueOf(tokens[1]) * 60 + Long.valueOf(tokens[2])) * 1000;
+
+                    Log.d(getClass().getName(), "resource.getDuration(): " + resource.getDuration() +" millis: " + millis);
+
+				} catch (Exception e) {
 					Log.d(getClass().getName(), "bad duration format", e);
 				}
 			}
