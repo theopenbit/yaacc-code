@@ -197,6 +197,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
             Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
             metadata = "";
         }
+
         SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(new UnsignedIntegerFourBytes(id),
                 service, playableItem.getUri().toString(), actionState, metadata);
         getUpnpClient().getControlPoint().execute(setAVTransportURI);

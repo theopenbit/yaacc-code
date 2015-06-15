@@ -923,6 +923,10 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
                 }
                 break;
             }
+            if(mimeType  == null || mimeType.equals("")){
+                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(positionInfo.getTrackURI());
+                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+            }
         } else {
             playableItem = new PlayableItem();
             playableItem.setDuration(getDefaultDuration());
