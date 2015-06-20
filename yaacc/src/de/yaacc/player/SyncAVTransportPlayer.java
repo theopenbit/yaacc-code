@@ -795,7 +795,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                             + deviceId);
             return;
         }
-        Service<?, ?> service = getUpnpClient().getRenderingControlService(getDevice());
+        Service<?, ?> service = getUpnpClient().getAVTransportService(getDevice());
         if (service == null) {
             Log.d(getClass().getName(),
                     "No AVTransport-Service found on Device: "

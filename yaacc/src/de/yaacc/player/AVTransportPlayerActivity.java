@@ -73,8 +73,8 @@ public class AVTransportPlayerActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        setTrackInfo();
         updateTime = true;
+        setTrackInfo();
     }
 
     @Override
@@ -120,6 +120,7 @@ public class AVTransportPlayerActivity extends Activity {
 
                 }
             });
+            updateTime = true;
             setTrackInfo();
             btnPrev.setActivated(true);
             btnNext.setActivated(true);
@@ -359,7 +360,7 @@ public class AVTransportPlayerActivity extends Activity {
                     }
                 });
             }
-        }, 10000L);
+        }, 1000L);
 
     }
 

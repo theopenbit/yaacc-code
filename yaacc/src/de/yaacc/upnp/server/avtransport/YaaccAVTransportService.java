@@ -18,6 +18,8 @@
  */
 package de.yaacc.upnp.server.avtransport;
 
+import android.util.Log;
+
 import org.fourthline.cling.binding.annotations.UpnpAction;
 import org.fourthline.cling.binding.annotations.UpnpInputArgument;
 import org.fourthline.cling.binding.annotations.UpnpOutputArgument;
@@ -440,7 +442,9 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     }
 
     protected AVTransport createTransport(UnsignedIntegerFourBytes instanceId, LastChange lastChange) {
-        avTransport = new AvTransport(instanceId, lastChange, StorageMedium.NETWORK);
+        if(avTransport  == null) {
+            avTransport = new AvTransport(instanceId, lastChange, StorageMedium.NETWORK);
+        }
         return avTransport;
     }
 
@@ -567,6 +571,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
     })
     public PositionInfo getPositionInfo(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId)
             throws AVTransportException {
+        Log.d(getClass().getName(),"Transport: " + findStateMachine(instanceId).getCurrentState().getTransport() + " PositionInfo: " + findStateMachine(instanceId).getCurrentState().getTransport().getPositionInfo());
         return findStateMachine(instanceId).getCurrentState().getTransport().getPositionInfo();
     }
 

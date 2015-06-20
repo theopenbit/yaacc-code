@@ -72,9 +72,11 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
         for (Player player : players) {
             player.play();
         }
-// Start playing now!
-        updateTime = true;
-        setTrackInfo();
+        if(players != null && players.size() > 0) {
+        // Start playing now!
+            updateTime = true;
+            setTrackInfo();
+        }
 
     }
     /*
@@ -222,10 +224,10 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     }
     private void doSetTrackInfo() {
         for (Player player : players) {
-            if (player != null) {
+            if (player != null && !player.getDuration().equals("")) {
                getTransport().getPositionInfo().setTrackDuration(player.getDuration());
                getTransport().getPositionInfo().setRelTime(player.getElapsedTime());
-                Log.d(getClass().getName(), "doSetTrackInfo: " +getTransport().getPositionInfo().getRelTime());
+                Log.d(getClass().getName(), "doSetTrackInfo: " + getTransport() + "Posinfo:" + getTransport().getPositionInfo() + " RelTime: "  + getTransport().getPositionInfo().getRelTime());
                break;
             }
         }

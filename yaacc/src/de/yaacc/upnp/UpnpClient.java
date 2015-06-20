@@ -681,7 +681,9 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
     private ContentDirectoryBrowseResult enrichWithCover(ContentDirectoryBrowseResult callbackResult) {
 
         DIDLContent cont = callbackResult.getResult();
-
+        if (cont == null){
+            return callbackResult;
+        }
         if (cont.getContainers().size() != 0) {
             return callbackResult;
         }
