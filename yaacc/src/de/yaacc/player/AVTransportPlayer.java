@@ -178,11 +178,27 @@ public class AVTransportPlayer extends AbstractPlayer {
 			 Log.d(getClass().getName(), "Error while generating Didl-Item xml: " + e);
 			 metadata = ""; 
 		}
-        SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
+        InternalSetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(
                 service, playableItem.getUri().toString(), actionState, metadata);
         getUpnpClient().getControlPoint().execute(setAVTransportURI);        
         waitForActionComplete(actionState);
-        
+        int tries = 1;
+        if(setAVTransportURI.hasFailures){
+            //another try
+            Log.d(getClass().getName(), "setAVTransportURI.hasFailures");
+            while (setAVTransportURI.hasFailures && tries < 4){
+                tries++;
+                Log.d(getClass().getName(), "setAVTransportURI.hasFailures retry:" + tries);
+                setAVTransportURI.hasFailures = false;
+                getUpnpClient().getControlPoint().execute(setAVTransportURI);
+                waitForActionComplete(actionState);
+            }
+        }
+        if(setAVTransportURI.hasFailures) {
+            //another try
+            Log.d(getClass().getName(), "Can't set AVTransportURI. Giving up");
+            return;
+        }
 // Now start Playing
         Log.d(getClass().getName(), "Action Play");
         actionState.actionFinished = false;
@@ -229,6 +245,7 @@ public class AVTransportPlayer extends AbstractPlayer {
     }
     private static class InternalSetAVTransportURI extends SetAVTransportURI {
         ActionState actionState = null;
+        public boolean hasFailures = false;
         private InternalSetAVTransportURI(Service service, String uri,
                                           ActionState actionState, String metadata) {
             super(service, uri, metadata);
@@ -246,6 +263,7 @@ public class AVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(),
                         "UpnpResponse: " + upnpresponse.getStatusCode());
             }
+            hasFailures = true;
             Log.d(getClass().getName(), "s: " + s);
             actionState.actionFinished = true;
         }
@@ -634,7 +652,7 @@ public class AVTransportPlayer extends AbstractPlayer {
          getPositionInfo();
 
         if (currentPositionInfo != null){
-            return currentPositionInfo.getAbsTime();
+            return currentPositionInfo.getRelTime();
         }
         return "00:00:00";
     }

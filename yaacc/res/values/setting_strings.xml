@@ -25,8 +25,8 @@
     <string name="settings_selected_receivers_title">Current media receivers</string>
     <string name="settings_change_receiver">Tab to change current receiver</string>
     <string name="settings_audio_app">Audio Playback</string>
-    <string name="settings_video_app">Image Playback</string>
-    <string name="settings_image_app">Video Playback</string>
+    <string name="settings_video_app">Video Playback</string>
+    <string name="settings_image_app">Image Playback</string>
     <string name="settings_default_duration">default item duration</string>
     <string name="settings_default_duration_key">default item duration</string>
     <string name="settings_silence_duration">silence duration</string>

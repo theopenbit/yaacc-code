@@ -421,7 +421,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
             }
         }
         if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
                 context.startActivity(intent);
             } catch (ActivityNotFoundException anfe) {

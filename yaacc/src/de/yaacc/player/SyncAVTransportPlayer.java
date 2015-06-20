@@ -198,11 +198,27 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
             metadata = "";
         }
 
-        SetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(new UnsignedIntegerFourBytes(id),
+        InternalSetAVTransportURI setAVTransportURI = new InternalSetAVTransportURI(new UnsignedIntegerFourBytes(id),
                 service, playableItem.getUri().toString(), actionState, metadata);
         getUpnpClient().getControlPoint().execute(setAVTransportURI);
         waitForActionComplete(actionState);
-
+        int tries = 1;
+        if(setAVTransportURI.hasFailures){
+            //another try
+            Log.d(getClass().getName(), "setAVTransportURI.hasFailures");
+            while (setAVTransportURI.hasFailures && tries < 4){
+                tries++;
+                Log.d(getClass().getName(), "setAVTransportURI.hasFailures retry:" + tries);
+                setAVTransportURI.hasFailures = false;
+                getUpnpClient().getControlPoint().execute(setAVTransportURI);
+                waitForActionComplete(actionState);
+            }
+        }
+        if(setAVTransportURI.hasFailures) {
+            //another try
+            Log.d(getClass().getName(), "Can't set AVTransportURI. Giving up");
+            return;
+        }
 // Now start Playing
         Log.d(getClass().getName(), "Action SyncPlay");
         actionState.actionFinished = false;
@@ -568,7 +584,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action get Mute ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        GetMute actionCallback = new GetMute(service) {
+        GetMute actionCallback = new GetMute(new UnsignedIntegerFourBytes(id),service) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -627,7 +643,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action set Mute ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        SetMute actionCallback = new SetMute(service, mute) {
+        SetMute actionCallback = new SetMute(new UnsignedIntegerFourBytes(id),service, mute) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -666,7 +682,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action get Volume ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        GetVolume actionCallback = new GetVolume(service) {
+        GetVolume actionCallback = new GetVolume(new UnsignedIntegerFourBytes(id),service) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -725,7 +741,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action set Volume ");
         final ActionState actionState = new ActionState();
         actionState.actionFinished = false;
-        SetVolume actionCallback = new SetVolume(service, volume) {
+        SetVolume actionCallback = new SetVolume(new UnsignedIntegerFourBytes(id),service, volume) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -749,6 +765,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 
     private static class InternalSetAVTransportURI extends SetAVTransportURI {
         ActionState actionState = null;
+        public boolean hasFailures = false;
 
         private InternalSetAVTransportURI(UnsignedIntegerFourBytes instanceId, Service service, String uri,
                                           ActionState actionState, String metadata) {
@@ -768,6 +785,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
                 Log.d(getClass().getName(),
                         "UpnpResponse: " + upnpresponse.getStatusCode());
             }
+            hasFailures = true;
             Log.d(getClass().getName(), "s: " + s);
             actionState.actionFinished = true;
         }
@@ -808,7 +826,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         String relativeTimeTarget =dateFormat.format(millisecondsFromStart);
-        Seek seekAction = new Seek(service, relativeTimeTarget) {
+        Seek seekAction = new Seek(new UnsignedIntegerFourBytes(id),service, relativeTimeTarget) {
             @Override
             public void success(ActionInvocation invocation)
             {
@@ -847,7 +865,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         Log.d(getClass().getName(), "Action get position info ");
         positionActionState = new ActionState();
         positionActionState.actionFinished = false;
-        GetPositionInfo actionCallback = new GetPositionInfo(service) {
+        GetPositionInfo actionCallback = new GetPositionInfo(new UnsignedIntegerFourBytes(id),service) {
             @Override
             public void failure(ActionInvocation actioninvocation,
                                 UpnpResponse upnpresponse, String s) {
@@ -896,7 +914,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
         getPositionInfo();
 
         if (currentPositionInfo != null){
-            return currentPositionInfo.getAbsTime();
+            return currentPositionInfo.getRelTime();
         }
         return "00:00:00";
     }

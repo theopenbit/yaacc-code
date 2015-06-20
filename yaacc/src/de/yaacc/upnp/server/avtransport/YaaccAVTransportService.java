@@ -237,9 +237,7 @@ import de.yaacc.upnp.model.types.SyncOffset;
 public class YaaccAVTransportService implements LastChangeDelegator {
 
     private UpnpClient upnpClient = null;
-    private AvTransport avTransport;
 
-    final private static Logger log = Logger.getLogger(YaaccAVTransportService.class.getName());
 
     private Map<Long, AVTransportStateMachine> stateMachines = new ConcurrentHashMap();
 
@@ -359,26 +357,26 @@ public class YaaccAVTransportService implements LastChangeDelegator {
                 AvTransportStateMachine.class,
                 AvTransportMediaRendererNoMediaPresent.class, new Class[]{
                 AvTransport.class, UpnpClient.class}, new Object[]{
-                createTransport(instanceId, getLastChange()),
+                new AvTransport(instanceId, getLastChange(), StorageMedium.NETWORK),
                 upnpClient});
     }
 
     @UpnpAction(name = "GetSyncOffset",
             out = {@UpnpOutputArgument(name = "CurrentSyncOffset", stateVariable = "SyncOffset", getterName = "toString")})
     public SyncOffset getSyncOffset(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        return avTransport.getSynchronizationInfo().getOffset();
+        return ((AvTransport)findStateMachine(instanceId).getCurrentState().getTransport()).getSynchronizationInfo().getOffset();
     }
 
     @UpnpAction(name = "SetSyncOffset")
     public void setSyncOffset(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                               @UpnpInputArgument(name = "NewSyncOffset", stateVariable = "SyncOffset") String offset) throws AVTransportException {
-        avTransport.getSynchronizationInfo().setOffset(new SyncOffset(offset));
+        ((AvTransport)findStateMachine(instanceId).getCurrentState().getTransport()).getSynchronizationInfo().setOffset(new SyncOffset(offset));
     }
 
     @UpnpAction(name = "AdjustSyncOffset")
     public void adjustSyncOffset(@UpnpInputArgument(name = "InstanceID") UnsignedIntegerFourBytes instanceId,
                                  @UpnpInputArgument(name = "Adjustment", stateVariable = "SyncOffset") String offset) throws AVTransportException {
-        avTransport.getSynchronizationInfo().setOffset(avTransport.getSynchronizationInfo().getOffset().add(new SyncOffset(offset)));
+        ((AvTransport)findStateMachine(instanceId).getCurrentState().getTransport()).getSynchronizationInfo().getOffset().add(new SyncOffset(offset));
     }
 
 
@@ -436,17 +434,11 @@ public class YaaccAVTransportService implements LastChangeDelegator {
         try {
             return ((YaaccState) stateMachine.getCurrentState()).getPossibleTransportActions();
         } catch (TransitionException ex) {
-            log.log(Level.SEVERE,"Exception in state transition ignoring it", ex);
+            Log.d(getClass().getName(),"Exception in state transition ignoring it", ex);
             return new TransportAction[0];
         }
     }
 
-    protected AVTransport createTransport(UnsignedIntegerFourBytes instanceId, LastChange lastChange) {
-        if(avTransport  == null) {
-            avTransport = new AvTransport(instanceId, lastChange, StorageMedium.NETWORK);
-        }
-        return avTransport;
-    }
 
 
     @UpnpAction
@@ -470,6 +462,7 @@ public class YaaccAVTransportService implements LastChangeDelegator {
         } catch (TransitionException ex) {
             throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, ex.getMessage());
         }
+        Log.d(getClass().getName(),"setAVTransportURI: " + uri + " currentURIMetaData: " + currentURIMetaData );
     }
 
     @UpnpAction
@@ -708,13 +701,13 @@ public class YaaccAVTransportService implements LastChangeDelegator {
             long id = instanceId.getValue();
             AVTransportStateMachine stateMachine = stateMachines.get(id);
             if (stateMachine == null && createDefaultTransport) {
-                log.fine("Creating stateMachine instance with ID '"+id+"'");
+                Log.d(getClass().getName(),"Creating stateMachine instance with ID '"+id+"'");
                 stateMachine = createStateMachine(instanceId);
                 stateMachines.put(id, stateMachine);
             } else if (stateMachine == null) {
                 throw new AVTransportException(AVTransportErrorCode.INVALID_INSTANCE_ID);
             }
-            log.fine("Found transport control with ID '" + id + "'");
+            Log.d(getClass().getName(),"Found transport control with ID '" + id + "'");
             return stateMachine;
         }
     }

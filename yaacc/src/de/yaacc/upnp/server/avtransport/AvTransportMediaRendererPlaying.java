@@ -68,6 +68,12 @@ public class AvTransportMediaRendererPlaying extends Playing<AvTransport> implem
     public void onEntry() {
         Log.d(this.getClass().getName(), "On Entry");
         super.onEntry();
+        if(getTransport() == null
+                || getTransport().getPositionInfo() == null
+                || getTransport().getPositionInfo().getTrackURI() == null
+                ||getTransport().getPositionInfo().getTrackURI().equals("")){
+            return;
+        }
         players = upnpClient.initializePlayers((AvTransport)getTransport());
         for (Player player : players) {
             player.play();
