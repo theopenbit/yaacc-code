@@ -20,7 +20,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.yaacc"
     android:versionCode="10"
-    android:versionName="1.1.6-SNAPSHOT">
+    android:versionName="1.1.6">
 
     <uses-sdk
         android:minSdkVersion="15"
