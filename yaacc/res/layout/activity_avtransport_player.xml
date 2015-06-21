@@ -28,6 +28,7 @@
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
+         android:layout_alignParentStart="true"
          android:layout_alignParentLeft="true"
          android:orientation="horizontal" >
 
@@ -35,6 +36,7 @@
              android:id="@+id/avtransportPlayerActivityControlPrev"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
+             android:layout_alignParentStart="true"
              android:layout_alignParentLeft="true"
              android:layout_alignParentTop="true"
              android:contentDescription="@string/previous"
@@ -45,6 +47,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/avtransportPlayerActivityControlPrev"
              android:layout_toRightOf="@+id/avtransportPlayerActivityControlPrev"
              android:contentDescription="@string/play"
              android:src="@drawable/player_play" />
@@ -54,6 +57,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/avtransportPlayerActivityControlPlay"
              android:layout_toRightOf="@+id/avtransportPlayerActivityControlPlay"
              android:contentDescription="@string/pause"
              android:src="@drawable/player_pause" />
@@ -64,6 +68,7 @@
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
              android:layout_centerHorizontal="true"
+             android:layout_toEndOf="@+id/avtransportPlayerActivityControlPause"
              android:layout_toRightOf="@+id/avtransportPlayerActivityControlPause"
              android:contentDescription="@string/stop"
              android:src="@drawable/player_stop" />
@@ -73,6 +78,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/avtransportPlayerActivityControlStop"
              android:layout_toRightOf="@+id/avtransportPlayerActivityControlStop"
              android:contentDescription="@string/next"
              android:src="@drawable/player_end" />
@@ -81,6 +87,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/avtransportPlayerActivityControlNext"
              android:layout_toRightOf="@+id/avtransportPlayerActivityControlNext"
              android:contentDescription="@string/exit"
              android:src="@drawable/button_cancel" />
@@ -95,6 +102,8 @@
          android:layout_below="@+id/avtransportPlayerActivityControlVolumeSeekBar"
          android:layout_alignParentLeft="true"
          android:layout_alignParentRight="true"
+         android:layout_alignParentEnd="true"
+         android:layout_alignParentStart="true"
          android:src="@drawable/device" />
 
     <Switch
@@ -110,6 +119,7 @@
         android:text="@string/activity_remote_player_volume"
         android:layout_below="@+id/avtransportPlayerActivityControlMuteSwitch"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:id="@+id/avtransportPlayerActivityControlVolumeTextView"
         android:labelFor="@+id/avtransportPlayerActivityControlVolumeSeekBar"
         />
@@ -119,14 +129,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/avtransportPlayerActivityControlMuteSwitch"
         android:id="@+id/avtransportPlayerActivityControlVolumeSeekBar"
+        android:layout_toEndOf="@+id/avtransportPlayerActivityControlVolumeTextView"
         android:layout_toRightOf="@+id/avtransportPlayerActivityControlVolumeTextView"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
     <TextView
         android:id="@+id/avtransportPlayerActivityElapsedTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/avtransportPlayerActivityControlSeekBar"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:text="@string/playerTimeElapsed"/>
     <TextView
         android:id="@+id/avtransportPlayerActivityDuration"
@@ -134,6 +147,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/avtransportPlayerActivityControlSeekBar"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:text="@string/playerTimeDuration"/>
 
     <SeekBar

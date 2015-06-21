@@ -47,6 +47,7 @@ import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
 import org.fourthline.cling.support.renderingcontrol.callback.SetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
@@ -599,6 +600,7 @@ public class AVTransportPlayer extends AbstractPlayer {
     }
 
     @Override
+    @SuppressLint("SimpleDateFormat")
     public void seekTo(long millisecondsFromStart){
         if(getDevice() == null) {
             Log.d(getClass().getName(),

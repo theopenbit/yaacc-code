@@ -17,6 +17,7 @@
 */
 package de.yaacc.player;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -806,6 +807,7 @@ public class SyncAVTransportPlayer extends AbstractPlayer {
 
 
     @Override
+    @SuppressLint("SimpleDateFormat")
     public void seekTo(long millisecondsFromStart){
         if(getDevice() == null) {
             Log.d(getClass().getName(),

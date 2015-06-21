@@ -39,6 +39,7 @@
             android:id="@+id/controlDevices"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/controlPrev"
             android:layout_toLeftOf="@+id/controlPrev"
             android:contentDescription="@string/browse_button_devices"
             android:src="@drawable/device_48_48" />
@@ -47,6 +48,7 @@
             android:id="@+id/controlPrev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/controlStop"
             android:layout_toLeftOf="@+id/controlStop"
             android:contentDescription="@string/browse_button_prev"
             android:src="@drawable/player_play" />
@@ -63,6 +65,7 @@
             android:id="@+id/controlNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/controlStop"
             android:layout_toRightOf="@+id/controlStop"
             android:contentDescription="@string/browse_button_next"
             android:src="@drawable/refresh" />
@@ -72,6 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/controlNext"
             android:layout_toRightOf="@+id/controlNext"
             android:contentDescription="@string/browse_button_devices"
             android:src="@drawable/laptop_48_48" />

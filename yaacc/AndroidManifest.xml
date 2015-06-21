@@ -41,6 +41,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:supportsRtl="true"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
@@ -119,20 +120,20 @@
         <activity
             android:name="de.yaacc.settings.SettingsActivity"
             android:label="@string/title_activity_settings">
-            <intent-filter>
+            <!--intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            </intent-filter-->
         </activity>
         <activity
             android:name="de.yaacc.settings.ImageViewerSettingsActivity"
             android:label="@string/title_activity_image_viewer_settings">
-            <intent-filter>
+            <!--intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            </intent-filter-->
         </activity>
 
         <receiver android:name="de.yaacc.imageviewer.ImageViewerBroadcastReceiver"></receiver>

@@ -26,6 +26,7 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -208,6 +209,7 @@ public class MusicPlayerActivity extends Activity {
             }
 
             @Override
+            @SuppressLint("SimpleDateFormat")
             public  void onStopTrackingTouch(android.widget.SeekBar seekBar){
                 String durationString = getPlayer().getDuration();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -262,6 +264,7 @@ public class MusicPlayerActivity extends Activity {
         doSetTrackInfo();
         updateTime();
     }
+    @SuppressLint("SimpleDateFormat")
     private void doSetTrackInfo() {
         if (getPlayer() == null)
             return;

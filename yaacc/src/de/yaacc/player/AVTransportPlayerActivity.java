@@ -17,6 +17,7 @@
  */
 package de.yaacc.player;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -248,6 +249,7 @@ public class AVTransportPlayerActivity extends Activity {
             }
 
             @Override
+            @SuppressLint("SimpleDateFormat")
             public  void onStopTrackingTouch(android.widget.SeekBar seekBar){
                 String durationString = getPlayer().getDuration();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -320,6 +322,7 @@ public class AVTransportPlayerActivity extends Activity {
         updateTime();
     }
 
+    @SuppressLint("SimpleDateFormat")
     private void doSetTrackInfo() {
         if (getPlayer() == null)
             return;

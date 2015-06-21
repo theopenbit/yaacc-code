@@ -28,6 +28,7 @@
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
+         android:layout_alignParentStart="true"
          android:layout_alignParentLeft="true"
          android:orientation="horizontal" >
 
@@ -35,6 +36,7 @@
              android:id="@+id/thirdPratieMusicActivityControlPrev"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
+             android:layout_alignParentStart="true"
              android:layout_alignParentLeft="true"
              android:layout_alignParentTop="true"
              android:contentDescription="@string/previous"
@@ -45,6 +47,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/thirdPratieMusicActivityControlPrev"
              android:layout_toRightOf="@+id/thirdPratieMusicActivityControlPrev"
              android:contentDescription="@string/play"
              android:src="@drawable/player_play" />
@@ -54,6 +57,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/thirdPratieMusicActivityControlPlay"
              android:layout_toRightOf="@+id/thirdPratieMusicActivityControlPlay"
              android:contentDescription="@string/pause"
              android:src="@drawable/player_pause" />
@@ -64,6 +68,7 @@
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
              android:layout_centerHorizontal="true"
+             android:layout_toEndOf="@+id/thirdPratieMusicActivityControlPause"
              android:layout_toRightOf="@+id/thirdPratieMusicActivityControlPause"
              android:contentDescription="@string/stop"
              android:src="@drawable/player_stop" />
@@ -73,6 +78,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/thirdPratieMusicActivityControlStop"
              android:layout_toRightOf="@+id/thirdPratieMusicActivityControlStop"
              android:contentDescription="@string/next"
              android:src="@drawable/player_end" />
@@ -81,6 +87,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:layout_toEndOf="@+id/thirdPratieMusicActivityControlNext"
              android:layout_toRightOf="@+id/thirdPratieMusicActivityControlNext"
              android:contentDescription="@string/exit"
              android:src="@drawable/button_cancel" />
@@ -91,6 +98,8 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_above="@+id/thirdPartieMusicActivityControls"
+         android:layout_alignParentStart="true"
+         android:layout_alignParentEnd="true"
          android:layout_alignParentLeft="true"
          android:layout_alignParentRight="true"
          android:layout_alignParentTop="true"

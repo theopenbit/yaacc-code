@@ -149,7 +149,7 @@ public class UpnpClient implements RegistryListener, ServiceConnection {
         if (offsetValue > 999) {
             Editor editor = preferences.edit();
             editor.putString(getContext().getString(R.string.settings_device_playback_offset_key), String.valueOf(999));
-            editor.commit();
+            editor.apply();
             offsetValue = 999;
         }
         return new SyncOffset(true, 0, 0, 0, offsetValue, 0, 0);
