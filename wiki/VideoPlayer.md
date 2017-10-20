@@ -9,3 +9,5 @@ Behavior:
 * Show available video files ?
 * Next video (in folder ?)
 * Previous video (in folder ?)
+
+![VideoPlayer](./pictures/videoplayer.png)

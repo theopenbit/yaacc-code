@@ -8,3 +8,5 @@ Behavior:
 * Show available audio files ?
 * Next track (in folder ?)
 * Previous track (in folder ?)
+
+![MusicPlayer](./pictures/musicplayer.png)

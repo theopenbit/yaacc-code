@@ -54,6 +54,6 @@ Other OpenSource Media Player plugins (for next monday when everything else is f
 
 Tools
 _
-* All tools we are using are documented here: [./Tools.md]
+* All tools we are using are documented here: [Tools](./Tools.md)
 
 
