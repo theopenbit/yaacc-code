@@ -29,10 +29,10 @@ All features are described in detail in the following sections...
 
 
 # Browse
-![device list](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1deviceList.png)
-![content directory](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1contentDirectory.png)
-![item list images](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1itemListImage.png)
-![item list music](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1itemListMusic.png)
+![device list](./pictures/1deviceList.png)
+![content directory](./pictures/1contentDirectory.png)
+![item list images](./pictures/1itemListImage.png)
+![item list music](./pictures/1itemListMusic.png)
 
 # Player
 
@@ -42,19 +42,19 @@ There are no restrictions in combining players and devices. With yaacc you are a
 
 
 ## music player
-![music player](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1musicPlayer.png)
+![music player](./pictures/1musicPlayer.png)
 
 ## remote player
-![remote player](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1remotePlayer.png)
+![remote player](./pictures/1remotePlayer.png)
 
 
 ## player notification
-![player control](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1CurrentActivePlayers2.png)
+![player control](./pictures/1CurrentActivePlayers2.png)
 
 # image viewer
-![image viewer fullscreen](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/ImageViewer.png)
+![image viewer fullscreen](./pictures/ImageViewer.png)
 
-![image viewer menu](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1imageViewerMenu.png)
+![image viewer menu](./pictures/1imageViewerMenu.png)
 
 
 # Upnp renderer
@@ -78,4 +78,4 @@ Current related Project are:
 [black + white icons 2.0a](http://www.carpicon.com/index.php?option=com_content&task=view&id=6&Itemid=26)
 [Android a trademark of Google Inc.](http://developer.android.com/about/index.html)
  
-![about](https://sourceforge.net/p/yaacc/wiki/Screenshots/attachment/1about.png)
+![about](./pictures/1about.png)

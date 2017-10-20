@@ -1,3 +1,4 @@
+All ticket numbers references the sf.net ticket system
 # Release 1.1.6 #
 * Support of seek and position info for local and remote player (Ticket #112)
 * correct lint messages (Ticket #103)

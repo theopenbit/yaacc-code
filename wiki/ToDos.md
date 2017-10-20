@@ -6,10 +6,10 @@ GUI
 -
 Everything a user might see in the application
 
-* Configure media provider and receiver in [SettingsMenu]
-* Listing for available remote media [GlobalMenu]
-* Listing for local media [GlobalMenu]
-* Player controls [VideoPlayer],[MusicPlayer]
+* Configure media provider and receiver in [./SettingsMenu.md]
+* Listing for available remote media [./GlobalMenu.md]
+* Listing for local media [./GlobalMenu.md]
+* Player controls [./VideoPlayer.md],[./MusicPlayer.md]
 * Generic upnp client interface to discover any upnp services in the network.  
 
 Media-Services
@@ -54,8 +54,6 @@ Other OpenSource Media Player plugins (for next monday when everything else is f
 
 Tools
 _
-* All tools we are using are documented here: [Tools]
+* All tools we are using are documented here: [./Tools.md]
 
-Technical documentation
-* the technical documentation is here: [Code structure]  
 
