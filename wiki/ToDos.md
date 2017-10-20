@@ -1,4 +1,4 @@
-oDo's
+ToDo's
 =
 Collecting ideas what could be done or needs to be done. Currently unsorted. As soon as we think we have everything we can think of we should group it by priorities and put everything with the highest priority for milestone 1 in the ticketsystem.
 
