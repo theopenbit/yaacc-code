@@ -1,1 +1,3 @@
-This repo will be now maintainted under my new identity @tobexyz
+This repo is now maintainted under my new identity @tobexyz
+
+https://github.com/tobexyz/yaacc-code
